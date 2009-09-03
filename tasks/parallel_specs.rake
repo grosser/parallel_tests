@@ -1,20 +1,21 @@
 namespace :parallel do
-  desc "prepare parallel test running by calling db:reset for every test database needed with parallel:prepare[num_cpus]"
+  desc "update test databases by running db:test:prepare for each --> parallel:prepare[num_cpus]"
   task :prepare, :count do |t,args|
     require File.join(File.dirname(__FILE__), '..', 'lib', "parallel_tests")
 
     ParallelTests::Parallel.in_processes(args[:count] ? args[:count].to_i : nil) do |i|
-      puts "Preparing database #{i + 1}"
+      puts "Preparing test database #{i + 1}"
       `export TEST_ENV_NUMBER=#{ParallelTests.test_env_number(i)} ; rake db:test:prepare`
     end
   end
 
-  desc "run db:migrate for every test database needed with parallel:prepare[num_cpus]"
+  # Useful when dumping/resetting takes too long
+  desc "update test databases by running db:mgrate for each --> parallel:migrate[num_cpus]"
   task :migrate, :count do |t,args|
     require File.join(File.dirname(__FILE__), '..', 'lib', "parallel_tests")
 
     ParallelTests::Parallel.in_processes(args[:count] ? args[:count].to_i : nil) do |i|
-      puts "Preparing database #{i + 1}"
+      puts "Migrating test database #{i + 1}"
       `export TEST_ENV_NUMBER=#{ParallelTests.test_env_number(i)} ; rake db:migrate RAILS_ENV=test`
     end
   end
