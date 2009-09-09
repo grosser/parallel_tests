@@ -17,8 +17,8 @@ def test_tests_in_groups(klass, folder, suffix)
     before :all do
       system "rm -rf #{FAKE_RAILS_ROOT}; mkdir -p #{test_root}/temp"
 
-      1.upto(100) do |i|
-        size = 100 * i
+      [1,2,3,4,5,6,7,8].each do |i|
+        size = 99
         File.open("#{test_root}/temp/x#{i}#{suffix}", 'w') { |f| f.puts 'x' * size }
       end
     end
@@ -32,29 +32,29 @@ def test_tests_in_groups(klass, folder, suffix)
     it "partitions them into groups by equal size" do
       groups = klass.tests_in_groups(test_root, 2)
       groups.size.should == 2
-      group0 = size_of(groups[0])
-      group1 = size_of(groups[1])
-      diff = group0 * 0.1
-      group0.should be_close(group1, diff)
+      size_of(groups[0]).should == 400
+      size_of(groups[1]).should == 400
     end
 
     it 'should partition correctly with a group size of 4' do
       groups = klass.tests_in_groups(test_root, 4)
       groups.size.should == 4
-      group_size = size_of(groups[0])
-      diff = group_size * 0.1
-      group_size.should be_close(size_of(groups[1]), diff)
-      group_size.should be_close(size_of(groups[2]), diff)
-      group_size.should be_close(size_of(groups[3]), diff)
+      size_of(groups[0]).should == 200
+      size_of(groups[1]).should == 200
+      size_of(groups[2]).should == 200
+      size_of(groups[3]).should == 200
     end
 
     it 'should partition correctly with an uneven group size' do
       groups = klass.tests_in_groups(test_root, 3)
       groups.size.should == 3
-      group_size = size_of(groups[0])
-      diff = group_size * 0.1
-      group_size.should be_close(size_of(groups[1]), diff)
-      group_size.should be_close(size_of(groups[2]), diff)
+      size_of(groups[0]).should == 300
+      size_of(groups[1]).should == 300
+      size_of(groups[2]).should == 200
+    end
+
+    it "partitions by runtime when runtime-data is available" do
+      
     end
   end
 end
