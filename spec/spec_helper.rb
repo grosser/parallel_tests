@@ -17,10 +17,16 @@ def test_tests_in_groups(klass, folder, suffix)
     before :all do
       system "rm -rf #{FAKE_RAILS_ROOT}; mkdir -p #{test_root}/temp"
 
-      [1,2,3,4,5,6,7,8].each do |i|
+      @files = [1,2,3,4,5,6,7,8].map do |i|
         size = 99
-        File.open("#{test_root}/temp/x#{i}#{suffix}", 'w') { |f| f.puts 'x' * size }
+        file = "#{test_root}/temp/x#{i}#{suffix}"
+        File.open(file, 'w') { |f| f.puts 'x' * size }
+        file
       end
+
+      @log = "#{FAKE_RAILS_ROOT}/tmp/parallel_profile.log"
+      `mkdir #{File.dirname(@log)}`
+      `rm -f #{@log}`
     end
 
     it "finds all tests" do
@@ -54,7 +60,15 @@ def test_tests_in_groups(klass, folder, suffix)
     end
 
     it "partitions by runtime when runtime-data is available" do
-      
+      File.open(@log,'w') do |f|
+        @files[1..-1].each{|file| f.puts "#{file}:2"}
+        f.puts "#{@files[0]}:8"
+      end
+
+      groups = klass.tests_in_groups(test_root, 2)
+      groups.size.should == 2
+      groups[0].should == [@files[0],@files[1],@files[2]]
+      groups[1].should == [@files[3],@files[4],@files[5],@files[6],@files[7]]
     end
   end
 end

@@ -6,11 +6,12 @@ class ParallelTests
     groups = []
     current_group = current_size = 0
     tests_with_sizes.each do |test, size|
-      current_size += size
       # inserts into next group if current is full and we are not in the last group
-      if current_size > group_size(tests_with_sizes, num) and num > current_group + 1
-        current_size = 0
+      if (0.5*size + current_size) > group_size(tests_with_sizes, num) and num > current_group + 1
+        current_size = size
         current_group += 1
+      else
+        current_size += size
       end
       groups[current_group] ||= []
       groups[current_group] << test
@@ -72,16 +73,18 @@ class ParallelTests
 
   def self.find_tests_with_sizes(root)
     tests = find_tests(root).sort
+
     #TODO get the real root, atm this only works for complete runs when root point to e.g. real_root/spec
     runtime_file = File.join(root,'..','tmp','parallel_profile.log')
-    if File.exist?(runtime_file)
-      # use recorded test runtime
-      times = Hash.new(1)
-      File.read(runtime_file).split("\n").map do |line|
-        data = line.split(":")
-        times[data.first] = data.last.to_f
-      end
+    lines = File.read(runtime_file).split("\n") rescue []
 
+    if lines.size * 1.5 > tests.size
+      # use recorded test runtime if we got enought data
+      times = Hash.new(1)
+      lines.each do |line|
+        test, time = line.split(":")
+        times[test] = time.to_f
+      end
       tests.map { |test| [ test, times[test] ] }
     else
       # use file sizes

@@ -51,10 +51,11 @@ Example output
 
     Took 29.925333 seconds
 
-Even out runtimes (for specs only atm)
+Even runtime for processes (for specs only atm)
 -----------------
 Add to your `spec/spec.opts` :
     --format ParallelSpecs::SpecRuntimeLogger:tmp/prallel_profile.log
+It will log test runtime and partition the test-load accordingly.
 
 TIPS
 ====
