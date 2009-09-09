@@ -72,7 +72,21 @@ class ParallelTests
 
   def self.find_tests_with_sizes(root)
     tests = find_tests(root).sort
-    tests.map { |test| [ test, File.stat(test).size ] }
+    #TODO get the real root, atm this only works for complete runs when root point to e.g. real_root/spec
+    runtime_file = File.join(root,'..','tmp','parallel_profile.log')
+    if File.exist?(runtime_file)
+      # use recorded test runtime
+      times = Hash.new(1)
+      File.read(runtime_file).split("\n").map do |line|
+        data = line.split(":")
+        times[data.first] = data.last.to_f
+      end
+
+      tests.map { |test| [ test, times[test] ] }
+    else
+      # use file sizes
+      tests.map { |test| [ test, File.stat(test).size ] }
+    end
   end
 
   def self.find_tests(root)

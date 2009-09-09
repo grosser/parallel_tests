@@ -51,6 +51,11 @@ Example output
 
     Took 29.925333 seconds
 
+Even out runtimes (for specs only atm)
+-----------------
+Add to your `spec/spec.opts` :
+    --format ParallelSpecs::SpecRuntimeLogger:tmp/prallel_profile.log
+
 TIPS
 ====
  - 'script/spec_server' or [spork](http://github.com/timcharper/spork/tree/master) do not work in parallel
@@ -59,6 +64,8 @@ TIPS
 
 TODO
 ====
+ - disable --drb for parallel running, so it works while e.g. spork is running
+ - make spec runtime recording/evaluating work with sub-folders
  - add gem + cli interface `parallel_specs` + `parallel_tests` + `parallel_features` -> non-rails projects
  - build parallel:bootstrap [idea/basics](http://github.com/garnierjm/parallel_specs/commit/dd8005a2639923dc5adc6400551c4dd4de82bf9a)
  - make jRuby compatible [basics](http://yehudakatz.com/2009/07/01/new-rails-isolation-testing/)
