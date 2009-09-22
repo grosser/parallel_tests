@@ -59,6 +59,7 @@ It will log test runtime and partition the test-load accordingly.
 
 TIPS
 ====
+ - if `script/spec` is missing parallel:spec uses just `spec` (which solves some issues with double-loaded environment.rb)
  - 'script/spec_server' or [spork](http://github.com/timcharper/spork/tree/master) do not work in parallel
  - `./script/generate rspec` if you are running rspec from gems (this plugin uses script/spec which may fail if rspec files are outdated)
  - with zsh this would be `rake "parallel:prepare[3]"`
