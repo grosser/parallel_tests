@@ -1,39 +1,33 @@
-Rake tasks to run tests, cucmber features or specs in parallel, to use multiple CPUs and speedup test runtime.
-[more documentation and great illustrations](http://giantrobots.thoughtbot.com/2009/7/24/make-your-test-suite-uncomfortably-fast)
+Speedup RSpec + Test::Unit + Cucumber by running parallel on multiple CPUs.
 
 Setup
 =====
 
     script/plugin install git://github.com/grosser/parallel_specs.git
 
-Add <%= ENV['TEST_ENV_NUMBER'] %> to the database name for the test environment in `config/database.yml`,  
-it is '' for process 1, and '2' for process 2.
-
+### 1: Edit `config/database.yml`
     test:
-      adapter: mysql
       database: xxx_test<%= ENV['TEST_ENV_NUMBER'] %>
-      username: root
 
-Create the databases
-    mysql -u root
-    create database xxx_test; #should normally exist...
+### 2: Create additional database(s)
+    script/db_console
     create database xxx_test2;
     ...
 
-Run like hell :D
-    rake parallel:prepare[2] #db:reset for 2 databases
+### 3: Copy development schema (repeat after migrations)
+    rake parallel:prepare
 
-    rake parallel:spec[1] --> 1 cpu  --> 86 seconds
-    #OR for Test::Unit
-    rake parallel:test[1]
-    #OR for Cucumber
-    rake parallel:features[1]
+### 4: Run!
+    rake parallel:spec          # RSpec
+    rake parallel:test          # Test::Unit
+    rake parallel:features      # Cucumber
 
-    rake parallel:spec    --> 2 cpus --> 47 seconds
-    rake parallel:spec[4] --> 4 cpus --> 26 seconds
+    rake parallel:spec[1] --> force 1 CPU --> 86 seconds
+    rake parallel:spec    --> got 2 CPUs? --> 47 seconds
+    rake parallel:spec    --> got 4 CPUs? --> 26 seconds
     ...
 
-Just some subfolders please (e.g. set up one integration server to check each subfolder)
+Test just a subfolder (e.g. use one integration server per subfolder)
     rake parallel:spec[2,models]
     rake parallel:test[2,something/else]
 
@@ -51,7 +45,7 @@ Example output
 
     Took 29.925333 seconds
 
-Even runtime for processes (for specs only atm)
+Even process runtimes (for specs only atm)
 -----------------
 Add to your `spec/spec.opts` :
     --format ParallelSpecs::SpecRuntimeLogger:tmp/prallel_profile.log
@@ -59,6 +53,7 @@ It will log test runtime and partition the test-load accordingly.
 
 TIPS
 ====
+ - if something looks fishy try to delete `script/spec`
  - if `script/spec` is missing parallel:spec uses just `spec` (which solves some issues with double-loaded environment.rb)
  - 'script/spec_server' or [spork](http://github.com/timcharper/spork/tree/master) do not work in parallel
  - `./script/generate rspec` if you are running rspec from gems (this plugin uses script/spec which may fail if rspec files are outdated)
