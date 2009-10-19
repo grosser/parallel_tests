@@ -5,7 +5,7 @@ Setup
 
     script/plugin install git://github.com/grosser/parallel_specs.git
 
-### 1: Edit `config/database.yml`
+### 1: Add to `config/database.yml`
     test:
       database: xxx_test<%= ENV['TEST_ENV_NUMBER'] %>
 
