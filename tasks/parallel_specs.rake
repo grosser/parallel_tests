@@ -32,8 +32,8 @@ namespace :parallel do
 
       start = Time.now
 
-      num_processes = (args[:count] || ParallelTests::Parallel.processor_count).to_i
-      tests_folder = File.join(RAILS_ROOT, task, args[:path_prefix].to_s)
+      num_processes, prefix = ParallelTests.parse_test_args(args)
+      tests_folder = File.join(RAILS_ROOT, task, prefix)
       groups = klass.tests_in_groups(tests_folder, num_processes)
 
       #adjust processes to groups
@@ -84,6 +84,7 @@ namespace :spec do
     Rake::Task['parallel:spec'].invoke(args[:count], args[:path_prefix])
   end
 end
+
 namespace :test do
   task :parallel, :count, :path_prefix do |t,args|
     $stderr.puts "WARNING -- Deprecated! use parallel:test"
