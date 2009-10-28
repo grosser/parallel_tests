@@ -28,11 +28,11 @@ Setup
     ...
 
 Test just a subfolder (e.g. use one integration server per subfolder)
-    rake parallel:spec[2,models]
-    rake parallel:test[2,something/else]
+    rake parallel:spec[models]
+    rake parallel:test[something/else]
 
     partial paths are OK too...
-    rake parallel:test[2,functional] == rake parallel:test[2,fun]
+    rake parallel:test[functional] == rake parallel:test[fun]
 
 Example output
 --------------
