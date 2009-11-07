@@ -3,6 +3,7 @@ Speedup RSpec + Test::Unit + Cucumber by running parallel on multiple CPUs.
 Setup
 =====
 
+    sudo gem install parallel
     script/plugin install git://github.com/grosser/parallel_specs.git
 
 ### 1: Add to `config/database.yml`
