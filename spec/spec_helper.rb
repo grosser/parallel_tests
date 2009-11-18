@@ -1,5 +1,6 @@
 # ---- requirements
 $LOAD_PATH << File.expand_path("../lib", File.dirname(__FILE__))
+require 'rubygems'
 
 FAKE_RAILS_ROOT = '/tmp/pspecs/fixtures'
 
