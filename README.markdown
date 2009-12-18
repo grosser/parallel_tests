@@ -69,6 +69,10 @@ TODO
  - make jRuby compatible [basics](http://yehudakatz.com/2009/07/01/new-rails-isolation-testing/)
  - make windows compatible (does anyone care ?)
 
+MODIFICIATIONS (rdeshpande-parallel_specs)
+====
+ - add support for parallel_spec.opts (takes precedence over spec.opts)
+
 Authors
 ====
 inspired by [pivotal labs](http://pivotallabs.com/users/miked/blog/articles/849-parallelize-your-rspec-suite)  
