@@ -48,13 +48,13 @@ Example output
 
 Even process runtimes (for specs only atm)
 -----------------
-Add to your `spec/spec.opts` :
+Add to your `spec/parallel_spec.opts` (or `spec/spec.opts`) :
     --format ParallelSpecs::SpecRuntimeLogger:tmp/prallel_profile.log
 It will log test runtime and partition the test-load accordingly.
 
 TIPS
 ====
- - [RSpec] add a `spec/parallel_spec.opts` to use different options (default: spec/spec.opts) 
+ - [RSpec] add a `spec/parallel_spec.opts` to use different options, e.g. no --drb (default: `spec/spec.opts`) 
  - [RSpec] if something looks fishy try to delete `script/spec`
  - [RSpec] if `script/spec` is missing parallel:spec uses just `spec` (which solves some issues with double-loaded environment.rb)
  - [RSpec] 'script/spec_server' or [spork](http://github.com/timcharper/spork/tree/master) do not work in parallel
