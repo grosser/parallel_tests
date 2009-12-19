@@ -54,24 +54,20 @@ It will log test runtime and partition the test-load accordingly.
 
 TIPS
 ====
- - if something looks fishy try to delete `script/spec`
- - if `script/spec` is missing parallel:spec uses just `spec` (which solves some issues with double-loaded environment.rb)
- - 'script/spec_server' or [spork](http://github.com/timcharper/spork/tree/master) do not work in parallel
- - `./script/generate rspec` if you are running rspec from gems (this plugin uses script/spec which may fail if rspec files are outdated)
+ - [RSpec] add a `spec/parallel_spec.opts` to use different options (default: spec/spec.opts) 
+ - [RSpec] if something looks fishy try to delete `script/spec`
+ - [RSpec] if `script/spec` is missing parallel:spec uses just `spec` (which solves some issues with double-loaded environment.rb)
+ - [RSpec] 'script/spec_server' or [spork](http://github.com/timcharper/spork/tree/master) do not work in parallel
+ - [RSpec] `./script/generate rspec` if you are running rspec from gems (this plugin uses script/spec which may fail if rspec files are outdated)
  - with zsh this would be `rake "parallel:prepare[3]"`
 
 TODO
 ====
- - disable --drb for parallel running, so it works while e.g. spork is running
  - make spec runtime recording/evaluating work with sub-folders
  - add gem + cli interface `parallel_specs` + `parallel_tests` + `parallel_features` -> non-rails projects
  - build parallel:bootstrap [idea/basics](http://github.com/garnierjm/parallel_specs/commit/dd8005a2639923dc5adc6400551c4dd4de82bf9a)
  - make jRuby compatible [basics](http://yehudakatz.com/2009/07/01/new-rails-isolation-testing/)
  - make windows compatible (does anyone care ?)
-
-MODIFICIATIONS (rdeshpande-parallel_specs)
-====
- - add support for parallel_spec.opts (takes precedence over spec.opts)
 
 Authors
 ====
@@ -81,8 +77,9 @@ inspired by [pivotal labs](http://pivotallabs.com/users/miked/blog/articles/849-
  - [Charles Finkel](http://charlesfinkel.com/) -- charles.finkel<$at$>gmail.com
  - [Jason Morrison](http://jayunit.net) -- jason.p.morrison<$at$>gmail.com
  - [Joakim Kolsjö](http://www.rubyblocks.se) -- joakim.kolsjo<$at$>gmail.com
- - [Maksim Horbu](http://github.com/mhorbul) -- likonar<$at$>gmail.com
  - [Kpumuk](http://kpumuk.info/) -- kpumuk<$at$>kpumuk.info
+ - [Maksim Horbu](http://github.com/mhorbul) -- likonar<$at$>gmail.com
+ - [Rohan Deshpande](http://github.com/rdeshpande) -- rohan.deshpande@gmail.com
  - [Tchandy](http://thiagopradi.net/) -- tchandy<$at$>gmail.com
 
 [Michael Grosser](http://pragmatig.wordpress.com)  

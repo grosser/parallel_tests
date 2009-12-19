@@ -4,6 +4,11 @@ describe ParallelSpecs do
   test_tests_in_groups(ParallelSpecs, 'spec', '_spec.rb')
 
   describe :run_tests do
+    before do
+      File.stub!(:file?).with('script/spec').and_return true
+      File.stub!(:file?).with('spec/parallel_spec.opts').and_return false
+    end
+
     it "uses TEST_ENV_NUMBER=blank when called for process 0" do
       ParallelSpecs.should_receive(:open).with{|x|x=~/TEST_ENV_NUMBER= /}.and_return mock(:gets=>false)
       ParallelSpecs.run_tests(['xxx'],0)
@@ -27,13 +32,25 @@ describe ParallelSpecs do
     end
 
     it "runs script/spec when script/spec can be found" do
-      File.should_receive(:exist?).with('script/spec').and_return true
+      File.should_receive(:file?).with('script/spec').and_return true
       ParallelSpecs.should_receive(:open).with{|x| x =~ %r{script/spec}}.and_return mock(:gets=>false)
       ParallelSpecs.run_tests(['xxx'],1)
     end
 
     it "runs spec when script/spec cannot be found" do
+      File.stub!(:file?).with('script/spec').and_return false
       ParallelSpecs.should_receive(:open).with{|x| x !~ %r{script/spec}}.and_return mock(:gets=>false)
+      ParallelSpecs.run_tests(['xxx'],1)
+    end
+
+    it "uses spec/spec.opts by default" do
+      ParallelSpecs.should_receive(:open).with{|x| x =~ %r{script/spec -O spec/spec.opts}}.and_return mock(:gets=>false)
+      ParallelSpecs.run_tests(['xxx'],1)
+    end
+
+    it "uses spec/parallel_spec.opts when present" do
+      File.should_receive(:file?).with('spec/parallel_spec.opts').and_return true
+      ParallelSpecs.should_receive(:open).with{|x| x =~ %r{script/spec -O spec/parallel_spec.opts}}.and_return mock(:gets=>false)
       ParallelSpecs.run_tests(['xxx'],1)
     end
 

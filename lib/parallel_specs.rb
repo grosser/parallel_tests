@@ -9,7 +9,7 @@ class ParallelSpecs < ParallelTests
   end
 
   def self.executable
-    File.exist?("script/spec") ? "script/spec" : "spec"
+    File.file?("script/spec") ? "script/spec" : "spec"
   end
 
   protected
