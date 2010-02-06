@@ -23,7 +23,8 @@ class ParallelSpecs::SpecRuntimeLogger < Spec::Runner::Formatter::BaseTextFormat
 
   def start_dump(*args)
     return unless ENV['TEST_ENV_NUMBER'] #only record when running in parallel
-    @output.puts @example_times.map{|file, time| "#{file}:#{time}"}
+    # TODO: Figure out why sometimes time can be less than 0
+    @output.puts @example_times.map { |file, time| "#{file}:#{time > 0 ? time : 0}" }
     @output.flush
   end
 
