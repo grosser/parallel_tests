@@ -68,8 +68,8 @@ def test_tests_in_groups(klass, folder, suffix)
 
       groups = klass.tests_in_groups(test_root, 2)
       groups.size.should == 2
-      groups[0].should == [@files[0],@files[1],@files[2]]
-      groups[1].should == [@files[3],@files[4],@files[5],@files[6],@files[7]]
+      groups[0].should == [@files[0],@files[4],@files[2]]                     # 8 + 2 + 2 = 12
+      groups[1].should == [@files[3],@files[1],@files[5],@files[6],@files[7]] # 2 + 2 + 2 + 2 + 2 = 10
     end
   end
 end

@@ -15,7 +15,7 @@ class ParallelTests
 
   # finds all tests and partitions them into groups
   def self.tests_in_groups(root, num)
-    tests_with_sizes = find_tests_with_sizes(root)
+    tests_with_sizes = slow_specs_first(find_tests_with_sizes(root))
 
     groups = []
     current_group = current_size = 0
@@ -68,6 +68,10 @@ class ParallelTests
 
   protected
 
+  def self.slow_specs_first(tests_with_sizes)
+    tests_with_sizes.sort { |a, b| b.last <=> a.last }
+  end
+  
   def self.test_result_seperator
     "."
   end
@@ -93,7 +97,7 @@ class ParallelTests
     lines = File.read(runtime_file).split("\n") rescue []
 
     if lines.size * 1.5 > tests.size
-      # use recorded test runtime if we got enought data
+      # use recorded test runtime if we got enough data
       times = Hash.new(1)
       lines.each do |line|
         test, time = line.split(":")

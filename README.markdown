@@ -49,7 +49,7 @@ Example output
 Even process runtimes (for specs only atm)
 -----------------
 Add to your `spec/parallel_spec.opts` (or `spec/spec.opts`) :
-    --format ParallelSpecs::SpecRuntimeLogger:tmp/prallel_profile.log
+    --format ParallelSpecs::SpecRuntimeLogger:tmp/parallel_profile.log
 It will log test runtime and partition the test-load accordingly.
 
 TIPS
