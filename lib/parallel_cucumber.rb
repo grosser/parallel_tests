@@ -14,11 +14,11 @@ class ParallelCucumber < ParallelTests
   end
 
   def self.line_is_result?(line)
-    line =~ /^\d+ steps/
+    line =~ /^\d+ (steps|scenarios)/
   end
   
   def self.line_is_failure?(line)
-    line =~ /^\d+ steps.*(\d{2,}|[1-9]) failed/
+    line =~ /^\d+ (steps|scenarios).*(\d{2,}|[1-9]) failed/
   end
 
   def self.find_tests(root)
