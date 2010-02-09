@@ -38,7 +38,7 @@ And I should not see "/en/"                                       # features/ste
 40 steps (40 passed)
 
 EOF
-      ParallelCucumber.find_results(output).should == ["33 steps (3 failed, 2 skipped, 28 passed)", "40 steps (40 passed)"]
+      ParallelCucumber.find_results(output).should == ["7 scenarios (3 failed, 4 passed)", "33 steps (3 failed, 2 skipped, 28 passed)", "4 scenarios (4 passed)", "40 steps (40 passed)"]
     end
   end
 
