@@ -81,6 +81,7 @@ inspired by [pivotal labs](http://pivotallabs.com/users/miked/blog/articles/849-
  - [Maksim Horbu](http://github.com/mhorbul) -- likonar<$at$>gmail.com
  - [Rohan Deshpande](http://github.com/rdeshpande) -- rohan.deshpande@gmail.com
  - [Tchandy](http://thiagopradi.net/) -- tchandy<$at$>gmail.com
+ - [Will Bryant](http://willbryant.net/) -- will.bryant<$at$>gmail.com
 
 [Michael Grosser](http://pragmatig.wordpress.com)  
 grosser.michael@gmail.com  
