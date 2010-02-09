@@ -68,8 +68,8 @@ class ParallelTests
 
   protected
 
-  def self.slow_specs_first(tests_with_sizes)
-    tests_with_sizes.sort { |a, b| b.last <=> a.last }
+  def self.slow_specs_first(tests)
+    tests.sort_by{|test, size| size }.reverse
   end
   
   def self.test_result_seperator

@@ -18,7 +18,7 @@ def test_tests_in_groups(klass, folder, suffix)
     before :all do
       system "rm -rf #{FAKE_RAILS_ROOT}; mkdir -p #{test_root}/temp"
 
-      @files = [1,2,3,4,5,6,7,8].map do |i|
+      @files = [0,1,2,3,4,5,6,7].map do |i|
         size = 99
         file = "#{test_root}/temp/x#{i}#{suffix}"
         File.open(file, 'w') { |f| f.puts 'x' * size }
@@ -62,14 +62,17 @@ def test_tests_in_groups(klass, folder, suffix)
 
     it "partitions by runtime when runtime-data is available" do
       File.open(@log,'w') do |f|
-        @files[1..-1].each{|file| f.puts "#{file}:2"}
-        f.puts "#{@files[0]}:8"
+        @files[1..-1].each{|file| f.puts "#{file}:#{@files.index(file)}"}
+        f.puts "#{@files[0]}:10"
       end
 
       groups = klass.tests_in_groups(test_root, 2)
       groups.size.should == 2
-      groups[0].should == [@files[0],@files[4],@files[2]]                     # 8 + 2 + 2 = 12
-      groups[1].should == [@files[3],@files[1],@files[5],@files[6],@files[7]] # 2 + 2 + 2 + 2 + 2 = 10
+      # 10 + 7 = 17
+      groups[0].should == [@files[0],@files[7]]
+      # 6+5+4+3+2+1 = 21
+      # still room for optimization...
+      groups[1].should == [@files[6],@files[5],@files[4],@files[3],@files[2],@files[1]]
     end
   end
 end
