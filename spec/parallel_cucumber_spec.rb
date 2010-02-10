@@ -50,13 +50,21 @@ EOF
     it "fails with multiple failed tests" do
       ParallelCucumber.failed?(['33 steps (3 failed, 2 skipped, 28 passed)','33 steps (3 failed, 2 skipped, 28 passed)']).should == true
     end
+    
+    it "fails with a single scenario failure during setup phase" do
+      ParallelCucumber.failed?(['1 scenarios (1 failed)']).should == true
+    end
+
+    it "fails with scenario failures during setup phase when other steps pass" do
+      ParallelCucumber.failed?(['7 scenarios (3 failed, 4 passed)','40 steps (40 passed)']).should == true
+    end
 
     it "does not fail with successful tests" do
-      ParallelCucumber.failed?(['40 steps (40 passed)','40 steps (40 passed)']).should == false
+      ParallelCucumber.failed?(['4 scenarios (4 passed)','40 steps (40 passed)','4 scenarios (4 passed)','40 steps (40 passed)']).should == false
     end
 
     it "does not fail with 0 failures" do
-      ParallelCucumber.failed?(['40 steps (40 passed 0 failed)','40 steps (40 passed)']).should == false
+      ParallelCucumber.failed?(['4 scenarios (4 passed 0 failed)','40 steps (40 passed 0 failed)','4 scenarios (4 passed 0 failed)','40 steps (40 passed)']).should == false
     end
 
     it "does fail with 10 failures" do
