@@ -40,11 +40,12 @@ class ParallelTests
   end
 
   def self.execute_command(cmd)
-    f = open("|#{cmd}")
+    f = open("|#{cmd}", 'r')
     all = ''
-    while out = f.gets(test_result_seperator)
-      all+=out
-      print out
+    while char = f.getc
+      char = (char.is_a?(Fixnum) ? char.chr : char) # 1.8 <-> 1.9
+      all << char
+      print char
       STDOUT.flush
     end
     all
@@ -72,10 +73,6 @@ class ParallelTests
     tests.sort_by{|test, size| size }.reverse
   end
   
-  def self.test_result_seperator
-    "."
-  end
-
   def self.line_is_result?(line)
     line =~ /\d+ failure/
   end

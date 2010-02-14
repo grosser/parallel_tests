@@ -9,10 +9,6 @@ class ParallelCucumber < ParallelTests
 
   protected
 
-  def self.test_result_seperator
-    ' '
-  end
-
   def self.line_is_result?(line)
     line =~ /^\d+ (steps|scenarios)/
   end

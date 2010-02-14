@@ -5,12 +5,12 @@ describe ParallelCucumber do
 
   describe :run_tests do
     it "uses TEST_ENV_NUMBER=blank when called for process 0" do
-      ParallelCucumber.should_receive(:open).with{|x|x=~/TEST_ENV_NUMBER= /}.and_return mock(:gets=>false)
+      ParallelCucumber.should_receive(:open).with{|x,y| x=~/TEST_ENV_NUMBER= /}.and_return mock(:getc=>false)
       ParallelCucumber.run_tests(['xxx'],0)
     end
 
     it "uses TEST_ENV_NUMBER=2 when called for process 1" do
-      ParallelCucumber.should_receive(:open).with{|x| x=~/TEST_ENV_NUMBER=2/}.and_return mock(:gets=>false)
+      ParallelCucumber.should_receive(:open).with{|x,y| x=~/TEST_ENV_NUMBER=2/}.and_return mock(:getc=>false)
       ParallelCucumber.run_tests(['xxx'],1)
     end
 
