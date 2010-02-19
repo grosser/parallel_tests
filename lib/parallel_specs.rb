@@ -9,7 +9,13 @@ class ParallelSpecs < ParallelTests
   end
 
   def self.executable
-    File.file?("script/spec") ? "script/spec" : "spec"
+    if File.file?(".bundle/environment.rb")
+      "bundle exec spec"
+    elsif File.file?("script/spec")
+      "script/spec"
+    else
+      "spec"
+    end
   end
 
   protected

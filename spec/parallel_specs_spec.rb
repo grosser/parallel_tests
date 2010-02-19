@@ -5,6 +5,7 @@ describe ParallelSpecs do
 
   describe :run_tests do
     before do
+      File.stub!(:file?).with('.bundle/environment.rb').and_return false
       File.stub!(:file?).with('script/spec').and_return true
       File.stub!(:file?).with('spec/parallel_spec.opts').and_return false
     end
@@ -28,6 +29,12 @@ describe ParallelSpecs do
     it "runs without color when not called from cmdline" do
       ParallelSpecs.should_receive(:open).with{|x,y| x !~ /RSPEC_COLOR/}.and_return mock(:getc=>false)
       $stdout.should_receive(:tty?).and_return false
+      ParallelSpecs.run_tests(['xxx'],1)
+    end
+
+    it "run bundle exec spec when on bundler 0.9" do
+      File.stub!(:file?).with('.bundle/environment.rb').and_return true
+      ParallelSpecs.should_receive(:open).with{|x,y| x =~ %r{bundle exec spec}}.and_return mock(:getc=>false)
       ParallelSpecs.run_tests(['xxx'],1)
     end
 
