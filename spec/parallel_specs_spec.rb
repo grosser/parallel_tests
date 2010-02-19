@@ -46,7 +46,7 @@ describe ParallelSpecs do
 
     it "runs spec when script/spec cannot be found" do
       File.stub!(:file?).with('script/spec').and_return false
-      ParallelSpecs.should_receive(:open).with{|x,y| x !~ %r{script/spec}}.and_return mock(:getc=>false)
+      ParallelSpecs.should_receive(:open).with{|x,y| x !~ %r{(script/spec)|(bundle exec spec)}}.and_return mock(:getc=>false)
       ParallelSpecs.run_tests(['xxx'],1)
     end
 
