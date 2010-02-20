@@ -74,14 +74,15 @@ Authors
 inspired by [pivotal labs](http://pivotallabs.com/users/miked/blog/articles/849-parallelize-your-rspec-suite)  
 
 ###Contributors (alphabetical)
- - [Charles Finkel](http://charlesfinkel.com/) -- charles.finkel<$at$>gmail.com
- - [Jason Morrison](http://jayunit.net) -- jason.p.morrison<$at$>gmail.com
- - [Joakim Kolsjö](http://www.rubyblocks.se) -- joakim.kolsjo<$at$>gmail.com
- - [Kpumuk](http://kpumuk.info/) -- kpumuk<$at$>kpumuk.info
- - [Maksim Horbu](http://github.com/mhorbul) -- likonar<$at$>gmail.com
- - [Rohan Deshpande](http://github.com/rdeshpande) -- rohan.deshpande@gmail.com
- - [Tchandy](http://thiagopradi.net/) -- tchandy<$at$>gmail.com
- - [Will Bryant](http://willbryant.net/) -- will.bryant<$at$>gmail.com
+ - [Charles Finkel](http://charlesfinkel.com/)
+ - [Jason Morrison](http://jayunit.net)
+ - [Joakim Kolsjö](http://www.rubyblocks.se)
+ - [Kpumuk](http://kpumuk.info/)
+ - [Maksim Horbu](http://github.com/mhorbul)
+ - [Rohan Deshpande](http://github.com/rdeshpande)
+ - [Tchandy](http://thiagopradi.net/)
+ - [Terence Lee](http://hone.heroku.com/)
+ - [Will Bryant](http://willbryant.net/)
 
 [Michael Grosser](http://pragmatig.wordpress.com)  
 grosser.michael@gmail.com  
