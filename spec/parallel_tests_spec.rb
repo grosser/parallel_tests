@@ -3,6 +3,23 @@ require File.dirname(__FILE__) + '/spec_helper'
 describe ParallelTests do
   test_tests_in_groups(ParallelTests, 'test', '_test.rb')
 
+  describe :parse_test_args do
+    it "should return the count" do
+      args = {:count => 2}
+      ParallelTests.parse_test_args(args).should == [2, '']
+    end
+
+    it "should default to the prefix" do
+      args = {:count => "models"}
+      ParallelTests.parse_test_args(args).should == [2, "models"]
+    end
+
+    it "should return the count and prefix" do
+      args = {:count => 2, :path_prefix => "models"}
+      ParallelTests.parse_test_args(args).should == [2, "models"]
+    end
+  end
+
   describe :run_tests do
     it "uses TEST_ENV_NUMBER=blank when called for process 0" do
       ParallelTests.should_receive(:open).with{|x,y|x=~/TEST_ENV_NUMBER= /}.and_return mock(:getc=>false)
