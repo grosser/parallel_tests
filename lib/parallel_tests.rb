@@ -4,13 +4,15 @@ class ParallelTests
   # parallel:spec[2,controller] <-> parallel:spec[controller]
   def self.parse_test_args(args)
     num_processes = Parallel.processor_count
+    options = ""
     if args[:count].to_s =~ /^\d*$/ # number or empty
       num_processes = args[:count] unless args[:count].to_s.empty?
       prefix = args[:path_prefix]
+      options = args[:options] if args[:options]
     else # something stringy
       prefix = args[:count]
     end
-    [num_processes.to_i, prefix.to_s]
+    [num_processes.to_i, prefix.to_s, options]
   end
 
   # finds all tests and partitions them into groups

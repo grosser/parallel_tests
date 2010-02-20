@@ -6,17 +6,22 @@ describe ParallelTests do
   describe :parse_test_args do
     it "should return the count" do
       args = {:count => 2}
-      ParallelTests.parse_test_args(args).should == [2, '']
+      ParallelTests.parse_test_args(args).should == [2, '', ""]
     end
 
     it "should default to the prefix" do
       args = {:count => "models"}
-      ParallelTests.parse_test_args(args).should == [2, "models"]
+      ParallelTests.parse_test_args(args).should == [2, "models", ""]
     end
 
     it "should return the count and prefix" do
       args = {:count => 2, :path_prefix => "models"}
-      ParallelTests.parse_test_args(args).should == [2, "models"]
+      ParallelTests.parse_test_args(args).should == [2, "models", ""]
+    end
+
+    it "should return the count, prefix, and options" do
+      args = {:count => 2, :path_prefix => "plain", :options => "-p default" }
+      ParallelTests.parse_test_args(args).should == [2, "plain", "-p default"]
     end
   end
 
