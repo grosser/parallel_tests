@@ -59,6 +59,7 @@ TIPS
  - [RSpec] if `script/spec` is missing parallel:spec uses just `spec` (which solves some issues with double-loaded environment.rb)
  - [RSpec] 'script/spec_server' or [spork](http://github.com/timcharper/spork/tree/master) do not work in parallel
  - [RSpec] `./script/generate rspec` if you are running rspec from gems (this plugin uses script/spec which may fail if rspec files are outdated)
+ - [Bundler] if you have a `.bundle/environment.rb` then `bundle exec xxx` will be used to run tests 
  - with zsh this would be `rake "parallel:prepare[3]"`
 
 TODO
