@@ -60,6 +60,7 @@ class ParallelTests
   end
 
   def self.failed?(results)
+    return true if results.empty?
     !! results.detect{|line| line_is_failure?(line)}
   end
 
