@@ -25,7 +25,7 @@ namespace :parallel do
     task type, :count, :path_prefix, :options do |t,args|
       require File.join(File.dirname(__FILE__), '..', 'lib', "parallel_tests")
       count, prefix, options = ParallelTests.parse_rake_args(args)
-      sh "#{File.join(File.dirname(__FILE__), '..', 'bin', 'parallel_test')} --type #{type} -n #{count} -p #{prefix} -r #{RAILS_ROOT} -o #{options} -e"
+      sh "#{File.join(File.dirname(__FILE__), '..', 'bin', 'parallel_test')} --type #{type} -n #{count} -p #{prefix} -r #{RAILS_ROOT} -o #{options}"
     end
   end
 end

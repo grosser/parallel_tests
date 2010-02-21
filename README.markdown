@@ -1,7 +1,7 @@
 Speedup RSpec + Test::Unit + Cucumber by running parallel on multiple CPUs.
 
-Setup
-=====
+Setup for Rails
+===============
 
     sudo gem install parallel
     script/plugin install git://github.com/grosser/parallel_specs.git
@@ -51,6 +51,22 @@ Even process runtimes (for specs only atm)
 Add to your `spec/parallel_spec.opts` (or `spec/spec.opts`) :
     --format ParallelSpecs::SpecRuntimeLogger:tmp/parallel_profile.log
 It will log test runtime and partition the test-load accordingly.
+
+Setup for non-rails
+===================
+    sudo gem install parallel_tests
+    # go to your project dir
+    parallel_test OR parallel_spec OR parallel_features
+    # [Optional] use ENV['TEST_ENV_NUMBER'] for separate db/resources/etc.
+
+Options are:
+    -n [PROCESSES]                   How many processes to use, default: available CPUs
+    -p, --path [PATH]                run tests inside this path only
+    -r, --root [PATH]                execute test commands from this path
+    -o, --test-options [SOMETHING]   execute test commands with those options
+    -t, --type [TYPE]                which type of tests to run? test, spec or features
+    -v, --version                    Show Version
+    -h, --help                       Show this.
 
 TIPS
 ====
