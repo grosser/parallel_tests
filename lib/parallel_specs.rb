@@ -1,10 +1,10 @@
 require File.join(File.dirname(__FILE__), 'parallel_tests')
 
 class ParallelSpecs < ParallelTests
-  def self.run_tests(test_files, process_number)
+  def self.run_tests(test_files, process_number, options)
     spec_opts = File.file?('spec/parallel_spec.opts') ? 'spec/parallel_spec.opts' : 'spec/spec.opts'
     color = ($stdout.tty? ? 'export RSPEC_COLOR=1 ;' : '')#display color when we are in a terminal
-    cmd = "export RAILS_ENV=test ; export TEST_ENV_NUMBER=#{test_env_number(process_number)} ; #{color} #{executable} -O #{spec_opts} #{test_files*' '}"
+    cmd = "export RAILS_ENV=test ; export TEST_ENV_NUMBER=#{test_env_number(process_number)} ; #{color} #{executable} #{options} -O #{spec_opts} #{test_files*' '}"
     execute_command(cmd)
   end
 

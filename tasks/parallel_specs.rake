@@ -26,13 +26,13 @@ namespace :parallel do
     ["cucumber", "feature", "features"]
   ].each do |lib, name, task|
     desc "run #{name}s in parallel with parallel:#{task}[num_cpus]"
-    task task, :count, :path_prefix do |t,args|
+    task task, :count, :path_prefix, :options do |t,args|
       require File.join(File.dirname(__FILE__), '..', 'lib', "parallel_#{lib}")
       klass = eval("Parallel#{lib.capitalize}")
 
       start = Time.now
 
-      num_processes, prefix = ParallelTests.parse_test_args(args)
+      num_processes, prefix, options = ParallelTests.parse_test_args(args)
       tests_folder = File.join(RAILS_ROOT, task, prefix)
       groups = klass.tests_in_groups(tests_folder, num_processes)
 
@@ -45,7 +45,7 @@ namespace :parallel do
       puts "#{num_processes} processes for #{num_tests} #{name}s, ~ #{num_tests / num_processes} #{name}s per process"
 
       output = Parallel.in_processes(num_processes) do |process_number|
-        klass.run_tests(groups[process_number], process_number)
+        klass.run_tests(groups[process_number], process_number, options)
       end
 
       #parse and print results

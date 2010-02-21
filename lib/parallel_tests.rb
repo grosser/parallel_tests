@@ -35,9 +35,9 @@ class ParallelTests
     groups.compact
   end
 
-  def self.run_tests(test_files, process_number)
+  def self.run_tests(test_files, process_number, options)
     require_list = test_files.map { |filename| "\"#{filename}\"" }.join(",")
-    cmd = "export RAILS_ENV=test ; export TEST_ENV_NUMBER=#{test_env_number(process_number)} ; ruby -Itest -e '[#{require_list}].each {|f| require f }'"
+    cmd = "export RAILS_ENV=test ; export TEST_ENV_NUMBER=#{test_env_number(process_number)} ; ruby -Itest #{options} -e '[#{require_list}].each {|f| require f }'"
     execute_command(cmd)
   end
 
