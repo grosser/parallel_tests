@@ -2,7 +2,7 @@ require 'parallel'
 
 class ParallelTests
   # parallel:spec[2,controller] <-> parallel:spec[controller]
-  def self.parse_test_args(args)
+  def self.parse_rake_args (args)
     num_processes = Parallel.processor_count
     options = ""
     if args[:count].to_s =~ /^\d*$/ # number or empty
