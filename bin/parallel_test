@@ -12,50 +12,60 @@ BANNER
   opts.on("-n [PROCESSES]", Integer, "How many processes to use, default: available CPUs"){|n| options[:count] = n }
   opts.on("-p", '--path [PATH]', "run tests inside this path only"){|path| options[:path_prefix] = path }
   opts.on("-r", '--root [PATH]', "execute test commands from this path"){|path| options[:root] = path }
+  opts.on("-e", '--exec [COMMAND]', "execute this code parallel and with ENV['TEST_ENV_NUM']"){|path| options[:execute] = path }
   opts.on("-o", '--test-options [SOMETHING]', "execute test commands with those options"){|arg| options[:test_options] = arg }
   opts.on("-t", "--type [TYPE]", "which type of tests to run? test, spec or features"){|type| options[:type] = type }
   opts.on('-v', '--version', 'Show Version'){ puts ParallelTests::VERSION; exit}
   opts.on("-h", "--help", "Show this.") { puts opts; exit }
 end.parse!
 
-lib, name, task = {
-  'test' => ["tests", "test", "test"],
-  'spec' => ["specs", "spec", "spec"],
-  'features' => ["cucumber", "feature", "features"]
-}[options[:type]||'test']
-
-require File.join(File.dirname(__FILE__), '..', 'lib', "parallel_#{lib}")
-klass = eval("Parallel#{lib.capitalize}")
-
-start = Time.now
-
+lib_folder = File.join(File.dirname(__FILE__), '..', 'lib')
 num_processes = options[:count] || Parallel.processor_count
-tests_folder = File.join(task, options[:path_prefix].to_s)
-tests_folder = File.join(options[:root], tests_folder) if options[:root]
 
-groups = klass.tests_in_groups(tests_folder, num_processes)
+if options[:execute]
+  require File.join(lib_folder, "parallel_tests")
+  Parallel.in_processes(num_processes) do |i|
+    ParallelTests.execute_command(options[:execute], i)
+  end
+else
+  lib, name, task = {
+    'test' => ["tests", "test", "test"],
+    'spec' => ["specs", "spec", "spec"],
+    'features' => ["cucumber", "feature", "features"]
+  }[options[:type]||'test']
 
-#adjust processes to groups
-abort "no #{name}s found!" if groups.size == 0
+  require File.join(lib_folder, "parallel_#{lib}")
+  klass = eval("Parallel#{lib.capitalize}")
 
-num_tests = groups.sum{|g| g.size }
-puts "#{groups.size} processes for #{num_tests} #{name}s, ~ #{num_tests / groups.size} #{name}s per process"
+  start = Time.now
 
-output = Parallel.map(groups) do |group|
-  klass.run_tests(group, groups.index(group), options[:test_options])
+  tests_folder = File.join(task, options[:path_prefix].to_s)
+  tests_folder = File.join(options[:root], tests_folder) if options[:root]
+
+  groups = klass.tests_in_groups(tests_folder, num_processes)
+
+  #adjust processes to groups
+  abort "no #{name}s found!" if groups.size == 0
+
+  num_tests = groups.sum{|g| g.size }
+  puts "#{groups.size} processes for #{num_tests} #{name}s, ~ #{num_tests / groups.size} #{name}s per process"
+
+  output = Parallel.map(groups) do |group|
+    klass.run_tests(group, groups.index(group), options[:test_options])
+  end
+
+  #parse and print results
+  results = klass.find_results(output*"")
+  puts ""
+  puts "Results:"
+  results.each{|r| puts r}
+
+  #report total time taken
+  puts ""
+  puts "Took #{Time.now - start} seconds"
+
+  #exit with correct status code
+  # - rake parallel:test && echo 123 ==> 123 should not show up when test failed
+  # - rake parallel:test db:reset ==> works when tests succeed
+  abort "#{name.capitalize}s Failed" if klass.failed?(results)
 end
-
-#parse and print results
-results = klass.find_results(output*"")
-puts ""
-puts "Results:"
-results.each{|r| puts r}
-
-#report total time taken
-puts ""
-puts "Took #{Time.now - start} seconds"
-
-#exit with correct status code
-# - rake parallel:test && echo 123 ==> 123 should not show up when test failed
-# - rake parallel:test db:reset ==> works when tests succeed
-abort "#{name.capitalize}s Failed" if klass.failed?(results)

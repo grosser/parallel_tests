@@ -18,8 +18,12 @@ describe 'CLI' do
     path
   end
 
+  def executable
+    "#{File.expand_path(File.dirname(__FILE__))}/../bin/parallel_test"
+  end
+
   def run_specs
-    `cd #{folder} && #{File.expand_path(File.dirname(__FILE__))}/../bin/parallel_test -t spec -n 2 && echo 'i ran!'`
+    `cd #{folder} && #{executable} -t spec -n 2 2>&1 && echo 'i ran!'`
   end
 
   it "runs tests in parallel" do
@@ -42,10 +46,16 @@ describe 'CLI' do
   it "fails when tests fail" do
     write 'xxx_spec.rb', 'describe("it"){it("should"){puts "TEST1"}}'
     write 'xxx2_spec.rb', 'describe("it"){it("should"){1.should == 2}}'
-    puts result = run_specs
+    result = run_specs
 
     result.scan('1 example, 1 failure').size.should == 2
     result.scan('1 example, 0 failure').size.should == 2
+    result.should =~ /specs failed/i
     result.should_not include('i ran!')
+  end
+
+  it "can exec given commands with ENV['TEST_ENV_NUM']" do
+    result = `#{executable} -e 'ruby -e "puts ENV[:TEST_ENV_NUMBER.to_s].inspect"' -n 4`
+    result.split("\n").sort.should == %w["" "2" "3" "4"]
   end
 end
