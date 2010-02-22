@@ -63,10 +63,19 @@ Options are:
     -n [PROCESSES]                   How many processes to use, default: available CPUs
     -p, --path [PATH]                run tests inside this path only
     -r, --root [PATH]                execute test commands from this path
+    -e, --exec [COMMAND]             execute this code parallel and with ENV['TEST_ENV_NUM']
     -o, --test-options [SOMETHING]   execute test commands with those options
     -t, --type [TYPE]                which type of tests to run? test, spec or features
     -v, --version                    Show Version
     -h, --help                       Show this.
+
+You can run any kind of code with -e / --execute
+    parallel_test -n 5 -e 'ruby -e "puts %[hello from process #{ENV[:TEST_ENV_NUMBER.to_s].inspect}]"'
+    hello from process "2"
+    hello from process ""
+    hello from process "3"
+    hello from process "5"
+    hello from process "4"
 
 TIPS
 ====

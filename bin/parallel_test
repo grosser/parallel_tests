@@ -19,6 +19,7 @@ BANNER
   opts.on("-h", "--help", "Show this.") { puts opts; exit }
 end.parse!
 
+require 'parallel'
 lib_folder = File.join(File.dirname(__FILE__), '..', 'lib')
 num_processes = options[:count] || Parallel.processor_count
 
