@@ -7,6 +7,7 @@ describe ParallelSpecs do
     before do
       File.stub!(:file?).with('.bundle/environment.rb').and_return false
       File.stub!(:file?).with('script/spec').and_return true
+      File.stub!(:file?).with('spec/spec.opts').and_return true
       File.stub!(:file?).with('spec/parallel_spec.opts').and_return false
     end
 
@@ -50,12 +51,18 @@ describe ParallelSpecs do
       ParallelSpecs.run_tests(['xxx'],1,'')
     end
 
-    it "uses spec/spec.opts by default" do
+    it "uses no -O when no opts where found" do
+      File.stub!(:file?).with('spec/spec.opts').and_return false
+      ParallelSpecs.should_receive(:open).with{|x,y| x !~ %r{spec/spec.opts}}.and_return mock(:getc=>false)
+      ParallelSpecs.run_tests(['xxx'],1,'')
+    end
+
+    it "uses spec/spec.opts when found" do
       ParallelSpecs.should_receive(:open).with{|x,y| x =~ %r{script/spec\s+-O spec/spec.opts}}.and_return mock(:getc=>false)
       ParallelSpecs.run_tests(['xxx'],1,'')
     end
 
-    it "uses spec/parallel_spec.opts when present" do
+    it "uses spec/parallel_spec.opts when found" do
       File.should_receive(:file?).with('spec/parallel_spec.opts').and_return true
       ParallelSpecs.should_receive(:open).with{|x,y| x =~ %r{script/spec\s+-O spec/parallel_spec.opts}}.and_return mock(:getc=>false)
       ParallelSpecs.run_tests(['xxx'],1,'')
