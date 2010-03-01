@@ -1,6 +1,5 @@
 #!/usr/bin/env ruby
 require 'rubygems'
-require 'active_support' # TODO remove this later...
 
 options = {}
 OptionParser.new do |opts|
@@ -48,7 +47,7 @@ else
   #adjust processes to groups
   abort "no #{name}s found!" if groups.size == 0
 
-  num_tests = groups.sum{|g| g.size }
+  num_tests = groups.inject(0){|sum,item| sum + item.size }
   puts "#{groups.size} processes for #{num_tests} #{name}s, ~ #{num_tests / groups.size} #{name}s per process"
 
   output = Parallel.map(groups) do |group|
