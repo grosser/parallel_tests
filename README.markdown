@@ -77,11 +77,11 @@ You can run any kind of code with -e / --execute
     hello from process "5"
     hello from process "4"
 
-Performance improvement is not as good as on rails (YET), since the specs are not ordered according to runtime.  
-e.g. RSpec test suite:
-    1: 18s
-    2: 14s
-    4: 10s
+<table>
+<tr><td></td><td>1 Process</td><td>2 Processes</td><td>4 Processes</td></tr>
+<tr><td>RSpec spec-suite</td><td>18</td><td>14</td><td>10</td></tr>
+<tr><td>Rails-ActionPack</td><td>88</td><td>53</td><td>44</td></tr>
+</table>
 
 TIPS
 ====

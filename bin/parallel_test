@@ -1,5 +1,6 @@
 #!/usr/bin/env ruby
 require 'rubygems'
+require 'optparse'
 lib_folder = File.join(File.dirname(__FILE__), '..', 'lib')
 require File.join(lib_folder, "parallel_tests")
 
