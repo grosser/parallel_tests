@@ -42,7 +42,7 @@ else
   start = Time.now
 
   tests_folder = File.join(task, options[:path_prefix].to_s)
-  tests_folder = File.join(options[:root], tests_folder) if options[:root]
+  tests_folder = File.join(options[:root], tests_folder) unless options[:root].to_s.empty?
 
   groups = klass.tests_in_groups(tests_folder, num_processes)
   num_processes = groups.size
