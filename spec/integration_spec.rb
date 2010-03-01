@@ -18,8 +18,12 @@ describe 'CLI' do
     path
   end
 
+  def bin_folder
+    "#{File.expand_path(File.dirname(__FILE__))}/../bin"
+  end
+
   def executable
-    "#{File.expand_path(File.dirname(__FILE__))}/../bin/parallel_test"
+    "#{bin_folder}/parallel_test"
   end
 
   def run_specs
@@ -57,5 +61,11 @@ describe 'CLI' do
   it "can exec given commands with ENV['TEST_ENV_NUM']" do
     result = `#{executable} -e 'ruby -e "puts ENV[:TEST_ENV_NUMBER.to_s].inspect"' -n 4`
     result.split("\n").sort.should == %w["" "2" "3" "4"]
+  end
+
+  it "can run through parallel_spec / parallel_cucumber" do
+    version = `#{executable} -v`
+    `#{bin_folder}/parallel_spec -v`.should == version
+    `#{bin_folder}/parallel_cucumber -v`.should == version
   end
 end

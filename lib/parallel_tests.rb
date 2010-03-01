@@ -1,6 +1,8 @@
 require 'parallel'
 
 class ParallelTests
+  VERSION = File.read( File.join(File.dirname(__FILE__),'..','VERSION') ).strip
+
   # parallel:spec[2,controller] <-> parallel:spec[controller]
   def self.parse_rake_args (args)
     num_processes = Parallel.processor_count

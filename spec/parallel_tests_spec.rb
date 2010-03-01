@@ -123,4 +123,8 @@ EOF
       ParallelTests.failed?([]).should == true
     end
   end
+
+  it "has a version" do
+    ParallelTests::VERSION.should =~ /^\d+\.\d+\.\d+$/
+  end
 end

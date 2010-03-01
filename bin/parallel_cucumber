@@ -1,0 +1,2 @@
+#!/usr/bin/env ruby
+exec "#{File.join(File.dirname(__FILE__), 'parallel_test')} -t features #{ARGV * ' '}"

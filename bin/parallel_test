@@ -1,5 +1,7 @@
 #!/usr/bin/env ruby
 require 'rubygems'
+lib_folder = File.join(File.dirname(__FILE__), '..', 'lib')
+require File.join(lib_folder, "parallel_tests")
 
 options = {}
 OptionParser.new do |opts|
@@ -19,7 +21,6 @@ BANNER
 end.parse!
 
 require 'parallel'
-lib_folder = File.join(File.dirname(__FILE__), '..', 'lib')
 num_processes = options[:count] || Parallel.processor_count
 
 if options[:execute]
