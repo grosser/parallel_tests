@@ -44,14 +44,15 @@ else
   tests_folder = File.join(options[:root], tests_folder) if options[:root]
 
   groups = klass.tests_in_groups(tests_folder, num_processes)
+  num_processes = groups.size
 
   #adjust processes to groups
   abort "no #{name}s found!" if groups.size == 0
 
   num_tests = groups.inject(0){|sum,item| sum + item.size }
-  puts "#{groups.size} processes for #{num_tests} #{name}s, ~ #{num_tests / groups.size} #{name}s per process"
+  puts "#{num_processes} processes for #{num_tests} #{name}s, ~ #{num_tests / groups.size} #{name}s per process"
 
-  output = Parallel.map(groups) do |group|
+  output = Parallel.map(groups, :in_processes => num_processes) do |group|
     klass.run_tests(group, groups.index(group), options[:test_options])
   end
 

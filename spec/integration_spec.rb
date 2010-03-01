@@ -26,8 +26,8 @@ describe 'CLI' do
     "#{bin_folder}/parallel_test"
   end
 
-  def run_specs
-    `cd #{folder} && #{executable} -t spec -n 2 2>&1 && echo 'i ran!'`
+  def run_specs(options={})
+    `cd #{folder} && #{executable} -t spec -n #{options[:processes]||2} 2>&1 && echo 'i ran!'`
   end
 
   it "runs tests in parallel" do
@@ -67,5 +67,17 @@ describe 'CLI' do
     version = `#{executable} -v`
     `#{bin_folder}/parallel_spec -v`.should == version
     `#{bin_folder}/parallel_cucumber -v`.should == version
+  end
+
+  it "runs faster with more processes" do
+    write 'xxx_spec.rb', 'describe("it"){it("should"){sleep 2}}'
+    write 'xxx2_spec.rb', 'describe("it"){it("should"){sleep 2}}'
+    write 'xxx3_spec.rb', 'describe("it"){it("should"){sleep 2}}'
+    write 'xxx4_spec.rb', 'describe("it"){it("should"){sleep 2}}'
+    write 'xxx5_spec.rb', 'describe("it"){it("should"){sleep 2}}'
+    write 'xxx6_spec.rb', 'describe("it"){it("should"){sleep 2}}'
+    t = Time.now
+    run_specs :processes => 6
+    (Time.now - t).should < 5
   end
 end
