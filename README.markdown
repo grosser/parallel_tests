@@ -56,7 +56,7 @@ Setup for non-rails
 ===================
     sudo gem install parallel_tests
     # go to your project dir
-    parallel_test OR parallel_spec OR parallel_features
+    parallel_test OR parallel_spec OR parallel_cucumber
     # [Optional] use ENV['TEST_ENV_NUMBER'] for separate db/resources/etc.
 
 Options are:
@@ -76,6 +76,12 @@ You can run any kind of code with -e / --execute
     hello from process "3"
     hello from process "5"
     hello from process "4"
+
+Performance improvement is not as good as on rails (YET), since the specs are not ordered according to runtime.  
+e.g. RSpec test suite:
+    1: 18s
+    2: 14s
+    4: 10s
 
 TIPS
 ====
