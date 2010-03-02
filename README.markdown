@@ -79,8 +79,8 @@ You can run any kind of code with -e / --execute
 
 <table>
 <tr><td></td><td>1 Process</td><td>2 Processes</td><td>4 Processes</td></tr>
-<tr><td>RSpec spec-suite</td><td>18</td><td>14</td><td>10</td></tr>
-<tr><td>Rails-ActionPack</td><td>88</td><td>53</td><td>44</td></tr>
+<tr><td>RSpec spec-suite</td><td>18s</td><td>14s</td><td>10s</td></tr>
+<tr><td>Rails-ActionPack</td><td>88s</td><td>53s</td><td>44s</td></tr>
 </table>
 
 TIPS
