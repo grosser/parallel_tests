@@ -5,7 +5,7 @@ namespace :parallel do
 
     Parallel.in_processes(args[:count] ? args[:count].to_i : nil) do |i|
       puts "Preparing test database #{i + 1}"
-      `export TEST_ENV_NUMBER=#{ParallelTests.test_env_number(i)} ; rake db:test:prepare`
+      exec "export TEST_ENV_NUMBER=#{ParallelTests.test_env_number(i)} ; rake db:test:prepare"
     end
   end
 
@@ -16,7 +16,7 @@ namespace :parallel do
 
     Parallel.in_processes(args[:count] ? args[:count].to_i : nil) do |i|
       puts "Migrating test database #{i + 1}"
-      `export TEST_ENV_NUMBER=#{ParallelTests.test_env_number(i)} ; rake db:migrate RAILS_ENV=test`
+      exec "export TEST_ENV_NUMBER=#{ParallelTests.test_env_number(i)} ; rake db:migrate RAILS_ENV=test"
     end
   end
 
@@ -25,7 +25,7 @@ namespace :parallel do
     task type, :count, :path_prefix, :options do |t,args|
       require File.join(File.dirname(__FILE__), '..', 'lib', "parallel_tests")
       count, prefix, options = ParallelTests.parse_rake_args(args)
-      sh "#{File.join(File.dirname(__FILE__), '..', 'bin', 'parallel_test')} --type #{type} -n #{count} -p '#{prefix}' -r '#{RAILS_ROOT}' -o '#{options}'"
+      exec "#{File.join(File.dirname(__FILE__), '..', 'bin', 'parallel_test')} --type #{type} -n #{count} -p '#{prefix}' -r '#{RAILS_ROOT}' -o '#{options}'"
     end
   end
 end
