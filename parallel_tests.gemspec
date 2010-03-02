@@ -5,7 +5,7 @@
 
 Gem::Specification.new do |s|
   s.name = %q{parallel_tests}
-  s.version = "0.3.0"
+  s.version = "0.3.1"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Michael Grosser"]
@@ -33,7 +33,7 @@ Gem::Specification.new do |s|
      "spec/parallel_specs_spec.rb",
      "spec/parallel_tests_spec.rb",
      "spec/spec_helper.rb",
-     "tasks/parallel_specs.rake"
+     "tasks/parallel_tests.rake"
   ]
   s.homepage = %q{http://github.com/grosser/parallel_tests}
   s.rdoc_options = ["--charset=UTF-8"]
