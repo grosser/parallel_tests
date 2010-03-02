@@ -78,6 +78,6 @@ describe 'CLI' do
     write 'xxx6_spec.rb', 'describe("it"){it("should"){sleep 2}}'
     t = Time.now
     run_specs :processes => 6
-    (Time.now - t).should < 5
+    (Time.now - t).should < (Parallel.processor_count == 1 ? 10 : 5)
   end
 end
