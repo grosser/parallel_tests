@@ -1,10 +1,10 @@
-Speedup RSpec + Test::Unit + Cucumber by running parallel on multiple CPUs.
+Speedup Test::Unit + RSpec + Cucumber by running parallel on multiple CPUs.
 
 Setup for Rails
 ===============
 
     sudo gem install parallel
-    script/plugin install git://github.com/grosser/parallel_specs.git
+    script/plugin install git://github.com/grosser/parallel_tests.git
 
 ### 1: Add to `config/database.yml`
     test:
@@ -19,17 +19,17 @@ Setup for Rails
     rake parallel:prepare
 
 ### 4: Run!
-    rake parallel:spec          # RSpec
     rake parallel:test          # Test::Unit
+    rake parallel:spec          # RSpec
     rake parallel:features      # Cucumber
 
-    rake parallel:spec[1] --> force 1 CPU --> 86 seconds
-    rake parallel:spec    --> got 2 CPUs? --> 47 seconds
-    rake parallel:spec    --> got 4 CPUs? --> 26 seconds
+    rake parallel:test[1] --> force 1 CPU --> 86 seconds
+    rake parallel:test    --> got 2 CPUs? --> 47 seconds
+    rake parallel:test    --> got 4 CPUs? --> 26 seconds
     ...
 
 Test just a subfolder (e.g. use one integration server per subfolder)
-    rake parallel:spec[models]
+    rake parallel:test[models]
     rake parallel:test[something/else]
 
     partial paths are OK too...
@@ -48,7 +48,7 @@ Example output
 
 Even process runtimes (for specs only atm)
 -----------------
-Add to your `spec/parallel_spec.opts` (or `spec/spec.opts`) :
+Add to your `spec/parallel_specs.opts` (or `spec/spec.opts`) :
     --format ParallelSpecs::SpecRuntimeLogger:tmp/parallel_profile.log
 It will log test runtime and partition the test-load accordingly.
 
@@ -57,7 +57,7 @@ Setup for non-rails
     sudo gem install parallel_tests
     # go to your project dir
     parallel_test OR parallel_spec OR parallel_cucumber
-    # [Optional] use ENV['TEST_ENV_NUMBER'] for separate db/resources/etc.
+    # [Optional] use ENV['TEST_ENV_NUMBER'] inside your tests for separate db/resources/etc.
 
 Options are:
     -n [PROCESSES]                   How many processes to use, default: available CPUs
@@ -95,8 +95,6 @@ TIPS
 
 TODO
 ====
- - make spec runtime recording/evaluating work with sub-folders
- - add gem + cli interface `parallel_specs` + `parallel_tests` + `parallel_features` -> non-rails projects
  - build parallel:bootstrap [idea/basics](http://github.com/garnierjm/parallel_specs/commit/dd8005a2639923dc5adc6400551c4dd4de82bf9a)
  - make jRuby compatible [basics](http://yehudakatz.com/2009/07/01/new-rails-isolation-testing/)
  - make windows compatible (does anyone care ?)
