@@ -1,23 +1,25 @@
 namespace :parallel do
-  desc "update test databases by running db:test:prepare for each --> parallel:prepare[num_cpus]"
-  task :prepare, :count do |t,args|
-    require File.join(File.dirname(__FILE__), '..', 'lib', "parallel_tests")
-
-    Parallel.in_processes(args[:count] ? args[:count].to_i : nil) do |i|
-      puts "Preparing test database #{i + 1}"
-      exec "export TEST_ENV_NUMBER=#{ParallelTests.test_env_number(i)} ; rake db:test:prepare"
-    end
+  def run_in_parallel(cmd, options)
+    count = (options[:count] ? options[:count].to_i : nil)
+    system "#{File.join(File.dirname(__FILE__), '..', 'bin', 'parallel_test')} --exec '#{cmd}' -n #{count}"
   end
 
-  # Useful when dumping/resetting takes too long
-  desc "update test databases by running db:mgrate for each --> parallel:migrate[num_cpus]"
-  task :migrate, :count do |t,args|
-    require File.join(File.dirname(__FILE__), '..', 'lib', "parallel_tests")
+  desc "update test databases by running db:test:prepare for each test db --> parallel:prepare[num_cpus]"
+  task :prepare, :count do |t,args|
+    run_in_parallel('rake db:test:prepare', args)
+  end
 
-    Parallel.in_processes(args[:count] ? args[:count].to_i : nil) do |i|
-      puts "Migrating test database #{i + 1}"
-      exec "export TEST_ENV_NUMBER=#{ParallelTests.test_env_number(i)} ; rake db:migrate RAILS_ENV=test"
-    end
+  # when dumping/resetting takes too long
+  desc "update test databases by running db:mgrate for each test db --> parallel:migrate[num_cpus]"
+  task :migrate, :count do |t,args|
+    run_in_parallel('rake db:migrate RAILS_ENV=test', args)
+  end
+
+  # Do not want a development db on integration server.
+  # and always dump a complete schema ?
+  desc "load dumped schema for each test db --> parallel:load_schema[num_cpus]"
+  task :load_schema, :count do |t,args|
+    run_in_parallel('rake db:schema:load RAILS_ENV=test', args)
   end
 
   ['test', 'spec', 'features'].each do |type|
