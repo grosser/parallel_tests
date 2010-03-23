@@ -5,11 +5,11 @@
 
 Gem::Specification.new do |s|
   s.name = %q{parallel_tests}
-  s.version = "0.3.2"
+  s.version = "0.3.3"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Michael Grosser"]
-  s.date = %q{2010-03-09}
+  s.date = %q{2010-03-23}
   s.email = %q{grosser.michael@gmail.com}
   s.executables = ["parallel_test", "parallel_spec", "parallel_cucumber"]
   s.extra_rdoc_files = [
@@ -27,13 +27,13 @@ Gem::Specification.new do |s|
      "lib/parallel_specs.rb",
      "lib/parallel_specs/spec_runtime_logger.rb",
      "lib/parallel_tests.rb",
+     "lib/tasks/parallel_tests.rake",
      "parallel_tests.gemspec",
      "spec/integration_spec.rb",
      "spec/parallel_cucumber_spec.rb",
      "spec/parallel_specs_spec.rb",
      "spec/parallel_tests_spec.rb",
-     "spec/spec_helper.rb",
-     "tasks/parallel_tests.rake"
+     "spec/spec_helper.rb"
   ]
   s.homepage = %q{http://github.com/grosser/parallel_tests}
   s.rdoc_options = ["--charset=UTF-8"]
