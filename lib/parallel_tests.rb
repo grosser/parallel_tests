@@ -21,18 +21,13 @@ class ParallelTests
   def self.tests_in_groups(root, num)
     tests_with_sizes = slow_specs_first(find_tests_with_sizes(root))
 
-    groups = []
-    current_group = current_size = 0
+    groups = Array.new(num) {[]}
+    sizes = [0] * num
     tests_with_sizes.each do |test, size|
-      # inserts into next group if current is full and we are not in the last group
-      if (0.5*size + current_size) > group_size(tests_with_sizes, num) and num > current_group + 1
-        current_size = size
-        current_group += 1
-      else
-        current_size += size
-      end
-      groups[current_group] ||= []
-      groups[current_group] << test
+      # insert into the smallest group
+      smallest_index = (0..num-1).min { |a,b| sizes[a] <=> sizes[b] }
+      groups[smallest_index] << test
+      sizes[smallest_index] += size
     end
     groups.compact
   end
