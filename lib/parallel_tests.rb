@@ -39,12 +39,12 @@ class ParallelTests
 
   def self.run_tests(test_files, process_number, options)
     require_list = test_files.map { |filename| "\"#{filename}\"" }.join(",")
-    cmd = "export RAILS_ENV=test ; ruby -Itest #{options} -e '[#{require_list}].each {|f| require f }'"
+    cmd = "RAILS_ENV=test ; export RAILS_ENV ; ruby -Itest #{options} -e '[#{require_list}].each {|f| require f }'"
     execute_command(cmd, process_number)
   end
 
   def self.execute_command(cmd, process_number)
-    cmd = "export TEST_ENV_NUMBER=#{test_env_number(process_number)} ; #{cmd}"
+    cmd = "TEST_ENV_NUMBER=#{test_env_number(process_number)} ; export TEST_ENV_NUMBER; #{cmd}"
     f = open("|#{cmd}", 'r')
     all = ''
     while char = f.getc
@@ -78,11 +78,11 @@ class ParallelTests
   def self.slow_specs_first(tests)
     tests.sort_by{|test, size| size }.reverse
   end
-  
+
   def self.line_is_result?(line)
     line =~ /\d+ failure/
   end
-  
+
   def self.line_is_failure?(line)
     line =~ /(\d{2,}|[1-9]) (failure|error)/
   end

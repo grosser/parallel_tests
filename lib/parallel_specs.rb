@@ -4,8 +4,8 @@ class ParallelSpecs < ParallelTests
   def self.run_tests(test_files, process_number, options)
     spec_opts = ['spec/parallel_spec.opts', 'spec/spec.opts'].detect{|f| File.file?(f) }
     spec_opts = (spec_opts ? "-O #{spec_opts}" : nil)
-    color = ($stdout.tty? ? 'export RSPEC_COLOR=1 ;' : '')#display color when we are in a terminal
-    cmd = "export RAILS_ENV=test ; #{color} #{executable} #{options} #{spec_opts} #{test_files*' '}"
+    color = ($stdout.tty? ? 'RSPEC_COLOR=1 ; export RSPEC_COLOR ;' : '')#display color when we are in a terminal
+    cmd = "RAILS_ENV=test ; export RAILS_ENV ; #{color} #{executable} #{options} #{spec_opts} #{test_files*' '}"
     execute_command(cmd, process_number)
   end
 
