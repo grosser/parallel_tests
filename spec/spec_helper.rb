@@ -38,26 +38,17 @@ def test_tests_in_groups(klass, folder, suffix)
 
     it "partitions them into groups by equal size" do
       groups = klass.tests_in_groups(test_root, 2)
-      groups.size.should == 2
-      size_of(groups[0]).should == 400
-      size_of(groups[1]).should == 400
+      groups.map{|g| size_of(g)}.should == [400, 400]
     end
 
     it 'should partition correctly with a group size of 4' do
       groups = klass.tests_in_groups(test_root, 4)
-      groups.size.should == 4
-      size_of(groups[0]).should == 200
-      size_of(groups[1]).should == 200
-      size_of(groups[2]).should == 200
-      size_of(groups[3]).should == 200
+      groups.map{|g| size_of(g)}.should == [200, 200, 200, 200]
     end
 
     it 'should partition correctly with an uneven group size' do
       groups = klass.tests_in_groups(test_root, 3)
-      groups.size.should == 3
-      size_of(groups[0]).should == 300
-      size_of(groups[1]).should == 300
-      size_of(groups[2]).should == 200
+      groups.map{|g| size_of(g)}.should =~ [300, 300, 200]
     end
 
     it "partitions by runtime when runtime-data is available" do

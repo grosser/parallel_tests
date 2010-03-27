@@ -21,15 +21,15 @@ class ParallelTests
   def self.tests_in_groups(root, num)
     tests_with_sizes = slow_specs_first(find_tests_with_sizes(root))
 
-    groups = Array.new(num) {[]}
-    sizes = [0] * num
+    # always add to smallest group
+    groups = Array.new(num){{:tests => [], :size => 0}}
     tests_with_sizes.each do |test, size|
-      # insert into the smallest group
-      smallest_index = (0..num-1).min { |a,b| sizes[a] <=> sizes[b] }
-      groups[smallest_index] << test
-      sizes[smallest_index] += size
+      smallest = groups.sort_by{|g| g[:size] }.first
+      smallest[:tests] << test
+      smallest[:size] += size
     end
-    groups.compact
+
+    groups.map{|g| g[:tests] }
   end
 
   def self.run_tests(test_files, process_number, options)
