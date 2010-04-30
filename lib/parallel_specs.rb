@@ -21,7 +21,7 @@ class ParallelSpecs < ParallelTests
 
   protected
 
-  def self.find_tests(root)
-    Dir["#{root}**/**/*_spec.rb"]
+  def self.test_suffix
+    "_spec.rb"
   end
 end

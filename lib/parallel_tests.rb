@@ -108,7 +108,15 @@ class ParallelTests
     end
   end
 
+  def self.test_suffix
+    "_test.rb"
+  end
+
   def self.find_tests(root)
-    Dir["#{root}**/**/*_test.rb"]
+    if root.is_a?(Array)
+      root
+    else
+      Dir["#{root}**/**/*#{self.test_suffix}"]
+    end
   end
 end

@@ -13,6 +13,7 @@ Options are:
 BANNER
   opts.on("-n [PROCESSES]", Integer, "How many processes to use, default: available CPUs"){|n| options[:count] = n }
   opts.on("-p", '--path [PATH]', "run tests inside this path only"){|path| options[:path_prefix] = path }
+  opts.on("-f", '--files [path/to/file.rb,path/to/other.rb]', Array, "run tests for all specified files (comma-separated list w/o spaces)"){|files| options[:files] = files }
   opts.on("-r", '--root [PATH]', "execute test commands from this path"){|path| options[:root] = path }
   opts.on("-e", '--exec [COMMAND]', "execute this code parallel and with ENV['TEST_ENV_NUM']"){|path| options[:execute] = path }
   opts.on("-o", '--test-options [SOMETHING]', "execute test commands with those options"){|arg| options[:test_options] = arg }
@@ -44,7 +45,7 @@ else
   tests_folder = File.join(task, options[:path_prefix].to_s)
   tests_folder = File.join(options[:root], tests_folder) unless options[:root].to_s.empty?
 
-  groups = klass.tests_in_groups(tests_folder, num_processes)
+  groups = klass.tests_in_groups(options[:files] || tests_folder, num_processes)
   num_processes = groups.size
 
   #adjust processes to groups
