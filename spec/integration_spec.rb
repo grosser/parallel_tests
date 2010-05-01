@@ -4,7 +4,7 @@ describe 'CLI' do
   end
 
   after do
-    `rm -rf #{folder}`
+#    `rm -rf #{folder}`
   end
 
   def folder
@@ -27,7 +27,7 @@ describe 'CLI' do
   end
 
   def run_specs(options={})
-    `cd #{folder} && #{executable} -t spec -n #{options[:processes]||2} 2>&1 && echo 'i ran!'`
+    `cd #{folder} && #{executable} -t spec -n #{options[:processes]||2} #{options[:add]} 2>&1 && echo 'i ran!'`
   end
 
   it "runs tests in parallel" do
@@ -80,5 +80,15 @@ describe 'CLI' do
     run_specs :processes => 6
     expected = ((Parallel.processor_count == 1 or ENV['RUN_CODE_RUN']) ? 10 : 5)
     (Time.now - t).should <= expected
+  end
+
+  it "can run with given files" do
+    write "x1_spec.rb", "puts '111'"
+    write "x2_spec.rb", "puts '222'"
+    write "x3_spec.rb", "puts '333'"
+    result = run_specs(:add => '--files spec/x1_spec.rb,spec/x3_spec.rb')
+    result.should include('111')
+    result.should include('333')
+    result.should_not include('222')
   end
 end
