@@ -23,17 +23,12 @@ BANNER
 end.parse!
 
 
-# setup files option from default arguments
-if ARGV.size > 0
-  options[:files] = ARGV
-end
+# get files to run from arguments
+options[:files] = ARGV if ARGV.size > 0
 
 require 'parallel'
 num_processes = options[:count] || Parallel.processor_count
-
-if multiplier = options[:multiply]
-  num_processes = num_processes * multiplier
-end
+num_processes = num_processes * (options[:multiply] || 1)
 
 if options[:execute]
   require File.join(lib_folder, "parallel_tests")

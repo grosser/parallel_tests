@@ -4,7 +4,7 @@ describe 'CLI' do
   end
 
   after do
-#    `rm -rf #{folder}`
+    `rm -rf #{folder}`
   end
 
   def folder
