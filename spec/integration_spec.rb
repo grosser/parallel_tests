@@ -86,7 +86,7 @@ describe 'CLI' do
     write "x1_spec.rb", "puts '111'"
     write "x2_spec.rb", "puts '222'"
     write "x3_spec.rb", "puts '333'"
-    result = run_specs(:add => '--files spec/x1_spec.rb,spec/x3_spec.rb')
+    result = run_specs(:add => 'spec/x1_spec.rb spec/x3_spec.rb')
     result.should include('111')
     result.should include('333')
     result.should_not include('222')

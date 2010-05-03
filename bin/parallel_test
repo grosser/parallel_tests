@@ -13,17 +13,27 @@ Options are:
 BANNER
   opts.on("-n [PROCESSES]", Integer, "How many processes to use, default: available CPUs"){|n| options[:count] = n }
   opts.on("-p", '--path [PATH]', "run tests inside this path only"){|path| options[:path_prefix] = path }
-  opts.on("-f", '--files path/to/test_file,path/to/other_test_file', Array, "run these test files (comma-separated list w/o spaces)"){|files| options[:files] = files }
+  opts.on("-m [FLOAT]", "--multiply-processes [FLOAT]", Float, "use given number as a multiplier of processes to run"){ |multiply| options[:multiply] = multiply }
   opts.on("-r", '--root [PATH]', "execute test commands from this path"){|path| options[:root] = path }
   opts.on("-e", '--exec [COMMAND]', "execute this code parallel and with ENV['TEST_ENV_NUM']"){|path| options[:execute] = path }
-  opts.on("-o", '--test-options [SOMETHING]', "execute test commands with those options"){|arg| options[:test_options] = arg }
+  opts.on("-o", "--test-options '[SOMETHING]'", "execute test commands with those options"){|arg| options[:test_options] = arg }
   opts.on("-t", "--type [TYPE]", "which type of tests to run? test, spec or features"){|type| options[:type] = type }
   opts.on('-v', '--version', 'Show Version'){ puts ParallelTests::VERSION; exit}
   opts.on("-h", "--help", "Show this.") { puts opts; exit }
 end.parse!
 
+
+# setup files option from default arguments
+if ARGV.size > 0
+  options[:files] = ARGV
+end
+
 require 'parallel'
 num_processes = options[:count] || Parallel.processor_count
+
+if multiplier = options[:multiply]
+  num_processes = num_processes * multiplier
+end
 
 if options[:execute]
   require File.join(lib_folder, "parallel_tests")

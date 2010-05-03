@@ -65,8 +65,10 @@ Options are:
     -f path/to/test_file,path/to/other_test_file
         --files                      run these test files (comma-separated list w/o spaces)
     -r, --root [PATH]                execute test commands from this path
+    -f, --files [FILES]              run these test files (comma-separated list w/o spaces)
+    -m, --multiply-processes [FLOAT] use given number as a multiplier of processes to run
     -e, --exec [COMMAND]             execute this code parallel and with ENV['TEST_ENV_NUM']
-    -o, --test-options [SOMETHING]   execute test commands with those options
+    -o, --test-options '[SOMETHING]' execute test commands with those options
     -t, --type [TYPE]                which type of tests to run? test, spec or features
     -v, --version                    Show Version
     -h, --help                       Show this.
