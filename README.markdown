@@ -63,6 +63,8 @@ Options are:
     -n [PROCESSES]                   How many processes to use, default: available CPUs
     -p, --path [PATH]                run tests inside this path only
     -r, --root [PATH]                execute test commands from this path
+    -f, --files [FILES]              run these test files (comma-separated list w/o spaces)
+    -m, --multiply [FLOAT]           use given number as a multiplier of processes to run
     -e, --exec [COMMAND]             execute this code parallel and with ENV['TEST_ENV_NUM']
     -o, --test-options [SOMETHING]   execute test commands with those options
     -t, --type [TYPE]                which type of tests to run? test, spec or features
