@@ -1,2 +1,11 @@
 #!/usr/bin/env ruby
-exec "#{File.join(File.dirname(__FILE__), 'parallel_test')} -t features #{ARGV * ' '}"
+require 'optparse'
+
+# prepare options that don't work with ARGV splat
+options = {}
+OptionParser.new do |opts|
+  opts.on("-o", "--test-options '[OPTIONS]'", "execute test commands with those options"){|arg| options[:test_options] = arg }
+end.parse!
+test_options = "-o '#{options[:test_options]}'"
+
+exec "#{File.join(File.dirname(__FILE__), 'parallel_test')} #{test_options} -t features #{ARGV * ' '}"
