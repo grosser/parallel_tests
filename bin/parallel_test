@@ -30,6 +30,8 @@ require 'parallel'
 num_processes = options[:count] || Parallel.processor_count
 num_processes = num_processes * (options[:multiply] || 1)
 
+puts options[:test_options]
+
 if options[:execute]
   require File.join(lib_folder, "parallel_tests")
   Parallel.in_processes(num_processes) do |i|
