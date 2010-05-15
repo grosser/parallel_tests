@@ -114,7 +114,7 @@ inspired by [pivotal labs](http://pivotallabs.com/users/miked/blog/articles/849-
  - [Kevin Scaldeferri](http://kevin.scaldeferri.com/blog/)
  - [Kpumuk](http://kpumuk.info/)
  - [Maksim Horbul](http://github.com/mhorbul)
- - [Pivotal Labs][http://pivotallabs.com]
+ - [Pivotal Labs](http://pivotallabs.com)
  - [Rohan Deshpande](http://github.com/rdeshpande)
  - [Tchandy](http://thiagopradi.net/)
  - [Terence Lee](http://hone.heroku.com/)
