@@ -1,10 +1,2 @@
 #!/usr/bin/env ruby
-if index = ARGV.index("-o")
-  extra = ARGV.fetch(index + 1)
-  test_options = "-o '#{extra}'"
-
-  ARGV.delete "-o"
-  ARGV.delete extra
-end
-
-exec "#{File.join(File.dirname(__FILE__), 'parallel_test')} #{test_options} -t spec #{ARGV * ' '}"
+exec "#{File.join(File.dirname(__FILE__), 'parallel_test')} -t spec #{ARGV * ' '}"

@@ -62,6 +62,7 @@ Setup for non-rails
 Options are:
     -n [PROCESSES]                   How many processes to use, default: available CPUs
     -p, --path [PATH]                run tests inside this path only
+    --[no-]sort                      [no] sort of files to run by size (default is to perform sort)
     -r, --root [PATH]                execute test commands from this path
     -f, --files [FILES]              run these test files (comma-separated list w/o spaces)
     -m, --multiply-processes [FLOAT] use given number as a multiplier of processes to run
