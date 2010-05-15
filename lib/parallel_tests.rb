@@ -18,9 +18,9 @@ class ParallelTests
   end
 
   # finds all tests and partitions them into groups
-  def self.tests_in_groups(root, num, do_sort=true)
+  def self.tests_in_groups(root, num, options={})
     tests_with_sizes = find_tests_with_sizes(root)
-    tests_with_sizes = slow_specs_first(tests_with_sizes) if do_sort
+    tests_with_sizes = slow_specs_first(tests_with_sizes) unless options[:no_sort]
 
     # always add to smallest group
     groups = Array.new(num){{:tests => [], :size => 0}}

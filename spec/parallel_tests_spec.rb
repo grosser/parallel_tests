@@ -52,7 +52,7 @@ describe ParallelTests do
   describe :test_in_groups do
     it "does not sort when passed false do_sort option" do
       ParallelTests.should_not_receive(:slow_specs_first)
-      ParallelTests.tests_in_groups [], 1, false
+      ParallelTests.tests_in_groups [], 1, :no_sort => true
     end
 
     it "does sort when not passed do_sort option" do
