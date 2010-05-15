@@ -67,7 +67,7 @@ Options are:
     -f, --files [FILES]              run these test files (comma-separated list w/o spaces)
     -m, --multiply-processes [FLOAT] use given number as a multiplier of processes to run
     -e, --exec [COMMAND]             execute this code parallel and with ENV['TEST_ENV_NUM']
-    -o, --test-options '[SOMETHING]' execute test commands with those options
+    -o, --test-options '[OPTIONS]' execute test commands with those options
     -t, --type [TYPE]                which type of tests to run? test, spec or features
     -v, --version                    Show Version
     -h, --help                       Show this.
@@ -113,7 +113,7 @@ inspired by [pivotal labs](http://pivotallabs.com/users/miked/blog/articles/849-
  - [Kevin Scaldeferri](http://kevin.scaldeferri.com/blog/)
  - [Kpumuk](http://kpumuk.info/)
  - [Maksim Horbul](http://github.com/mhorbul)
- - [Pivotal Labs](http://pivotallabs.com)
+ - [Pivotal Labs](http://www.pivotallabs.com)
  - [Rohan Deshpande](http://github.com/rdeshpande)
  - [Tchandy](http://thiagopradi.net/)
  - [Terence Lee](http://hone.heroku.com/)
