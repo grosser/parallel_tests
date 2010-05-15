@@ -91,4 +91,11 @@ describe 'CLI' do
     result.should include('333')
     result.should_not include('222')
   end
+
+  it "can run with test-options" do
+    write "x1_spec.rb", ""
+    write "x2_spec.rb", ""
+    result = run_specs(:add => "--test-options ' --version'", :processes => 2)
+    result.should =~ /^rspec [\d\.]+\nrspec [\d\.]+$/m # prints version twice
+  end
 end
