@@ -19,18 +19,11 @@ class ParallelTests
 
   # finds all tests and partitions them into groups
   def self.tests_in_groups(root, num, options={})
-    tests_with_sizes = find_tests_with_sizes(root)
-    tests_with_sizes = slow_specs_first(tests_with_sizes) unless options[:no_sort]
-
-    # always add to smallest group
-    groups = Array.new(num){{:tests => [], :size => 0}}
-    tests_with_sizes.each do |test, size|
-      smallest = groups.sort_by{|g| g[:size] }.first
-      smallest[:tests] << test
-      smallest[:size] += size
+    if options[:no_sort] == true
+      distribute_tests_in_groups(root, num)
+    else
+      sorted_tests_in_groups(root, num, options)
     end
-
-    groups.map{|g| g[:tests] }
   end
 
   def self.run_tests(test_files, process_number, options)
@@ -70,6 +63,36 @@ class ParallelTests
   end
 
   protected
+
+
+  def self.sorted_tests_in_groups(root, num, options={})
+    # always add to smallest group
+    groups = Array.new(num){{:tests => [], :size => 0}}
+    tests_with_sizes(root, options).each do |test, size|
+      smallest = groups.sort_by{|g| g[:size] }.first
+      smallest[:tests] << test
+      smallest[:size] += size
+    end
+
+    groups.map{|g| g[:tests] }
+  end
+
+  def self.distribute_tests_in_groups(root, num)
+    tests = find_tests(root)
+    [].tap do |groups|
+      while ! tests.empty?
+        (0...num).map do |group_number|
+          groups[group_number] ||= []
+          groups[group_number] << tests.shift
+        end
+      end
+    end
+  end
+
+  def self.tests_with_sizes(root, options={})
+    tests_with_sizes = find_tests_with_sizes(root)
+    tests_with_sizes = slow_specs_first(tests_with_sizes) unless options[:no_sort]
+  end
 
   def self.slow_specs_first(tests)
     tests.sort_by{|test, size| size }.reverse

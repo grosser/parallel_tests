@@ -70,5 +70,13 @@ def test_tests_in_groups(klass, folder, suffix)
       # 7 + 6 + 4 + 2 = 19
       groups[1].should == [@files[7],@files[6],@files[4],@files[2]]
     end
+
+    it "partitions by round-robin when not sorting" do
+      files = ["file1.rb", "file2.rb", "file3.rb", "file4.rb"]
+      klass.should_receive(:find_tests).and_return(files)
+      groups = klass.tests_in_groups(files, 2, :no_sort => true)
+      groups[0].should == ["file1.rb", "file3.rb"]
+      groups[1].should == ["file2.rb", "file4.rb"]
+    end
   end
 end
