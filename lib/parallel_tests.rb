@@ -4,7 +4,7 @@ class ParallelTests
   VERSION = File.read( File.join(File.dirname(__FILE__),'..','VERSION') ).strip
 
   # parallel:spec[2,controller] <-> parallel:spec[controller]
-  def self.parse_rake_args (args)
+  def self.parse_rake_args(args)
     num_processes = Parallel.processor_count
     options = ""
     if args[:count].to_s =~ /^\d*$/ # number or empty
@@ -22,7 +22,7 @@ class ParallelTests
     if options[:no_sort] == true
       distribute_tests_in_groups(root, num)
     else
-      sorted_tests_in_groups(root, num, options)
+      sorted_tests_in_groups(root, num)
     end
   end
 
@@ -65,10 +65,10 @@ class ParallelTests
   protected
 
 
-  def self.sorted_tests_in_groups(root, num, options={})
+  def self.sorted_tests_in_groups(root, num)
     # always add to smallest group
     groups = Array.new(num){{:tests => [], :size => 0}}
-    tests_with_sizes(root, options).each do |test, size|
+    tests_with_sizes(root).each do |test, size|
       smallest = groups.sort_by{|g| g[:size] }.first
       smallest[:tests] << test
       smallest[:size] += size
@@ -89,9 +89,9 @@ class ParallelTests
     end
   end
 
-  def self.tests_with_sizes(root, options={})
+  def self.tests_with_sizes(root)
     tests_with_sizes = find_tests_with_sizes(root)
-    tests_with_sizes = slow_specs_first(tests_with_sizes) unless options[:no_sort]
+    slow_specs_first(tests_with_sizes)
   end
 
   def self.slow_specs_first(tests)
