@@ -2,7 +2,7 @@ require File.join(File.dirname(__FILE__), 'parallel_tests')
 
 class ParallelSpecs < ParallelTests
   def self.run_tests(test_files, process_number, options)
-    cmd = "RAILS_ENV=test ; export RAILS_ENV ; #{color} #{executable} #{options} #{spec_opts} #{test_files*' '}"
+    cmd = "#{color} #{executable} #{options} #{spec_opts} #{test_files*' '}"
     execute_command(cmd, process_number)
   end
 

@@ -28,7 +28,7 @@ class ParallelTests
 
   def self.run_tests(test_files, process_number, options)
     require_list = test_files.map { |filename| "\"#{filename}\"" }.join(",")
-    cmd = "RAILS_ENV=test ; export RAILS_ENV ; ruby -Itest #{options} -e '[#{require_list}].each {|f| require f }'"
+    cmd = "ruby -Itest #{options} -e '[#{require_list}].each {|f| require f }'"
     execute_command(cmd, process_number)
   end
 
