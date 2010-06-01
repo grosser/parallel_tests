@@ -11,7 +11,7 @@ describe ParallelTests do
 
     it "should default to the prefix" do
       args = {:count => "models"}
-      ParallelTests.parse_rake_args(args).should == [2, "models", ""]
+      ParallelTests.parse_rake_args(args).should == [Parallel.processor_count, "models", ""]
     end
 
     it "should return the count and prefix" do
