@@ -57,13 +57,7 @@ describe ParallelTests do
 
     it "does sort when not passed do_sort option" do
       ParallelTests.stub!(:tests_with_runtime).and_return([])
-      ParallelTests.should_receive(:smallest_first).and_return([])
-      ParallelTests.tests_in_groups [], 1
-    end
-
-    it "does sort when not passed true do_sort option" do
-      ParallelTests.stub!(:tests_with_runtime).and_return([])
-      ParallelTests.should_receive(:smallest_first).and_return([])
+      ParallelTests::Grouper.should_receive(:smallest_first).and_return([])
       ParallelTests.tests_in_groups [], 1
     end
   end

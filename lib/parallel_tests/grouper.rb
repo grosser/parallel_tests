@@ -1,4 +1,4 @@
-class ParallelTest
+class ParallelTests
   class Grouper
     def self.in_groups(items, num_groups)
       [].tap do |groups|
