@@ -51,19 +51,19 @@ describe ParallelTests do
 
   describe :test_in_groups do
     it "does not sort when passed false do_sort option" do
-      ParallelTests.should_not_receive(:slow_specs_first)
+      ParallelTests.should_not_receive(:smallest_first)
       ParallelTests.tests_in_groups [], 1, :no_sort => true
     end
 
     it "does sort when not passed do_sort option" do
-      ParallelTests.stub!(:find_tests_with_sizes).and_return([])
-      ParallelTests.should_receive(:slow_specs_first).and_return([])
+      ParallelTests.stub!(:tests_with_runtime).and_return([])
+      ParallelTests.should_receive(:smallest_first).and_return([])
       ParallelTests.tests_in_groups [], 1
     end
 
     it "does sort when not passed true do_sort option" do
-      ParallelTests.stub!(:find_tests_with_sizes).and_return([])
-      ParallelTests.should_receive(:slow_specs_first).and_return([])
+      ParallelTests.stub!(:tests_with_runtime).and_return([])
+      ParallelTests.should_receive(:smallest_first).and_return([])
       ParallelTests.tests_in_groups [], 1
     end
   end

@@ -32,7 +32,7 @@ def test_tests_in_groups(klass, folder, suffix)
 
     it "groups when given an array of files" do
       list_of_files = Dir["#{test_root}/**/*#{suffix}"]
-      found = klass.find_tests_with_sizes(list_of_files)
+      found = klass.tests_with_runtime(list_of_files)
       found.should =~ list_of_files.map{ |file| [file, File.stat(file).size]}
     end
 

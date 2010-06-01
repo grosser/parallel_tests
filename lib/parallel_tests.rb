@@ -1,4 +1,5 @@
 require 'parallel'
+require 'parallel_tests/grouper'
 
 class ParallelTests
   VERSION = File.read( File.join(File.dirname(__FILE__),'..','VERSION') ).strip
@@ -19,10 +20,11 @@ class ParallelTests
 
   # finds all tests and partitions them into groups
   def self.tests_in_groups(root, num, options={})
+    tests = find_tests(root)
     if options[:no_sort] == true
-      distribute_tests_in_groups(root, num)
+      Grouper.in_groups(tests, num)
     else
-      sorted_tests_in_groups(root, num)
+      Grouper.in_even_groups_by_size(tests_with_runtime(tests))
     end
   end
 
@@ -64,40 +66,6 @@ class ParallelTests
 
   protected
 
-
-  def self.sorted_tests_in_groups(root, num)
-    # always add to smallest group
-    groups = Array.new(num){{:tests => [], :size => 0}}
-    tests_with_sizes(root).each do |test, size|
-      smallest = groups.sort_by{|g| g[:size] }.first
-      smallest[:tests] << test
-      smallest[:size] += size
-    end
-
-    groups.map{|g| g[:tests] }
-  end
-
-  def self.distribute_tests_in_groups(root, num)
-    tests = find_tests(root)
-    [].tap do |groups|
-      while ! tests.empty?
-        (0...num).map do |group_number|
-          groups[group_number] ||= []
-          groups[group_number] << tests.shift
-        end
-      end
-    end
-  end
-
-  def self.tests_with_sizes(root)
-    tests_with_sizes = find_tests_with_sizes(root)
-    slow_specs_first(tests_with_sizes)
-  end
-
-  def self.slow_specs_first(tests)
-    tests.sort_by{|test, size| size }.reverse
-  end
-
   def self.line_is_result?(line)
     line =~ /\d+ failure/
   end
@@ -106,34 +74,25 @@ class ParallelTests
     line =~ /(\d{2,}|[1-9]) (failure|error)/
   end
 
-  def self.group_size(tests_with_sizes, num_groups)
-    total_size = tests_with_sizes.inject(0) { |sum, test| sum += test[1] }
-    total_size / num_groups.to_f
+  def self.test_suffix
+    "_test.rb"
   end
 
-  def self.find_tests_with_sizes(root)
-    tests = find_tests(root).sort
-
-    #TODO get the real root, atm this only works for complete runs when root point to e.g. real_root/spec
+  def self.tests_with_runtime(tests)
     runtime_file = File.join(root,'..','tmp','parallel_profile.log')
     lines = File.read(runtime_file).split("\n") rescue []
 
+    # use recorded test runtime if we got enough data
     if lines.size * 1.5 > tests.size
-      # use recorded test runtime if we got enough data
       times = Hash.new(1)
       lines.each do |line|
         test, time = line.split(":")
         times[test] = time.to_f
       end
-      tests.map { |test| [ test, times[test] ] }
-    else
-      # use file sizes
-      tests.map { |test| [ test, File.stat(test).size ] }
+      tests.sort.map{|test| [test, times[test]] }
+    else # use file sizes
+      tests.sort.map{|test| [test, File.stat(test).size] }
     end
-  end
-
-  def self.test_suffix
-    "_test.rb"
   end
 
   def self.find_tests(root)
