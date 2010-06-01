@@ -7,7 +7,7 @@ class ParallelSpecs < ParallelTests
   end
 
   def self.executable
-    if File.file?(".bundle/environment.rb")
+    if Object.const_defined?(:Bundler)
       "bundle exec spec"
     elsif File.file?("script/spec")
       "script/spec"
