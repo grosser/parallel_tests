@@ -1,8 +1,9 @@
 #!/usr/bin/env ruby
 require 'rubygems'
 require 'optparse'
-lib_folder = File.join(File.dirname(__FILE__), '..', 'lib')
-require File.join(lib_folder, "parallel_tests")
+require 'parallel'
+$LOAD_PATH << File.join(File.dirname(__FILE__), '..', 'lib')
+require "parallel_tests"
 
 options = {}
 OptionParser.new do |opts|
@@ -26,12 +27,10 @@ end.parse!
 # get files to run from arguments
 options[:files] = ARGV if ARGV.size > 0
 
-require 'parallel'
 num_processes = options[:count] || Parallel.processor_count
 num_processes = num_processes * (options[:multiply] || 1)
 
 if options[:execute]
-  require File.join(lib_folder, "parallel_tests")
   Parallel.in_processes(num_processes) do |i|
     ParallelTests.execute_command(options[:execute], i)
   end
@@ -42,7 +41,7 @@ else
     'features' => ["cucumber", "feature", "features"]
   }[options[:type]||'test']
 
-  require File.join(lib_folder, "parallel_#{lib}")
+  require "parallel_#{lib}"
   klass = eval("Parallel#{lib.capitalize}")
 
   start = Time.now
