@@ -143,6 +143,29 @@ EOF
     end
   end
 
+  describe :bundler_enabled? do
+    it "should return false" do
+      ParallelTests.send(:bundler_enabled?).should == false
+    end
+
+    it "should return true when there is a constant called Bundler" do
+      Object.stub!(:const_defined?).with(:Bundler).and_return true
+      ParallelTests.send(:bundler_enabled?).should == true
+    end
+
+    it "should be true when there is a Gemfile" do
+      root_dir = File.join(File.dirname(__FILE__), "..")
+      gemfile = File.join(root_dir, "Gemfile")
+
+      begin
+        FileUtils.touch(gemfile)
+        ParallelTests.send(:bundler_enabled?).should == true
+      ensure
+        FileUtils.rm(gemfile) if File.exists?(gemfile)
+      end
+    end
+  end
+
   it "has a version" do
     ParallelTests::VERSION.should =~ /^\d+\.\d+\.\d+$/
   end

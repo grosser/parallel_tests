@@ -27,7 +27,7 @@ describe ParallelCucumber do
     end
 
     it "runs bundle exec cucumber when on bundler 0.9" do
-      Object.stub!(:const_defined?).with(:Bundler).and_return true
+      ParallelCucumber.stub!(:bundler_enabled?).and_return true
       ParallelCucumber.should_receive(:open).with{|x,y| x =~ %r{bundle exec cucumber}}.and_return mock(:getc=>false)
       ParallelCucumber.run_tests(['xxx'],1,'')
     end

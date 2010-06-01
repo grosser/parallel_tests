@@ -8,7 +8,7 @@ class ParallelCucumber < ParallelTests
   end
 
   def self.executable
-    if Object.const_defined?(:Bundler)
+    if bundler_enabled?
       "bundle exec cucumber"
     elsif File.file?("script/cucumber")
       "script/cucumber"
