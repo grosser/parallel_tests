@@ -145,23 +145,29 @@ EOF
 
   describe :bundler_enabled? do
     it "should return false" do
-      ParallelTests.send(:bundler_enabled?).should == false
+      use_temporary_directory_for do
+        ParallelTests.send(:bundler_enabled?).should == false
+      end
     end
 
     it "should return true when there is a constant called Bundler" do
-      Object.stub!(:const_defined?).with(:Bundler).and_return true
-      ParallelTests.send(:bundler_enabled?).should == true
+      use_temporary_directory_for do
+        Object.stub!(:const_defined?).with(:Bundler).and_return true
+        ParallelTests.send(:bundler_enabled?).should == true
+      end
     end
 
     it "should be true when there is a Gemfile" do
-      root_dir = File.join(File.dirname(__FILE__), "..")
-      gemfile = File.join(root_dir, "Gemfile")
-
-      begin
-        FileUtils.touch(gemfile)
+      use_temporary_directory_for do
+        FileUtils.touch("Gemfile")
         ParallelTests.send(:bundler_enabled?).should == true
-      ensure
-        FileUtils.rm(gemfile) if File.exists?(gemfile)
+      end
+    end
+
+    it "should be true when there is a Gemfile in the parent directory" do
+      use_temporary_directory_for do
+        FileUtils.touch(File.join("..", "Gemfile"))
+        ParallelTests.send(:bundler_enabled?).should == true
       end
     end
   end

@@ -64,6 +64,7 @@ class ParallelTests
 
   protected
 
+  # copied from http://github.com/carlhuda/bundler Bundler::SharedHelpers#find_gemfile
   def self.bundler_enabled?
     return true if Object.const_defined?(:Bundler) 
 

@@ -11,6 +11,28 @@ def size_of(group)
   group.inject(0) { |sum, test| sum += File.stat(test).size }
 end
 
+# Uses /tmp/parallel_tests/application as the cwd so we can create and remove
+# files as we want to. After execution it changes cwd back to the original one.
+def use_temporary_directory_for
+  dir = File.join("/tmp", "parallel_tests")
+  new_dir = File.join(dir, "application")
+
+  begin
+    # just in case the temporary dir already exists
+    FileUtils.rm_rf(dir) if File.exists?(dir) 
+
+    # create the temporary directory
+    FileUtils.mkdir_p(new_dir)
+
+    # chdir changes cwd back to the original one after it is done
+    Dir.chdir(new_dir) do
+      yield
+    end
+  ensure
+    FileUtils.rm_rf(dir) if File.exists?(dir)
+  end
+end
+
 def test_tests_in_groups(klass, folder, suffix)
   test_root = "#{FAKE_RAILS_ROOT}/#{folder}"
 
