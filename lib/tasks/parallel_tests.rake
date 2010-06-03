@@ -25,7 +25,8 @@ namespace :parallel do
   ['test', 'spec', 'features'].each do |type|
     desc "run #{type} in parallel with parallel:#{type}[num_cpus]"
     task type, :count, :path_prefix, :options do |t,args|
-      require File.join(File.dirname(__FILE__), '..', "parallel_tests")
+      $LOAD_PATH << File.join(File.dirname(__FILE__), '..')
+      require "parallel_tests"
       count, prefix, options = ParallelTests.parse_rake_args(args)
       exec "#{File.join(File.dirname(__FILE__), '..', '..', 'bin', 'parallel_test')} --type #{type} -n #{count} -p '#{prefix}' -r '#{RAILS_ROOT}' -o '#{options}'"
     end
