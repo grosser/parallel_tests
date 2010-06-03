@@ -108,6 +108,7 @@ inspired by [pivotal labs](http://pivotallabs.com/users/miked/blog/articles/849-
 
 ###Contributors (alphabetical)
  - [Charles Finkel](http://charlesfinkel.com/)
+ - [Indrek Juhkam](http://urgas.eu)
  - [Jason Morrison](http://jayunit.net)
  - [Joakim Kolsjö](http://www.rubyblocks.se)
  - [Kevin Scaldeferri](http://kevin.scaldeferri.com/blog/)
