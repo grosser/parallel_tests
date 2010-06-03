@@ -11,7 +11,7 @@ describe ParallelTests do
 
     it "should default to the prefix" do
       args = {:count => "models"}
-      ParallelTests.parse_rake_args(args).should == [2, "models", ""]
+      ParallelTests.parse_rake_args(args).should == [Parallel.processor_count, "models", ""]
     end
 
     it "should return the count and prefix" do
@@ -134,6 +134,35 @@ EOF
 
     it "is failed when there are no results" do
       ParallelTests.failed?([]).should == true
+    end
+  end
+
+  describe :bundler_enabled? do
+    it "should return false" do
+      use_temporary_directory_for do
+        ParallelTests.send(:bundler_enabled?).should == false
+      end
+    end
+
+    it "should return true when there is a constant called Bundler" do
+      use_temporary_directory_for do
+        Object.stub!(:const_defined?).with(:Bundler).and_return true
+        ParallelTests.send(:bundler_enabled?).should == true
+      end
+    end
+
+    it "should be true when there is a Gemfile" do
+      use_temporary_directory_for do
+        FileUtils.touch("Gemfile")
+        ParallelTests.send(:bundler_enabled?).should == true
+      end
+    end
+
+    it "should be true when there is a Gemfile in the parent directory" do
+      use_temporary_directory_for do
+        FileUtils.touch(File.join("..", "Gemfile"))
+        ParallelTests.send(:bundler_enabled?).should == true
+      end
     end
   end
 

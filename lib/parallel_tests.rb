@@ -65,6 +65,22 @@ class ParallelTests
 
   protected
 
+  # copied from http://github.com/carlhuda/bundler Bundler::SharedHelpers#find_gemfile
+  def self.bundler_enabled?
+    return true if Object.const_defined?(:Bundler) 
+
+    previous = nil
+    current = File.expand_path(Dir.pwd)
+
+    until !File.directory?(current) || current == previous
+      filename = File.join(current, "Gemfile")
+      return true if File.exists?(filename)
+      current, previous = File.expand_path("..", current), current
+    end
+
+    false
+  end
+
   def self.line_is_result?(line)
     line =~ /\d+ failure/
   end

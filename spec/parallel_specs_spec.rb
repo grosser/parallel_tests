@@ -34,7 +34,7 @@ describe ParallelSpecs do
     end
 
     it "run bundle exec spec when on bundler 0.9" do
-      File.stub!(:file?).with('.bundle/environment.rb').and_return true
+      ParallelSpecs.stub!(:bundler_enabled?).and_return true
       ParallelSpecs.should_receive(:open).with{|x,y| x =~ %r{bundle exec spec}}.and_return mock(:getc=>false)
       ParallelSpecs.run_tests(['xxx'],1,'')
     end
