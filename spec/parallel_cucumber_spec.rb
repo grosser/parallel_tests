@@ -10,12 +10,12 @@ describe ParallelCucumber do
     end
 
     it "uses TEST_ENV_NUMBER=blank when called for process 0" do
-      ParallelCucumber.should_receive(:open).with{|x,y| x=~/TEST_ENV_NUMBER= /}.and_return mock(:getc=>false)
+      ParallelCucumber.should_receive(:open).with{|x,y| x=~/TEST_ENV_NUMBER= /}.and_return mocked_process
       ParallelCucumber.run_tests(['xxx'],0,'')
     end
 
     it "uses TEST_ENV_NUMBER=2 when called for process 1" do
-      ParallelCucumber.should_receive(:open).with{|x,y| x=~/TEST_ENV_NUMBER=2/}.and_return mock(:getc=>false)
+      ParallelCucumber.should_receive(:open).with{|x,y| x=~/TEST_ENV_NUMBER=2/}.and_return mocked_process
       ParallelCucumber.run_tests(['xxx'],1,'')
     end
 
@@ -28,23 +28,23 @@ describe ParallelCucumber do
 
     it "runs bundle exec cucumber when on bundler 0.9" do
       ParallelCucumber.stub!(:bundler_enabled?).and_return true
-      ParallelCucumber.should_receive(:open).with{|x,y| x =~ %r{bundle exec cucumber}}.and_return mock(:getc=>false)
+      ParallelCucumber.should_receive(:open).with{|x,y| x =~ %r{bundle exec cucumber}}.and_return mocked_process
       ParallelCucumber.run_tests(['xxx'],1,'')
     end
 
     it "runs script/cucumber when script/cucumber is found" do
-      ParallelCucumber.should_receive(:open).with{|x,y| x =~ %r{script/cucumber}}.and_return mock(:getc=>false)
+      ParallelCucumber.should_receive(:open).with{|x,y| x =~ %r{script/cucumber}}.and_return mocked_process
       ParallelCucumber.run_tests(['xxx'],1,'')
     end
 
     it "runs cucumber by default" do
       File.stub!(:file?).with('script/cucumber').and_return false
-      ParallelCucumber.should_receive(:open).with{|x,y| x !~ %r{(script/cucumber)|(bundle exec cucumber)}}.and_return mock(:getc=>false)
+      ParallelCucumber.should_receive(:open).with{|x,y| x !~ %r{(script/cucumber)|(bundle exec cucumber)}}.and_return mocked_process
       ParallelCucumber.run_tests(['xxx'],1,'')
     end
 
     it "uses options passed in" do
-      ParallelCucumber.should_receive(:open).with{|x,y| x =~ %r{script/cucumber -p default}}.and_return mock(:getc=>false)
+      ParallelCucumber.should_receive(:open).with{|x,y| x =~ %r{script/cucumber -p default}}.and_return mocked_process
       ParallelCucumber.run_tests(['xxx'],1,'-p default')
     end
   end

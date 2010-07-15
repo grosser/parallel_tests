@@ -7,6 +7,10 @@ FAKE_RAILS_ROOT = '/tmp/pspecs/fixtures'
 require 'parallel_specs'
 require 'parallel_cucumber'
 
+def mocked_process
+  open('|cat /dev/null')
+end
+
 def size_of(group)
   group.inject(0) { |sum, test| sum += File.stat(test).size }
 end

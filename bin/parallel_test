@@ -2,6 +2,7 @@
 require 'rubygems'
 require 'optparse'
 require 'parallel'
+raise "please ' gem install parallel '" if Gem::Version.new(Parallel::VERSION) < Gem::Version.new('0.4.2')
 $LOAD_PATH << File.join(File.dirname(__FILE__), '..', 'lib')
 require "parallel_tests"
 
@@ -31,9 +32,10 @@ num_processes = options[:count] || Parallel.processor_count
 num_processes = num_processes * (options[:multiply] || 1)
 
 if options[:execute]
-  Parallel.in_processes(num_processes) do |i|
+  results = Parallel.map(0...num_processes, :in_processes => num_processes) do |i|
     ParallelTests.execute_command(options[:execute], i)
   end
+  abort if results.any?{|r| r[:exit_status] != 0 }
 else
   lib, name, task = {
     'test' => ["tests", "test", "test"],

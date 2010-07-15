@@ -4,7 +4,7 @@ class ParallelCucumber < ParallelTests
   def self.run_tests(test_files, process_number, options)
     color = ($stdout.tty? ? 'AUTOTEST=1 ; export AUTOTEST ;' : '')#display color when we are in a terminal
     cmd = "#{color} #{executable} #{options} #{test_files*' '}"
-    execute_command(cmd, process_number)
+    execute_command(cmd, process_number)[:stdout]
   end
 
   def self.executable

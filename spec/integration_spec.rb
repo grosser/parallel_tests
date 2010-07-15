@@ -1,3 +1,5 @@
+require 'spec/spec_helper'
+
 describe 'CLI' do
   before do
     `rm -rf #{folder}`
@@ -61,6 +63,14 @@ describe 'CLI' do
   it "can exec given commands with ENV['TEST_ENV_NUM']" do
     result = `#{executable} -e 'ruby -e "puts ENV[:TEST_ENV_NUMBER.to_s].inspect"' -n 4`
     result.split("\n").sort.should == %w["" "2" "3" "4"]
+  end
+
+  it "exists with success if all sub-processes returned success" do
+    system("#{executable} -e 'cat /dev/null' -n 4").should == true
+  end
+
+  it "exists with failure if any sub-processes returned failure" do
+    system("#{executable} -e 'test -e xxxx' -n 4").should == false
   end
 
   it "can run through parallel_spec / parallel_cucumber" do

@@ -1,7 +1,9 @@
 namespace :parallel do
   def run_in_parallel(cmd, options)
     count = (options[:count] ? options[:count].to_i : nil)
-    system "#{File.join(File.dirname(__FILE__), '..', '..', 'bin', 'parallel_test')} --exec '#{cmd}' -n #{count}"
+    executable = File.join(File.dirname(__FILE__), '..', '..', 'bin', 'parallel_test')
+    command = "#{executable} --exec '#{cmd}' -n #{count}"
+    abort unless system(command)
   end
 
   desc "update test databases by running db:test:prepare for each test db --> parallel:prepare[num_cpus]"
@@ -28,7 +30,9 @@ namespace :parallel do
       $LOAD_PATH << File.expand_path(File.join(File.dirname(__FILE__), '..'))
       require "parallel_tests"
       count, prefix, options = ParallelTests.parse_rake_args(args)
-      exec "#{File.join(File.dirname(__FILE__), '..', '..', 'bin', 'parallel_test')} --type #{type} -n #{count} -p '#{prefix}' -r '#{RAILS_ROOT}' -o '#{options}'"
+      executable = File.join(File.dirname(__FILE__), '..', '..', 'bin', 'parallel_test')
+      command = "#{executable} --type #{type} -n #{count} -p '#{prefix}' -r '#{RAILS_ROOT}' -o '#{options}'"
+      abort unless system(command) # allow to chain tasks e.g. rake parallel:spec parallel:features
     end
   end
 end

@@ -30,7 +30,7 @@ class ParallelTests
   def self.run_tests(test_files, process_number, options)
     require_list = test_files.map { |filename| "\"#{filename}\"" }.join(",")
     cmd = "ruby -Itest #{options} -e '[#{require_list}].each {|f| require f }'"
-    execute_command(cmd, process_number)
+    execute_command(cmd, process_number)[:stdout]
   end
 
   def self.execute_command(cmd, process_number)
@@ -43,7 +43,8 @@ class ParallelTests
       print char
       STDOUT.flush
     end
-    all
+    f.close
+    {:stdout => all, :exit_status => $?.exitstatus}
   end
 
   def self.find_results(test_output)

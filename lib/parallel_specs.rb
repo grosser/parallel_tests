@@ -3,7 +3,7 @@ require File.join(File.dirname(__FILE__), 'parallel_tests')
 class ParallelSpecs < ParallelTests
   def self.run_tests(test_files, process_number, options)
     cmd = "#{color} #{executable} #{options} #{spec_opts} #{test_files*' '}"
-    execute_command(cmd, process_number)
+    execute_command(cmd, process_number)[:stdout]
   end
 
   def self.executable
