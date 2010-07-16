@@ -6,6 +6,11 @@ namespace :parallel do
     abort unless system(command)
   end
 
+  desc "create test databases by running db:create for each test db --> parallel:create[num_cpus]"
+  task :create, :count do |t,args|
+    run_in_parallel('rake db:create RAILS_ENV=test', args)
+  end
+
   desc "update test databases by running db:test:prepare for each test db --> parallel:prepare[num_cpus]"
   task :prepare, :count do |t,args|
     run_in_parallel('rake db:test:prepare', args)
