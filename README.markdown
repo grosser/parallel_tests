@@ -110,6 +110,7 @@ inspired by [pivotal labs](http://pivotallabs.com/users/miked/blog/articles/849-
  - [Charles Finkel](http://charlesfinkel.com/)
  - [Indrek Juhkam](http://urgas.eu)
  - [Jason Morrison](http://jayunit.net)
+ - [jinzhu](http://github.com/jinzhu)
  - [Joakim Kolsjö](http://www.rubyblocks.se)
  - [Kevin Scaldeferri](http://kevin.scaldeferri.com/blog/)
  - [Kpumuk](http://kpumuk.info/)
