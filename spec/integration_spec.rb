@@ -88,11 +88,11 @@ describe 'CLI' do
     write 'xxx6_spec.rb', 'describe("it"){it("should"){sleep 2}}'
     t = Time.now
     run_specs :processes => 6
-    expected = ((Parallel.processor_count == 1 or ENV['RUN_CODE_RUN']) ? 10 : 5)
+    expected = 10
     (Time.now - t).should <= expected
   end
 
-  it "can run with given files" do
+  it "can can with given files" do
     write "x1_spec.rb", "puts '111'"
     write "x2_spec.rb", "puts '222'"
     write "x3_spec.rb", "puts '333'"
@@ -106,6 +106,6 @@ describe 'CLI' do
     write "x1_spec.rb", ""
     write "x2_spec.rb", ""
     result = run_specs(:add => "--test-options ' --version'", :processes => 2)
-    result.should =~ /^rspec [\d\.]+\nrspec [\d\.]+$/m # prints version twice
+    result.should =~ /\d+\.\d+\.\d+\..*\d+\.\d+\.\d+\./m # prints version twice
   end
 end

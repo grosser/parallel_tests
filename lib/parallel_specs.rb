@@ -10,7 +10,7 @@ class ParallelSpecs < ParallelTests
     cmd = if File.file?("script/spec")
       "script/spec"
     elsif bundler_enabled?
-      cmd = (`bundle show rspec` =~ %r{/rspec-1[^/]+$} ? "spec" : "rspec")
+      cmd = (run("bundle show rspec") =~ %r{/rspec-1[^/]+$} ? "spec" : "rspec")
       "bundle exec #{cmd}"
     else
       %w[spec rspec].detect{|cmd| system "#{cmd} --version > /dev/null 2>&1" }
@@ -19,6 +19,11 @@ class ParallelSpecs < ParallelTests
   end
 
   protected
+
+  # so it can be stubbed....
+  def self.run(cmd)
+    `#{cmd}`
+  end
 
   def self.spec_opts
     opts = ['spec/parallel_spec.opts', 'spec/spec.opts'].detect{|f| File.file?(f) }

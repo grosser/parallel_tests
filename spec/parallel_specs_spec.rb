@@ -33,9 +33,19 @@ describe ParallelSpecs do
       ParallelSpecs.run_tests(['xxx'],1,'')
     end
 
-    it "run bundle exec spec when on bundler 0.9" do
+    it "run bundle exec spec when on bundler 0.9 and rspec 1" do
+      File.stub!(:file?).with('script/spec').and_return false
       ParallelSpecs.stub!(:bundler_enabled?).and_return true
+      ParallelSpecs.stub!(:run).with("bundle show rspec").and_return "/foo/bar/rspec-1.0.2"
       ParallelSpecs.should_receive(:open).with{|x,y| x =~ %r{bundle exec spec}}.and_return mocked_process
+      ParallelSpecs.run_tests(['xxx'],1,'')
+    end
+
+    it "run bundle exec rspec when on bundler 0.9 and rspec 2" do
+      File.stub!(:file?).with('script/spec').and_return false
+      ParallelSpecs.stub!(:bundler_enabled?).and_return true
+      ParallelSpecs.stub!(:run).with("bundle show rspec").and_return "/foo/bar/rspec-2.0.2"
+      ParallelSpecs.should_receive(:open).with{|x,y| x =~ %r{bundle exec rspec}}.and_return mocked_process
       ParallelSpecs.run_tests(['xxx'],1,'')
     end
 
