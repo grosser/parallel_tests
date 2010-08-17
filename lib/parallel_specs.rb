@@ -7,17 +7,15 @@ class ParallelSpecs < ParallelTests
   end
 
   def self.executable
-    %w(spec rspec).each do |cmd|
-      executable = if bundler_enabled?
-        "bundle exec #{cmd}"
-      elsif File.file?("script/#{cmd}")
-        "script/#{cmd}"
-      else
-        cmd
-      end
-      return executable if system("#{executable} --version")
+    cmd = if File.file?("script/spec")
+      "script/spec"
+    elsif bundler_enabled?
+      cmd = (`bundle show rspec` =~ %r{/rspec-1[^/]+$} ? "spec" : "rspec")
+      "bundle exec #{cmd}"
+    else
+      %w[spec rspec].detect{|cmd| system "#{cmd} --version > /dev/null 2>&1" }
     end
-    raise "Can't find executables rspec or spec"
+    cmd or raise("Can't find executables rspec or spec")
   end
 
   protected
