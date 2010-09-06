@@ -11,9 +11,7 @@ Setup for Rails
       database: xxx_test<%= ENV['TEST_ENV_NUMBER'] %>
 
 ### 2: Create additional database(s)
-    script/db_console
-    create database xxx_test2;
-    ...
+    rake parallel:create
 
 ### 3: Copy development schema (repeat after migrations)
     rake parallel:prepare
@@ -95,14 +93,13 @@ TIPS
  - [RSpec] if `script/spec` is missing parallel:spec uses just `spec` (which solves some issues with double-loaded environment.rb)
  - [RSpec] 'script/spec_server' or [spork](http://github.com/timcharper/spork/tree/master) do not work in parallel
  - [RSpec] `./script/generate rspec` if you are running rspec from gems (this plugin uses script/spec which may fail if rspec files are outdated)
- - [Bundler] if you have a `.bundle/environment.rb` then `bundle exec xxx` will be used to run tests 
+ - [Bundler] if you have a `Gemfile` then `bundle exec` will be used to run tests 
  - with zsh this would be `rake "parallel:prepare[3]"`
 
 TODO
 ====
- - build parallel:bootstrap [idea/basics](http://github.com/garnierjm/parallel_specs/commit/dd8005a2639923dc5adc6400551c4dd4de82bf9a)
  - make jRuby compatible [basics](http://yehudakatz.com/2009/07/01/new-rails-isolation-testing/)
- - make windows compatible (does anyone care ?)
+ - make windows compatible
 
 Authors
 ====
