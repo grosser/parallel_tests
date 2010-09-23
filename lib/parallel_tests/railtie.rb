@@ -1,9 +1,11 @@
-require 'rails/railtie'
+if defined?(Rails::Railtie)
+  require 'rails/railtie'
 
-class ParallelTests
-  class Railtie < ::Rails::Railtie
-    rake_tasks do
-      load File.expand_path("../../tasks/parallel_tests.rake", __FILE__)
+  class ParallelTests
+    class Railtie < ::Rails::Railtie
+      rake_tasks do
+        load File.expand_path("../../tasks/parallel_tests.rake", __FILE__)
+      end
     end
   end
 end
