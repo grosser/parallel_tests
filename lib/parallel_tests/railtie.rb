@@ -1,6 +1,4 @@
 if defined?(Rails::Railtie)
-  require 'rails/railtie'
-
   class ParallelTests
     class Railtie < ::Rails::Railtie
       rake_tasks do
