@@ -36,7 +36,7 @@ namespace :parallel do
       require "parallel_tests"
       count, prefix, options = ParallelTests.parse_rake_args(args)
       executable = File.join(File.dirname(__FILE__), '..', '..', 'bin', 'parallel_test')
-      command = "#{executable} --type #{type} -n #{count} -p '#{prefix}' -r '#{RAILS_ROOT}' -o '#{options}'"
+      command = "#{executable} --type #{type} -n #{count} -p '#{prefix}' -r '#{Rails.root}' -o '#{options}'"
       abort unless system(command) # allow to chain tasks e.g. rake parallel:spec parallel:features
     end
   end
