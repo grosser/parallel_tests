@@ -6,16 +6,20 @@ Setup for Rails
 ### As a gem
 
     sudo gem install parallel_tests
+    
     # rails 2, add it to `environment.rb`
     config.gem "parallel_tests"
+    
     # rails 3, add it to `Gemfile`
     gem "parallel_tests"
 
 ### As a plugin
 
     sudo gem install parallel
+    
     # rails 2
     script/plugin install git://github.com/grosser/parallel_tests.git
+    
     # rails 3
     rails plugin install git://github.com/grosser/parallel_tests.git
 
