@@ -26,7 +26,6 @@ OR as plugin
     sudo gem install parallel
     ./script/plugin install git://github.com/grosser/parallel_tests.git
 
-
 ## Setup
 ### 1: Add to `config/database.yml`
     test:
