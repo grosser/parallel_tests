@@ -3,9 +3,31 @@ Speedup Test::Unit + RSpec + Cucumber by running parallel on multiple CPUs.
 Setup for Rails
 ===============
 
-    sudo gem install parallel
-    script/plugin install git://github.com/grosser/parallel_tests.git
+## Install
+### Rails 3
+As gem
+    sudo gem install parallel_tests
+    # add to Gemfile
+    gem "parallel_tests"
 
+OR as plugin
+    sudo gem install parallel
+    rails plugin install git://github.com/grosser/parallel_tests.git
+
+### Rails 2
+
+As gem
+    sudo gem install parallel_tests
+    # add to config/environment.rb
+    config.gem "parallel_tests"
+
+OR as plugin
+
+    sudo gem install parallel
+    ./script/plugin install git://github.com/grosser/parallel_tests.git
+
+
+## Setup
 ### 1: Add to `config/database.yml`
     test:
       database: xxx_test<%= ENV['TEST_ENV_NUMBER'] %>
