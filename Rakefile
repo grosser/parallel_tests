@@ -4,14 +4,13 @@ Spec::Rake::SpecTask.new {|t| t.spec_opts = ['--color --backtrace']}
 
 begin
   require 'jeweler'
-  project_name = 'parallel_tests'
   Jeweler::Tasks.new do |gem|
-    gem.name = project_name
-    gem.summary = "Run tests / specs / features in parallel"
-    gem.email = "grosser.michael@gmail.com"
-    gem.homepage = "http://github.com/grosser/#{project_name}"
-    gem.authors = ["Michael Grosser"]
-    gem.add_dependency ['parallel']
+    gem.name     = "parallel_tests"
+    gem.summary  = "Run tests / specs / features in parallel"
+    gem.email    = "grosser.michael@gmail.com"
+    gem.homepage = "http://github.com/grosser/#{gem.name}"
+    gem.authors  = "Michael Grosser"
+    gem.add_dependency "parallel"
   end
 
   Jeweler::GemcutterTasks.new
