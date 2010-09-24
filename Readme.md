@@ -8,7 +8,7 @@ Setup for Rails
 As gem
     sudo gem install parallel_tests
     # add to Gemfile
-    gem "parallel_tests"
+    gem "parallel_tests", :group=>:development
 
 OR as plugin
     sudo gem install parallel
@@ -18,7 +18,7 @@ OR as plugin
 
 As gem
     sudo gem install parallel_tests
-    # add to config/environment.rb
+    # add to config/environments/development.rb
     config.gem "parallel_tests"
 
 OR as plugin
