@@ -1,3 +1,4 @@
+# add rake tasks if we are inside Rails
 if defined?(Rails::Railtie)
   class ParallelTests
     class Railtie < ::Rails::Railtie
