@@ -18,6 +18,8 @@ end
 # Uses /tmp/parallel_tests/application as the cwd so we can create and remove
 # files as we want to. After execution it changes cwd back to the original one.
 def use_temporary_directory_for
+  require 'fileutils' unless defined?(FileUtils)
+
   dir = File.join("/tmp", "parallel_tests")
   new_dir = File.join(dir, "application")
 

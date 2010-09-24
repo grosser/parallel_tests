@@ -37,7 +37,7 @@ num_processes = num_processes * (options[:multiply] || 1)
 if options[:execute]
   results = Parallel.map(0...num_processes, :in_processes => num_processes) do |i|
     ParallelTests.execute_command(options[:execute], i)
-  end
+  end.flatten
   abort if results.any?{|r| r[:exit_status] != 0 }
 else
   lib, name, task = {
