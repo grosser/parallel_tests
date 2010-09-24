@@ -20,6 +20,8 @@ As gem
     sudo gem install parallel_tests
     # add to config/environments/development.rb
     config.gem "parallel_tests"
+    # add to Rakefile
+    begin; require 'parallel_tests/tasks'; rescue LoadError; end
 
 OR as plugin
 
