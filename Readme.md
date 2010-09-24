@@ -126,7 +126,7 @@ Authors
 ====
 inspired by [pivotal labs](http://pivotallabs.com/users/miked/blog/articles/849-parallelize-your-rspec-suite)  
 
-###Contributors (alphabetical)
+### [Contributors](http://github.com/grosser/parallel_tests/contributors)
  - [Charles Finkel](http://charlesfinkel.com/)
  - [Indrek Juhkam](http://urgas.eu)
  - [Jason Morrison](http://jayunit.net)
