@@ -5,7 +5,7 @@
 
 Gem::Specification.new do |s|
   s.name = %q{parallel_tests}
-  s.version = "0.4.6"
+  s.version = "0.4.7"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Michael Grosser"]
@@ -26,6 +26,7 @@ Gem::Specification.new do |s|
      "lib/parallel_tests.rb",
      "lib/parallel_tests/grouper.rb",
      "lib/parallel_tests/railtie.rb",
+     "lib/parallel_tests/tasks.rb",
      "lib/tasks/parallel_tests.rake",
      "parallel_tests.gemspec",
      "spec/integration_spec.rb",
