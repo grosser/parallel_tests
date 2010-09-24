@@ -140,6 +140,7 @@ inspired by [pivotal labs](http://pivotallabs.com/users/miked/blog/articles/849-
  - [Tchandy](http://thiagopradi.net/)
  - [Terence Lee](http://hone.heroku.com/)
  - [Will Bryant](http://willbryant.net/)
+ - [Fred Wu](http://fredwu.me)
 
 [Michael Grosser](http://pragmatig.wordpress.com)  
 grosser.michael@gmail.com  
