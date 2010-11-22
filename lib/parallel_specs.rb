@@ -27,7 +27,9 @@ class ParallelSpecs < ParallelTests
 
   def self.spec_opts
     opts = ['spec/parallel_spec.opts', 'spec/spec.opts'].detect{|f| File.file?(f) }
-    opts ? "-O #{opts}" : nil
+#    opts ? "-O #{opts}" : nil
+    # RSpec2 doesn't handle -O. Hopefully it will one day.
+    opts ? File.read(opts).tr("\n", ' ') : nil
   end
 
   #display color when we are in a terminal
