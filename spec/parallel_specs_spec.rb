@@ -5,8 +5,8 @@ describe ParallelSpecs do
 
   describe :run_tests do
     before do
-      File.stub!(:file?).with('script/spec').and_return true
-      File.stub!(:file?).with('spec/spec.opts').and_return true
+      File.stub!(:file?).with('script/spec').and_return false
+      File.stub!(:file?).with('spec/spec.opts').and_return false
       File.stub!(:file?).with('spec/parallel_spec.opts').and_return false
       ParallelSpecs.stub!(:bundler_enabled?).and_return false
     end
@@ -33,7 +33,7 @@ describe ParallelSpecs do
       ParallelSpecs.run_tests(['xxx'],1,'')
     end
 
-    it "run bundle exec spec when on bundler 0.9 and rspec 1" do
+    it "run bundle exec spec when on bundler rspec 1" do
       File.stub!(:file?).with('script/spec').and_return false
       ParallelSpecs.stub!(:bundler_enabled?).and_return true
       ParallelSpecs.stub!(:run).with("bundle show rspec").and_return "/foo/bar/rspec-1.0.2"
@@ -41,7 +41,7 @@ describe ParallelSpecs do
       ParallelSpecs.run_tests(['xxx'],1,'')
     end
 
-    it "run bundle exec rspec when on bundler 0.9 and rspec 2" do
+    it "run bundle exec rspec when on bundler rspec 2" do
       File.stub!(:file?).with('script/spec').and_return false
       ParallelSpecs.stub!(:bundler_enabled?).and_return true
       ParallelSpecs.stub!(:run).with("bundle show rspec").and_return "/foo/bar/rspec-2.0.2"
@@ -67,19 +67,22 @@ describe ParallelSpecs do
       ParallelSpecs.run_tests(['xxx'],1,'')
     end
 
-    it "uses spec/spec.opts when found" do
+    it "uses -O spec/spec.opts when found (with script/spec)" do
+      File.stub!(:file?).with('script/spec').and_return true
+      File.stub!(:file?).with('spec/spec.opts').and_return true
       ParallelSpecs.should_receive(:open).with{|x,y| x =~ %r{script/spec\s+-O spec/spec.opts}}.and_return mocked_process
       ParallelSpecs.run_tests(['xxx'],1,'')
     end
 
-    it "uses spec/parallel_spec.opts when found" do
+    it "uses -O spec/parallel_spec.opts when found (with script/spec)" do
+      File.stub!(:file?).with('script/spec').and_return true
       File.should_receive(:file?).with('spec/parallel_spec.opts').and_return true
       ParallelSpecs.should_receive(:open).with{|x,y| x =~ %r{script/spec\s+-O spec/parallel_spec.opts}}.and_return mocked_process
       ParallelSpecs.run_tests(['xxx'],1,'')
     end
 
     it "uses options passed in" do
-      ParallelSpecs.should_receive(:open).with{|x,y| x =~ %r{script/spec -f n}}.and_return mocked_process
+      ParallelSpecs.should_receive(:open).with{|x,y| x =~ %r{rspec -f n}}.and_return mocked_process
       ParallelSpecs.run_tests(['xxx'],1,'-f n')
     end
 
