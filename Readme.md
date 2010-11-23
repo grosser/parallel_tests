@@ -143,6 +143,7 @@ inspired by [pivotal labs](http://pivotallabs.com/users/miked/blog/articles/849-
  - [Terence Lee](http://hone.heroku.com/)
  - [Will Bryant](http://willbryant.net/)
  - [Fred Wu](http://fredwu.me)
+ - [xxx](https://github.com/xxx)
 
 [Michael Grosser](http://pragmatig.wordpress.com)  
 grosser.michael@gmail.com  
