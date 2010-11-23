@@ -2,7 +2,8 @@ require File.join(File.dirname(__FILE__), 'parallel_tests')
 
 class ParallelSpecs < ParallelTests
   def self.run_tests(test_files, process_number, options)
-    cmd = "#{color} #{executable} #{options} #{spec_opts} #{test_files*' '}"
+    exe = executable # its expensive with bundler, so do not call it twice
+    cmd = "#{color} #{exe} #{options} #{spec_opts(exe)} #{test_files*' '}"
     execute_command(cmd, process_number)[:stdout]
   end
 
@@ -25,13 +26,14 @@ class ParallelSpecs < ParallelTests
     `#{cmd}`
   end
 
-  def self.spec_opts
+  def self.spec_opts(executable)
     opts = ['spec/parallel_spec.opts', 'spec/spec.opts'].detect{|f| File.file?(f) }
+    return unless opts
     if executable =~ /\brspec\b/
-      # RSpec2 doesn't handle -O. Hopefully it will one day.
-      opts ? File.read(opts).tr("\n", ' ') : nil
+      # RSpec2 does not handle -O, so we inline the options
+      File.read(opts).tr("\n", ' ')
     else
-      opts ? "-O #{opts}" : nil
+      "-O #{opts}"
     end
   end
 
