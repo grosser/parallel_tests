@@ -106,6 +106,6 @@ describe 'CLI' do
     write "x1_spec.rb", ""
     write "x2_spec.rb", ""
     result = run_specs(:add => "--test-options ' --version'", :processes => 2)
-    result.should =~ /rspec \d+\.\d+\.\d+.*rspec \d+\.\d+\.\d+/m # prints version twice
+    result.should =~ /\d+\.\d+\.\d+.*\d+\.\d+\.\d+/m # prints version twice
   end
 end

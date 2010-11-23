@@ -138,6 +138,10 @@ EOF
   end
 
   describe :bundler_enabled? do
+    before do
+      Object.stub!(:const_defined?).with(:Bundler).and_return false
+    end
+
     it "should return false" do
       use_temporary_directory_for do
         ParallelTests.send(:bundler_enabled?).should == false

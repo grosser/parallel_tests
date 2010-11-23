@@ -4,7 +4,8 @@ describe ParallelCucumber do
   test_tests_in_groups(ParallelCucumber, 'features', ".feature")
 
   describe :run_tests do
-    before(:each) do
+    before do
+      ParallelCucumber.stub!(:bundler_enabled?).and_return false
       File.stub!(:file?).with('.bundle/environment.rb').and_return false
       File.stub!(:file?).with('script/cucumber').and_return true
     end
