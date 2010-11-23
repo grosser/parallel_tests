@@ -1,4 +1,4 @@
-require File.dirname(__FILE__) + '/spec_helper'
+require 'spec/spec_helper'
 
 describe ParallelSpecs do
   test_tests_in_groups(ParallelSpecs, 'spec', '_spec.rb')
