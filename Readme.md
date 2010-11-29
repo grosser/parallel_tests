@@ -111,6 +111,7 @@ You can run any kind of code with -e / --execute
 
 TIPS
 ====
+ - [Capybara + Selenium] add to env.rb: `Capybara.server_port = 8888 + ENV['TEST_ENV_NUMBER'].to_i`
  - [RSpec] add a `spec/parallel_spec.opts` to use different options, e.g. no --drb (default: `spec/spec.opts`) 
  - [RSpec] if something looks fishy try to delete `script/spec`
  - [RSpec] if `script/spec` is missing parallel:spec uses just `spec` (which solves some issues with double-loaded environment.rb)
