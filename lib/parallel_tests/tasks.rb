@@ -6,27 +6,34 @@ namespace :parallel do
     abort unless system(command)
   end
 
-  desc "create test databases by running db:create for each test db --> parallel:create[num_cpus]"
+  desc "create test databases via db:create --> parallel:create[num_cpus]"
   task :create, :count do |t,args|
     run_in_parallel('rake db:create RAILS_ENV=test', args)
   end
 
-  desc "update test databases by running db:test:prepare for each test db --> parallel:prepare[num_cpus]"
-  task :prepare, :count do |t,args|
-    run_in_parallel('rake db:test:prepare', args)
+  desc "update test databases by dumping and loading --> parallel:prepare[num_cpus]"
+  task(:prepare, [:count] => 'db:abort_if_pending_migrations') do |t,args|
+    if ActiveRecord::Base.schema_format == :ruby
+      # dump then load in parallel
+      Rake::Task['db:schema:dump'].invoke
+      Rake::Task['parallel:load_schema'].invoke(args[:count])
+    else
+      # there is no separate dump / load for schema_format :sql, schema file can get corrupted
+      run_in_parallel('rake db:test:prepare', args)
+    end
   end
 
   # when dumping/resetting takes too long
-  desc "update test databases by running db:mgrate for each test db --> parallel:migrate[num_cpus]"
+  desc "update test databases via db:mgrate --> parallel:migrate[num_cpus]"
   task :migrate, :count do |t,args|
     run_in_parallel('rake db:migrate RAILS_ENV=test', args)
   end
 
-  # Do not want a development db on integration server.
-  # and always dump a complete schema ?
-  desc "load dumped schema for each test db --> parallel:load_schema[num_cpus]"
+  # just load the schema (good for integration server <-> no development db)
+  desc "load dumped schema for test databases via db:schema:load --> parallel:load_schema[num_cpus]"
   task :load_schema, :count do |t,args|
-    run_in_parallel('rake db:schema:load RAILS_ENV=test', args)
+    puts args.inspect
+    run_in_parallel('rake db:test:load', args)
   end
 
   ['test', 'spec', 'features'].each do |type|
