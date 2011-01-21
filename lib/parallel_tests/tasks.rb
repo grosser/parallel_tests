@@ -11,6 +11,11 @@ namespace :parallel do
     run_in_parallel('rake db:create RAILS_ENV=test', args)
   end
 
+  desc "drop test databases via db:drop --> parallel:drop[num_cpus]"
+  task :drop, :count do |t,args|
+     run_in_parallel('rake db:drop RAILS_ENV=test', args)
+  end
+
   desc "update test databases by dumping and loading --> parallel:prepare[num_cpus]"
   task(:prepare, [:count] => 'db:abort_if_pending_migrations') do |t,args|
     if ActiveRecord::Base.schema_format == :ruby
