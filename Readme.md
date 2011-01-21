@@ -147,6 +147,7 @@ inspired by [pivotal labs](http://pivotallabs.com/users/miked/blog/articles/849-
  - [Will Bryant](http://willbryant.net/)
  - [Fred Wu](http://fredwu.me)
  - [xxx](https://github.com/xxx)
+ - [Levent Ali](http://purebreeze.com/)
 
 [Michael Grosser](http://pragmatig.wordpress.com)  
 grosser.michael@gmail.com  
