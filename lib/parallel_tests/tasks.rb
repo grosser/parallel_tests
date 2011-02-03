@@ -37,7 +37,6 @@ namespace :parallel do
   # just load the schema (good for integration server <-> no development db)
   desc "load dumped schema for test databases via db:schema:load --> parallel:load_schema[num_cpus]"
   task :load_schema, :count do |t,args|
-    puts args.inspect
     run_in_parallel('rake db:test:load', args)
   end
 
