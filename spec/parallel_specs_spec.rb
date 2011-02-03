@@ -113,6 +113,11 @@ describe ParallelSpecs do
       ParallelSpecs.should_receive(:open).and_return io
       ParallelSpecs.run_tests(['xxx'],1,'').should =~ /\$LOAD_PATH << File/
     end
+
+    it "returns 'Aborted' if the status code returned by execute_command is 1 and there is no output" do
+      ParallelSpecs.stub(:execute_command => { :stdout => '', :exit_status => 1 })
+      ParallelSpecs.run_tests(['xxx'],1,'').should == 'Aborted'
+    end
   end
 
   describe :find_results do
@@ -164,5 +169,8 @@ EOF
       ParallelSpecs.failed?(['0 examples, 10 failures, 0 pending','1 examples, 0 failures, 1 pending']).should == true
     end
 
+    it "fails when a process returns 'Aborted'" do
+      ParallelSpecs.failed?(['Aborted', '1 examples, 0 failures, 1 pending']).should be_true
+    end
   end
 end

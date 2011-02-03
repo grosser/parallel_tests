@@ -47,6 +47,11 @@ describe ParallelTests do
       ParallelTests.should_receive(:open).and_return io
       ParallelTests.run_tests(['xxx'],1,'').should =~ /\$LOAD_PATH << File/
     end
+
+    it "returns 'Aborted' if the status code returned by execute_command is 1 and there is no output" do
+      ParallelTests.stub(:execute_command => { :stdout => '', :exit_status => 1 })
+      ParallelTests.run_tests(['xxx'],1,'').should == 'Aborted'
+    end
   end
 
   describe :test_in_groups do
@@ -134,6 +139,10 @@ EOF
 
     it "is failed when there are no results" do
       ParallelTests.failed?([]).should == true
+    end
+
+    it "fails when a process returns 'Aborted'" do
+      ParallelTests.failed?(['Aborted', '10 tests, 20 assertions, 0 failures, 0 errors']).should be_true
     end
   end
 

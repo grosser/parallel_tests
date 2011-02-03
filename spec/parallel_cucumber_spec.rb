@@ -48,6 +48,11 @@ describe ParallelCucumber do
       ParallelCucumber.should_receive(:open).with{|x,y| x =~ %r{script/cucumber -p default}}.and_return mocked_process
       ParallelCucumber.run_tests(['xxx'],1,'-p default')
     end
+
+    it "returns 'Aborted' if the status code returned by execute_command is 1 and there is no output" do
+      ParallelCucumber.stub(:execute_command => { :stdout => '', :exit_status => 1 })
+      ParallelCucumber.run_tests(['xxx'],1,'').should == 'Aborted'
+    end
   end
 
   describe :find_results do
@@ -78,7 +83,7 @@ EOF
     it "fails with multiple failed tests" do
       ParallelCucumber.failed?(['33 steps (3 failed, 2 skipped, 28 passed)','33 steps (3 failed, 2 skipped, 28 passed)']).should == true
     end
-    
+
     it "fails with a single scenario failure during setup phase" do
       ParallelCucumber.failed?(['1 scenarios (1 failed)']).should == true
     end
@@ -97,6 +102,10 @@ EOF
 
     it "does fail with 10 failures" do
       ParallelCucumber.failed?(['40 steps (40 passed 10 failed)','40 steps (40 passed)']).should == true
+    end
+
+    it "fails when a process returns 'Aborted'" do
+      ParallelCucumber.failed?(['Aborted', '4 scenarios (4 passed 0 failed)']).should be_true
     end
   end
 end

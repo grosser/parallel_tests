@@ -31,7 +31,9 @@ class ParallelTests
   def self.run_tests(test_files, process_number, options)
     require_list = test_files.map { |filename| "\"#{filename}\"" }.join(",")
     cmd = "ruby -Itest #{options} -e '[#{require_list}].each {|f| require f }'"
-    execute_command(cmd, process_number)[:stdout]
+    results = execute_command(cmd, process_number)
+    return 'Aborted' if results[:exit_status] == 1 && results[:stdout] == ''
+    results[:stdout]
   end
 
   def self.execute_command(cmd, process_number)
@@ -69,7 +71,7 @@ class ParallelTests
 
   # copied from http://github.com/carlhuda/bundler Bundler::SharedHelpers#find_gemfile
   def self.bundler_enabled?
-    return true if Object.const_defined?(:Bundler) 
+    return true if Object.const_defined?(:Bundler)
 
     previous = nil
     current = File.expand_path(Dir.pwd)
@@ -84,11 +86,15 @@ class ParallelTests
   end
 
   def self.line_is_result?(line)
-    line =~ /\d+ failure/
+    line =~ /\d+ failure/ || line_is_abort?(line)
   end
 
   def self.line_is_failure?(line)
-    line =~ /(\d{2,}|[1-9]) (failure|error)/
+    line =~ /(\d{2,}|[1-9]) (failure|error)/ || line_is_abort?(line)
+  end
+
+  def self.line_is_abort?(line)
+    line =~ /^Aborted$/
   end
 
   def self.test_suffix

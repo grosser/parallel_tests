@@ -4,7 +4,9 @@ class ParallelSpecs < ParallelTests
   def self.run_tests(test_files, process_number, options)
     exe = executable # its expensive with bundler, so do not call it twice
     cmd = "#{color} #{exe} #{options} #{spec_opts(exe)} #{test_files*' '}"
-    execute_command(cmd, process_number)[:stdout]
+    results = execute_command(cmd, process_number)
+    return 'Aborted' if results[:exit_status] == 1 && results[:stdout] == ''
+    results[:stdout]
   end
 
   def self.executable
