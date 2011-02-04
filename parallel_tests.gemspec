@@ -5,11 +5,11 @@
 
 Gem::Specification.new do |s|
   s.name = %q{parallel_tests}
-  s.version = "0.4.10"
+  s.version = "0.4.11"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Michael Grosser"]
-  s.date = %q{2011-01-21}
+  s.date = %q{2011-02-04}
   s.email = %q{grosser.michael@gmail.com}
   s.executables = ["parallel_spec", "parallel_cucumber", "parallel_test"]
   s.files = [
