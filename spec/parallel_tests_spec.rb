@@ -45,7 +45,7 @@ describe ParallelTests do
       io = open('spec/spec_helper.rb')
       ParallelTests.stub!(:print)
       ParallelTests.should_receive(:open).and_return io
-      ParallelTests.run_tests(['xxx'],1,'').should =~ /\$LOAD_PATH << File/
+      ParallelTests.run_tests(['xxx'],1,'')[:stdout].should =~ /\$LOAD_PATH << File/
     end
   end
 
@@ -100,40 +100,6 @@ Finished in 0.145069 seconds.
 EOF
 
       ParallelTests.find_results(output).should == ['10 tests, 20 assertions, 0 failures, 0 errors','14 tedsts, 20 assertions, 0 failures, 0 errors']
-    end
-  end
-
-  describe :failed do
-    it "fails with single failed" do
-      ParallelTests.failed?(['10 tests, 20 assertions, 0 failures, 0 errors','10 tests, 20 assertions, 1 failure, 0 errors']).should == true
-    end
-
-    it "fails with single error" do
-      ParallelTests.failed?(['10 tests, 20 assertions, 0 failures, 1 errors','10 tests, 20 assertions, 0 failures, 0 errors']).should == true
-    end
-
-    it "fails with failed and error" do
-      ParallelTests.failed?(['10 tests, 20 assertions, 0 failures, 1 errors','10 tests, 20 assertions, 1 failures, 1 errors']).should == true
-    end
-
-    it "fails with multiple failed tests" do
-      ParallelTests.failed?(['10 tests, 20 assertions, 2 failures, 0 errors','10 tests, 1 assertion, 1 failures, 0 errors']).should == true
-    end
-
-    it "does not fail with successful tests" do
-      ParallelTests.failed?(['10 tests, 20 assertions, 0 failures, 0 errors','10 tests, 20 assertions, 0 failures, 0 errors']).should == false
-    end
-
-    it "does fail with 10 failures" do
-      ParallelTests.failed?(['10 tests, 20 assertions, 10 failures, 0 errors','10 tests, 20 assertions, 0 failures, 0 errors']).should == true
-    end
-
-    it "is not failed with empty results" do
-      ParallelTests.failed?(['0 tests, 0 assertions, 0 failures, 0 errors']).should == false
-    end
-
-    it "is failed when there are no results" do
-      ParallelTests.failed?([]).should == true
     end
   end
 

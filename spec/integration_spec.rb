@@ -29,7 +29,7 @@ describe 'CLI' do
   end
 
   def run_specs(options={})
-    `cd #{folder} && #{executable} -t spec -n #{options[:processes]||2} #{options[:add]} 2>&1 && echo 'i ran!'`
+    `cd #{folder} && #{executable} -t spec -n #{options[:processes]||2} #{options[:add]} 2>&1`
   end
 
   it "runs tests in parallel" do
@@ -45,8 +45,7 @@ describe 'CLI' do
     result.scan('1 example, 0 failure').size.should == 4 # 2 results + 2 result summary
     result.scan(/Finished in \d+\.\d+ seconds/).size.should == 2
     result.scan(/Took \d+\.\d+ seconds/).size.should == 1 # parallel summary
-
-    result.should include('i ran!')
+    $?.success?.should == true
   end
 
   it "fails when tests fail" do
@@ -56,8 +55,7 @@ describe 'CLI' do
 
     result.scan('1 example, 1 failure').size.should == 2
     result.scan('1 example, 0 failure').size.should == 2
-    result.should =~ /specs failed/i
-    result.should_not include('i ran!')
+    $?.success?.should == false
   end
 
   it "can exec given commands with ENV['TEST_ENV_NUM']" do

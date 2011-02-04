@@ -31,7 +31,7 @@ class ParallelTests
   def self.run_tests(test_files, process_number, options)
     require_list = test_files.map { |filename| "\"#{filename}\"" }.join(",")
     cmd = "ruby -Itest #{options} -e '[#{require_list}].each {|f| require f }'"
-    execute_command(cmd, process_number)[:stdout]
+    execute_command(cmd, process_number)
   end
 
   def self.execute_command(cmd, process_number)
@@ -54,11 +54,6 @@ class ParallelTests
       next unless line_is_result?(line)
       line
     }.compact
-  end
-
-  def self.failed?(results)
-    return true if results.empty?
-    !! results.detect{|line| line_is_failure?(line)}
   end
 
   def self.test_env_number(process_number)
@@ -85,10 +80,6 @@ class ParallelTests
 
   def self.line_is_result?(line)
     line =~ /\d+ failure/
-  end
-
-  def self.line_is_failure?(line)
-    line =~ /(\d{2,}|[1-9]) (failure|error)/
   end
 
   def self.test_suffix

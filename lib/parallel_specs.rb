@@ -4,7 +4,7 @@ class ParallelSpecs < ParallelTests
   def self.run_tests(test_files, process_number, options)
     exe = executable # its expensive with bundler, so do not call it twice
     cmd = "#{color} #{exe} #{options} #{spec_opts(exe)} #{test_files*' '}"
-    execute_command(cmd, process_number)[:stdout]
+    execute_command(cmd, process_number)
   end
 
   def self.executable

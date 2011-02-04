@@ -111,7 +111,7 @@ describe ParallelSpecs do
       io = open('spec/spec_helper.rb')
       ParallelSpecs.stub!(:print)
       ParallelSpecs.should_receive(:open).and_return io
-      ParallelSpecs.run_tests(['xxx'],1,'').should =~ /\$LOAD_PATH << File/
+      ParallelSpecs.run_tests(['xxx'],1,'')[:stdout].should =~ /\$LOAD_PATH << File/
     end
   end
 
@@ -145,24 +145,5 @@ EOF
 
       ParallelSpecs.find_results(output).should == ['0 examples, 0 failures, 0 pending','1 examples, 1 failures, 1 pending']
     end
-  end
-
-  describe :failed do
-    it "fails with single failed specs" do
-      ParallelSpecs.failed?(['0 examples, 0 failures, 0 pending','1 examples, 1 failure, 1 pending']).should == true
-    end
-
-    it "fails with multiple failed specs" do
-      ParallelSpecs.failed?(['0 examples, 1 failure, 0 pending','1 examples, 111 failures, 1 pending']).should == true
-    end
-
-    it "does not fail with successful specs" do
-      ParallelSpecs.failed?(['0 examples, 0 failures, 0 pending','1 examples, 0 failures, 1 pending']).should == false
-    end
-
-    it "does fail with 10 failures" do
-      ParallelSpecs.failed?(['0 examples, 10 failures, 0 pending','1 examples, 0 failures, 1 pending']).should == true
-    end
-
   end
 end

@@ -63,22 +63,21 @@ else
   num_tests = groups.inject(0){|sum,item| sum + item.size }
   puts "#{num_processes} processes for #{num_tests} #{name}s, ~ #{num_tests / groups.size} #{name}s per process"
 
-  output = Parallel.map(groups, :in_processes => num_processes) do |group|
+  test_results = Parallel.map(groups, :in_processes => num_processes) do |group|
     klass.run_tests(group, groups.index(group), options[:test_options])
   end
 
   #parse and print results
-  results = klass.find_results(output*"")
+  results = klass.find_results(test_results.map{|result| result[:stdout] }*"")
   puts ""
   puts "Results:"
-  results.each{|r| puts r}
+  results.each{|r| puts r }
 
   #report total time taken
   puts ""
   puts "Took #{Time.now - start} seconds"
 
-  #exit with correct status code
-  # - rake parallel:test && echo 123 ==> 123 should not show up when test failed
-  # - rake parallel:test db:reset ==> works when tests succeed
-  abort "#{name.capitalize}s Failed" if klass.failed?(results)
+  #exit with correct status code so rake parallel:test && echo 123 works
+  failed = test_results.any?{|result| result[:exit_status] != 0 }
+  abort "#{name.capitalize}s Failed" if failed
 end
