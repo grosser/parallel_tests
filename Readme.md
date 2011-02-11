@@ -1,4 +1,4 @@
-Speedup Test::Unit + RSpec + Cucumber by running parallel on multiple CPUs.
+Speedup Test::Unit + RSpec + Cucumber by running parallel on multiple CPUs(or cores).
 
 Setup for Rails
 ===============
@@ -112,14 +112,14 @@ You can run any kind of code with -e / --execute
 TIPS
 ====
  - [Capybara + Selenium] add to env.rb: `Capybara.server_port = 8888 + ENV['TEST_ENV_NUMBER'].to_i`
- - [RSpec] add a `spec/parallel_spec.opts` to use different options, e.g. no --drb (default: `spec/spec.opts`) 
+ - [RSpec] add a `spec/parallel_spec.opts` to use different options, e.g. no --drb (default: `spec/spec.opts`)
  - [RSpec] if something looks fishy try to delete `script/spec`
  - [RSpec] if `script/spec` is missing parallel:spec uses just `spec` (which solves some issues with double-loaded environment.rb)
  - [RSpec] 'script/spec_server' or [spork](http://github.com/timcharper/spork/tree/master) do not work in parallel
  - [RSpec] `./script/generate rspec` if you are running rspec from gems (this plugin uses script/spec which may fail if rspec files are outdated)
  - [Bundler] if you have a `Gemfile` then `bundle exec` will be used to run tests
  - [Capybara setup](https://github.com/grosser/parallel_tests/wiki)
- - [Sphinx setup](https://github.com/grosser/parallel_tests/wiki) 
+ - [Sphinx setup](https://github.com/grosser/parallel_tests/wiki)
  - with zsh this would be `rake "parallel:prepare[3]"`
 
 TODO
@@ -129,7 +129,7 @@ TODO
 
 Authors
 ====
-inspired by [pivotal labs](http://pivotallabs.com/users/miked/blog/articles/849-parallelize-your-rspec-suite)  
+inspired by [pivotal labs](http://pivotallabs.com/users/miked/blog/articles/849-parallelize-your-rspec-suite)
 
 ### [Contributors](http://github.com/grosser/parallel_tests/contributors)
  - [Charles Finkel](http://charlesfinkel.com/)
@@ -149,6 +149,6 @@ inspired by [pivotal labs](http://pivotallabs.com/users/miked/blog/articles/849-
  - [xxx](https://github.com/xxx)
  - [Levent Ali](http://purebreeze.com/)
 
-[Michael Grosser](http://pragmatig.wordpress.com)  
-grosser.michael@gmail.com  
+[Michael Grosser](http://grosser.it)<br/>
+michael@grosser.it<br/>
 Hereby placed under public domain, do what you want, just do not hold me accountable...
