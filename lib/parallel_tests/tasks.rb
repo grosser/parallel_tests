@@ -2,7 +2,7 @@ namespace :parallel do
   def run_in_parallel(cmd, options)
     count = (options[:count] ? options[:count].to_i : nil)
     executable = File.join(File.dirname(__FILE__), '..', '..', 'bin', 'parallel_test')
-    command = "#{executable} --exec '#{cmd}' -n #{count}"
+    command = "#{executable} --exec '#{cmd}' -n #{count} #{'--non-parallel' if options[:non_parallel]}"
     abort unless system(command)
   end
 
@@ -23,8 +23,9 @@ namespace :parallel do
       Rake::Task['db:schema:dump'].invoke
       Rake::Task['parallel:load_schema'].invoke(args[:count])
     else
-      # there is no separate dump / load for schema_format :sql, schema file can get corrupted
-      run_in_parallel('rake db:test:prepare', args)
+      # there is no separate dump / load for schema_format :sql -> do it safe and slow
+      args = args.to_hash.merge(:non_parallel => true) # normal merge returns nil
+      run_in_parallel('rake db:test:prepare --trace', args)
     end
   end
 
@@ -37,7 +38,6 @@ namespace :parallel do
   # just load the schema (good for integration server <-> no development db)
   desc "load dumped schema for test databases via db:schema:load --> parallel:load_schema[num_cpus]"
   task :load_schema, :count do |t,args|
-    puts args.inspect
     run_in_parallel('rake db:test:load', args)
   end
 

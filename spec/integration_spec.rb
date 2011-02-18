@@ -63,6 +63,11 @@ describe 'CLI' do
     result.split("\n").sort.should == %w["" "2" "3" "4"]
   end
 
+  it "can exec given command non-parallel" do
+    result = `#{executable} -e 'ruby -e "sleep(rand(10)/100.0); puts ENV[:TEST_ENV_NUMBER.to_s].inspect"' -n 4 --non-parallel`
+    result.split("\n").should == %w["" "2" "3" "4"]
+  end
+
   it "exists with success if all sub-processes returned success" do
     system("#{executable} -e 'cat /dev/null' -n 4").should == true
   end

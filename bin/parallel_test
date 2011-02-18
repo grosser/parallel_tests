@@ -24,6 +24,7 @@ BANNER
   opts.on("-e", '--exec [COMMAND]', "execute this code parallel and with ENV['TEST_ENV_NUM']"){|path| options[:execute] = path }
   opts.on("-o", "--test-options '[OPTIONS]'", "execute test commands with those options"){|arg| options[:test_options] = arg }
   opts.on("-t", "--type [TYPE]", "which type of tests to run? test, spec or features"){|type| options[:type] = type }
+  opts.on("--non-parallel", "execute same commands but do not in parallel, needs --exec"){|type| options[:non_parallel] = true }
   opts.on('-v', '--version', 'Show Version'){ puts ParallelTests::VERSION; exit}
   opts.on("-h", "--help", "Show this.") { puts opts; exit }
 end.parse!
@@ -35,8 +36,15 @@ num_processes = options[:count] || Parallel.processor_count
 num_processes = num_processes * (options[:multiply] || 1)
 
 if options[:execute]
-  results = Parallel.map(0...num_processes, :in_processes => num_processes) do |i|
-    ParallelTests.execute_command(options[:execute], i)
+  runs = (0...num_processes).to_a
+  results = if options[:non_parallel]
+    runs.map do |i|
+      ParallelTests.execute_command(options[:execute], i)
+    end
+  else
+    Parallel.map(runs, :in_processes => num_processes) do |i|
+      ParallelTests.execute_command(options[:execute], i)
+    end
   end.flatten
   abort if results.any?{|r| r[:exit_status] != 0 }
 else

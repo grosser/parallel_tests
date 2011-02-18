@@ -90,8 +90,9 @@ Options are:
     -m, --multiply-processes [FLOAT] use given number as a multiplier of processes to run
     -r, --root [PATH]                execute test commands from this path
     -e, --exec [COMMAND]             execute this code parallel and with ENV['TEST_ENV_NUM']
-    -o, --test-options '[OPTIONS]' execute test commands with those options
+    -o, --test-options '[OPTIONS]'   execute test commands with those options
     -t, --type [TYPE]                which type of tests to run? test, spec or features
+        --non-parallel               execute same commands but do not in parallel, needs --exec
     -v, --version                    Show Version
     -h, --help                       Show this.
 
@@ -120,6 +121,7 @@ TIPS
  - [Bundler] if you have a `Gemfile` then `bundle exec` will be used to run tests
  - [Capybara setup](https://github.com/grosser/parallel_tests/wiki)
  - [Sphinx setup](https://github.com/grosser/parallel_tests/wiki)
+ - [SQL schema format] use :ruby schema format to get faster parallel:prepare`
  - with zsh this would be `rake "parallel:prepare[3]"`
 
 TODO
