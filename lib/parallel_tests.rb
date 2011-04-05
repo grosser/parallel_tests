@@ -103,8 +103,6 @@ class ParallelTests
     lines = File.read(runtime_file).split("\n") rescue []
 
     # use recorded test runtime if we got enough data
-    p "lines.size #{lines.size}"
-    p "tests.size #{tests.size}"
     if lines.size * 1.5 > tests.size
       times = Hash.new(1)
       lines.each do |line|
