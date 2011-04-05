@@ -1,7 +1,8 @@
-require 'spec/runner/formatter/progress_bar_formatter'
+require 'rspec/core/formatters/base_text_formatter'
+require 'parallel_specs'
 
-class ParallelSpecs::SpecRuntimeLogger < Spec::Runner::Formatter::BaseTextFormatter
-  def initialize(options, output)
+class ParallelSpecs::SpecRuntimeLogger < RSpec::Core::Formatters::BaseTextFormatter
+  def initialize(output)
     if String === output
       FileUtils.mkdir_p(File.dirname(output))
       File.open(output,'w'){|f| f.write ''} # clean the file
@@ -10,6 +11,7 @@ class ParallelSpecs::SpecRuntimeLogger < Spec::Runner::Formatter::BaseTextFormat
       @output = output
     end
     @example_times = Hash.new(0)
+    @failed_examples = []
   end
 
   def example_started(*args)

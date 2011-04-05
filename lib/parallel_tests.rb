@@ -85,21 +85,36 @@ class ParallelTests
   def self.test_suffix
     "_test.rb"
   end
+  
+  def self.append_previous_profile_files
+    f0 = File.join('tmp', "parallel_profile.log")
+
+    (0..Parallel.processor_count).each {|process_number|
+      f = File.join('tmp', "parallel_profile#{process_number}.log")
+      system "cat #{f} >> #{f0}" if File.exists?(f)
+    }
+    system "cat #{f0}"
+  end
 
   def self.tests_with_runtime(root)
     tests = find_tests(root)
-    runtime_file = File.join(root,'..','tmp','parallel_profile.log')
+    append_previous_profile_files
+    runtime_file = File.join('tmp','parallel_profile.log')
     lines = File.read(runtime_file).split("\n") rescue []
 
     # use recorded test runtime if we got enough data
+    p "lines.size #{lines.size}"
+    p "tests.size #{tests.size}"
     if lines.size * 1.5 > tests.size
       times = Hash.new(1)
       lines.each do |line|
         test, time = line.split(":")
         times[test] = time.to_f
       end
+      p "Using recorded test runtimes to partition groups..."
       tests.sort.map{|test| [test, times[test]] }
     else # use file sizes
+      p "Using file sizes to partition groups..."
       tests.sort.map{|test| [test, File.stat(test).size] }
     end
   end

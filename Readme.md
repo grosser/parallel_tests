@@ -1,5 +1,11 @@
 Speedup Test::Unit + RSpec + Cucumber by running parallel on multiple CPUs(or cores).
 
+Fork Notes
+==============
+This fork created to fix ParallelSpecs::SpecRuntimeLogger and it's usage to be compatible
+with RSpec2 formatters and reporters.  See 'Even process runtimes'
+discussion below for how to enable the formatter
+
 Setup for Rails
 ===============
 
@@ -69,9 +75,20 @@ Example output
 
 Even process runtimes (for specs only atm)
 -----------------
-Add to your `spec/parallel_spec.opts` (or `spec/spec.opts`) :
-    --format ParallelSpecs::SpecRuntimeLogger:tmp/parallel_profile.log
+Create the following in file #{Rails.root}/spec/support/parallel_tests.rb
+
+RSpec.configure do |config|
+  # when using parallel tests, add the profile logger as a custom reporter formatter
+  if ENV["TEST_ENV_NUMBER"]
+    progress_formatter = config.send(:built_in_formatter, :progress).new(config.output)
+    custom_formatter = ParallelSpecs::SpecRuntimeLogger.new(File.open("tmp/parallel_profile#{ENV['TEST_ENV_NUMBER']}.log", "w"))
+    config.instance_variable_set(:@reporter, RSpec::Core::Reporter.new(progress_formatter, custom_formatter))
+  end 
+end
+
 It will log test runtime and partition the test-load accordingly.
+
+
 
 Setup for non-rails
 ===================

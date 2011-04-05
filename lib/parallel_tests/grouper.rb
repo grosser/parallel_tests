@@ -20,6 +20,9 @@ class ParallelTests
         smallest[:items] << item
         smallest[:size] += size
       end
+      groups.each {|g|
+        p "group size/time:  #{g[:size]}"
+      }
 
       groups.map{|g| g[:items] }
     end
