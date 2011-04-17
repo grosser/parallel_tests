@@ -2,8 +2,9 @@ require File.join(File.dirname(__FILE__), 'parallel_tests')
 
 class ParallelSpecs < ParallelTests
   def self.run_tests(test_files, process_number, options)
-    exe = executable # its expensive with bundler, so do not call it twice
-    cmd = "#{color} #{exe} #{options} #{spec_opts(exe)} #{test_files*' '}"
+    exe = executable # expensive, so we cache
+    version = (exe =~ /\brspec\b/ ? 2 : 1)
+    cmd = "#{rspec_1_color if version == 1}#{exe} #{options} #{rspec_2_color if version == 2}#{spec_opts(version)} #{test_files*' '}"
     execute_command(cmd, process_number)
   end
 
@@ -26,20 +27,23 @@ class ParallelSpecs < ParallelTests
     `#{cmd}`
   end
 
-  def self.spec_opts(executable)
-    opts = ['spec/parallel_spec.opts', 'spec/spec.opts'].detect{|f| File.file?(f) }
-    return unless opts
-    if executable =~ /\brspec\b/
-      # RSpec2 does not handle -O, so we inline the options
-      File.read(opts).tr("\n", ' ')
-    else
-      "-O #{opts}"
-    end
+  def self.rspec_1_color
+    'RSPEC_COLOR=1 ; export RSPEC_COLOR ;' if $stdout.tty?
   end
 
-  #display color when we are in a terminal
-  def self.color
-    ($stdout.tty? ? 'RSPEC_COLOR=1 ; export RSPEC_COLOR ;' : '')
+  def self.rspec_2_color
+    '--tty ' if $stdout.tty?
+  end
+
+  def self.spec_opts(rspec_version)
+    options_file = ['spec/parallel_spec.opts', 'spec/spec.opts'].detect{|f| File.file?(f) }
+    return unless options_file
+    if rspec_version == 2
+      # does not handle -O, so we inline the options
+      File.read(options_file).tr("\n", ' ')
+    else
+      "-O #{options_file}"
+    end
   end
 
   def self.test_suffix
