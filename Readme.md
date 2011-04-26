@@ -67,10 +67,12 @@ Example output
 
     Took 29.925333 seconds
 
-Even process runtimes (for specs only atm)
+Even process runtimes (for specs only)
 -----------------
 Add to your `spec/parallel_spec.opts` (or `spec/spec.opts`) :
-    --format ParallelSpecs::SpecRuntimeLogger:tmp/parallel_profile.log
+    Installed as plugin: -I vendor/plugins/parallel_tests
+    RSpec 1.x: --format ParallelSpecs::SpecRuntimeLogger:tmp/parallel_profile.log
+    RSpec 2.x: --format ParallelSpecs::SpecRuntimeLogger --out tmp/parallel_profile.log
 It will log test runtime and partition the test-load accordingly.
 
 Setup for non-rails
@@ -150,6 +152,7 @@ inspired by [pivotal labs](http://pivotallabs.com/users/miked/blog/articles/849-
  - [Fred Wu](http://fredwu.me)
  - [xxx](https://github.com/xxx)
  - [Levent Ali](http://purebreeze.com/)
+ - [Michael Kintzer](https://github.com/rockrep)
 
 [Michael Grosser](http://grosser.it)<br/>
 michael@grosser.it<br/>
