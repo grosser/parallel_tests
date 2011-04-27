@@ -15,11 +15,11 @@ class ParallelSpecs::SpecRuntimeLogger < ParallelSpecs::SpecRuntimeLoggerBase
 
     if String === output
       FileUtils.mkdir_p(File.dirname(output))
-      File.open(output,'w'){|f| f.write ''} # clean the file
-      @output = File.open(output, 'a+') #append so that multiple processes can write at once
+      @output = File.open(output, 'w')
     else
       @output = output
     end
+
     @example_times = Hash.new(0)
     @failed_examples = [] # only needed for rspec 2
   end
