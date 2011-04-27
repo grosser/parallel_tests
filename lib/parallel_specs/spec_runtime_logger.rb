@@ -36,7 +36,9 @@ class ParallelSpecs::SpecRuntimeLogger < ParallelSpecs::SpecRuntimeLoggerBase
   def start_dump(*args)
     return unless ENV['TEST_ENV_NUMBER'] #only record when running in parallel
     # TODO: Figure out why sometimes time can be less than 0
-    @output.puts @example_times.map { |file, time| "#{file}:#{time > 0 ? time : 0}" }
+    lock_output do
+      @output.puts @example_times.map { |file, time| "#{file}:#{time > 0 ? time : 0}" }
+    end
     @output.flush
   end
 
@@ -57,5 +59,19 @@ class ParallelSpecs::SpecRuntimeLogger < ParallelSpecs::SpecRuntimeLoggerBase
   #stolen from Rspec
   def close
     @output.close  if (IO === @output) & (@output != $stdout)
+  end
+
+  # do not let multiple processes get in each others way
+  def lock_output
+    if File === @output
+      begin
+        @output.flock File::LOCK_EX
+        yield
+      ensure
+        @output.flock File::LOCK_UN
+      end
+    else
+      yield
+    end
   end
 end
