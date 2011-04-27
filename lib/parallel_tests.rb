@@ -88,11 +88,11 @@ class ParallelTests
 
   def self.tests_with_runtime(root)
     tests = find_tests(root)
-    runtime_file = File.join(root,'..','tmp','parallel_profile.log')
-    lines = File.read(runtime_file).split("\n") rescue []
+    lines = File.read('tmp/parallel_profile.log').split("\n") rescue []
 
     # use recorded test runtime if we got enough data
     if lines.size * 1.5 > tests.size
+      puts "Using recorded test runtime"
       times = Hash.new(1)
       lines.each do |line|
         test, time = line.split(":")

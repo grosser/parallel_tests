@@ -69,11 +69,15 @@ Example output
 
 Even process runtimes (for specs only)
 -----------------
+
+Log test runtime to give each process the same test runtime.<br/>
 Add to your `spec/parallel_spec.opts` (or `spec/spec.opts`) :
-    Installed as plugin: -I vendor/plugins/parallel_tests
-    RSpec 1.x: --format ParallelSpecs::SpecRuntimeLogger:tmp/parallel_profile.log
-    RSpec 2.x: --format ParallelSpecs::SpecRuntimeLogger --out tmp/parallel_profile.log
-It will log test runtime and partition the test-load accordingly.
+
+    RSpec 1.x:
+      --format ParallelSpecs::SpecRuntimeLogger:tmp/parallel_profile.log
+    RSpec 2.x:
+      Installed as plugin: -I vendor/plugins/parallel_tests/lib
+      --format ParallelSpecs::SpecRuntimeLogger --out tmp/parallel_profile.log
 
 Setup for non-rails
 ===================
