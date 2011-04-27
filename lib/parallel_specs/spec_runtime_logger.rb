@@ -47,6 +47,9 @@ class ParallelSpecs::SpecRuntimeLogger < ParallelSpecs::SpecRuntimeLoggerBase
   def example_pending(*args)
   end
 
+  def example_failed(*args)
+  end
+
   def dump_summary(*args)
   end
 
