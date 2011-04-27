@@ -86,6 +86,7 @@ def test_tests_in_groups(klass, folder, suffix)
     end
 
     it "partitions by runtime when runtime-data is available" do
+      klass.stub!(:puts)
       File.open(@log,'w') do |f|
         @files[1..-1].each{|file| f.puts "#{file}:#{@files.index(file)}"}
         f.puts "#{@files[0]}:10"
