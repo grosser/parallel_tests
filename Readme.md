@@ -74,9 +74,11 @@ Log test runtime to give each process the same test runtime.<br/>
 Add to your `spec/parallel_spec.opts` (or `spec/spec.opts`) :
 
     RSpec 1.x:
+      --format progress
       --format ParallelSpecs::SpecRuntimeLogger:tmp/parallel_profile.log
     RSpec 2.x:
       Installed as plugin: -I vendor/plugins/parallel_tests/lib
+      --format progress
       --format ParallelSpecs::SpecRuntimeLogger --out tmp/parallel_profile.log
 
 Setup for non-rails
