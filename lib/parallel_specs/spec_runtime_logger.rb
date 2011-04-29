@@ -15,7 +15,12 @@ class ParallelSpecs::SpecRuntimeLogger < ParallelSpecs::SpecRuntimeLoggerBase
 
     if String === output
       FileUtils.mkdir_p(File.dirname(output))
-      @output = File.open(output, 'w')
+      File.open(output, 'w'){} # overwrite previous results
+      @output = File.open(output, 'a')
+      puts 'string'
+    elsif File === output
+      output.close # close file opened with 'w'
+      @output = File.open(output.path, 'a')
     else
       @output = output
     end
