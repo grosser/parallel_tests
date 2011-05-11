@@ -34,16 +34,26 @@ class ParallelTests
     execute_command(cmd, process_number)
   end
 
+  def self.is_dot?(*chars)
+    chars.each { |char| return false unless char == '.' }
+    true
+  end
+
   def self.execute_command(cmd, process_number)
     cmd = "TEST_ENV_NUMBER=#{test_env_number(process_number)} ; export TEST_ENV_NUMBER; #{cmd}"
     f = open("|#{cmd}", 'r')
     all = ''
+
+    prior_char = nil
     while char = f.getc
       char = (char.is_a?(Fixnum) ? char.chr : char) # 1.8 <-> 1.9
       all << char
       print char
-      STDOUT.flush
+      STDOUT.flush if is_dot?(char, prior_char)
+      STDOUT.flush if char[/\n/]
+      prior_char = char
     end
+    STDOUT.flush
     f.close
     {:stdout => all, :exit_status => $?.exitstatus}
   end
