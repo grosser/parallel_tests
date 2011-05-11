@@ -37,15 +37,9 @@ class ParallelTests
   def self.execute_command(cmd, process_number)
     cmd = "TEST_ENV_NUMBER=#{test_env_number(process_number)} ; export TEST_ENV_NUMBER; #{cmd}"
     f = open("|#{cmd}", 'r')
-    all = ''
-    while char = f.getc
-      char = (char.is_a?(Fixnum) ? char.chr : char) # 1.8 <-> 1.9
-      all << char
-      print char
-      STDOUT.flush
-    end
+    output = fetch_output(f)
     f.close
-    {:stdout => all, :exit_status => $?.exitstatus}
+    {:stdout => output, :exit_status => $?.exitstatus}
   end
 
   def self.find_results(test_output)
@@ -61,6 +55,35 @@ class ParallelTests
   end
 
   protected
+
+  # read output of the process and print in in chucks
+  def self.fetch_output(process)
+    all = ''
+    buffer = ''
+    timeout = 0.2
+    flushed = Time.now.to_f
+
+    while char = process.getc
+      char = (char.is_a?(Fixnum) ? char.chr : char) # 1.8 <-> 1.9
+      all << char
+
+      # print in chunks so large blocks stay together
+      now = Time.now.to_f
+      buffer << char
+      if flushed + timeout < now
+        print buffer
+        STDOUT.flush
+        buffer = ''
+        flushed = now
+      end
+    end
+
+    # print the remainder
+    print buffer
+    STDOUT.flush
+
+    all
+  end
 
   # copied from http://github.com/carlhuda/bundler Bundler::SharedHelpers#find_gemfile
   def self.bundler_enabled?
