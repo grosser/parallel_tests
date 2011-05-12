@@ -118,7 +118,7 @@ describe ParallelSpecs do
 
     it "uses options passed in" do
       ParallelSpecs.should_receive(:open).with{|x,y| x =~ %r{rspec -f n}}.and_return mocked_process
-      ParallelSpecs.run_tests(['xxx'],1,'-f n')
+      ParallelSpecs.run_tests(['xxx'],1, :test_options => '-f n')
     end
 
     it "returns the output" do

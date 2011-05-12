@@ -46,7 +46,7 @@ describe ParallelCucumber do
 
     it "uses options passed in" do
       ParallelCucumber.should_receive(:open).with{|x,y| x =~ %r{script/cucumber -p default}}.and_return mocked_process
-      ParallelCucumber.run_tests(['xxx'],1,'-p default')
+      ParallelCucumber.run_tests(['xxx'],1,:test_options => '-p default')
     end
   end
 

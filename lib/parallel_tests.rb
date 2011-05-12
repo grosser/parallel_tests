@@ -30,14 +30,14 @@ class ParallelTests
 
   def self.run_tests(test_files, process_number, options)
     require_list = test_files.map { |filename| "\"#{filename}\"" }.join(",")
-    cmd = "ruby -Itest #{options} -e '[#{require_list}].each {|f| require f }'"
-    execute_command(cmd, process_number)
+    cmd = "ruby -Itest #{options[:test_options]} -e '[#{require_list}].each {|f| require f }'"
+    execute_command(cmd, process_number, options)
   end
 
-  def self.execute_command(cmd, process_number)
+  def self.execute_command(cmd, process_number, options)
     cmd = "TEST_ENV_NUMBER=#{test_env_number(process_number)} ; export TEST_ENV_NUMBER; #{cmd}"
     f = open("|#{cmd}", 'r')
-    output = fetch_output(f)
+    output = fetch_output(f, options)
     f.close
     {:stdout => output, :exit_status => $?.exitstatus}
   end
@@ -57,10 +57,10 @@ class ParallelTests
   protected
 
   # read output of the process and print in in chucks
-  def self.fetch_output(process)
+  def self.fetch_output(process, options)
     all = ''
     buffer = ''
-    timeout = 0.2
+    timeout = options[:chunk_timeout] || 0.2
     flushed = Time.now.to_f
 
     while char = process.getc

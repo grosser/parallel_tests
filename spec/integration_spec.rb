@@ -29,7 +29,7 @@ describe 'CLI' do
   end
 
   def run_specs(options={})
-    `cd #{folder} && #{executable} -t spec -n #{options[:processes]||2} #{options[:add]} 2>&1`
+    `cd #{folder} && #{executable} --chunk-timeout 999 -t spec -n #{options[:processes]||2} #{options[:add]} 2>&1`
   end
 
   it "runs tests in parallel" do

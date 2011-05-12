@@ -38,7 +38,7 @@ describe ParallelTests do
 
     it "uses options" do
       ParallelTests.should_receive(:open).with{|x,y| x=~ %r{ruby -Itest -v}}.and_return mocked_process
-      ParallelTests.run_tests(['xxx'],1,'-v')
+      ParallelTests.run_tests(['xxx'],1,:test_options => '-v')
     end
 
     it "returns the output" do

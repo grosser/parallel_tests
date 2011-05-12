@@ -3,8 +3,8 @@ require File.join(File.dirname(__FILE__), 'parallel_tests')
 class ParallelCucumber < ParallelTests
   def self.run_tests(test_files, process_number, options)
     color = ($stdout.tty? ? 'AUTOTEST=1 ; export AUTOTEST ;' : '')#display color when we are in a terminal
-    cmd = "#{color} #{executable} #{options} #{test_files*' '}"
-    execute_command(cmd, process_number)
+    cmd = "#{color} #{executable} #{options[:test_options]} #{test_files*' '}"
+    execute_command(cmd, process_number, options)
   end
 
   def self.executable
