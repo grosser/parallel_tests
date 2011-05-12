@@ -5,13 +5,13 @@
 
 Gem::Specification.new do |s|
   s.name = %q{parallel_tests}
-  s.version = "0.4.16"
+  s.version = "0.4.17"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Michael Grosser"]
-  s.date = %q{2011-04-29}
+  s.date = %q{2011-05-12}
   s.email = %q{grosser.michael@gmail.com}
-  s.executables = ["parallel_spec", "parallel_cucumber", "parallel_test"]
+  s.executables = ["parallel_cucumber", "parallel_spec", "parallel_test"]
   s.files = [
     ".gitignore",
      "Gemfile",
@@ -40,14 +40,14 @@ Gem::Specification.new do |s|
   s.homepage = %q{http://github.com/grosser/parallel_tests}
   s.rdoc_options = ["--charset=UTF-8"]
   s.require_paths = ["lib"]
-  s.rubygems_version = %q{1.4.2}
+  s.rubygems_version = %q{1.6.2}
   s.summary = %q{Run tests / specs / features in parallel}
   s.test_files = [
-    "spec/parallel_cucumber_spec.rb",
+    "spec/parallel_tests_spec.rb",
      "spec/integration_spec.rb",
      "spec/parallel_specs_spec.rb",
-     "spec/parallel_tests_spec.rb",
-     "spec/spec_helper.rb"
+     "spec/spec_helper.rb",
+     "spec/parallel_cucumber_spec.rb"
   ]
 
   if s.respond_to? :specification_version then
