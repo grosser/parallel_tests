@@ -18,7 +18,7 @@ namespace :parallel do
 
   desc "update test databases by dumping and loading --> parallel:prepare[num_cpus]"
   task(:prepare, [:count] => 'db:abort_if_pending_migrations') do |t,args|
-    if ActiveRecord::Base.schema_format == :ruby
+    if defined?(ActiveRecord) && ActiveRecord::Base.schema_format == :ruby
       # dump then load in parallel
       Rake::Task['db:schema:dump'].invoke
       Rake::Task['parallel:load_schema'].invoke(args[:count])
