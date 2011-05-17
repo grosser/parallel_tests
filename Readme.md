@@ -159,6 +159,7 @@ inspired by [pivotal labs](http://pivotallabs.com/users/miked/blog/articles/849-
  - [xxx](https://github.com/xxx)
  - [Levent Ali](http://purebreeze.com/)
  - [Michael Kintzer](https://github.com/rockrep)
+ - [nathansobo](https://github.com/nathansobo)
 
 [Michael Grosser](http://grosser.it)<br/>
 michael@grosser.it<br/>
