@@ -7,28 +7,34 @@ Setup for Rails
 ### Rails 3
 As gem
 
-    sudo gem install parallel_tests
+    gem install parallel_tests
+
     # add to Gemfile
-    gem "parallel_tests", :group=>:development
+    gem "parallel_tests", :group => :development
 
 OR as plugin
 
-    sudo gem install parallel
+    gem install parallel
     rails plugin install git://github.com/grosser/parallel_tests.git
+
+    # add to Gemfile
+    gem "parallel", :group => :development
 
 ### Rails 2
 
 As gem
 
-    sudo gem install parallel_tests
+    gem install parallel_tests
+
     # add to config/environments/development.rb
     config.gem "parallel_tests"
+
     # add to Rakefile
     begin; require 'parallel_tests/tasks'; rescue LoadError; end
 
 OR as plugin
 
-    sudo gem install parallel
+    gem install parallel
     ./script/plugin install git://github.com/grosser/parallel_tests.git
 
 ## Setup
