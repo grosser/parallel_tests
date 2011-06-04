@@ -20,6 +20,10 @@ class ParallelSpecs < ParallelTests
     cmd or raise("Can't find executables rspec or spec")
   end
 
+  def self.runtime_log
+    'tmp/parallel_profile.log'
+  end
+
   protected
 
   # so it can be stubbed....

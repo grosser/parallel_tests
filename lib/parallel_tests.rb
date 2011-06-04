@@ -54,6 +54,10 @@ class ParallelTests
     process_number == 0 ? '' : process_number + 1
   end
 
+  def self.runtime_log
+    '__foo__'
+  end
+
   protected
 
   # read output of the process and print in in chucks
@@ -111,7 +115,7 @@ class ParallelTests
 
   def self.tests_with_runtime(root)
     tests = find_tests(root)
-    lines = File.read("#{root}/../tmp/parallel_profile.log").split("\n") rescue []
+    lines = File.read("#{root}/../#{runtime_log}").split("\n") rescue []
 
     # use recorded test runtime if we got enough data
     if lines.size * 1.5 > tests.size
