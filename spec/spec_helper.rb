@@ -53,7 +53,7 @@ def test_tests_in_groups(klass, folder, suffix)
         file
       end
 
-      @log = "#{FAKE_RAILS_ROOT}/tmp/parallel_profile.log"
+      @log = "#{FAKE_RAILS_ROOT}/#{klass.runtime_log}"
       `mkdir #{File.dirname(@log)}`
       `rm -f #{@log}`
     end

@@ -3,7 +3,10 @@ require File.join(File.dirname(__FILE__), 'parallel_tests')
 class ParallelCucumber < ParallelTests
   def self.run_tests(test_files, process_number, options)
     color = ($stdout.tty? ? 'AUTOTEST=1 ; export AUTOTEST ;' : '')#display color when we are in a terminal
-    cmd = "#{color} #{executable} --format ParallelCucumber::RuntimeLogger --out #{runtime_log} #{options[:test_options]} #{test_files*' '}"
+    runtime_logging = "--format ParallelCucumber::RuntimeLogger --out #{runtime_log}"
+    cmd = "#{color} #{executable}"
+    cmd << runtime_logging if File.directory?(File.dirname(runtime_log))
+    cmd << " #{options[:test_options]} #{test_files*' '}"
     execute_command(cmd, process_number, options)
   end
 
