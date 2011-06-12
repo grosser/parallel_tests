@@ -1,4 +1,7 @@
 require 'spec/spec_helper'
+require 'parallel_specs/spec_runtime_logger'
+require 'parallel_specs/spec_summary_logger'
+require 'parallel_specs/spec_failures_logger'
 
 describe ParallelSpecs do
   test_tests_in_groups(ParallelSpecs, 'spec', '_spec.rb')
@@ -159,5 +162,104 @@ EOF
 
       ParallelSpecs.find_results(output).should == ['0 examples, 0 failures, 0 pending','1 examples, 1 failures, 1 pending']
     end
+  end
+
+  context "logging" do
+
+    OutputLogger = Struct.new(:output) do
+      attr_reader :flock, :flush
+      def puts(s)
+        self.output << s
+      end
+    end
+
+    before :each do
+      @output     = OutputLogger.new([])
+      @example1   = mock( 'example', :location => '/my/spec/path/to/example:123', :description => 'should do stuff' )
+      @example2   = mock( 'example', :location => '/my/spec/path/to/example2:456', :description => 'should do other stuff' )
+      @exception1 = mock( :to_s => 'exception', :backtrace => [ '/path/to/error/line:33' ] )
+      @failure1   = mock( 'example', :location => '/path/to/example:123', :header => 'header', :exception => @exception1 )
+    end
+
+    describe ParallelSpecs::SpecRuntimeLogger do
+      before :each do
+        ENV['TEST_ENV_NUMBER'] = '1'
+        @logger                = ParallelSpecs::SpecRuntimeLogger.new( @output )
+      end
+
+      it "collects runtime information" do
+        @logger.example_started
+        @logger.example_passed( @example1 )
+
+        @logger.start_dump
+
+        @output.output.size.should == 1
+        @output.output[0].size.should == 1
+        @output.output[0][0].should =~ %r(/path/to/example:([\d\.e\-]+))
+      end
+    end
+
+    describe ParallelSpecs::SpecSummaryLogger do
+      before :each do
+        @logger = ParallelSpecs::SpecSummaryLogger.new( @output )
+      end
+
+      it "should print a summary of failing examples" do
+        @logger.example_failed( nil, nil, @failure1 )
+
+        @logger.dump_failure
+
+        @output.output.should == ["1 examples failed:", "1)", "header", "exception", "/path/to/error/line:33", ""]
+      end
+    end
+
+    describe ParallelSpecs::SpecFailuresLogger do
+      before :each do
+        @logger = ParallelSpecs::SpecFailuresLogger.new( @output )
+      end
+
+      it "should produce a list of command lines for failing examples" do
+        @logger.example_failed( @example1, nil, nil )
+        @logger.example_failed( @example2, nil, nil )
+
+        @logger.dump_failure
+
+        @output.output.size.should == 2
+        @output.output[0].should =~ /r?spec .*? -e "should do stuff"/
+        @output.output[1].should =~ /r?spec .*? -e "should do other stuff"/
+      end
+
+      it "should invoke spec for rspec 1" do
+        ParallelSpecs.stub!(:bundler_enabled?).and_return true
+        ParallelSpecs.stub!(:run).with("bundle show rspec").and_return "/foo/bar/rspec-1.0.2"
+        @logger.example_failed( @example1, nil, nil )
+
+        @logger.dump_failure
+
+        @output.output[0].should =~ /^bundle exec spec/
+      end
+
+      it "should invoke rspec for rspec 2" do
+        ParallelSpecs.stub!(:bundler_enabled?).and_return true
+        ParallelSpecs.stub!(:run).with("bundle show rspec").and_return "/foo/bar/rspec-2.0.2"
+        @logger.example_failed( @example1, nil, nil )
+
+        @logger.dump_failure
+
+        @output.output[0].should =~ /^bundle exec rspec/
+      end
+
+      it "should return relative paths" do
+        @logger.example_failed( @example1, nil, nil )
+        @logger.example_failed( @example2, nil, nil )
+
+        @logger.dump_failure
+
+        @output.output[0].should =~ %r(\./spec/path/to/example)
+        @output.output[1].should =~ %r(\./spec/path/to/example2)
+      end
+
+    end
+
   end
 end

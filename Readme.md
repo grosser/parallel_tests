@@ -1,4 +1,4 @@
-Speedup Test::Unit + RSpec + Cucumber by running parallel on multiple CPUs(or cores).
+Speedup Test::Unit + RSpec + Cucumber by running parallel on multiple CPUs (or cores).
 
 Setup for Rails
 ===============
@@ -59,6 +59,7 @@ OR as plugin
     ...
 
 Test just a subfolder (e.g. use one integration server per subfolder)
+
     rake parallel:test[models]
     rake parallel:test[something/else]
 
@@ -76,10 +77,14 @@ Example output
 
     Took 29.925333 seconds
 
-Even process runtimes (for specs only)
+Spec Loggers
+===================
+
+Even process runtimes
 -----------------
 
-Log test runtime to give each process the same test runtime.<br/>
+Log test runtime to give each process the same test runtime.
+
 Add to your `spec/parallel_spec.opts` (or `spec/spec.opts`) :
 
     RSpec 1.x:
@@ -90,6 +95,36 @@ Add to your `spec/parallel_spec.opts` (or `spec/spec.opts`) :
       --format progress
       --format ParallelSpecs::SpecRuntimeLogger --out tmp/parallel_profile.log
 
+SpecSummaryLogger
+--------------------
+
+This logger stops the different processes overwriting each other's output.
+
+Add the following to your `spec/parallel_spec.opts` (or `spec/spec.opts`) :
+
+    RSpec 1.x:
+      --format progress
+      --format ParallelSpecs::SpecSummaryLogger:tmp/spec_summary.log
+    RSpec >= 2.2:
+      --format progress
+      --format ParallelSpecs::SpecSummaryLogger --out tmp/spec_summary.log
+
+SpecFailuresLogger
+-----------------------
+
+This logger produces command lines for running any failing examples.
+
+E.g.
+
+    spec /path/to/my_spec.rb -e "should do something"
+
+Add the following to your `spec/parallel_spec.opts` (or `spec/spec.opts`) :
+
+    RSpec 1.x:
+      --format ParallelSpecs::SpecFailuresLogger:tmp/failing_specs.log
+    RSpec >= 2.2:
+      --format ParallelSpecs::SpecFailuresLogger --out tmp/failing_specs.log
+
 Setup for non-rails
 ===================
     sudo gem install parallel_tests
@@ -98,9 +133,11 @@ Setup for non-rails
     # [Optional] use ENV['TEST_ENV_NUMBER'] inside your tests to select separate db/memcache/etc.
 
 [optional] Only run selected files & folders:
+
     parallel_test test/bar test/baz/xxx_text.rb
 
 Options are:
+
     -n [PROCESSES]                   How many processes to use, default: available CPUs
     -p, --path [PATH]                run tests inside this path only
         --no-sort                    do not sort files before running them
@@ -114,6 +151,7 @@ Options are:
     -h, --help                       Show this.
 
 You can run any kind of code with -e / --execute
+
     parallel_test -n 5 -e 'ruby -e "puts %[hello from process #{ENV[:TEST_ENV_NUMBER.to_s].inspect}]"'
     hello from process "2"
     hello from process ""

@@ -54,8 +54,12 @@ def test_tests_in_groups(klass, folder, suffix)
       end
 
       @log = klass.runtime_log
-      `mkdir #{File.dirname(@log)}`
+      `mkdir -p #{File.dirname(@log)}`
       `rm -f #{@log}`
+    end
+
+    after :all do
+      `rm -f #{klass.runtime_log}`
     end
 
     it "groups when given an array of files" do
