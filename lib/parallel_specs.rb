@@ -42,12 +42,7 @@ class ParallelSpecs < ParallelTests
   def self.spec_opts(rspec_version)
     options_file = ['spec/parallel_spec.opts', 'spec/spec.opts'].detect{|f| File.file?(f) }
     return unless options_file
-    if rspec_version == 2
-      # does not handle -O, so we inline the options
-      File.read(options_file).tr("\n", ' ')
-    else
-      "-O #{options_file}"
-    end
+    "-O #{options_file}"
   end
 
   def self.test_suffix
