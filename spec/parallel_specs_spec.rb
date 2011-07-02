@@ -108,14 +108,13 @@ describe ParallelSpecs do
       ParallelSpecs.run_tests(['xxx'],1,'')
     end
 
-    it "uses inline options with rspec2" do
+    it "uses -O spec/parallel_spec.opts with rspec2" do
       File.should_receive(:file?).with('spec/parallel_spec.opts').and_return true
-      File.should_receive(:read).with('spec/parallel_spec.opts').and_return "--foo\n--bar\n"
 
       ParallelSpecs.stub!(:bundler_enabled?).and_return true
-      ParallelSpecs.stub!(:run).with("bundle show rspec").and_return "/foo/bar/rspec-2.0.2"
+      ParallelSpecs.stub!(:run).with("bundle show rspec").and_return "/foo/bar/rspec-2.4.2"
 
-      ParallelSpecs.should_receive(:open).with{|x,y| x =~ %r{rspec\s+ --tty --foo --bar}}.and_return mocked_process
+      ParallelSpecs.should_receive(:open).with{|x,y| x =~ %r{rspec\s+ --tty -O spec/parallel_spec.opts}}.and_return mocked_process
       ParallelSpecs.run_tests(['xxx'],1,'')
     end
 
