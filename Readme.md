@@ -20,6 +20,7 @@ OR as plugin
     # add to Gemfile
     gem "parallel", :group => :development
 
+
 ### Rails 2
 
 As gem
@@ -90,7 +91,7 @@ Add to your `spec/parallel_spec.opts` (or `spec/spec.opts`) :
     RSpec 1.x:
       --format progress
       --format ParallelSpecs::SpecRuntimeLogger:tmp/parallel_profile.log
-    RSpec >= 2.2:
+    RSpec >= 2.4:
       Installed as plugin: -I vendor/plugins/parallel_tests/lib
       --format progress
       --format ParallelSpecs::SpecRuntimeLogger --out tmp/parallel_profile.log
@@ -122,7 +123,7 @@ Add the following to your `spec/parallel_spec.opts` (or `spec/spec.opts`) :
 
     RSpec 1.x:
       --format ParallelSpecs::SpecFailuresLogger:tmp/failing_specs.log
-    RSpec >= 2.2:
+    RSpec >= 2.4:
       --format ParallelSpecs::SpecFailuresLogger --out tmp/failing_specs.log
 
 Setup for non-rails
