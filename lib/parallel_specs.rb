@@ -36,7 +36,7 @@ class ParallelSpecs < ParallelTests
   end
 
   def self.rspec_2_color
-    '--tty ' if $stdout.tty?
+    '--color --tty ' if $stdout.tty?
   end
 
   def self.spec_opts(rspec_version)

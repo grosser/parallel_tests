@@ -114,7 +114,7 @@ describe ParallelSpecs do
       ParallelSpecs.stub!(:bundler_enabled?).and_return true
       ParallelSpecs.stub!(:run).with("bundle show rspec").and_return "/foo/bar/rspec-2.4.2"
 
-      ParallelSpecs.should_receive(:open).with{|x,y| x =~ %r{rspec\s+ --tty -O spec/parallel_spec.opts}}.and_return mocked_process
+      ParallelSpecs.should_receive(:open).with{|x,y| x =~ %r{rspec\s+ --color --tty -O spec/parallel_spec.opts}}.and_return mocked_process
       ParallelSpecs.run_tests(['xxx'],1,'')
     end
 
