@@ -59,8 +59,8 @@ describe 'CLI' do
   end
 
   it "can exec given commands with ENV['TEST_ENV_NUM']" do
-    result = `#{executable} -e 'ruby -e "puts ENV[:TEST_ENV_NUMBER.to_s].inspect"' -n 4`
-    result.split("\n").sort.should == %w["" "2" "3" "4"]
+    result = `#{executable} -e 'ruby -e "print ENV[:TEST_ENV_NUMBER.to_s].to_i"' -n 4`
+    result.gsub('"','').split('').sort.should == %w[0 2 3 4]
   end
 
   it "can exec given command non-parallel" do
@@ -83,14 +83,11 @@ describe 'CLI' do
   end
 
   it "runs faster with more processes" do
-    write 'xxx_spec.rb', 'describe("it"){it("should"){sleep 2}}'
-    write 'xxx2_spec.rb', 'describe("it"){it("should"){sleep 2}}'
-    write 'xxx3_spec.rb', 'describe("it"){it("should"){sleep 2}}'
-    write 'xxx4_spec.rb', 'describe("it"){it("should"){sleep 2}}'
-    write 'xxx5_spec.rb', 'describe("it"){it("should"){sleep 2}}'
-    write 'xxx6_spec.rb', 'describe("it"){it("should"){sleep 2}}'
+    2.times{|i|
+      write "xxx#{i}_spec.rb",  'describe("it"){it("should"){sleep 5}}; $stderr.puts ENV["TEST_ENV_NUMBER"]'
+    }
     t = Time.now
-    run_specs :processes => 6
+    puts run_specs(:processes => 2)
     expected = 10
     (Time.now - t).should <= expected
   end
