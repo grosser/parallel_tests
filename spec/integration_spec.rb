@@ -108,4 +108,14 @@ describe 'CLI' do
     result = run_specs(:add => "--test-options ' --version'", :processes => 2)
     result.should =~ /\d+\.\d+\.\d+.*\d+\.\d+\.\d+/m # prints version twice
   end
+
+  it 'can run with test patterns' do
+    write 'test1_spec.rb', 'describe("it"){it("should"){puts "TEST1"}}'
+    write 'test2_spec.rb', 'describe("it"){it("should"){puts "TEST2"}}'
+    write 'test3_spec.rb', 'describe("it"){it("should"){puts "TEST3"}}'
+    result = run_specs(:add => "-P '**/test1_spec.rb,**/test2_spec.rb'")
+    result.should include('TEST1')
+    result.should include('TEST2')
+    result.should_not include('TEST3')
+  end
 end

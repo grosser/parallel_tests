@@ -13,18 +13,19 @@ class ParallelTests
       num_processes = args[:count] unless args[:count].to_s.empty?
       prefix = args[:path_prefix]
       options = args[:options] if args[:options]
+      patterns = args[:patterns] if args[:patterns]
     else # something stringy
       prefix = args[:count]
     end
-    [num_processes.to_i, prefix.to_s, options]
+    [num_processes.to_i, prefix.to_s, options, patterns.to_s]
   end
 
   # finds all tests and partitions them into groups
   def self.tests_in_groups(root, num_groups, options={})
     if options[:no_sort] == true
-      Grouper.in_groups(find_tests(root), num_groups)
+      Grouper.in_groups(find_tests(root, options[:pattern]), num_groups)
     else
-      Grouper.in_even_groups_by_size(tests_with_runtime(root), num_groups)
+      Grouper.in_even_groups_by_size(tests_with_runtime(root, options[:pattern]), num_groups)
     end
   end
 
@@ -91,7 +92,7 @@ class ParallelTests
 
   # copied from http://github.com/carlhuda/bundler Bundler::SharedHelpers#find_gemfile
   def self.bundler_enabled?
-    return true if Object.const_defined?(:Bundler) 
+    return true if Object.const_defined?(:Bundler)
 
     previous = nil
     current = File.expand_path(Dir.pwd)
@@ -113,8 +114,8 @@ class ParallelTests
     "_test.rb"
   end
 
-  def self.tests_with_runtime(root)
-    tests = find_tests(root)
+  def self.tests_with_runtime(root, pattern='')
+    tests = find_tests(root, pattern)
     lines = File.read(runtime_log).split("\n") rescue []
 
     # use recorded test runtime if we got enough data
@@ -131,11 +132,18 @@ class ParallelTests
     end
   end
 
-  def self.find_tests(root)
+  def self.find_tests(root, pattern=nil)
     if root.is_a?(Array)
       root
     else
-      Dir["#{root}**/**/*#{self.test_suffix}"]
+      if pattern.to_s.empty?
+        Dir["#{root}**/**/*#{self.test_suffix}"]
+      else
+        patterns = pattern.to_s.split(',')
+        patterns.inject([]) do |files, pattern|
+          files += Dir["#{root}#{pattern}"]
+        end
+      end
     end
   end
 end
