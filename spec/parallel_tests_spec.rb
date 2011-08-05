@@ -6,22 +6,27 @@ describe ParallelTests do
   describe :parse_rake_args do
     it "should return the count" do
       args = {:count => 2}
-      ParallelTests.parse_rake_args(args).should == [2, '', ""]
+      ParallelTests.parse_rake_args(args).should == [2, '', "", '']
     end
 
     it "should default to the prefix" do
       args = {:count => "models"}
-      ParallelTests.parse_rake_args(args).should == [Parallel.processor_count, "models", ""]
+      ParallelTests.parse_rake_args(args).should == [Parallel.processor_count, "models", "", '']
     end
 
     it "should return the count and prefix" do
       args = {:count => 2, :path_prefix => "models"}
-      ParallelTests.parse_rake_args(args).should == [2, "models", ""]
+      ParallelTests.parse_rake_args(args).should == [2, "models", "", '']
     end
 
     it "should return the count, prefix, and options" do
       args = {:count => 2, :path_prefix => "plain", :options => "-p default" }
-      ParallelTests.parse_rake_args(args).should == [2, "plain", "-p default"]
+      ParallelTests.parse_rake_args(args).should == [2, "plain", "-p default", '']
+    end
+
+    it "should return the count, prefix, options, and patterns" do
+      args = {:count => 2, :path_prefix => "plain", :options => "-p default", :patterns => "**/**/*_spec.rb" }
+      ParallelTests.parse_rake_args(args).should == [2, "plain", "-p default", "**/**/*_spec.rb"]
     end
   end
 
