@@ -21,10 +21,12 @@ class ParallelTests
 
   # finds all tests and partitions them into groups
   def self.tests_in_groups(root, num_groups, options={})
+    tests = find_tests(root)
     if options[:no_sort] == true
-      Grouper.in_groups(find_tests(root), num_groups)
+      Grouper.in_groups(tests, num_groups)
     else
-      Grouper.in_even_groups_by_size(tests_with_runtime(root), num_groups)
+      tests = with_runtime_info(tests)
+      Grouper.in_even_groups_by_size(tests, num_groups)
     end
   end
 
@@ -113,8 +115,7 @@ class ParallelTests
     "_test.rb"
   end
 
-  def self.tests_with_runtime(root)
-    tests = find_tests(root)
+  def self.with_runtime_info(tests)
     lines = File.read(runtime_log).split("\n") rescue []
 
     # use recorded test runtime if we got enough data
