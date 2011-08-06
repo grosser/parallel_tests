@@ -5,18 +5,21 @@ require 'parallel_tests/railtie'
 class ParallelTests
   VERSION = File.read( File.join(File.dirname(__FILE__),'..','VERSION') ).strip
 
-  # parallel:spec[2,controller] <-> parallel:spec[controller]
+  # parallel:spec[:count, :path_prefix, :options]
   def self.parse_rake_args(args)
-    num_processes = Parallel.processor_count
-    options = ""
-    if args[:count].to_s =~ /^\d*$/ # number or empty
-      num_processes = args[:count] unless args[:count].to_s.empty?
-      prefix = args[:path_prefix]
-      options = args[:options] if args[:options]
-    else # something stringy
-      prefix = args[:count]
-    end
-    [num_processes.to_i, prefix.to_s, options]
+    # order as given by user
+    args = [args[:count], args[:path_prefix], args[:options]]
+
+    # count given or empty ?
+    # parallel:spec[2,models,options]
+    # parallel:spec[,models,options]
+    count = args.shift if args.first.to_s =~ /^\d*$/
+    num_processes = (count.to_s.empty? ? Parallel.processor_count : count.to_i)
+
+    prefix = args.shift
+    options = args.shift
+
+    [num_processes.to_i, prefix.to_s, options.to_s]
   end
 
   # finds all tests and partitions them into groups
