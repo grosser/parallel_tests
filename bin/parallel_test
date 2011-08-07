@@ -60,10 +60,10 @@ else
 
   start = Time.now
 
-  tests_folder = File.join(task, options[:path_prefix].to_s)
+  tests_folder = task
   tests_folder = File.join(options[:root], tests_folder) unless options[:root].to_s.empty?
 
-  groups = klass.tests_in_groups(options[:files] || tests_folder, num_processes, :no_sort => options[:no_sort])
+  groups = klass.tests_in_groups(options[:files] || tests_folder, num_processes, :no_sort => options[:no_sort], :pattern => options[:path_prefix].to_s)
   num_processes = groups.size
 
   #adjust processes to groups

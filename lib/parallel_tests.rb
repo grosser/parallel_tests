@@ -24,11 +24,12 @@ class ParallelTests
 
   # finds all tests and partitions them into groups
   def self.tests_in_groups(root, num_groups, options={})
-    tests = find_tests(root)
+    tests = find_tests(root, options)
     if options[:no_sort] == true
       Grouper.in_groups(tests, num_groups)
     else
       tests = with_runtime_info(tests)
+      puts tests.inspect
       Grouper.in_even_groups_by_size(tests, num_groups)
     end
   end
@@ -96,7 +97,7 @@ class ParallelTests
 
   # copied from http://github.com/carlhuda/bundler Bundler::SharedHelpers#find_gemfile
   def self.bundler_enabled?
-    return true if Object.const_defined?(:Bundler) 
+    return true if Object.const_defined?(:Bundler)
 
     previous = nil
     current = File.expand_path(Dir.pwd)
@@ -135,11 +136,12 @@ class ParallelTests
     end
   end
 
-  def self.find_tests(root)
+  def self.find_tests(root, options={})
     if root.is_a?(Array)
       root
     else
-      Dir["#{root}**/**/*#{self.test_suffix}"]
+      files = Dir["#{root}/**/*"]
+      files.select {|f| f.sub(root+'/','') =~ /#{options[:pattern]}.*#{test_suffix}$/ }
     end
   end
 end
