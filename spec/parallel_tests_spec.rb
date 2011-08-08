@@ -136,6 +136,54 @@ EOF
     end
   end
 
+  describe :find_tests do
+    it "returns if root is an array" do
+      ParallelTests.send(:find_tests, [1]).should == [1]
+    end
+
+    it "finds all test files" do
+      begin
+        root = "/tmp/test-find_tests-#{rand(999)}"
+        `mkdir #{root}`
+        `mkdir #{root}/a`
+        `mkdir #{root}/b`
+        `touch #{root}/x_test.rb`
+        `touch #{root}/a/x_test.rb`
+        `touch #{root}/a/test.rb`
+        `touch #{root}/b/y_test.rb`
+        `touch #{root}/b/test.rb`
+        `ln -s #{root}/b #{root}/c`
+        `ln -s #{root}/b #{root}/a/`
+        ParallelTests.send(:find_tests, root).sort.should == [
+          "#{root}/a/b/y_test.rb",
+          "#{root}/a/x_test.rb",
+          "#{root}/b/y_test.rb",
+          "#{root}/c/y_test.rb",
+          "#{root}/x_test.rb"
+        ]
+      ensure
+        `rm -rf #{root}`
+      end
+    end
+
+    it "finds files by pattern" do
+      begin
+        root = "/tmp/test-find_tests-#{rand(999)}"
+        `mkdir #{root}`
+        `mkdir #{root}/a`
+        `touch #{root}/a/x_test.rb`
+        `touch #{root}/a/y_test.rb`
+        `touch #{root}/a/z_test.rb`
+        ParallelTests.send(:find_tests, root, :pattern => '^a/(y|z)_test').sort.should == [
+          "#{root}/a/y_test.rb",
+          "#{root}/a/z_test.rb",
+        ]
+      ensure
+        `rm -rf #{root}`
+      end
+    end
+  end
+
   it "has a version" do
     ParallelTests::VERSION.should =~ /^\d+\.\d+\.\d+$/
   end

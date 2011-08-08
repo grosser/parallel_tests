@@ -29,7 +29,6 @@ class ParallelTests
       Grouper.in_groups(tests, num_groups)
     else
       tests = with_runtime_info(tests)
-      puts tests.inspect
       Grouper.in_even_groups_by_size(tests, num_groups)
     end
   end
@@ -140,8 +139,12 @@ class ParallelTests
     if root.is_a?(Array)
       root
     else
-      files = Dir["#{root}/**/*"]
-      files.select {|f| f.sub(root+'/','') =~ /#{options[:pattern]}.*#{test_suffix}$/ }
+      # follow one symlink and direct children
+      # http://stackoverflow.com/questions/357754/can-i-traverse-symlinked-directories-in-ruby-with-a-glob
+      files = Dir["#{root}/**{,/*/**}/*#{test_suffix}"].uniq
+      files = files.map{|f| f.sub(root+'/','') }
+      files = files.grep(/#{options[:pattern]}/)
+      files.map{|f| "#{root}/#{f}" }
     end
   end
 end
