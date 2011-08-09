@@ -14,13 +14,13 @@ describe ParallelTests do
       ParallelTests.parse_rake_args(args).should == [Parallel.processor_count, "models", ""]
     end
 
-    it "should return the count and prefix" do
-      args = {:count => 2, :path_prefix => "models"}
+    it "should return the count and pattern" do
+      args = {:count => 2, :pattern => "models"}
       ParallelTests.parse_rake_args(args).should == [2, "models", ""]
     end
 
-    it "should return the count, prefix, and options" do
-      args = {:count => 2, :path_prefix => "plain", :options => "-p default" }
+    it "should return the count, pattern, and options" do
+      args = {:count => 2, :pattern => "plain", :options => "-p default" }
       ParallelTests.parse_rake_args(args).should == [2, "plain", "-p default"]
     end
   end

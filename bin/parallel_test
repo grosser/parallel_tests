@@ -17,7 +17,7 @@ Run all tests in parallel, giving each process ENV['TEST_ENV_NUMBER'] ('', '2', 
 Options are:
 BANNER
   opts.on("-n [PROCESSES]", Integer, "How many processes to use, default: available CPUs"){|n| options[:count] = n }
-  opts.on("-p", '--path [PATH]', "run tests inside this path only"){|path| options[:path_prefix] = path }
+  opts.on("-p", '--pattern [PATTERN]', "run tests matching this pattern"){|pattern| options[:pattern] = pattern }
   opts.on("--no-sort", "do not sort files before running them"){ |no_sort| options[:no_sort] = no_sort }
   opts.on("-m [FLOAT]", "--multiply-processes [FLOAT]", Float, "use given number as a multiplier of processes to run"){ |multiply| options[:multiply] = multiply }
   opts.on("-r", '--root [PATH]', "execute test commands from this path"){|path| options[:root] = path }
@@ -63,7 +63,7 @@ else
   tests_folder = task
   tests_folder = File.join(options[:root], tests_folder) unless options[:root].to_s.empty?
 
-  groups = klass.tests_in_groups(options[:files] || tests_folder, num_processes, :no_sort => options[:no_sort], :pattern => options[:path_prefix].to_s)
+  groups = klass.tests_in_groups(options[:files] || tests_folder, num_processes, :no_sort => options[:no_sort], :pattern => options[:pattern])
   num_processes = groups.size
 
   #adjust processes to groups

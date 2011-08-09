@@ -43,12 +43,12 @@ namespace :parallel do
 
   ['test', 'spec', 'features'].each do |type|
     desc "run #{type} in parallel with parallel:#{type}[num_cpus]"
-    task type, :count, :path_prefix, :options do |t,args|
+    task type, :count, :pattern, :options do |t,args|
       $LOAD_PATH << File.expand_path(File.join(File.dirname(__FILE__), '..'))
       require "parallel_tests"
-      count, prefix, options = ParallelTests.parse_rake_args(args)
+      count, pattern, options = ParallelTests.parse_rake_args(args)
       executable = File.join(File.dirname(__FILE__), '..', '..', 'bin', 'parallel_test')
-      command = "#{executable} --type #{type} -n #{count} -p '#{prefix}' -r '#{Rails.root}' -o '#{options}'"
+      command = "#{executable} --type #{type} -n #{count} -p '#{pattern}' -r '#{Rails.root}' -o '#{options}'"
       abort unless system(command) # allow to chain tasks e.g. rake parallel:spec parallel:features
     end
   end
@@ -66,15 +66,15 @@ namespace :spec do
     end
   end
 
-  task :parallel, :count, :path_prefix do |t,args|
+  task :parallel, :count, :pattern do |t,args|
     $stderr.puts "WARNING -- Deprecated! use parallel:spec"
-    Rake::Task['parallel:spec'].invoke(args[:count], args[:path_prefix])
+    Rake::Task['parallel:spec'].invoke(args[:count], args[:pattern])
   end
 end
 
 namespace :test do
-  task :parallel, :count, :path_prefix do |t,args|
+  task :parallel, :count, :pattern do |t,args|
     $stderr.puts "WARNING -- Deprecated! use parallel:test"
-    Rake::Task['parallel:test'].invoke(args[:count], args[:path_prefix])
+    Rake::Task['parallel:test'].invoke(args[:count], args[:pattern])
   end
 end
