@@ -61,13 +61,12 @@ OR as plugin
     rake parallel:test    --> got 4 CPUs? --> 26 seconds
     ...
 
-Test just a subfolder (e.g. use one integration server per subfolder)
+Test by pattern (e.g. use one integration server per subfolder / see if you broke any user-related tests)
 
-    rake parallel:test[models]
-    rake parallel:test[something/else]
+    rake parallel:test[^unit] # everything in test/unit folder (every test file matching /^unit/)
+    rake parallel:test[user]  # run users_controller + user_helper + user tests
+    rake parallel:test['user|product']  # run user and product related tests
 
-    partial paths are OK too...
-    rake parallel:test[functional] == rake parallel:test[fun]
 
 Example output
 --------------
