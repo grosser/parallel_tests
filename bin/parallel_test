@@ -80,7 +80,14 @@ else
   results = klass.find_results(test_results.map{|result| result[:stdout] }*"")
   puts ""
   puts "Results:"
-  results.each{|r| puts r }
+
+  total_examples = results.collect{|r| r.first.split(",")[0].split(" ").first.gsub(/\e\[[0-9]+m/, "").to_i rescue 0 }.inject(:+)
+  total_failures = results.collect{|r| r.first.split(",")[1].split(" ").first.gsub(/\e\[[0-9]+m/, "").to_i rescue 0 }.inject(:+)
+  total_pendings = results.collect{|r| r.first.split(",")[2].split(" ").first.gsub(/\e\[[0-9]+m/, "").to_i rescue 0 }.inject(:+)
+
+  puts "Total examples: #{total_examples}"
+  puts "Total failures: #{total_failures} (#{(total_failures.to_f / 0.01 / total_examples).round}%)"
+  puts "Total pendings: #{total_pendings} (#{(total_pendings.to_f / 0.01 / total_examples).round}%)"
 
   #report total time taken
   puts ""
