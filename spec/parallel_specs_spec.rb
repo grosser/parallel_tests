@@ -1,4 +1,4 @@
-require 'spec/spec_helper'
+require 'spec_helper'
 require 'parallel_specs/spec_runtime_logger'
 require 'parallel_specs/spec_summary_logger'
 require 'parallel_specs/spec_failures_logger'
