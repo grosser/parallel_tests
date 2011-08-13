@@ -1,7 +1,7 @@
 require File.join(File.dirname(__FILE__), 'parallel_tests')
 
 class ParallelSpecs < ParallelTests
-  def self.run_tests(test_files, process_number, options)
+  def self.run_tests(test_files, process_number, options = {})
     exe = executable # expensive, so we cache
     version = (exe =~ /\brspec\b/ ? 2 : 1)
     cmd = "#{rspec_1_color if version == 1}#{exe} #{options[:test_options]} #{rspec_2_color if version == 2}#{spec_opts(version)} #{test_files*' '}"

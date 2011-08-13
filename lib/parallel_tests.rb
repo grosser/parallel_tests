@@ -33,7 +33,7 @@ class ParallelTests
     end
   end
 
-  def self.run_tests(test_files, process_number, options)
+  def self.run_tests(test_files, process_number, options = {})
     require_list = test_files.map { |filename| "\"#{filename}\"" }.join(",")
     cmd = "ruby -Itest #{options[:test_options]} -e '[#{require_list}].each {|f| require f }'"
     execute_command(cmd, process_number, options)
