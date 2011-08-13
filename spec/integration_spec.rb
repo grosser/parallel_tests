@@ -42,9 +42,12 @@ describe 'CLI' do
     result.should include('TEST2')
 
     # all results present
-    result.scan('1 example, 0 failure').size.should == 4 # 2 results + 2 result summary
+    result.scan('1 example, 0 failure').size.should == 2
     result.scan(/Finished in \d+\.\d+ seconds/).size.should == 2
     result.scan(/Took \d+\.\d+ seconds/).size.should == 1 # parallel summary
+    result.scan(/Total examples: 2/).size.should == 1
+    result.scan(/Total failures: 0 \(0%\)/).size.should == 1
+    result.scan(/Total pendings: 0 \(0%\)/).size.should == 1
     $?.success?.should == true
   end
 
@@ -53,8 +56,37 @@ describe 'CLI' do
     write 'xxx2_spec.rb', 'describe("it"){it("should"){1.should == 2}}'
     result = run_specs
 
-    result.scan('1 example, 1 failure').size.should == 2
-    result.scan('1 example, 0 failure').size.should == 2
+    result.scan('1 example, 1 failure').size.should == 1
+    result.scan('1 example, 0 failure').size.should == 1
+    result.scan(/Total examples: 2/).size.should == 1
+    result.scan(/Total failures: 1 \(50%\)/).size.should == 1
+    result.scan(/Total pendings: 0 \(0%\)/).size.should == 1
+    $?.success?.should == false
+  end
+
+  it "passes when there are pending tests and no failures" do
+    write 'xxx_spec.rb', "describe('it'){it('should'){puts 'TEST1'}}\ndescribe('it'){it('should'){puts 'TEST1'}}"
+    write 'xxx2_spec.rb', 'describe("it"){it("should")}'
+    result = run_specs
+
+    result.scan('1 example, 0 failures, 1 pending').size.should == 1
+    result.scan('2 examples, 0 failures').size.should == 1
+    result.scan(/Total examples: 3/).size.should == 1
+    result.scan(/Total failures: 0 \(0%\)/).size.should == 1
+    result.scan(/Total pendings: 1 \(33%\)/).size.should == 1
+    $?.success?.should == true
+  end
+
+  it "fails when there are pending tests and failures" do
+    write 'xxx_spec.rb', "describe('it'){it('should'){1.should == 2}}\ndescribe('it'){it('should')}"
+    write 'xxx2_spec.rb', 'describe("it"){it("should")}'
+    result = run_specs
+
+    result.scan('2 examples, 1 failure, 1 pending').size.should == 1
+    result.scan('1 example, 0 failures, 1 pending').size.should == 1
+    result.scan(/Total examples: 3/).size.should == 1
+    result.scan(/Total failures: 1 \(33%\)/).size.should == 1
+    result.scan(/Total pendings: 2 \(67%\)/).size.should == 1
     $?.success?.should == false
   end
 
