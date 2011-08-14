@@ -210,6 +210,7 @@ inspired by [pivotal labs](http://pivotallabs.com/users/miked/blog/articles/849-
  - [Michael Kintzer](https://github.com/rockrep)
  - [nathansobo](https://github.com/nathansobo)
  - [Joe Yates](http://titusd.co.uk)
+ - [asmega](http://www.ph-lee.com)
 
 [Michael Grosser](http://grosser.it)<br/>
 michael@grosser.it<br/>
