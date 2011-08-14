@@ -79,8 +79,7 @@ else
   #parse and print results
   results = klass.find_results(test_results.map{|result| result[:stdout] }*"")
   puts ""
-  puts "Results:"
-  results.each{|r| puts r }
+  puts klass.summarize_results(results)
 
   #report total time taken
   puts ""

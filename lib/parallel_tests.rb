@@ -63,6 +63,16 @@ class ParallelTests
     '__foo__'
   end
 
+  def self.summarize_results(results)
+    results = results.join(' ').gsub(/s\b/,'') # combine and singularize results
+    counts = results.scan(/(\d+) (\w+)/)
+    sums = counts.inject(Hash.new(0)) do |sum, (number, word)|
+      sum[word] += number.to_i
+      sum
+    end
+    sums.sort.map{|word, number|  "#{number} #{word}#{'s' if number != 1}" }.join(', ')
+  end
+
   protected
 
   # read output of the process and print in in chucks

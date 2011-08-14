@@ -184,6 +184,28 @@ EOF
     end
   end
 
+  describe :summarize_results do
+    it "adds results" do
+      ParallelTests.summarize_results(['1 foo 3 bar','2 foo 5 bar']).should == '8 bars, 3 foos'
+    end
+
+    it "adds results with braces" do
+      ParallelTests.summarize_results(['1 foo(s) 3 bar(s)','2 foo 5 bar']).should == '8 bars, 3 foos'
+    end
+
+    it "adds same results with plurals" do
+      ParallelTests.summarize_results(['1 foo 3 bar','2 foos 5 bar']).should == '8 bars, 3 foos'
+    end
+
+    it "adds non-similar results" do
+      ParallelTests.summarize_results(['1 xxx 2 yyy','1 xxx 2 zzz']).should == '2 xxxs, 2 yyys, 2 zzzs'
+    end
+
+    it "does not pluralize 1" do
+      ParallelTests.summarize_results(['1 xxx 2 yyy']).should == '1 xxx, 2 yyys'
+    end
+  end
+
   it "has a version" do
     ParallelTests::VERSION.should =~ /^\d+\.\d+\.\d+$/
   end

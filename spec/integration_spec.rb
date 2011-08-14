@@ -42,7 +42,8 @@ describe 'CLI' do
     result.should include('TEST2')
 
     # all results present
-    result.scan('1 example, 0 failure').size.should == 4 # 2 results + 2 result summary
+    result.scan('1 example, 0 failure').size.should == 2 # 2 results
+    result.scan('2 examples, 0 failures').size.should == 1 # 1 summary
     result.scan(/Finished in \d+\.\d+ seconds/).size.should == 2
     result.scan(/Took \d+\.\d+ seconds/).size.should == 1 # parallel summary
     $?.success?.should == true
@@ -53,8 +54,9 @@ describe 'CLI' do
     write 'xxx2_spec.rb', 'describe("it"){it("should"){1.should == 2}}'
     result = run_specs
 
-    result.scan('1 example, 1 failure').size.should == 2
-    result.scan('1 example, 0 failure').size.should == 2
+    result.scan('1 example, 1 failure').size.should == 1
+    result.scan('1 example, 0 failure').size.should == 1
+    result.scan('2 examples, 1 failure').size.should == 1
     $?.success?.should == false
   end
 
