@@ -1,4 +1,5 @@
-Speedup Test::Unit + RSpec + Cucumber by running parallel on multiple CPUs (or cores).
+Speedup Test::Unit + RSpec + Cucumber by running parallel on multiple CPUs (or cores).<br/>
+ParallelTests splits tests into even groups and runs each group in a single process with its own database.
 
 Setup for Rails
 ===============
@@ -41,6 +42,9 @@ OR as plugin
     ./script/plugin install git://github.com/grosser/parallel_tests.git
 
 ## Setup
+ParallelTests uses 1 database per test-process, 2 processes will use `*_test` and `*_test2`.
+
+
 ### 1: Add to `config/database.yml`
     test:
       database: xxx_test<%= ENV['TEST_ENV_NUMBER'] %>
@@ -61,7 +65,7 @@ OR as plugin
     rake parallel:test    --> got 4 CPUs? --> 26 seconds
     ...
 
-Test by pattern (e.g. use one integration server per subfolder / see if you broke any user-related tests)
+Test by pattern (e.g. use one integration server per subfolder / see if you broke any 'user'-related tests)
 
     rake parallel:test[^unit] # everything in test/unit folder (every test file matching /^unit/)
     rake parallel:test[user]  # run users_controller + user_helper + user tests
@@ -73,8 +77,6 @@ Example output
     2 processes for 210 specs, ~ 105 specs per process
     ... test output ...
 
-    Results:
-    877 examples, 0 failures, 11 pending
     843 examples, 0 failures, 1 pending
 
     Took 29.925333 seconds
