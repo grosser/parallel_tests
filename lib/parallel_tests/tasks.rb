@@ -30,7 +30,7 @@ namespace :parallel do
   end
 
   # when dumping/resetting takes too long
-  desc "update test databases via db:mgrate --> parallel:migrate[num_cpus]"
+  desc "update test databases via db:migrate --> parallel:migrate[num_cpus]"
   task :migrate, :count do |t,args|
     run_in_parallel('rake db:migrate RAILS_ENV=test', args)
   end
