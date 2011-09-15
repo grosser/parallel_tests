@@ -23,6 +23,17 @@ describe ParallelTests do
       args = {:count => 2, :pattern => "plain", :options => "-p default" }
       ParallelTests.parse_rake_args(args).should == [2, "plain", "-p default"]
     end
+
+    it "should use the PARALLEL_TEST_PROCESSORS env var for processor_count if set" do
+      ENV['PARALLEL_TEST_PROCESSORS'] = '28'
+      ParallelTests.parse_rake_args({}).should == [28, '', '']
+    end
+
+    it "should use count over PARALLEL_TEST_PROCESSORS env var" do
+      ENV['PARALLEL_TEST_PROCESSORS'] = '28'
+      args = {:count => 2}
+      ParallelTests.parse_rake_args(args).should == [2, '', ""]
+    end
   end
 
   describe :run_tests do
