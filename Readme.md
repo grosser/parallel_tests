@@ -181,6 +181,7 @@ TIPS
  - [Capybara setup](https://github.com/grosser/parallel_tests/wiki)
  - [Sphinx setup](https://github.com/grosser/parallel_tests/wiki)
  - [SQL schema format] use :ruby schema format to get faster parallel:prepare`
+ - `export PARALLEL_TEST_PROCESSORS=X` in your environment and parallel_tests will use this number of processors by default
  - with zsh this would be `rake "parallel:prepare[3]"`
 
 TODO
