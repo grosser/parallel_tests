@@ -215,6 +215,7 @@ inspired by [pivotal labs](http://pivotallabs.com/users/miked/blog/articles/849-
  - [Joe Yates](http://titusd.co.uk)
  - [asmega](http://www.ph-lee.com)
  - [Doug Barth](https://github.com/dougbarth)
+ - [Geoffrey Hichborn](https://github.com/phene)
 
 [Michael Grosser](http://grosser.it)<br/>
 michael@grosser.it<br/>
