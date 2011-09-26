@@ -14,7 +14,7 @@ describe 'CLI' do
   end
 
   def write(file, content)
-    path = "#{folder}/spec/#{file}"
+    path = "#{folder}/#{file}"
     `mkdir -p #{File.dirname(path)}` unless File.exist?(File.dirname(path))
     File.open(path, 'w'){|f| f.write content }
     path
@@ -28,14 +28,14 @@ describe 'CLI' do
     "#{bin_folder}/parallel_test"
   end
 
-  def run_specs(options={})
-    `cd #{folder} && #{executable} --chunk-timeout 999 -t spec -n #{options[:processes]||2} #{options[:add]} 2>&1`
+  def run_tests(options={})
+    `cd #{folder} && #{executable} --chunk-timeout 999 -t #{options[:type] || 'spec'} -n #{options[:processes]||2} #{options[:add]} 2>&1`
   end
 
   it "runs tests in parallel" do
-    write 'xxx_spec.rb', 'describe("it"){it("should"){puts "TEST1"}}'
-    write 'xxx2_spec.rb', 'describe("it"){it("should"){puts "TEST2"}}'
-    result = run_specs
+    write 'spec/xxx_spec.rb', 'describe("it"){it("should"){puts "TEST1"}}'
+    write 'spec/xxx2_spec.rb', 'describe("it"){it("should"){puts "TEST2"}}'
+    result = run_tests
 
     # test ran and gave their puts
     result.should include('TEST1')
@@ -50,9 +50,9 @@ describe 'CLI' do
   end
 
   it "fails when tests fail" do
-    write 'xxx_spec.rb', 'describe("it"){it("should"){puts "TEST1"}}'
-    write 'xxx2_spec.rb', 'describe("it"){it("should"){1.should == 2}}'
-    result = run_specs
+    write 'spec/xxx_spec.rb', 'describe("it"){it("should"){puts "TEST1"}}'
+    write 'spec/xxx2_spec.rb', 'describe("it"){it("should"){1.should == 2}}'
+    result = run_tests
 
     result.scan('1 example, 1 failure').size.should == 1
     result.scan('1 example, 0 failure').size.should == 1
@@ -86,28 +86,34 @@ describe 'CLI' do
 
   it "runs faster with more processes" do
     2.times{|i|
-      write "xxx#{i}_spec.rb",  'describe("it"){it("should"){sleep 5}}; $stderr.puts ENV["TEST_ENV_NUMBER"]'
+      write "spec/xxx#{i}_spec.rb",  'describe("it"){it("should"){sleep 5}}; $stderr.puts ENV["TEST_ENV_NUMBER"]'
     }
     t = Time.now
-    puts run_specs(:processes => 2)
+    puts run_tests(:processes => 2)
     expected = 10
     (Time.now - t).should <= expected
   end
 
   it "can can with given files" do
-    write "x1_spec.rb", "puts '111'"
-    write "x2_spec.rb", "puts '222'"
-    write "x3_spec.rb", "puts '333'"
-    result = run_specs(:add => 'spec/x1_spec.rb spec/x3_spec.rb')
+    write "spec/x1_spec.rb", "puts '111'"
+    write "spec/x2_spec.rb", "puts '222'"
+    write "spec/x3_spec.rb", "puts '333'"
+    result = run_tests(:add => 'spec/x1_spec.rb spec/x3_spec.rb')
     result.should include('111')
     result.should include('333')
     result.should_not include('222')
   end
 
   it "can run with test-options" do
-    write "x1_spec.rb", ""
-    write "x2_spec.rb", ""
-    result = run_specs(:add => "--test-options ' --version'", :processes => 2)
+    write "spec/x1_spec.rb", ""
+    write "spec/x2_spec.rb", ""
+    result = run_tests(:add => "--test-options ' --version'", :processes => 2)
     result.should =~ /\d+\.\d+\.\d+.*\d+\.\d+\.\d+/m # prints version twice
+  end
+
+  it "passes test options to test::unit" do
+    write "test/x1_test.rb", "require 'test/unit'; class XTest < Test::Unit::TestCase; def test_xxx; end; end"
+    result = run_tests(:type => :test, :add => '--test-options "-v"')
+    result.should include('test_xxx(XTest)') # verbose output of every test
   end
 end
