@@ -36,8 +36,9 @@ class ParallelTests
   end
 
   def self.run_tests(test_files, process_number, options)
-    require_list = test_files.map { |filename| "\"#{filename}\"" }.join(",")
-    cmd = "ruby -Itest -e '[#{require_list}].each {|f| require f }' - #{options[:test_options]}"
+    require_list = test_files.map { |filename| "\"./#{filename}\"" }.join(",")
+    test_options = "- #{options[:test_options]}" unless RUBY_VERSION > '1.9.2' # test options passing is broken on 1.9.3 see issue #64
+    cmd = "ruby -Itest -e '[#{require_list}].each {|f| require f }' #{test_options}"
     execute_command(cmd, process_number, options)
   end
 

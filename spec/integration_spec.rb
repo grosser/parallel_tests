@@ -114,6 +114,6 @@ describe 'CLI' do
   it "passes test options to test::unit" do
     write "test/x1_test.rb", "require 'test/unit'; class XTest < Test::Unit::TestCase; def test_xxx; end; end"
     result = run_tests(:type => :test, :add => '--test-options "-v"')
-    result.should include('test_xxx(XTest)') # verbose output of every test
+    result.should include('test_xxx') # verbose output of every test
   end
 end
