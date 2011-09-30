@@ -111,6 +111,13 @@ describe 'CLI' do
     result.should =~ /\d+\.\d+\.\d+.*\d+\.\d+\.\d+/m # prints version twice
   end
 
+  it "runs with test::unit" do
+    write "test/x1_test.rb", "require 'test/unit'; class XTest < Test::Unit::TestCase; def test_xxx; end; end"
+    result = run_tests(:type => :test)
+    result.should include('1 test')
+    $?.success?.should == true
+  end
+
   it "passes test options to test::unit" do
     write "test/x1_test.rb", "require 'test/unit'; class XTest < Test::Unit::TestCase; def test_xxx; end; end"
     result = run_tests(:type => :test, :add => '--test-options "-v"')
