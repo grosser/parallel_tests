@@ -8,7 +8,7 @@ class ParallelTests
             groups[group_number] << items.shift
           end
         end
-      end
+      end.map(&:sort)
     end
 
     def self.in_even_groups_by_size(items_with_sizes, num_groups)
@@ -21,7 +21,7 @@ class ParallelTests
         smallest[:size] += size
       end
 
-      groups.map{|g| g[:items] }
+      groups.map{|g| g[:items].sort }
     end
 
     def self.smallest_first(files)
