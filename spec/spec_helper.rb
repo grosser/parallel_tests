@@ -25,7 +25,7 @@ def use_temporary_directory_for
 
   begin
     # just in case the temporary dir already exists
-    FileUtils.rm_rf(dir) if File.exists?(dir) 
+    FileUtils.rm_rf(dir) if File.exists?(dir)
 
     # create the temporary directory
     FileUtils.mkdir_p(new_dir)
@@ -89,19 +89,34 @@ def test_tests_in_groups(klass, folder, suffix)
       groups.map{|g| size_of(g)}.should =~ [300, 300, 200]
     end
 
-    it "partitions by runtime when runtime-data is available" do
-      klass.stub!(:puts)
+    def setup_runtime_log
       File.open(@log,'w') do |f|
         @files[1..-1].each{|file| f.puts "#{file}:#{@files.index(file)}"}
         f.puts "#{@files[0]}:10"
       end
+    end
+
+    it "partitions by runtime when runtime-data is available" do
+      klass.stub!(:puts)
+      setup_runtime_log
 
       groups = klass.tests_in_groups(test_root, 2)
       groups.size.should == 2
-      # 10 + 5 + 3 + 1 = 19
-      groups[0].should == [@files[0],@files[5],@files[3],@files[1]]
-      # 7 + 6 + 4 + 2 = 19
-      groups[1].should == [@files[7],@files[6],@files[4],@files[2]]
+      # 10 + 1 + 3 + 5 = 19
+      groups[0].should == [@files[0],@files[1],@files[3],@files[5]]
+      # 2 + 4 + 6 + 7 = 19
+      groups[1].should == [@files[2],@files[4],@files[6],@files[7]]
+    end
+
+    it "alpha-sorts partitions when runtime-data is available" do
+      klass.stub!(:puts)
+      setup_runtime_log
+
+      groups = klass.tests_in_groups(test_root, 2)
+      groups.size.should == 2
+
+      groups[0].should == groups[0].sort
+      groups[1].should == groups[1].sort
     end
 
     it "partitions by round-robin when not sorting" do
@@ -110,6 +125,14 @@ def test_tests_in_groups(klass, folder, suffix)
       groups = klass.tests_in_groups(files, 2, :no_sort => true)
       groups[0].should == ["file1.rb", "file3.rb"]
       groups[1].should == ["file2.rb", "file4.rb"]
+    end
+
+    it "alpha-sorts partitions when not sorting by runtime" do
+      files = %w[q w e r t y u i o p a s d f g h j k l z x c v b n m]
+      klass.should_receive(:find_tests).and_return(files)
+      groups = klass.tests_in_groups(files, 2, :no_sort => true)
+      groups[0].should == groups[0].sort
+      groups[1].should == groups[1].sort
     end
   end
 end
