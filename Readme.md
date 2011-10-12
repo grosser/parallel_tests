@@ -219,4 +219,5 @@ inspired by [pivotal labs](http://pivotallabs.com/users/miked/blog/articles/849-
 
 [Michael Grosser](http://grosser.it)<br/>
 michael@grosser.it<br/>
-Hereby placed under public domain, do what you want, just do not hold me accountable...
+Hereby placed under public domain, do what you want, just do not hold me accountable...<br/>
+[![Flattr](http://api.flattr.com/button/flattr-badge-large.png)](https://flattr.com/submit/auto?user_id=grosser&url=https://github.com/grosser/parallel_tests&title=parallel_tests&language=en_GB&tags=github&category=software)
