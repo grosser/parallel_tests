@@ -1,5 +1,5 @@
 Speedup Test::Unit + RSpec + Cucumber by running parallel on multiple CPUs (or cores).<br/>
-ParallelTests splits tests into even groups and runs each group in a single process with its own database.
+ParallelTests splits tests into even groups(by number of tests or runtime) and runs each group in a single process with its own database.
 
 Setup for Rails
 ===============
@@ -87,7 +87,7 @@ Spec Loggers
 Even process runtimes
 -----------------
 
-Log test runtime to give each process the same test runtime.
+Log test runtime to give each process the same runtime.
 
 Add to your `spec/parallel_spec.opts` (or `spec/spec.opts`) :
 
@@ -102,7 +102,7 @@ Add to your `spec/parallel_spec.opts` (or `spec/spec.opts`) :
 SpecSummaryLogger
 --------------------
 
-This logger stops the different processes overwriting each other's output.
+This logger logs the test output without the different processes overwriting each other.
 
 Add the following to your `spec/parallel_spec.opts` (or `spec/spec.opts`) :
 
@@ -116,7 +116,7 @@ Add the following to your `spec/parallel_spec.opts` (or `spec/spec.opts`) :
 SpecFailuresLogger
 -----------------------
 
-This logger produces command lines for running any failing examples.
+This logger produces pasteable command-line snippets for each failed example.
 
 E.g.
 
