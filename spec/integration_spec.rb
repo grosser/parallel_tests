@@ -49,6 +49,13 @@ describe 'CLI' do
     $?.success?.should == true
   end
 
+  it "does not run any tests if there are none" do
+    write 'spec/xxx.rb', 'xxx'
+    result = run_tests
+    result.should include('No examples found')
+    result.should include('Took')
+  end
+
   it "fails when tests fail" do
     write 'spec/xxx_spec.rb', 'describe("it"){it("should"){puts "TEST1"}}'
     write 'spec/xxx2_spec.rb', 'describe("it"){it("should"){1.should == 2}}'
