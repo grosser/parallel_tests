@@ -27,5 +27,16 @@ class ParallelTests
     def self.smallest_first(files)
       files.sort_by{|item, size| size }.reverse
     end
+
+    def self.by_directories items, root, directories_to_group_by
+      directory_groups = items.group_by do | item |
+        group_name = 'non_matching'
+        directories_to_group_by.each do | dir |
+          group_name = dir if item.start_with?("#{root}/#{dir}")
+        end
+        group_name
+      end
+      directory_groups.values
+    end
   end
 end

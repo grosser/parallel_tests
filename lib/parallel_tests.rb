@@ -29,6 +29,8 @@ class ParallelTests
     tests = find_tests(root, options)
     if options[:no_sort] == true
       Grouper.in_groups(tests, num_groups)
+    elsif options[:directories_to_group_by]
+      Grouper.by_directories tests, root, options[:directories_to_group_by]
     else
       tests = with_runtime_info(tests)
       Grouper.in_even_groups_by_size(tests, num_groups)
