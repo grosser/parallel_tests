@@ -15,10 +15,7 @@ class ParallelTests
       items_with_size = smallest_first(items_with_sizes)
       groups = Array.new(num_groups){{:items => [], :size => 0}}
       items_with_size.each do |item, size|
-        # always add to smallest group
-        smallest = groups.sort_by{|g| g[:size] }.first
-        smallest[:items] << item
-        smallest[:size] += size
+        add_to_smallest_group(groups, item, size)
       end
 
       groups.map{|g| g[:items].sort }
@@ -26,6 +23,14 @@ class ParallelTests
 
     def self.smallest_first(files)
       files.sort_by{|item, size| size }.reverse
+    end
+
+  private
+
+    def self.add_to_smallest_group(groups, item, size)
+      smallest = groups.min_by{|g| g[:size] }
+      smallest[:items] << item
+      smallest[:size] += size
     end
   end
 end
