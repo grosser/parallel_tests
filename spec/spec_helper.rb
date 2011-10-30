@@ -145,13 +145,12 @@ def test_tests_in_groups(klass, folder, suffix)
     it "partitions by runtime when runtime-data is available even with imperfect data" do
       klass.stub!(:puts)
       setup_runtime_log_with_imperfections
-
       groups = klass.tests_in_groups(test_root, 2)
       groups.size.should == 2
-      # 0=>avg=4 + 3 + 4 + 7 = 18
-      groups[0].should == [@files[0],@files[3],@files[4],@files[7]]
-      # 1 + 2 + 5 + 6 = 14
-      groups[1].should == [@files[1],@files[2],@files[5],@files[6]]
+      # 0=>avg=4 + 1 + 4 + 7 = 16
+      groups[0].should == [@files[0],@files[1],@files[4],@files[7]]
+      # 2 + 3 + 5 + 6 = 16
+      groups[1].should == [@files[2],@files[3],@files[5],@files[6]]
     end
 
     it "alpha-sorts partitions when runtime-data is available" do

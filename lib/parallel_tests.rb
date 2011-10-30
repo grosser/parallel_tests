@@ -154,15 +154,16 @@ class ParallelTests
     if lines.size > 0
       puts "Using recorded test runtime"
       prefix=sort_prefix(options)
-      times = Hash.new(1)
+      times = Hash.new
       lines.each do |line|
         test, time = line.split(":")
         test = "#{prefix}#{test}" if prefix
         times[test] = time.to_f
       end
       v=times.values
+      average_time=1
       average_time=v.inject(:+).to_f/v.size.to_f if v.size > 0
-      tests.sort.map{|test| [test, times[test] || average_time] }
+      tests.sort.map{|test| [test, times[test] ? times[test] : average_time] }
     else # use file sizes
       tests.sort.map{|test| [test, File.stat(test).size] }
     end
