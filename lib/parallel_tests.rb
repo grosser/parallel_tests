@@ -30,7 +30,7 @@ class ParallelTests
     if options[:no_sort] == true
       Grouper.in_groups(tests, num_groups)
     else
-      tests = with_runtime_info(tests)
+      tests = with_runtime_info(tests, options)
       Grouper.in_even_groups_by_size(tests, num_groups)
     end
   end
@@ -61,8 +61,24 @@ class ParallelTests
     process_number == 0 ? '' : process_number + 1
   end
 
-  def self.runtime_log
-    '__foo__'
+  def self.runtime_log(options = {})
+    result = options[:runtime_log]
+    result ||= ENV['PARALLEL_TEST_RUNTIME_LOG'] if ENV['PARALLEL_TEST_RUNTIME_LOG'] && !ENV['PARALLEL_TEST_RUNTIME_LOG'].empty?
+    result ||= '__foo__'
+    result
+  end
+
+  def self.sort_datafile(options = {})
+    result = options[:sort_datafile]
+    result ||= ENV['PARALLEL_TEST_SORT_DATAFILE'] if ENV['PARALLEL_TEST_SORT_DATAFILE'] && !ENV['PARALLEL_TEST_SORT_DATAFILE'].empty?
+    result ||= '__foo__'
+    result
+  end
+
+  def self.sort_prefix(options = {})
+    result = options[:sort_prefix]
+    result ||= ENV['PARALLEL_TEST_SORT_PREFIX'] if ENV['PARALLEL_TEST_SORT_PREFIX'] && !ENV['PARALLEL_TEST_SORT_PREFIX'].empty?
+    result
   end
 
   def self.summarize_results(results)
@@ -130,18 +146,23 @@ class ParallelTests
     "_test.rb"
   end
 
-  def self.with_runtime_info(tests)
-    lines = File.read(runtime_log).split("\n") rescue []
+  def self.with_runtime_info(tests, options = {})
+    # strip comments ("# blah blah blah") and lines that don't generally look like "path-to-some-file:123.45"
+    lines = File.read(sort_datafile(options)).split("\n").grep(/^[^#][^\:]+:[0-9\.]+$/) rescue []
 
     # use recorded test runtime if we got enough data
-    if lines.size * 1.5 > tests.size
+    if lines.size > 0
       puts "Using recorded test runtime"
+      prefix=sort_prefix(options)
       times = Hash.new(1)
       lines.each do |line|
         test, time = line.split(":")
+        test = "#{prefix}#{test}" if prefix
         times[test] = time.to_f
       end
-      tests.sort.map{|test| [test, times[test]] }
+      v=times.values
+      average_time=v.inject(:+).to_f/v.size.to_f if v.size > 0
+      tests.sort.map{|test| [test, times[test] || average_time] }
     else # use file sizes
       tests.sort.map{|test| [test, File.stat(test).size] }
     end

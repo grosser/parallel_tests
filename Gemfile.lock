@@ -7,7 +7,7 @@ GEM
       bundler (~> 1.0)
       git (>= 1.2.5)
       rake
-    parallel (0.5.1)
+    parallel (0.5.9)
     rake (0.8.7)
     rspec (2.6.0)
       rspec-core (~> 2.6.0)
@@ -23,6 +23,6 @@ PLATFORMS
 
 DEPENDENCIES
   jeweler
-  parallel
+  parallel (>= 0.5.9)
   rake
   rspec (>= 2.4)
