@@ -71,6 +71,12 @@ describe ParallelTests do
       ParallelTests::Grouper.should_receive(:smallest_first).and_return([])
       ParallelTests.tests_in_groups [], 1
     end
+
+    it "groups by single_process pattern and then via size" do
+      ParallelTests.should_receive(:with_runtime_info).and_return([['aaa',5],['aaa2',5],['bbb',2],['ccc',1],['ddd',1]])
+      result = ParallelTests.tests_in_groups [], 3, :single_process => [/^a.a/]
+      result.should == [["aaa", "aaa2"], ["bbb"], ["ccc", "ddd"]]
+    end
   end
 
   describe :find_results do
@@ -94,7 +100,7 @@ EOF
       ParallelTests.find_results(output).should == ['10 tests, 20 assertions, 0 failures, 0 errors','14 tests, 20 assertions, 0 failures, 0 errors']
     end
 
-    it "is robust against scrambeled output" do
+    it "is robust against scrambled output" do
       output = <<EOF
 Loaded suite /opt/ruby-enterprise/lib/ruby/gems/1.8/gems/rake-0.8.4/lib/rake/rake_test_loader
 Started

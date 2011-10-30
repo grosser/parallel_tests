@@ -21,6 +21,10 @@ BANNER
   opts.on("--no-sort", "do not sort files before running them"){ |no_sort| options[:no_sort] = no_sort }
   opts.on("-m [FLOAT]", "--multiply-processes [FLOAT]", Float, "use given number as a multiplier of processes to run"){ |multiply| options[:multiply] = multiply }
   opts.on("-r", '--root [PATH]', "execute test commands from this path"){|path| options[:root] = path }
+  opts.on("-s [PATTERN]", "--single [PATTERN]", "Run all matching files in only one process") do |pattern|
+    options[:single_process] ||= []
+    options[:single_process] << /#{pattern}/
+  end
   opts.on("-e", '--exec [COMMAND]', "execute this code parallel and with ENV['TEST_ENV_NUM']"){|path| options[:execute] = path }
   opts.on("-o", "--test-options '[OPTIONS]'", "execute test commands with those options"){|arg| options[:test_options] = arg }
   opts.on("-t", "--type [TYPE]", "which type of tests to run? test, spec or features"){|type| options[:type] = type }
@@ -29,6 +33,8 @@ BANNER
   opts.on('-v', '--version', 'Show Version'){ puts ParallelTests::VERSION; exit}
   opts.on("-h", "--help", "Show this.") { puts opts; exit }
 end.parse!
+
+raise "--no-sort and --single-process are not supported" if options[:no_sort] and options[:single_process]
 
 # get files to run from arguments
 options[:files] = ARGV if ARGV.size > 0
@@ -63,7 +69,7 @@ else
   tests_folder = task
   tests_folder = File.join(options[:root], tests_folder) unless options[:root].to_s.empty?
 
-  groups = klass.tests_in_groups(options[:files] || tests_folder, num_processes, :no_sort => options[:no_sort], :pattern => options[:pattern])
+  groups = klass.tests_in_groups(options[:files] || tests_folder, num_processes, options)
   num_processes = groups.size
 
   #adjust processes to groups

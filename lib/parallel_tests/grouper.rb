@@ -12,11 +12,21 @@ class ParallelTests
       groups.map!(&:sort!)
     end
 
-    def self.in_even_groups_by_size(items_with_sizes, num_groups)
+    def self.in_even_groups_by_size(items_with_sizes, num_groups, options={})
       groups = Array.new(num_groups){{:items => [], :size => 0}}
 
+      # add all files that should run in a single process to one group
+      (options[:single_process]||[]).each do |pattern|
+        matched, items_with_sizes = items_with_sizes.partition{|item, size| item =~ pattern }
+        puts matched.inspect
+        smallest = smallest_group(groups)
+        matched.each{|item,size| add_to_group(smallest, item, size) }
+      end
+
+      # add all other files
       smallest_first(items_with_sizes).each do |item, size|
-        add_to_smallest_group(groups, item, size)
+        smallest = smallest_group(groups)
+        add_to_group(smallest, item, size)
       end
 
       groups.map!{|g| g[:items].sort }
@@ -28,10 +38,13 @@ class ParallelTests
 
   private
 
-    def self.add_to_smallest_group(groups, item, size)
-      smallest = groups.min_by{|g| g[:size] }
-      smallest[:items] << item
-      smallest[:size] += size
+    def self.smallest_group(groups)
+      groups.min_by{|g| g[:size] }
+    end
+
+    def self.add_to_group(group, item, size)
+      group[:items] << item
+      group[:size] += size
     end
   end
 end

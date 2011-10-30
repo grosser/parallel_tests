@@ -31,7 +31,7 @@ class ParallelTests
       Grouper.in_groups(tests, num_groups)
     else
       tests = with_runtime_info(tests)
-      Grouper.in_even_groups_by_size(tests, num_groups)
+      Grouper.in_even_groups_by_size(tests, num_groups, options)
     end
   end
 
