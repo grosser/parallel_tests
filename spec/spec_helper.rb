@@ -96,6 +96,28 @@ def test_tests_in_groups(klass, folder, suffix)
       end
     end
 
+    def setup_runtime_log_with_relative_paths(test_root)
+      File.open(@log,'w') do |f|
+        @files[0..-1].each do |file|
+          relative_file="#{file}"
+          relative_file.slice!("#{test_root}/")
+          f.puts "#{relative_file}:#{@files.index(file)}"
+        end
+        relative_file="#{@files[0]}"
+        relative_file.slice!("#{test_root}/")
+        f.puts "#{relative_file}:10"
+      end
+    end
+
+    def setup_runtime_log_with_imperfections
+      File.open(@log,'w') do |f|
+        f.puts "#/commented/out/file:1234"
+        f.puts "This is a bad line which will be:ignored"
+        @files[1..-1].each{|file| f.puts "#{file}:#{@files.index(file)}"}
+        # no entry for files[0], it should be assigned the average of the others = 4
+      end
+    end
+
     it "partitions by runtime when runtime-data is available" do
       klass.stub!(:puts)
       setup_runtime_log
@@ -106,6 +128,29 @@ def test_tests_in_groups(klass, folder, suffix)
       groups[0].should == [@files[0],@files[1],@files[3],@files[5]]
       # 2 + 4 + 6 + 7 = 19
       groups[1].should == [@files[2],@files[4],@files[6],@files[7]]
+    end
+
+    it "partitions by runtime when runtime-data is available with relative paths and a prefix" do
+      klass.stub!(:puts)
+      setup_runtime_log_with_relative_paths(test_root)
+
+      groups = klass.tests_in_groups(test_root, 2, { :sort_prefix => "#{test_root}/" })
+      groups.size.should == 2
+      # 10 + 1 + 3 + 5 = 19
+      groups[0].should == [@files[0],@files[1],@files[3],@files[5]]
+      # 2 + 4 + 6 + 7 = 19
+      groups[1].should == [@files[2],@files[4],@files[6],@files[7]]
+    end
+
+    it "partitions by runtime when runtime-data is available even with imperfect data" do
+      klass.stub!(:puts)
+      setup_runtime_log_with_imperfections
+      groups = klass.tests_in_groups(test_root, 2)
+      groups.size.should == 2
+      # 0=>avg=4 + 1 + 4 + 7 = 16
+      groups[0].should == [@files[0],@files[1],@files[4],@files[7]]
+      # 2 + 3 + 5 + 6 = 16
+      groups[1].should == [@files[2],@files[3],@files[5],@files[6]]
     end
 
     it "alpha-sorts partitions when runtime-data is available" do

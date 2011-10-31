@@ -131,6 +131,44 @@ describe ParallelSpecs do
     end
   end
 
+  describe :runtime_log do
+    it "should use the PARALLEL_TEST_RUNTIME_LOG env var if set" do
+      ENV['PARALLEL_TEST_RUNTIME_LOG'] = "tmp/my-runtime.log"
+      ParallelSpecs.runtime_log.should == "tmp/my-runtime.log"
+      ENV['PARALLEL_TEST_RUNTIME_LOG'] = nil
+    end
+
+    it "should use the runtime_log option over PARALLEL_TEST_RUNTIME_LOG env var if set" do
+      ENV['PARALLEL_TEST_RUNTIME_LOG'] = "tmp/my-runtime.log"
+      opts = { :runtime_log => "tmp/my-other-runtime.log" }
+      ParallelSpecs.runtime_log(opts).should == "tmp/my-other-runtime.log"
+      ENV['PARALLEL_TEST_RUNTIME_LOG'] = nil
+    end
+
+    it "should use the static profile log by default" do
+      ParallelSpecs.runtime_log.should == 'tmp/parallel_profile.log'
+    end
+  end
+
+  describe :sort_datafile do
+    it "should use the PARALLEL_TEST_SORT_DATAFILE env var if set" do
+      ENV['PARALLEL_TEST_SORT_DATAFILE'] = "tmp/my-sort.datafile"
+      ParallelSpecs.sort_datafile.should == "tmp/my-sort.datafile"
+      ENV['PARALLEL_TEST_SORT_DATAFILE'] = nil
+    end
+
+    it "should use the sort_datafile option over PARALLEL_TEST_SORT_DATAFILE env var if set" do
+      ENV['PARALLEL_TEST_SORT_DATAFILE'] = "tmp/my-sort.datafile"
+      opts = { :sort_datafile => "tmp/my-other-sort.datafile" }
+      ParallelSpecs.sort_datafile(opts).should == "tmp/my-other-sort.datafile"
+      ENV['PARALLEL_TEST_SORT_DATAFILE'] = nil
+    end
+
+    it "should use the static profile log by default" do
+      ParallelSpecs.sort_datafile.should == 'tmp/parallel_profile.log'
+    end
+  end
+
   describe :find_results do
     it "finds multiple results in spec output" do
       output = <<EOF

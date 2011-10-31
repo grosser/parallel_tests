@@ -20,8 +20,16 @@ class ParallelSpecs < ParallelTests
     cmd or raise("Can't find executables rspec or spec")
   end
 
-  def self.runtime_log
-    'tmp/parallel_profile.log'
+  def self.runtime_log(options = {})
+    result=ParallelTests.runtime_log(options)
+    result='tmp/parallel_profile.log' if "__foo__" == result
+    result
+  end
+
+  def self.sort_datafile(options = {})
+    result=ParallelTests.sort_datafile(options)
+    result='tmp/parallel_profile.log' if "__foo__" == result
+    result
   end
 
   protected
