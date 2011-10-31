@@ -154,6 +154,7 @@ class ParallelTests
     if lines.size > 0
       puts "Using recorded test runtime"
       prefix=sort_prefix(options)
+      puts "Using sort prefix #{prefix}" if prefix
       times = Hash.new
       lines.each do |line|
         test, time = line.split(":")
