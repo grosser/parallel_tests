@@ -129,6 +129,16 @@ Add the following to your `spec/parallel_spec.opts` (or `spec/spec.opts`) :
     RSpec >= 2.4:
       --format ParallelSpecs::SpecFailuresLogger --out tmp/failing_specs.log
 
+Other loggers
+-----------------------
+Generate a log file of the form "filename:runtime", e.g:
+
+    /path/to/my_first_test.rb:123.45
+    /path/to/my_second_test.rb:32.10
+
+Relative filepaths can be used in this sort datafile if you provide a sort prefix (e.g., `pwd`) to complete the full path.
+See options information, below.
+
 Setup for non-rails
 ===================
     sudo gem install parallel_tests
@@ -145,6 +155,9 @@ Options are:
     -n [PROCESSES]                   How many processes to use, default: available CPUs
     -p, --path [PATH]                run tests inside this path only
         --no-sort                    do not sort files before running them
+    -l, --runtime-log [PATH]         write runtime data to the file given
+    -s, --sort-datafile [PATH]       sort files based on runtime data from the file given
+    -x, --sort-prefix [PATH]         prepend the given prefix to the filepaths in the runtime data to match during sorting
     -m, --multiply-processes [FLOAT] use given number as a multiplier of processes to run
     -r, --root [PATH]                execute test commands from this path
     -e, --exec [COMMAND]             execute this code parallel and with ENV['TEST_ENV_NUM']
@@ -182,6 +195,7 @@ TIPS
  - [Sphinx setup](https://github.com/grosser/parallel_tests/wiki)
  - [SQL schema format] use :ruby schema format to get faster parallel:prepare`
  - `export PARALLEL_TEST_PROCESSORS=X` in your environment and parallel_tests will use this number of processors by default
+ - PARALLEL_TEST_SORT_DATAFILE, PARALLEL_TEST_SORT_PREFIX and PARALLEL_TEST_RUNTIME_LOG environment variables can be used to set the corresponding option values
  - with zsh this would be `rake "parallel:prepare[3]"`
 
 TODO
