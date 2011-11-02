@@ -1,4 +1,4 @@
-require File.join(File.dirname(__FILE__), 'parallel_tests')
+require 'parallel_tests'
 
 class ParallelSpecs < ParallelTests
   def self.run_tests(test_files, process_number, options)
