@@ -1,5 +1,4 @@
-require 'parallel_specs'
-require File.join(File.dirname(__FILE__), 'spec_logger_base')
+require 'parallel_specs/spec_logger_base'
 
 class ParallelSpecs::SpecRuntimeLogger < ParallelSpecs::SpecLoggerBase
   def initialize(options, output=nil)
@@ -20,9 +19,11 @@ class ParallelSpecs::SpecRuntimeLogger < ParallelSpecs::SpecLoggerBase
     return unless ENV['TEST_ENV_NUMBER'] #only record when running in parallel
     # TODO: Figure out why sometimes time can be less than 0
     lock_output do
-      @output.puts @example_times.map { |file, time| "#{file}:#{time > 0 ? time : 0}" }
+      @example_times.each do |file, time|
+        relative_path = file.sub(/^#{Regexp.escape Dir.pwd}\//,'')
+        @output.puts "#{relative_path}:#{time > 0 ? time : 0}"
+      end
     end
     @output.flush
   end
-
 end

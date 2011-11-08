@@ -1,5 +1,4 @@
-require 'parallel_specs'
-require File.join(File.dirname(__FILE__), 'spec_logger_base')
+require 'parallel_specs/spec_logger_base'
 
 class ParallelSpecs::SpecFailuresLogger < ParallelSpecs::SpecLoggerBase
   def initialize(options, output=nil)
