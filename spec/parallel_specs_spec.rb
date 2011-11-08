@@ -180,24 +180,6 @@ EOF
       @failure1   = mock( 'example', :location => '/path/to/example:123', :header => 'header', :exception => @exception1 )
     end
 
-    describe ParallelSpecs::SpecRuntimeLogger do
-      before :each do
-        ENV['TEST_ENV_NUMBER'] = '1'
-        @logger                = ParallelSpecs::SpecRuntimeLogger.new( @output )
-      end
-
-      it "collects runtime information" do
-        @logger.example_started
-        @logger.example_passed( @example1 )
-
-        @logger.start_dump
-
-        @output.output.size.should == 1
-        @output.output[0].size.should == 1
-        @output.output[0][0].should =~ %r(/path/to/example:([\d\.e\-]+))
-      end
-    end
-
     describe ParallelSpecs::SpecSummaryLogger do
       before :each do
         @logger = ParallelSpecs::SpecSummaryLogger.new( @output )
