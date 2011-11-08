@@ -62,7 +62,7 @@ class ParallelTests
   end
 
   def self.runtime_log
-    '__foo__'
+    'tmp/parallel_runtime_test.log'
   end
 
   def self.summarize_results(results)

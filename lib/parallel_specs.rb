@@ -20,6 +20,7 @@ class ParallelSpecs < ParallelTests
     cmd or raise("Can't find executables rspec or spec")
   end
 
+  # legacy <-> people log to this file using rspec options
   def self.runtime_log
     'tmp/parallel_profile.log'
   end
