@@ -18,7 +18,6 @@ class ParallelTests
       # add all files that should run in a single process to one group
       (options[:single_process]||[]).each do |pattern|
         matched, items_with_sizes = items_with_sizes.partition{|item, size| item =~ pattern }
-        puts matched.inspect
         smallest = smallest_group(groups)
         matched.each{|item,size| add_to_group(smallest, item, size) }
       end

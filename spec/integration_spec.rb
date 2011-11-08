@@ -96,7 +96,7 @@ describe 'CLI' do
       write "spec/xxx#{i}_spec.rb",  'describe("it"){it("should"){sleep 5}}; $stderr.puts ENV["TEST_ENV_NUMBER"]'
     }
     t = Time.now
-    puts run_tests(:processes => 2)
+    run_tests(:processes => 2)
     expected = 10
     (Time.now - t).should <= expected
   end
