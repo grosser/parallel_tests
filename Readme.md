@@ -185,6 +185,8 @@ TIPS
  - [Bundler] if you have a `Gemfile` then `bundle exec` will be used to run tests
  - [Capybara setup](https://github.com/grosser/parallel_tests/wiki)
  - [Sphinx setup](https://github.com/grosser/parallel_tests/wiki)
+ - [Capistrano setup](https://github.com/grosser/parallel_tests/wiki/Remotely-with-capistrano) let your tests run on a big box instead of your laptop
+ - [Test::Unit runtime logger](https://gist.github.com/1333414) some basic plumbing done (needs some love and a pull-request)
  - [SQL schema format] use :ruby schema format to get faster parallel:prepare`
  - `export PARALLEL_TEST_PROCESSORS=X` in your environment and parallel_tests will use this number of processors by default
  - with zsh this would be `rake "parallel:prepare[3]"`
