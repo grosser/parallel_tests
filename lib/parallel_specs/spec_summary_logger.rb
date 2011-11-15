@@ -12,12 +12,12 @@ class ParallelSpecs::SpecSummaryLogger < ParallelSpecs::SpecLoggerBase
     @passed_examples << example
   end
 
-  def example_pending(*args)
-    @pending_examples << args
+  def example_pending(example, *args)
+    @pending_examples << example
   end
 
-  def example_failed(example, count, failure)
-    @failed_examples << failure
+  def example_failed(example, *args)
+    @failed_examples << example
   end
 
   def dump_summary(duration, example_count, failure_count, pending_count)
@@ -29,16 +29,23 @@ class ParallelSpecs::SpecSummaryLogger < ParallelSpecs::SpecLoggerBase
 
   def dump_failure(*args)
     lock_output do
-      @output.puts "#{ @failed_examples.size } examples failed:"
-      @failed_examples.each.with_index do | failure, i |
-        @output.puts "#{ i + 1 })"
-        @output.puts failure.header
-        @output.puts failure.exception.to_s
-        failure.exception.backtrace.each do | caller |
-          @output.puts caller
-        end
-        @output.puts ''
+      @failed_examples.each.with_index do | example, i |
+        spec_file = example.location.scan(/^[^:]+/)[0]
+        spec_file.gsub!(%r(^.*?/spec/), './spec/')
+        @output.puts "#{ParallelSpecs.executable} #{spec_file} -e \"#{example.description}\""
       end
+      
+      
+      # @output.puts "#{ @failed_examples.size } examples failed:"
+      # @failed_examples.each.with_index do | failure, i |
+      #   @output.puts "#{ i + 1 })"
+      #   @output.puts failure.header
+      #   @output.puts failure.exception.to_s
+      #   failure.exception.backtrace.each do | caller |
+      #     @output.puts caller
+      #   end
+      #   @output.puts ''
+      # end
     end
     @output.flush
   end
