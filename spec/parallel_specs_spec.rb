@@ -186,11 +186,11 @@ EOF
       end
 
       it "should print a summary of failing examples" do
-        @logger.example_failed( nil, nil, @failure1 )
+        @logger.example_failed( @example1 )
 
         @logger.dump_failure
 
-        @output.output.should == ["1 examples failed:", "1)", "header", "exception", "/path/to/error/line:33", ""]
+        @output.output.should == ["bundle exec rspec ./spec/path/to/example -e \"should do stuff\""]
       end
     end
 
