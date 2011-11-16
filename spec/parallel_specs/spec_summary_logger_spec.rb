@@ -12,12 +12,12 @@ describe ParallelSpecs::SpecSummaryLogger do
   let(:logger){ ParallelSpecs::SpecSummaryLogger.new(output) }
 
   it "should print a summary of failing examples" do
-    logger.example_failed mock(:location => '/my/spec/path/to/example:123', :description => 'should do stuff')
-    logger.example_failed mock(:location => '/my/spec/path/to/example:125', :description => 'should not do stuff')
+    logger.example_failed mock(:location => '/my/spec/path/to/example.rb:123', :description => 'should do stuff')
+    logger.example_failed mock(:location => '/my/spec/path/to/example.rb:125', :description => 'should not do stuff')
     logger.dump_failure
     output.output.should == [
-      "bundle exec rspec ./spec/path/to/example -e \"should do stuff\"",
-      "bundle exec rspec ./spec/path/to/example -e \"should not do stuff\""
+      "bundle exec rspec ./spec/path/to/example.rb:123 # should do stuff",
+      "bundle exec rspec ./spec/path/to/example.rb:125 # should not do stuff"
     ]
   end
 

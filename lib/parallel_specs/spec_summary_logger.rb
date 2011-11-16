@@ -30,12 +30,11 @@ class ParallelSpecs::SpecSummaryLogger < ParallelSpecs::SpecLoggerBase
   def dump_failure(*args)
     lock_output do
       @failed_examples.each.with_index do | example, i |
-        spec_file = example.location.scan(/^[^:]+/)[0]
-        spec_file.gsub!(%r(^.*?/spec/), './spec/')
-        @output.puts "#{ParallelSpecs.executable} #{spec_file} -e \"#{example.description}\""
+        file, line = example.location.split(':')
+        file.gsub!(%r(^.*?/spec/), './spec/')
+        @output.puts "#{ParallelSpecs.executable} #{file}:#{line} # #{example.description}"
       end
-      
-      
+
       # @output.puts "#{ @failed_examples.size } examples failed:"
       # @failed_examples.each.with_index do | failure, i |
       #   @output.puts "#{ i + 1 })"
