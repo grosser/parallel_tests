@@ -22,7 +22,7 @@ class ParallelSpecs::SpecSummaryLogger < ParallelSpecs::SpecLoggerBase
 
   def dump_summary(duration, example_count, failure_count, pending_count)
     lock_output do
-      @output.puts "#{ @passed_examples.size } examples passed"
+      @output.puts "#{@passed_examples.size} passed, #{@failed_examples.size} failed, #{@pending_examples.size} pending"
     end
     @output.flush
   end

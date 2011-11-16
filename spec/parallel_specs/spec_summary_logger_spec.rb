@@ -24,7 +24,20 @@ describe ParallelSpecs::SpecSummaryLogger do
   it "does not print anything for passing examples" do
     logger.example_started
     logger.example_passed mock(:location => "/my/spec/foo.rb:123")
+    logger.example_passed mock(:location => "/my/spec/foo.rb:123")
     logger.dump_failure
     output.output.should == []
+    logger.dump_summary(1,2,3,4)
+    output.output.should == ["2 passed, 0 failed, 0 pending"]
+  end
+
+  it "does not print anything for pending examples" do
+    logger.example_started
+    logger.example_pending mock(:location => "/my/spec/foo.rb:123")
+    logger.example_pending mock(:location => "/my/spec/foo.rb:123")
+    logger.dump_failure
+    output.output.should == []
+    logger.dump_summary(1,2,3,4)
+    output.output.should == ["0 passed, 0 failed, 2 pending"]
   end
 end
