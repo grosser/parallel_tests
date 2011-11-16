@@ -1,28 +1,9 @@
 require 'parallel_specs/spec_logger_base'
 
 class ParallelSpecs::SpecSummaryLogger < ParallelSpecs::SpecLoggerBase
-  def initialize(options, output=nil)
-    super
-    @passed_examples = []
-    @pending_examples = []
-    @failed_examples = []
-  end
-
-  def example_passed(example)
-    @passed_examples << example
-  end
-
-  def example_pending(example, *args)
-    @pending_examples << example
-  end
-
-  def example_failed(example, *args)
-    @failed_examples << example
-  end
-
   def dump_summary(duration, example_count, failure_count, pending_count)
     lock_output do
-      @output.puts "#{@passed_examples.size} passed, #{@failed_examples.size} failed, #{@pending_examples.size} pending"
+      @output.puts "#{example_count} run, #{failure_count} failed, #{pending_count} pending"
     end
     @output.flush
   end

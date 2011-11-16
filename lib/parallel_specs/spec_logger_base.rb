@@ -1,54 +1,25 @@
 require 'parallel_specs'
 
 begin
-  require 'rspec/core/formatters/progress_formatter'
-  base = RSpec::Core::Formatters::ProgressFormatter
+  require 'rspec/core/formatters/base_formatter'
+  base = RSpec::Core::Formatters::BaseFormatter
 rescue LoadError
-  require 'spec/runner/formatter/progress_bar_formatter'
-  base = Spec::Runner::Formatter::BaseTextFormatter
+  require 'spec/runner/formatter/base_formatter'
+  base = Spec::Runner::Formatter::BaseFormatter
 end
 ParallelSpecs::SpecLoggerBaseBase = base
 
 class ParallelSpecs::SpecLoggerBase < ParallelSpecs::SpecLoggerBaseBase
-  def initialize(options, output=nil)
-    output ||= options # rspec 2 has output as first argument
-
-    if String === output
-      FileUtils.mkdir_p(File.dirname(output))
-      File.open(output, 'w'){} # overwrite previous results
-      @output = File.open(output, 'a')
-    elsif File === output
-      output.close # close file opened with 'w'
-      @output = File.open(output.path, 'a')
-    else
-      @output = output
+  def initialize(*args)
+    super
+    if String === @output # a path ?
+      FileUtils.mkdir_p(File.dirname(@output))
+      File.open(@output, 'w'){} # overwrite previous results
+      @output = File.open(@output, 'a')
+    elsif File === @output # close and restart in append mode
+      @output.close
+      @output = File.open(@output.path, 'a')
     end
-
-    @failed_examples = [] # only needed for rspec 2
-  end
-
-  def example_started(*args)
-  end
-
-  def example_passed(example)
-  end
-
-  def example_pending(*args)
-  end
-
-  def example_failed(*args)
-  end
-
-  def start_dump(*args)
-  end
-
-  def dump_summary(*args)
-  end
-
-  def dump_pending(*args)
-  end
-
-  def dump_failure(*args)
   end
 
   #stolen from Rspec
