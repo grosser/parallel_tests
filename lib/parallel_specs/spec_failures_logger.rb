@@ -4,6 +4,7 @@ class ParallelSpecs::SpecFailuresLogger < ParallelSpecs::SpecLoggerBase
   def dump_failures(*args)
     lock_output do
       @failed_examples.each do |example|
+        next unless example.location
         file, line = example.location.split(':')
         file.gsub!(%r(^.*?/spec/), './spec/')
         @output.puts "#{ParallelSpecs.executable} #{file}:#{line} # #{example.description}"

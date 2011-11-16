@@ -1,15 +1,12 @@
 require 'spec_helper'
 
 describe ParallelSpecs::SpecFailuresLogger do
-  before :each do
+  before do
     @output     = OutputLogger.new([])
     @example1   = mock( 'example', :location => '/my/spec/path/to/example:123', :description => 'should do stuff' )
     @example2   = mock( 'example', :location => '/my/spec/path/to/example2:456', :description => 'should do other stuff' )
     @exception1 = mock( :to_s => 'exception', :backtrace => [ '/path/to/error/line:33' ] )
     @failure1   = mock( 'example', :location => '/path/to/example:123', :header => 'header', :exception => @exception1 )
-  end
-
-  before :each do
     @logger = ParallelSpecs::SpecFailuresLogger.new( @output )
   end
 
@@ -17,7 +14,7 @@ describe ParallelSpecs::SpecFailuresLogger do
     @logger.example_failed @example1
     @logger.example_failed @example2
 
-    @logger.dump_failure
+    @logger.dump_failures
 
     @output.output.size.should == 2
     @output.output[0].should =~ /bundle exec r?spec .*? should do stuff/
@@ -29,7 +26,7 @@ describe ParallelSpecs::SpecFailuresLogger do
     ParallelSpecs.stub!(:run).with("bundle show rspec").and_return "/foo/bar/rspec-1.0.2"
     @logger.example_failed @example1
 
-    @logger.dump_failure
+    @logger.dump_failures
 
     @output.output[0].should =~ /^bundle exec spec/
   end
@@ -39,7 +36,7 @@ describe ParallelSpecs::SpecFailuresLogger do
     ParallelSpecs.stub!(:run).with("bundle show rspec").and_return "/foo/bar/rspec-2.0.2"
     @logger.example_failed @example1
 
-    @logger.dump_failure
+    @logger.dump_failures
 
     @output.output[0].should =~ /^bundle exec rspec/
   end
@@ -48,9 +45,16 @@ describe ParallelSpecs::SpecFailuresLogger do
     @logger.example_failed @example1
     @logger.example_failed @example2
 
-    @logger.dump_failure
+    @logger.dump_failures
 
     @output.output[0].should =~ %r(\./spec/path/to/example)
     @output.output[1].should =~ %r(\./spec/path/to/example2)
+  end
+
+  it "should not log examples without location" do
+    example = mock('example', :location => nil, :description => 'before :all')
+    @logger.example_failed example
+    @logger.dump_failures
+    @output.output.should == []
   end
 end

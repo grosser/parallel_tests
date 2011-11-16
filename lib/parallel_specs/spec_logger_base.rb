@@ -43,4 +43,21 @@ class ParallelSpecs::SpecLoggerBase < ParallelSpecs::SpecLoggerBaseBase
       yield
     end
   end
+
+  if defined? Spec::Runner # rspec 1 hacks
+    def dump_failure(*args)
+      if defined? dump_failures
+        dump_failures(*args)
+      else
+        super
+      end
+    end
+
+    # BaseFormatter did not record failed examples
+    def example_failed(example, count, failure)
+      @failed_examples ||= []
+      puts example.location.inspect
+      @failed_examples << example
+    end
+  end
 end
