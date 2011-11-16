@@ -8,22 +8,5 @@ class ParallelSpecs::SpecSummaryLogger < ParallelSpecs::SpecFailuresLogger
     @output.flush
   end
 
-  def dump_failure(*args)
-    return if @failed_examples.size == 0
-
-    lock_output do
-      @output.puts "#{@failed_examples.size} examples failed:"
-      @failed_examples.each.with_index do |failure, i|
-        @output.puts "#{ i + 1 })"
-        @output.puts failure.header
-        @output.puts failure.exception.to_s
-        failure.exception.backtrace.each do |caller|
-          @output.puts caller
-        end
-        @output.puts ''
-      end
-    end
-
-    super # dump failures
-  end
+  # TODO collect and then dump failure backtraces
 end

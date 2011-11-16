@@ -1,7 +1,7 @@
 require 'parallel_specs/spec_logger_base'
 
 class ParallelSpecs::SpecFailuresLogger < ParallelSpecs::SpecLoggerBase
-  def dump_failure(*args)
+  def dump_failures(*args)
     lock_output do
       @failed_examples.each do |example|
         file, line = example.location.split(':')
