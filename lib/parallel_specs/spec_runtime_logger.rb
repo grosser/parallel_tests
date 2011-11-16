@@ -1,16 +1,18 @@
 require 'parallel_specs/spec_logger_base'
 
 class ParallelSpecs::SpecRuntimeLogger < ParallelSpecs::SpecLoggerBase
-  def initialize(options, output=nil)
+  def initialize(*args)
     super
     @example_times = Hash.new(0)
   end
 
   def example_started(*args)
+    super
     @time = Time.now
   end
 
   def example_passed(example)
+    super
     file = example.location.split(':').first
     @example_times[file] += Time.now - @time
   end

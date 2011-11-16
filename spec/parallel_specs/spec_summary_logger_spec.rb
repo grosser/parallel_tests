@@ -1,21 +1,15 @@
 require 'spec_helper'
 
 describe ParallelSpecs::SpecSummaryLogger do
-  OutputLogger = Struct.new(:output) do
-    attr_reader :flock, :flush
-    def puts(s)
-      self.output << s
-    end
-  end
-
   let(:output){ OutputLogger.new([]) }
   let(:logger){ ParallelSpecs::SpecSummaryLogger.new(output) }
 
   it "should print a summary of failing examples" do
-    logger.example_failed mock(:location => '/my/spec/path/to/example.rb:123', :description => 'should do stuff')
-    logger.example_failed mock(:location => '/my/spec/path/to/example.rb:125', :description => 'should not do stuff')
+    logger.example_failed mock(:location => '/my/spec/path/to/example.rb:123', :description => 'should do stuff', :header => 'HEAD', :exception => mock(:backtrace => []))
+    logger.example_failed mock(:location => '/my/spec/path/to/example.rb:125', :description => 'should not do stuff', :header => 'HEAD', :exception => mock(:backtrace => []))
     logger.dump_failure
-    output.output.should == [
+    output.output[0].should == '2 examples failed:'
+    output.output[-2..-1].should == [
       "bundle exec rspec ./spec/path/to/example.rb:123 # should do stuff",
       "bundle exec rspec ./spec/path/to/example.rb:125 # should not do stuff"
     ]

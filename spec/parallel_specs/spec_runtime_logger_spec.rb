@@ -19,8 +19,10 @@ describe ParallelSpecs::SpecRuntimeLogger do
       else
         ParallelSpecs::SpecRuntimeLogger.new(f)
       end
-      logger.example_started
-      logger.example_passed(mock(:location => "#{Dir.pwd}/spec/foo.rb:123"))
+
+      example = (mock(:location => "#{Dir.pwd}/spec/foo.rb:123"))
+      logger.example_started example
+      logger.example_passed example
       logger.start_dump
 
       #f.close
@@ -29,7 +31,7 @@ describe ParallelSpecs::SpecRuntimeLogger do
   end
 
   it "logs runtime with relative paths" do
-    log_for_a_file.should =~ %r{^spec/foo.rb:0.\d+$}m
+    log_for_a_file.should =~ %r{^spec/foo.rb:[-\.e\d]+$}m
   end
 
   it "does not log if we do not run in parallel" do

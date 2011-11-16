@@ -10,6 +10,13 @@ require 'parallel_specs/spec_runtime_logger'
 require 'parallel_specs/spec_summary_logger'
 require 'parallel_cucumber'
 
+OutputLogger = Struct.new(:output) do
+  attr_reader :flock, :flush
+  def puts(s)
+    self.output << s
+  end
+end
+
 def mocked_process
   open('|cat /dev/null')
 end
