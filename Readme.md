@@ -121,7 +121,7 @@ This logger produces pasteable command-line snippets for each failed example.
 
 E.g.
 
-    spec /path/to/my_spec.rb -e "should do something"
+    rspec /path/to/my_spec.rb:123 # should do something
 
 Add the following to your `spec/parallel_spec.opts` (or `spec/spec.opts`) :
 
