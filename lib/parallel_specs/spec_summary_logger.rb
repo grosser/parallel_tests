@@ -29,24 +29,12 @@ class ParallelSpecs::SpecSummaryLogger < ParallelSpecs::SpecLoggerBase
 
   def dump_failure(*args)
     lock_output do
-      @failed_examples.each.with_index do | example, i |
+      @failed_examples.each do |example|
         file, line = example.location.split(':')
         file.gsub!(%r(^.*?/spec/), './spec/')
         @output.puts "#{ParallelSpecs.executable} #{file}:#{line} # #{example.description}"
       end
-
-      # @output.puts "#{ @failed_examples.size } examples failed:"
-      # @failed_examples.each.with_index do | failure, i |
-      #   @output.puts "#{ i + 1 })"
-      #   @output.puts failure.header
-      #   @output.puts failure.exception.to_s
-      #   failure.exception.backtrace.each do | caller |
-      #     @output.puts caller
-      #   end
-      #   @output.puts ''
-      # end
     end
     @output.flush
   end
-
 end
