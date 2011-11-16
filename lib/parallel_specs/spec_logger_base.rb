@@ -12,6 +12,9 @@ ParallelSpecs::SpecLoggerBaseBase = base
 class ParallelSpecs::SpecLoggerBase < ParallelSpecs::SpecLoggerBaseBase
   def initialize(*args)
     super
+
+    @output ||= args[1] || args[0] # rspec 1 has output as second argument
+
     if String === @output # a path ?
       FileUtils.mkdir_p(File.dirname(@output))
       File.open(@output, 'w'){} # overwrite previous results
