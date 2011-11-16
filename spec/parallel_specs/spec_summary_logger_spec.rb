@@ -8,23 +8,23 @@ describe ParallelSpecs::SpecSummaryLogger do
     end
   end
 
-  before :each do
-    @output     = OutputLogger.new([])
-    @example1   = mock( 'example', :location => '/my/spec/path/to/example:123', :description => 'should do stuff' )
-    @example2   = mock( 'example', :location => '/my/spec/path/to/example2:456', :description => 'should do other stuff' )
-    @exception1 = mock( :to_s => 'exception', :backtrace => [ '/path/to/error/line:33' ] )
-    @failure1   = mock( 'example', :location => '/path/to/example:123', :header => 'header', :exception => @exception1 )
-  end
-
-  before :each do
-    @logger = ParallelSpecs::SpecSummaryLogger.new( @output )
-  end
+  let(:output){ OutputLogger.new([]) }
+  let(:logger){ ParallelSpecs::SpecSummaryLogger.new(output) }
 
   it "should print a summary of failing examples" do
-    @logger.example_failed( @example1 )
+    logger.example_failed mock(:location => '/my/spec/path/to/example:123', :description => 'should do stuff')
+    logger.example_failed mock(:location => '/my/spec/path/to/example:125', :description => 'should not do stuff')
+    logger.dump_failure
+    output.output.should == [
+      "bundle exec rspec ./spec/path/to/example -e \"should do stuff\"",
+      "bundle exec rspec ./spec/path/to/example -e \"should not do stuff\""
+    ]
+  end
 
-    @logger.dump_failure
-
-    @output.output.should == ["bundle exec rspec ./spec/path/to/example -e \"should do stuff\""]
+  it "does not print anything for passing examples" do
+    logger.example_started
+    logger.example_passed mock(:location => "/my/spec/foo.rb:123")
+    logger.dump_failure
+    output.output.should == []
   end
 end
