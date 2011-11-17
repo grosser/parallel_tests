@@ -4,8 +4,8 @@ begin
   require 'rspec/core/formatters/base_formatter'
   base = RSpec::Core::Formatters::BaseFormatter
 rescue LoadError
-  require 'spec/runner/formatter/base_formatter'
-  base = Spec::Runner::Formatter::BaseFormatter
+  require 'spec/runner/formatter/base_text_formatter'
+  base = Spec::Runner::Formatter::BaseTextFormatter
 end
 ParallelSpecs::SpecLoggerBaseBase = base
 
@@ -44,20 +44,12 @@ class ParallelSpecs::SpecLoggerBase < ParallelSpecs::SpecLoggerBaseBase
     end
   end
 
-  if defined? Spec::Runner # rspec 1 hacks
-    def dump_failure(*args)
-      if defined? dump_failures
-        dump_failures(*args)
-      else
-        super
-      end
-    end
-
-    # BaseFormatter did not record failed examples
-    def example_failed(example, count, failure)
-      @failed_examples ||= []
-      puts example.location.inspect
-      @failed_examples << example
-    end
-  end
+  #if defined? Spec::Runner # rspec 1 hacks
+  #  # BaseFormatter did not record failed examples
+  #  def example_failed(example, count, failure)
+  #    @failed_examples ||= []
+  #    puts example.location.inspect
+  #    @failed_examples << example
+  #  end
+  #end
 end

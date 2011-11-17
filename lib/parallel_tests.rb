@@ -139,6 +139,7 @@ class ParallelTests
       times = Hash.new(1)
       lines.each do |line|
         test, time = line.split(":")
+        next unless test and time
         times[File.expand_path(test)] = time.to_f
       end
       tests.sort.map{|test| [test, times[test]] }
