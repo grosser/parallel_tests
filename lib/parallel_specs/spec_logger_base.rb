@@ -44,12 +44,7 @@ class ParallelSpecs::SpecLoggerBase < ParallelSpecs::SpecLoggerBaseBase
     end
   end
 
-  #if defined? Spec::Runner # rspec 1 hacks
-  #  # BaseFormatter did not record failed examples
-  #  def example_failed(example, count, failure)
-  #    @failed_examples ||= []
-  #    puts example.location.inspect
-  #    @failed_examples << example
-  #  end
-  #end
+  def rspec_1?
+    defined? Spec::Runner
+  end
 end
