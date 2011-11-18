@@ -7,15 +7,17 @@ class ParallelSpecs::SpecRuntimeLogger < ParallelSpecs::SpecLoggerBase
   end
 
   def example_started(*args)
-    super
     @time = Time.now
   end
 
   def example_passed(example)
-    super
     file = example.location.split(':').first
     @example_times[file] += Time.now - @time
   end
+
+  def dump_summary(*args);end
+  def dump_failures(*args);end
+  def dump_failure(*args);end
 
   def start_dump(*args)
     return unless ENV['TEST_ENV_NUMBER'] #only record when running in parallel
