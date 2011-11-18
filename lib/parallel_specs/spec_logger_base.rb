@@ -10,6 +10,8 @@ end
 ParallelSpecs::SpecLoggerBaseBase = base
 
 class ParallelSpecs::SpecLoggerBase < ParallelSpecs::SpecLoggerBaseBase
+  RSPEC_1 = defined? Spec::Runner
+
   def initialize(*args)
     super
 
@@ -42,9 +44,5 @@ class ParallelSpecs::SpecLoggerBase < ParallelSpecs::SpecLoggerBaseBase
     else
       yield
     end
-  end
-
-  def rspec_1?
-    defined? Spec::Runner
   end
 end
