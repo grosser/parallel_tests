@@ -5,11 +5,11 @@
 
 Gem::Specification.new do |s|
   s.name = "parallel_tests"
-  s.version = "0.6.10"
+  s.version = "0.6.11"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Michael Grosser"]
-  s.date = "2011-11-08"
+  s.date = "2011-11-18"
   s.email = "grosser.michael@gmail.com"
   s.executables = ["parallel_cucumber", "parallel_spec", "parallel_test"]
   s.files = [
@@ -36,7 +36,9 @@ Gem::Specification.new do |s|
     "parallel_tests.gemspec",
     "spec/integration_spec.rb",
     "spec/parallel_cucumber_spec.rb",
+    "spec/parallel_specs/spec_failure_logger_spec.rb",
     "spec/parallel_specs/spec_runtime_logger_spec.rb",
+    "spec/parallel_specs/spec_summary_logger_spec.rb",
     "spec/parallel_specs_spec.rb",
     "spec/parallel_tests_spec.rb",
     "spec/spec_helper.rb"
