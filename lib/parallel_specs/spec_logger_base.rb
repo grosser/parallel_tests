@@ -1,8 +1,8 @@
 require 'parallel_specs'
 
 begin
-  require 'rspec/core/formatters/base_formatter'
-  base = RSpec::Core::Formatters::BaseFormatter
+  require 'rspec/core/formatters/base_text_formatter'
+  base = RSpec::Core::Formatters::BaseTextFormatter
 rescue LoadError
   require 'spec/runner/formatter/base_text_formatter'
   base = Spec::Runner::Formatter::BaseTextFormatter
