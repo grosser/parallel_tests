@@ -12,8 +12,8 @@ require 'parallel_cucumber'
 
 OutputLogger = Struct.new(:output) do
   attr_reader :flock, :flush
-  def puts(s='')
-    self.output << s
+  def puts(s=nil)
+    self.output << s.to_s
   end
 end
 
