@@ -93,6 +93,7 @@ Add to your `spec/parallel_spec.opts` (or `spec/spec.opts`) :
 
     RSpec 1.x:
       --format progress
+      --require parallel_specs/spec_runtime_logger
       --format ParallelSpecs::SpecRuntimeLogger:tmp/parallel_profile.log
     RSpec >= 2.4:
       If installed as plugin: -I vendor/plugins/parallel_tests/lib
@@ -108,6 +109,7 @@ Add the following to your `spec/parallel_spec.opts` (or `spec/spec.opts`) :
 
     RSpec 1.x:
       --format progress
+      --require parallel_specs/spec_summary_logger
       --format ParallelSpecs::SpecSummaryLogger:tmp/spec_summary.log
     RSpec >= 2.2:
       If installed as plugin: -I vendor/plugins/parallel_tests/lib
@@ -127,6 +129,7 @@ Add the following to your `spec/parallel_spec.opts` (or `spec/spec.opts`) :
 
     RSpec 1.x:
       --format progress
+      --require parallel_specs/spec_failures_logger
       --format ParallelSpecs::SpecFailuresLogger:tmp/failing_specs.log
     RSpec >= 2.4:
       If installed as plugin: -I vendor/plugins/parallel_tests/lib
