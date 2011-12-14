@@ -18,6 +18,7 @@ class ParallelSpecs::SpecRuntimeLogger < ParallelSpecs::SpecLoggerBase
   def dump_summary(*args);end
   def dump_failures(*args);end
   def dump_failure(*args);end
+  def dump_pending(*args);end
 
   def start_dump(*args)
     return unless ENV['TEST_ENV_NUMBER'] #only record when running in parallel
