@@ -10,7 +10,7 @@ end
 ParallelSpecs::SpecLoggerBaseBase = base
 
 class ParallelSpecs::SpecLoggerBase < ParallelSpecs::SpecLoggerBaseBase
-  RSPEC_1 = defined? Spec::Runner
+  RSPEC_1 = !defined?(RSpec::Core::Formatters::BaseTextFormatter) # do not test for Spec, this will trigger deprecation warning in rspec 2
 
   def initialize(*args)
     super
