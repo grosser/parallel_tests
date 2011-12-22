@@ -4,13 +4,14 @@ describe ParallelSpecs::SpecRuntimeLogger do
   before do
     # pretend we run in parallel or the logger will log nothing
     ENV['TEST_ENV_NUMBER'] = ''
+    @clean_output = %r{^spec/foo.rb:[-\.e\d]+$}m
   end
 
   after do
     ENV.delete 'TEST_ENV_NUMBER'
   end
 
-  def log_for_a_file
+  def log_for_a_file(options={})
     Tempfile.open('xxx') do |temp|
       temp.close
       f = File.open(temp.path,'w')
@@ -23,6 +24,14 @@ describe ParallelSpecs::SpecRuntimeLogger do
       example = (mock(:location => "#{Dir.pwd}/spec/foo.rb:123"))
       logger.example_started example
       logger.example_passed example
+      if options[:pending]
+        logger.example_pending example
+        logger.dump_pending
+      end
+      if options[:failed]
+        logger.example_failed example
+        logger.dump_failures
+      end
       logger.start_dump
 
       #f.close
@@ -31,12 +40,20 @@ describe ParallelSpecs::SpecRuntimeLogger do
   end
 
   it "logs runtime with relative paths" do
-    log_for_a_file.should =~ %r{^spec/foo.rb:[-\.e\d]+$}m
+    log_for_a_file.should =~ @clean_output
+  end
+
+  it "does not log pending" do
+    log_for_a_file(:pending => true).should =~ @clean_output
+  end
+
+  it "does not log failures" do
+    log_for_a_file(:failed => true).should =~ @clean_output
   end
 
   it "does not log if we do not run in parallel" do
     ENV.delete 'TEST_ENV_NUMBER'
-    log_for_a_file.should == ''
+    log_for_a_file.should == ""
   end
 
   it "appends to a given file" do
