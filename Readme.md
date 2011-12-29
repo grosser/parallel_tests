@@ -191,6 +191,7 @@ TIPS
  - [Capistrano setup](https://github.com/grosser/parallel_tests/wiki/Remotely-with-capistrano) let your tests run on a big box instead of your laptop
  - [Test::Unit runtime logger](https://gist.github.com/1333414) some basic plumbing done (needs some love and a pull-request)
  - [SQL schema format] use :ruby schema format to get faster parallel:prepare`
+ - [ActiveRecord] if you do not have `db:abort_if_pending_migrations` add this to your Rakefile: `task('db:abort_if_pending_migrations'){}`
  - `export PARALLEL_TEST_PROCESSORS=X` in your environment and parallel_tests will use this number of processors by default
  - with zsh this would be `rake "parallel:prepare[3]"`
 
