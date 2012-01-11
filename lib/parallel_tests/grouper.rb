@@ -23,7 +23,7 @@ class ParallelTests
       end
 
       # add all other files
-      smallest_first(items_with_sizes).each do |item, size|
+      largest_first(items_with_sizes).each do |item, size|
         smallest = smallest_group(groups)
         add_to_group(smallest, item, size)
       end
@@ -31,7 +31,7 @@ class ParallelTests
       groups.map!{|g| g[:items].sort }
     end
 
-    def self.smallest_first(files)
+    def self.largest_first(files)
       files.sort_by{|item, size| size }.reverse
     end
 
