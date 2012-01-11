@@ -81,7 +81,7 @@ Example output
 
     Took 29.925333 seconds
 
-Spec Loggers
+Loggers
 ===================
 
 Even process runtimes
@@ -89,7 +89,7 @@ Even process runtimes
 
 Log test runtime to give each process the same runtime.
 
-Add to your `spec/parallel_spec.opts` (or `spec/spec.opts`) :
+Rspec: Add to your `spec/parallel_spec.opts` (or `spec/spec.opts`) :
 
     RSpec 1.x:
       --format progress
@@ -99,6 +99,10 @@ Add to your `spec/parallel_spec.opts` (or `spec/spec.opts`) :
       If installed as plugin: -I vendor/plugins/parallel_tests/lib
       --format progress
       --format ParallelSpecs::SpecRuntimeLogger --out tmp/parallel_profile.log
+
+Test::Unit:  Add to your `test_helper.rb`:
+    require 'parallel_tests/runtime_logger'
+
 
 SpecSummaryLogger
 --------------------
@@ -189,7 +193,6 @@ TIPS
  - [Capybara setup](https://github.com/grosser/parallel_tests/wiki)
  - [Sphinx setup](https://github.com/grosser/parallel_tests/wiki)
  - [Capistrano setup](https://github.com/grosser/parallel_tests/wiki/Remotely-with-capistrano) let your tests run on a big box instead of your laptop
- - [Test::Unit runtime logger](https://gist.github.com/1333414) some basic plumbing done (needs some love and a pull-request)
  - [SQL schema format] use :ruby schema format to get faster parallel:prepare`
  - [ActiveRecord] if you do not have `db:abort_if_pending_migrations` add this to your Rakefile: `task('db:abort_if_pending_migrations'){}`
  - `export PARALLEL_TEST_PROCESSORS=X` in your environment and parallel_tests will use this number of processors by default
@@ -228,6 +231,7 @@ inspired by [pivotal labs](http://pivotallabs.com/users/miked/blog/articles/849-
  - [Doug Barth](https://github.com/dougbarth)
  - [Geoffrey Hichborn](https://github.com/phene)
  - [Trae Robrock](https://github.com/trobrock)
+ - [Sean Walbran](https://github.com/seanwalbran)
 
 [Michael Grosser](http://grosser.it)<br/>
 michael@grosser.it<br/>

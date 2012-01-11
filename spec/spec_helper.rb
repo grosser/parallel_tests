@@ -9,6 +9,7 @@ require 'parallel_specs'
 require 'parallel_specs/spec_runtime_logger'
 require 'parallel_specs/spec_summary_logger'
 require 'parallel_cucumber'
+require 'parallel_tests/runtime_logger'
 
 OutputLogger = Struct.new(:output) do
   attr_reader :flock, :flush

@@ -1,16 +1,20 @@
 class ParallelTests::RuntimeLogger
+  @@has_started = false
 
   def self.log(test, start_time, end_time)
     return if test.is_a? Test::Unit::TestSuite  # don't log for suites-of-suites
 
-    if runtime_log = ENV['PARALLEL_TEST_RUNTIME_LOG']
-      File.open(runtime_log, 'a') do |output|
-        begin
-          output.flock File::LOCK_EX
-          output.puts(self.message(test, start_time, end_time))
-        ensure
-          output.flock File::LOCK_UN
-        end
+    if !@@has_started # make empty log file 
+      File.open(ParallelTests.runtime_log, 'w') do end
+      @@has_started = true
+    end
+
+    File.open(ParallelTests.runtime_log, 'a') do |output|
+      begin
+        output.flock File::LOCK_EX
+        output.puts(self.message(test, start_time, end_time))
+      ensure
+        output.flock File::LOCK_UN
       end
     end
   end
@@ -26,7 +30,7 @@ class ParallelTests::RuntimeLogger
   def self.class_directory(suspect)
     result = "test/"
 
-    if Module.const_get "Rails"
+    if defined?(Rails)
       result += case suspect.superclass.name
                 when "ActionDispatch::IntegrationTest"
                   "integration/"
@@ -58,6 +62,7 @@ class ParallelTests::RuntimeLogger
 
 end
 
+require 'test/unit/testsuite'
 class Test::Unit::TestSuite
 
   alias :run_without_timing :run unless defined? @@timing_installed
