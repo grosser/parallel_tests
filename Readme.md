@@ -228,6 +228,7 @@ inspired by [pivotal labs](http://pivotallabs.com/users/miked/blog/articles/849-
  - [Doug Barth](https://github.com/dougbarth)
  - [Geoffrey Hichborn](https://github.com/phene)
  - [Trae Robrock](https://github.com/trobrock)
+ - [Lawrence Wang](https://github.com/levity)
 
 [Michael Grosser](http://grosser.it)<br/>
 michael@grosser.it<br/>
