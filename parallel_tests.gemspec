@@ -5,13 +5,13 @@
 
 Gem::Specification.new do |s|
   s.name = "parallel_tests"
-  s.version = "0.6.15"
+  s.version = "0.6.16"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Michael Grosser"]
-  s.date = "2012-01-12"
+  s.date = "2012-01-13"
   s.email = "grosser.michael@gmail.com"
-  s.executables = ["parallel_cucumber", "parallel_spec", "parallel_test"]
+  s.executables = ["parallel_cucumber", "parallel_test", "parallel_spec"]
   s.files = [
     "Gemfile",
     "Gemfile.lock",
@@ -31,6 +31,7 @@ Gem::Specification.new do |s|
     "lib/parallel_tests.rb",
     "lib/parallel_tests/grouper.rb",
     "lib/parallel_tests/railtie.rb",
+    "lib/parallel_tests/runtime_logger.rb",
     "lib/parallel_tests/tasks.rb",
     "lib/tasks/parallel_tests.rake",
     "parallel_tests.gemspec",
@@ -40,12 +41,13 @@ Gem::Specification.new do |s|
     "spec/parallel_specs/spec_runtime_logger_spec.rb",
     "spec/parallel_specs/spec_summary_logger_spec.rb",
     "spec/parallel_specs_spec.rb",
+    "spec/parallel_tests/runtime_logger_spec.rb",
     "spec/parallel_tests_spec.rb",
     "spec/spec_helper.rb"
   ]
   s.homepage = "http://github.com/grosser/parallel_tests"
   s.require_paths = ["lib"]
-  s.rubygems_version = "1.8.10"
+  s.rubygems_version = "1.8.15"
   s.summary = "Run tests / specs / features in parallel"
 
   if s.respond_to? :specification_version then
