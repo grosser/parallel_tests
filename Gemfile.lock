@@ -17,6 +17,7 @@ GEM
     rspec-expectations (2.6.0)
       diff-lcs (~> 1.1.2)
     rspec-mocks (2.6.0)
+    test-unit (2.4.4)
 
 PLATFORMS
   ruby
@@ -26,3 +27,4 @@ DEPENDENCIES
   parallel
   rake
   rspec (>= 2.4)
+  test-unit
