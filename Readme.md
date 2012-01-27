@@ -47,7 +47,7 @@ ParallelTests uses 1 database per test-process, 2 processes will use `*_test` an
 
 ### 1: Add to `config/database.yml`
     test:
-      database: xxx_test<%= ENV['TEST_ENV_NUMBER'] %>
+      database: yourproject_test<%= ENV['TEST_ENV_NUMBER'] %>
 
 ### 2: Create additional database(s)
     rake parallel:create
@@ -149,7 +149,7 @@ Setup for non-rails
 
 [optional] Only run selected files & folders:
 
-    parallel_test test/bar test/baz/xxx_text.rb
+    parallel_test test/bar test/baz/foo_text.rb
 
 Options are:
 
