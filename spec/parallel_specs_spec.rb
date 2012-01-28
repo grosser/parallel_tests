@@ -11,7 +11,6 @@ describe ParallelSpecs do
       File.stub!(:file?).with('script/spec').and_return false
       File.stub!(:file?).with('spec/spec.opts').and_return false
       File.stub!(:file?).with('spec/parallel_spec.opts').and_return false
-      File.stub!(:file?).with('.parallel_rspec').and_return false
       File.stub!(:file?).with('.rspec_parallel').and_return false
       ParallelSpecs.stub!(:bundler_enabled?).and_return false
     end
@@ -99,14 +98,7 @@ describe ParallelSpecs do
       ParallelSpecs.should_receive(:open).with{|x,y| x =~ %r{script/spec\s+ -O spec/parallel_spec.opts}}.and_return mocked_process
       ParallelSpecs.run_tests(['xxx'],1,{})
     end
-    
-    it "uses -O .parallel_rspec when found (with script/spec)" do
-      File.stub!(:file?).with('script/spec').and_return true
-      File.should_receive(:file?).with('.parallel_rspec').and_return true
-      ParallelSpecs.should_receive(:open).with{|x,y| x =~ %r{script/spec\s+ -O .parallel_rspec}}.and_return mocked_process
-      ParallelSpecs.run_tests(['xxx'],1,{})
-    end
-    
+
     it "uses -O .rspec_parallel when found (with script/spec)" do
       File.stub!(:file?).with('script/spec').and_return true
       File.should_receive(:file?).with('.rspec_parallel').and_return true
