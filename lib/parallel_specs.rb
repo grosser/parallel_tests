@@ -41,7 +41,7 @@ class ParallelSpecs < ParallelTests
   end
 
   def self.spec_opts(rspec_version)
-    options_file = ['spec/parallel_spec.opts', 'spec/spec.opts'].detect{|f| File.file?(f) }
+    options_file = ['.parallel_rspec', '.rspec_parallel', 'spec/parallel_spec.opts', 'spec/spec.opts'].detect{|f| File.file?(f) }
     return unless options_file
     "-O #{options_file}"
   end
