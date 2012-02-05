@@ -118,16 +118,34 @@ describe 'CLI' do
     result.should =~ /\d+\.\d+\.\d+.*\d+\.\d+\.\d+/m # prints version twice
   end
 
-  it "runs with test::unit" do
-    write "test/x1_test.rb", "require 'test/unit'; class XTest < Test::Unit::TestCase; def test_xxx; end; end"
-    result = run_tests(:type => :test)
-    result.should include('1 test')
-    $?.success?.should == true
+  context "Test::Unit" do
+    it "runs" do
+      write "test/x1_test.rb", "require 'test/unit'; class XTest < Test::Unit::TestCase; def test_xxx; end; end"
+      result = run_tests(:type => :test)
+      result.should include('1 test')
+      $?.success?.should == true
+    end
+
+    it "passes test options" do
+      write "test/x1_test.rb", "require 'test/unit'; class XTest < Test::Unit::TestCase; def test_xxx; end; end"
+      result = run_tests(:type => :test, :add => '--test-options "-v"')
+      result.should include('test_xxx') # verbose output of every test
+    end
   end
 
-  it "passes test options to test::unit" do
-    write "test/x1_test.rb", "require 'test/unit'; class XTest < Test::Unit::TestCase; def test_xxx; end; end"
-    result = run_tests(:type => :test, :add => '--test-options "-v"')
-    result.should include('test_xxx') # verbose output of every test
+  context "Cucumber" do
+    it "passes TEST_ENV_NUMBER when running with pattern (issue #86)" do
+      write "features/good1.feature", "Feature: xxx\n  Scenario: xxx\n    Given I print TEST_ENV_NUMBER"
+      write "features/good2.feature", "Feature: xxx\n  Scenario: xxx\n    Given I print TEST_ENV_NUMBER"
+      write "features/b.feature", "Feature: xxx\n  Scenario: xxx\n    Given I FAIL"
+      write "features/steps/a.rb", "Given('I print TEST_ENV_NUMBER'){ puts \"YOUR TEST ENV IS \#{ENV['TEST_ENV_NUMBER']}!\" }"
+
+      result = run_tests :type => 'features', :add => '--pattern good'
+      $?.success?.should == true
+
+      result.should include('YOUR TEST ENV IS 2!')
+      result.should include('YOUR TEST ENV IS !')
+      result.should_not include('I FAIL')
+    end
   end
 end
