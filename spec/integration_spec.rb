@@ -50,7 +50,7 @@ describe 'CLI' do
   end
 
   it "does not run any tests if there are none" do
-    write 'spec/xxx.rb', 'xxx'
+    write 'spec/xxx_spec.rb', '1'
     result = run_tests
     result.should include('No examples found')
     result.should include('Took')
@@ -112,8 +112,8 @@ describe 'CLI' do
   end
 
   it "can run with test-options" do
-    write "spec/x1_spec.rb", ""
-    write "spec/x2_spec.rb", ""
+    write "spec/x1_spec.rb", "111"
+    write "spec/x2_spec.rb", "111"
     result = run_tests(:add => "--test-options ' --version'", :processes => 2)
     result.should =~ /\d+\.\d+\.\d+.*\d+\.\d+\.\d+/m # prints version twice
   end
@@ -146,6 +146,16 @@ describe 'CLI' do
       result.should include('YOUR TEST ENV IS 2!')
       result.should include('YOUR TEST ENV IS !')
       result.should_not include('I FAIL')
+    end
+
+    it "runs each feature once when there are more processes then features (issue #89)" do
+      write "features/steps/a.rb", "Given('I print TEST_ENV_NUMBER'){ puts \"YOUR TEST ENV IS \#{ENV['TEST_ENV_NUMBER']}!\" }"
+      2.times{|i|
+        write "features/good#{i}.feature", "Feature: xxx\n  Scenario: xxx\n    Given I print TEST_ENV_NUMBER"
+      }
+      result = run_tests :type => 'features', :add => '-n 3'
+      $?.success?.should == true
+      result.scan(/YOUR TEST ENV IS \d?!/).sort.should == ["YOUR TEST ENV IS !", "YOUR TEST ENV IS 2!"]
     end
   end
 end

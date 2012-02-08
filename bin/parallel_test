@@ -79,7 +79,11 @@ else
   puts "#{num_processes} processes for #{num_tests} #{name}s, ~ #{num_tests / groups.size} #{name}s per process"
 
   test_results = Parallel.map(groups, :in_processes => num_processes) do |group|
-    klass.run_tests(group, groups.index(group), options)
+    if group.empty?
+      {:stdout => '', :exit_status => 0}
+    else
+      klass.run_tests(group, groups.index(group), options)
+    end
   end
 
   #parse and print results
