@@ -22,7 +22,7 @@ describe ParallelCucumber do
 
     it "returns the output" do
       io = open('spec/spec_helper.rb')
-      ParallelCucumber.stub!(:print)
+      $stdout.stub!(:print)
       ParallelCucumber.should_receive(:open).and_return io
       ParallelCucumber.run_tests(['xxx'],1,{})[:stdout].should =~ /\$LOAD_PATH << File/
     end

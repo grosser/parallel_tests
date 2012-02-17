@@ -133,7 +133,7 @@ describe ParallelSpecs do
 
     it "returns the output" do
       io = open('spec/spec_helper.rb')
-      ParallelSpecs.stub!(:print)
+      $stdout.stub!(:print)
       ParallelSpecs.should_receive(:open).and_return io
       ParallelSpecs.run_tests(['xxx'],1,{})[:stdout].should =~ /\$LOAD_PATH << File/
     end

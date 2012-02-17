@@ -54,7 +54,7 @@ describe ParallelTests do
 
     it "returns the output" do
       io = open('spec/spec_helper.rb')
-      ParallelTests.stub!(:print)
+      $stdout.stub!(:print)
       ParallelTests.should_receive(:open).and_return io
       ParallelTests.run_tests(['xxx'],1,{})[:stdout].should =~ /\$LOAD_PATH << File/
     end
