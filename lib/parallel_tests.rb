@@ -92,16 +92,16 @@ class ParallelTests
       now = Time.now.to_f
       buffer << char
       if flushed + timeout < now
-        print buffer
-        STDOUT.flush
+        $stdout.print buffer
+        $stdout.flush
         buffer = ''
         flushed = now
       end
     end
 
     # print the remainder
-    print buffer
-    STDOUT.flush
+    $stdout.print buffer
+    $stdout.flush
 
     all
   end
