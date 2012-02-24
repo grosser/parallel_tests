@@ -29,7 +29,8 @@ describe 'CLI' do
   end
 
   def run_tests(options={})
-    `cd #{folder} && #{executable} --chunk-timeout 999 -t #{options[:type] || 'spec'} -n #{options[:processes]||2} #{options[:add]} 2>&1`
+    processes = "-n #{options[:processes]||2}" unless options[:processes] == false
+    `cd #{folder} && #{options[:export]} #{executable} --chunk-timeout 999 -t #{options[:type] || 'spec'} #{processes} #{options[:add]} 2>&1`
   end
 
   it "runs tests in parallel" do
@@ -85,9 +86,13 @@ describe 'CLI' do
     system("#{executable} -e 'test -e xxxx' -n 4").should == false
   end
 
-  it "can run through parallel_spec / parallel_cucumber" do
+  it "can run through parallel_spec" do
     version = `#{executable} -v`
     `#{bin_folder}/parallel_spec -v`.should == version
+  end
+
+  it "can run through parallel_spec" do
+    version = `#{executable} -v`
     `#{bin_folder}/parallel_cucumber -v`.should == version
   end
 
@@ -101,7 +106,7 @@ describe 'CLI' do
     (Time.now - t).should <= expected
   end
 
-  it "can can with given files" do
+  it "can run with given files" do
     write "spec/x1_spec.rb", "puts '111'"
     write "spec/x2_spec.rb", "puts '222'"
     write "spec/x3_spec.rb", "puts '333'"
@@ -116,6 +121,15 @@ describe 'CLI' do
     write "spec/x2_spec.rb", "111"
     result = run_tests(:add => "--test-options ' --version'", :processes => 2)
     result.should =~ /\d+\.\d+\.\d+.*\d+\.\d+\.\d+/m # prints version twice
+  end
+
+  it "runs with PARALLEL_TEST_PROCESSORS processes" do
+    processes = 5
+    processes.times{|i|
+      write "spec/x#{i}_spec.rb", "puts %{ENV-\#{ENV['TEST_ENV_NUMBER']}-}"
+    }
+    result = run_tests(:export => "PARALLEL_TEST_PROCESSORS=#{processes}", :processes => processes)
+    result.scan(/ENV-.?-/).should =~ ["ENV--", "ENV-2-", "ENV-3-", "ENV-4-", "ENV-5-"]
   end
 
   context "Test::Unit" do
