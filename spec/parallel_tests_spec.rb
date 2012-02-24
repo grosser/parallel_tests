@@ -11,7 +11,7 @@ describe ParallelTests do
 
     it "should default to the prefix" do
       args = {:count => "models"}
-      ParallelTests.parse_rake_args(args).should == [Parallel.processor_count, "models", ""]
+      ParallelTests.parse_rake_args(args).should == [nil, "models", ""]
     end
 
     it "should return the count and pattern" do
@@ -23,16 +23,38 @@ describe ParallelTests do
       args = {:count => 2, :pattern => "plain", :options => "-p default" }
       ParallelTests.parse_rake_args(args).should == [2, "plain", "-p default"]
     end
+  end
 
-    it "should use the PARALLEL_TEST_PROCESSORS env var for processor_count if set" do
-      ENV['PARALLEL_TEST_PROCESSORS'] = '28'
-      ParallelTests.parse_rake_args({}).should == [28, '', '']
+  describe ".determine_number_of_processes" do
+    before do
+      ENV.delete('PARALLEL_TEST_PROCESSORS')
+      Parallel.stub(:processor_count).and_return 20
     end
 
-    it "should use count over PARALLEL_TEST_PROCESSORS env var" do
-      ENV['PARALLEL_TEST_PROCESSORS'] = '28'
-      args = {:count => 2}
-      ParallelTests.parse_rake_args(args).should == [2, '', ""]
+    def call(count)
+      ParallelTests.determine_number_of_processes(count)
+    end
+
+    it "uses the given count if set" do
+      call('5').should == 5
+    end
+
+    it "uses the processor count from Parallel" do
+      call(nil).should == 20
+    end
+
+    it "uses the processor count from ENV before Parallel" do
+      ENV['PARALLEL_TEST_PROCESSORS'] = '22'
+      call(nil).should == 22
+    end
+
+    it "does not use blank count" do
+      call('   ').should == 20
+    end
+
+    it "does not use blank env" do
+      ENV['PARALLEL_TEST_PROCESSORS'] = '   '
+      call(nil).should == 20
     end
   end
 

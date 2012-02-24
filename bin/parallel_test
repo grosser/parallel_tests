@@ -39,7 +39,7 @@ raise "--no-sort and --single-process are not supported" if options[:no_sort] an
 # get files to run from arguments
 options[:files] = ARGV if ARGV.size > 0
 
-num_processes = options[:count] || Parallel.processor_count
+num_processes = ParallelTests.determine_number_of_processes(options[:count])
 num_processes = num_processes * (options[:multiply] || 1)
 
 if options[:execute]

@@ -1,8 +1,8 @@
 namespace :parallel do
   def run_in_parallel(cmd, options)
-    count = (options[:count] ? options[:count].to_i : nil)
+    count = "-n #{options[:count]}" if options[:count]
     executable = File.join(File.dirname(__FILE__), '..', '..', 'bin', 'parallel_test')
-    command = "#{executable} --exec '#{cmd}' -n #{count} #{'--non-parallel' if options[:non_parallel]}"
+    command = "#{executable} --exec '#{cmd}' #{count} #{'--non-parallel' if options[:non_parallel]}"
     abort unless system(command)
   end
 
