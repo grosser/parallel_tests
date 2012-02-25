@@ -77,7 +77,7 @@ Rspec: Add to your `.rspec_parallel` (or `.rspec`) :
 
 Test::Unit:  Add to your `test_helper.rb`:
 
-    require 'parallel_tests/runtime_logger'
+    require 'parallel_tests/test/runtime_logger'
 
 
 SpecSummaryLogger
@@ -110,12 +110,12 @@ Add the following to your `.rspec_parallel` (or `.rspec`) :
 
 Setup for non-rails
 ===================
-    sudo gem install parallel_tests
+    gem install parallel_tests
     # go to your project dir
     parallel_test OR parallel_spec OR parallel_cucumber
-    # [Optional] use ENV['TEST_ENV_NUMBER'] inside your tests to select separate db/memcache/etc.
 
-[optional] Only run selected files & folders:
+ - use ENV['TEST_ENV_NUMBER'] inside your tests to select separate db/memcache/etc.
+ - Only run selected files & folders:
 
     parallel_test test/bar test/baz/foo_text.rb
 
@@ -133,7 +133,7 @@ Options are:
     -v, --version                    Show Version
     -h, --help                       Show this.
 
-You can run any kind of code with -e / --execute
+You can run any kind of code in parallel with -e / --execute
 
     parallel_test -n 5 -e 'ruby -e "puts %[hello from process #{ENV[:TEST_ENV_NUMBER.to_s].inspect}]"'
     hello from process "2"
