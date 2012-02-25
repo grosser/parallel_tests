@@ -183,11 +183,9 @@ You can run any kind of code with -e / --execute
 TIPS
 ====
  - [Capybara + Selenium] add to env.rb: `Capybara.server_port = 8888 + ENV['TEST_ENV_NUMBER'].to_i`
- - [RSpec] add a `spec/parallel_spec.opts` to use different options, e.g. no --drb (default: `spec/spec.opts`)
- - [RSpec] if something looks fishy try to delete `script/spec`
- - [RSpec] if `script/spec` is missing parallel:spec uses just `spec` (which solves some issues with double-loaded environment.rb)
- - [RSpec] 'script/spec_server' or [spork](http://github.com/timcharper/spork/tree/master) do not work in parallel
- - [RSpec] `./script/generate rspec` if you are running rspec from gems (this plugin uses script/spec which may fail if rspec files are outdated)
+ - [RSpec] add a `.rspec_parallel` to use different options, e.g. **no --drb**
+ - [RSpec] delete `script/spec`
+ - [RSpec] [spork](https://github.com/timcharper/spork) does not work in parallel
  - [RSpec] remove --loadby from you spec/*.opts
  - [Bundler] if you have a `Gemfile` then `bundle exec` will be used to run tests
  - [Capybara setup](https://github.com/grosser/parallel_tests/wiki)
@@ -196,7 +194,7 @@ TIPS
  - [SQL schema format] use :ruby schema format to get faster parallel:prepare`
  - [ActiveRecord] if you do not have `db:abort_if_pending_migrations` add this to your Rakefile: `task('db:abort_if_pending_migrations'){}`
  - `export PARALLEL_TEST_PROCESSORS=X` in your environment and parallel_tests will use this number of processors by default
- - with zsh this would be `rake "parallel:prepare[3]"`
+ - [ZSH] use quotes to use rake arguments `rake "parallel:prepare[3]"`
 
 TODO
 ====
@@ -241,5 +239,4 @@ inspired by [pivotal labs](http://pivotallabs.com/users/miked/blog/articles/849-
 
 [Michael Grosser](http://grosser.it)<br/>
 michael@grosser.it<br/>
-Hereby placed under public domain, do what you want, just do not hold me accountable...<br/>
-[![Flattr](http://api.flattr.com/button/flattr-badge-large.png)](https://flattr.com/submit/auto?user_id=grosser&url=https://github.com/grosser/parallel_tests&title=parallel_tests&language=en_GB&tags=github&category=software)
+License: MIT
