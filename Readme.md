@@ -89,16 +89,16 @@ Even process runtimes
 
 Log test runtime to give each process the same runtime.
 
-Rspec: Add to your `spec/parallel_spec.opts` (or `spec/spec.opts`) :
+Rspec: Add to your `.rspec_parallel` (or `.rspec`) :
 
     RSpec 1.x:
       --format progress
-      --require parallel_specs/spec_runtime_logger
-      --format ParallelSpecs::SpecRuntimeLogger:tmp/parallel_profile.log
+      --require parallel_tests/spec/runtime_logger
+      --format ParallelTests::Spec::RuntimeLogger:tmp/parallel_profile.log
     RSpec >= 2.4:
       If installed as plugin: -I vendor/plugins/parallel_tests/lib
       --format progress
-      --format ParallelSpecs::SpecRuntimeLogger --out tmp/parallel_profile.log
+      --format ParallelTests::Spec::RuntimeLogger --out tmp/parallel_profile.log
 
 Test::Unit:  Add to your `test_helper.rb`:
     require 'parallel_tests/runtime_logger'
@@ -109,16 +109,16 @@ SpecSummaryLogger
 
 This logger logs the test output without the different processes overwriting each other.
 
-Add the following to your `spec/parallel_spec.opts` (or `spec/spec.opts`) :
+Add the following to your `.rspec_parallel` (or `.rspec`) :
 
     RSpec 1.x:
       --format progress
-      --require parallel_specs/spec_summary_logger
-      --format ParallelSpecs::SpecSummaryLogger:tmp/spec_summary.log
+      --require parallel_tests/spec/summary_logger
+      --format ParallelTests::Spec::SummaryLogger:tmp/spec_summary.log
     RSpec >= 2.2:
       If installed as plugin: -I vendor/plugins/parallel_tests/lib
       --format progress
-      --format ParallelSpecs::SpecSummaryLogger --out tmp/spec_summary.log
+      --format ParallelTests::Spec::SummaryLogger --out tmp/spec_summary.log
 
 SpecFailuresLogger
 -----------------------
@@ -129,16 +129,16 @@ E.g.
 
     rspec /path/to/my_spec.rb:123 # should do something
 
-Add the following to your `spec/parallel_spec.opts` (or `spec/spec.opts`) :
+Add the following to your `.rspec_parallel` (or `.rspec`) :
 
     RSpec 1.x:
       --format progress
-      --require parallel_specs/spec_failures_logger
-      --format ParallelSpecs::SpecFailuresLogger:tmp/failing_specs.log
+      --require parallel_tests/spec/failures_logger
+      --format ParallelTests::Spec::FailuresLogger:tmp/failing_specs.log
     RSpec >= 2.4:
       If installed as plugin: -I vendor/plugins/parallel_tests/lib
       --format progress
-      --format ParallelSpecs::SpecFailuresLogger --out tmp/failing_specs.log
+      --format ParallelTests::Spec::FailuresLogger --out tmp/failing_specs.log
 
 Setup for non-rails
 ===================
@@ -200,6 +200,7 @@ TIPS
 
 TODO
 ====
+ - add tests for cucumber runtime formatter
  - make jRuby compatible [basics](http://yehudakatz.com/2009/07/01/new-rails-isolation-testing/)
  - make windows compatible
 

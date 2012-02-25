@@ -53,28 +53,3 @@ namespace :parallel do
     end
   end
 end
-
-#backwards compatability
-#spec:parallel:prepare
-#spec:parallel
-#test:parallel
-namespace :spec do
-  namespace :parallel do
-    task :prepare, :count do |t,args|
-      $stderr.puts "WARNING -- Deprecated!  use parallel:prepare"
-      Rake::Task['parallel:prepare'].invoke(args[:count])
-    end
-  end
-
-  task :parallel, :count, :pattern do |t,args|
-    $stderr.puts "WARNING -- Deprecated! use parallel:spec"
-    Rake::Task['parallel:spec'].invoke(args[:count], args[:pattern])
-  end
-end
-
-namespace :test do
-  task :parallel, :count, :pattern do |t,args|
-    $stderr.puts "WARNING -- Deprecated! use parallel:test"
-    Rake::Task['parallel:test'].invoke(args[:count], args[:pattern])
-  end
-end

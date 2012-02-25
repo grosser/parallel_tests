@@ -1,6 +1,6 @@
-require 'parallel_specs/spec_failures_logger'
+require 'parallel_tests/spec/failures_logger'
 
-class ParallelSpecs::SpecSummaryLogger < ParallelSpecs::SpecLoggerBase
+class ParallelTests::Spec::SummaryLogger < ParallelTests::Spec::LoggerBase
   # RSpec 1: dumps 1 failed spec
   def dump_failure(*args)
     lock_output do

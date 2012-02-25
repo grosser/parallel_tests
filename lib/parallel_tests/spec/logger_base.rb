@@ -1,4 +1,7 @@
-require 'parallel_specs'
+module ParallelTests
+  module Spec
+  end
+end
 
 begin
   require 'rspec/core/formatters/base_text_formatter'
@@ -7,9 +10,10 @@ rescue LoadError
   require 'spec/runner/formatter/base_text_formatter'
   base = Spec::Runner::Formatter::BaseTextFormatter
 end
-ParallelSpecs::SpecLoggerBaseBase = base
 
-class ParallelSpecs::SpecLoggerBase < ParallelSpecs::SpecLoggerBaseBase
+ParallelTests::Spec::LoggerBaseBase = base
+
+class ParallelTests::Spec::LoggerBase < ParallelTests::Spec::LoggerBaseBase
   RSPEC_1 = !defined?(RSpec::Core::Formatters::BaseTextFormatter) # do not test for Spec, this will trigger deprecation warning in rspec 2
 
   def initialize(*args)

@@ -1,4 +1,4 @@
-class ParallelTests
+module ParallelTests
   class Grouper
     def self.in_groups(items, num_groups)
       groups = Array.new(num_groups){ [] }
@@ -35,7 +35,7 @@ class ParallelTests
       files.sort_by{|item, size| size }.reverse
     end
 
-  private
+    private
 
     def self.smallest_group(groups)
       groups.min_by{|g| g[:size] }

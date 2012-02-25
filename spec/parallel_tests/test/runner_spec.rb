@@ -1,0 +1,179 @@
+require 'spec_helper'
+
+describe ParallelTests::Test::Runner do
+  test_tests_in_groups(ParallelTests::Test::Runner, 'test', '_test.rb')
+
+  describe :run_tests do
+    def call(*args)
+      ParallelTests::Test::Runner.run_tests(*args)
+    end
+
+    it "uses TEST_ENV_NUMBER=blank when called for process 0" do
+      ParallelTests::Test::Runner.should_receive(:open).with{|x,y|x=~/TEST_ENV_NUMBER= /}.and_return mocked_process
+      call(['xxx'],0,{})
+    end
+
+    it "uses TEST_ENV_NUMBER=2 when called for process 1" do
+      ParallelTests::Test::Runner.should_receive(:open).with{|x,y| x=~/TEST_ENV_NUMBER=2/}.and_return mocked_process
+      call(['xxx'],1,{})
+    end
+
+    it "uses options" do
+      ParallelTests::Test::Runner.should_receive(:open).with{|x,y| x=~ %r{ruby -Itest .* -- -v}}.and_return mocked_process
+      call(['xxx'],1,:test_options => '-v')
+    end
+
+    it "returns the output" do
+      io = open('spec/spec_helper.rb')
+      $stdout.stub!(:print)
+      ParallelTests::Test::Runner.should_receive(:open).and_return io
+      call(['xxx'],1,{})[:stdout].should =~ /\$LOAD_PATH << File/
+    end
+  end
+
+  describe :test_in_groups do
+    def call(*args)
+      ParallelTests::Test::Runner.tests_in_groups(*args)
+    end
+
+    it "does not sort when passed false do_sort option" do
+      ParallelTests::Test::Runner.should_not_receive(:smallest_first)
+      call [], 1, :no_sort => true
+    end
+
+    it "does sort when not passed do_sort option" do
+      ParallelTests::Test::Runner.stub!(:tests_with_runtime).and_return([])
+      ParallelTests::Grouper.should_receive(:largest_first).and_return([])
+      call [], 1
+    end
+
+    it "groups by single_process pattern and then via size" do
+      ParallelTests::Test::Runner.should_receive(:with_runtime_info).and_return([['aaa',5],['aaa2',5],['bbb',2],['ccc',1],['ddd',1]])
+      result = call [], 3, :single_process => [/^a.a/]
+      result.should == [["aaa", "aaa2"], ["bbb"], ["ccc", "ddd"]]
+    end
+  end
+
+  describe :find_results do
+    def call(*args)
+      ParallelTests::Test::Runner.find_results(*args)
+    end
+
+    it "finds multiple results in test output" do
+      output = <<EOF
+Loaded suite /opt/ruby-enterprise/lib/ruby/gems/1.8/gems/rake-0.8.4/lib/rake/rake_test_loader
+Started
+..............
+Finished in 0.145069 seconds.
+
+10 tests, 20 assertions, 0 failures, 0 errors
+Loaded suite /opt/ruby-enterprise/lib/ruby/gems/1.8/gems/rake-0.8.4/lib/rake/rake_test_loader
+Started
+..............
+Finished in 0.145069 seconds.
+
+14 tests, 20 assertions, 0 failures, 0 errors
+
+EOF
+
+      call(output).should == ['10 tests, 20 assertions, 0 failures, 0 errors','14 tests, 20 assertions, 0 failures, 0 errors']
+    end
+
+    it "is robust against scrambled output" do
+      output = <<EOF
+Loaded suite /opt/ruby-enterprise/lib/ruby/gems/1.8/gems/rake-0.8.4/lib/rake/rake_test_loader
+Started
+..............
+Finished in 0.145069 seconds.
+
+10 tests, 20 assertions, 0 failures, 0 errors
+Loaded suite /opt/ruby-enterprise/lib/ruby/gems/1.8/gems/rake-0.8.4/lib/rake/rake_test_loader
+Started
+..............
+Finished in 0.145069 seconds.
+
+14 te.dsts, 20 assertions, 0 failures, 0 errors
+EOF
+
+      call(output).should == ['10 tests, 20 assertions, 0 failures, 0 errors','14 tedsts, 20 assertions, 0 failures, 0 errors']
+    end
+  end
+
+  describe :find_tests do
+    def call(*args)
+      ParallelTests::Test::Runner.send(:find_tests, *args)
+    end
+
+    it "returns if root is an array" do
+      call([1]).should == [1]
+    end
+
+    it "finds all test files" do
+      begin
+        root = "/tmp/test-find_tests-#{rand(999)}"
+        `mkdir #{root}`
+        `mkdir #{root}/a`
+        `mkdir #{root}/b`
+        `touch #{root}/x_test.rb`
+        `touch #{root}/a/x_test.rb`
+        `touch #{root}/a/test.rb`
+        `touch #{root}/b/y_test.rb`
+        `touch #{root}/b/test.rb`
+        `ln -s #{root}/b #{root}/c`
+        `ln -s #{root}/b #{root}/a/`
+        call(root).sort.should == [
+          "#{root}/a/b/y_test.rb",
+            "#{root}/a/x_test.rb",
+            "#{root}/b/y_test.rb",
+            "#{root}/c/y_test.rb",
+            "#{root}/x_test.rb"
+        ]
+      ensure
+        `rm -rf #{root}`
+      end
+    end
+
+    it "finds files by pattern" do
+      begin
+        root = "/tmp/test-find_tests-#{rand(999)}"
+        `mkdir #{root}`
+        `mkdir #{root}/a`
+        `touch #{root}/a/x_test.rb`
+        `touch #{root}/a/y_test.rb`
+        `touch #{root}/a/z_test.rb`
+        call(root, :pattern => '^a/(y|z)_test').sort.should == [
+          "#{root}/a/y_test.rb",
+            "#{root}/a/z_test.rb",
+        ]
+      ensure
+        `rm -rf #{root}`
+      end
+    end
+  end
+
+  describe :summarize_results do
+    def call(*args)
+      ParallelTests::Test::Runner.summarize_results(*args)
+    end
+
+    it "adds results" do
+      call(['1 foo 3 bar','2 foo 5 bar']).should == '8 bars, 3 foos'
+    end
+
+    it "adds results with braces" do
+      call(['1 foo(s) 3 bar(s)','2 foo 5 bar']).should == '8 bars, 3 foos'
+    end
+
+    it "adds same results with plurals" do
+      call(['1 foo 3 bar','2 foos 5 bar']).should == '8 bars, 3 foos'
+    end
+
+    it "adds non-similar results" do
+      call(['1 xxx 2 yyy','1 xxx 2 zzz']).should == '2 xxxs, 2 yyys, 2 zzzs'
+    end
+
+    it "does not pluralize 1" do
+      call(['1 xxx 2 yyy']).should == '1 xxx, 2 yyys'
+    end
+  end
+end

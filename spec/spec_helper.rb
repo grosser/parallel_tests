@@ -1,15 +1,17 @@
-# ---- requirements
 $LOAD_PATH << File.expand_path("../lib", File.dirname(__FILE__))
-require 'rubygems'
 
 FAKE_RAILS_ROOT = '/tmp/pspecs/fixtures'
 
 require 'tempfile'
-require 'parallel_specs'
-require 'parallel_specs/spec_runtime_logger'
-require 'parallel_specs/spec_summary_logger'
-require 'parallel_cucumber'
-require 'parallel_tests/runtime_logger'
+require 'parallel_tests'
+require 'parallel_tests/test/runner'
+require 'parallel_tests/test/runtime_logger'
+
+require 'parallel_tests/spec/runner'
+require 'parallel_tests/spec/runtime_logger'
+require 'parallel_tests/spec/summary_logger'
+
+require 'parallel_tests/cucumber/runner'
 
 OutputLogger = Struct.new(:output) do
   attr_reader :flock, :flush
