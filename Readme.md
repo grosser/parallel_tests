@@ -3,8 +3,9 @@ ParallelTests splits tests into even groups(by number of tests or runtime) and r
 
 Setup for Rails
 ===============
+[still using Rails 2?](https://github.com/grosser/parallel_tests/blob/master/ReadmeRails2.md)
+
 ## Install
-### Rails 3
 If you use RSpec: ensure you got >= 2.4
 
 As gem
@@ -18,28 +19,6 @@ OR as plugin
 
     # add to Gemfile
     gem "parallel", :group => :development
-
-
-### Rails 2
-
-As gem
-
-    gem install parallel_tests
-
-    # add to config/environments/development.rb
-    config.gem "parallel_tests"
-
-    # add to Rakefile
-    begin; require 'parallel_tests/tasks'; rescue LoadError; end
-
-OR as plugin
-
-    gem install parallel
-
-    # add to config/environments/development.rb
-    config.gem "parallel"
-
-    ./script/plugin install git://github.com/grosser/parallel_tests.git
 
 ## Setup
 ParallelTests uses 1 database per test-process, 2 processes will use `*_test` and `*_test2`.
@@ -91,16 +70,13 @@ Log test runtime to give each process the same runtime.
 
 Rspec: Add to your `.rspec_parallel` (or `.rspec`) :
 
-    RSpec 1.x:
-      --format progress
-      --require parallel_tests/spec/runtime_logger
-      --format ParallelTests::Spec::RuntimeLogger:tmp/parallel_profile.log
-    RSpec >= 2.4:
+    RSpec
       If installed as plugin: -I vendor/plugins/parallel_tests/lib
       --format progress
       --format ParallelTests::Spec::RuntimeLogger --out tmp/parallel_profile.log
 
 Test::Unit:  Add to your `test_helper.rb`:
+
     require 'parallel_tests/runtime_logger'
 
 
@@ -111,11 +87,7 @@ This logger logs the test output without the different processes overwriting eac
 
 Add the following to your `.rspec_parallel` (or `.rspec`) :
 
-    RSpec 1.x:
-      --format progress
-      --require parallel_tests/spec/summary_logger
-      --format ParallelTests::Spec::SummaryLogger:tmp/spec_summary.log
-    RSpec >= 2.2:
+    RSpec:
       If installed as plugin: -I vendor/plugins/parallel_tests/lib
       --format progress
       --format ParallelTests::Spec::SummaryLogger --out tmp/spec_summary.log
@@ -131,11 +103,7 @@ E.g.
 
 Add the following to your `.rspec_parallel` (or `.rspec`) :
 
-    RSpec 1.x:
-      --format progress
-      --require parallel_tests/spec/failures_logger
-      --format ParallelTests::Spec::FailuresLogger:tmp/failing_specs.log
-    RSpec >= 2.4:
+    RSpec:
       If installed as plugin: -I vendor/plugins/parallel_tests/lib
       --format progress
       --format ParallelTests::Spec::FailuresLogger --out tmp/failing_specs.log
@@ -199,7 +167,6 @@ TIPS
 TODO
 ====
  - document how to use cucumber runtime logger
- - move everything Rails 2 related to a e.g. Rails2Readme.md and link it
  - unify runtime-log location
  - add tests for cucumber runtime formatter
  - make jRuby compatible [basics](http://yehudakatz.com/2009/07/01/new-rails-isolation-testing/)
