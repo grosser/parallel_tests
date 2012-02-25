@@ -200,6 +200,8 @@ TIPS
 
 TODO
 ====
+ - move everything Rails 2 related to a e.g. Rails2Readme.md and link it
+ - unify runtime-log location
  - add tests for cucumber runtime formatter
  - make jRuby compatible [basics](http://yehudakatz.com/2009/07/01/new-rails-isolation-testing/)
  - make windows compatible
