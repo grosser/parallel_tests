@@ -90,6 +90,6 @@ describe ParallelTests do
   end
 
   it "has a version" do
-    ParallelTests::VERSION.should =~ /^\d+\.\d+\.\d+$/
+    ParallelTests::VERSION.should =~ /^\d+\.\d+\.\d+/
   end
 end

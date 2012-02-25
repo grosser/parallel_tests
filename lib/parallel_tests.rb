@@ -1,9 +1,8 @@
 require 'parallel'
+require 'parallel_tests/version'
 require 'parallel_tests/grouper'
 
 module ParallelTests
-  VERSION = File.read( File.join(File.dirname(__FILE__),'..','VERSION') ).strip
-
   def self.determine_number_of_processes(count)
     [
       count,

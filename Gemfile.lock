@@ -1,3 +1,9 @@
+PATH
+  remote: .
+  specs:
+    parallel_tests (0.7.0.alpha)
+      parallel
+
 GEM
   remote: http://rubygems.org/
   specs:
@@ -11,11 +17,6 @@ GEM
     diff-lcs (1.1.2)
     gherkin (2.7.6)
       json (>= 1.4.6)
-    git (1.2.5)
-    jeweler (1.6.3)
-      bundler (~> 1.0)
-      git (>= 1.2.5)
-      rake
     json (1.6.4)
     parallel (0.5.1)
     rake (0.8.7)
@@ -35,8 +36,7 @@ PLATFORMS
 
 DEPENDENCIES
   cucumber
-  jeweler
-  parallel
+  parallel_tests!
   rake
   rspec (>= 2.4)
   test-unit

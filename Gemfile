@@ -1,11 +1,9 @@
 source :rubygems
+gemspec
 
-gem 'parallel'
-
-group :dev do
+group :development do
   gem 'test-unit', :platform => :ruby_19
   gem 'rspec', '>=2.4'
   gem 'cucumber'
   gem 'rake'
-  gem 'jeweler'
 end
