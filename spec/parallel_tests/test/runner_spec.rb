@@ -127,6 +127,14 @@ EOF
       Dir.chdir old
     end
 
+    it "finds test in folders with appended /" do
+      with_files(['b/a_test.rb']) do |root|
+        call(["#{root}/"]).sort.should == [
+          "#{root}/b/a_test.rb",
+        ]
+      end
+    end
+
     it "finds test files nested in symlinked folders" do
       with_files(['a/a_test.rb','b/b_test.rb']) do |root|
         `ln -s #{root}/a #{root}/b/link`

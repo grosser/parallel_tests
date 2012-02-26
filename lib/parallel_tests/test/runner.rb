@@ -132,7 +132,7 @@ module ParallelTests
       def self.files_in_folder(folder)
         # follow one symlink and direct children
         # http://stackoverflow.com/questions/357754/can-i-traverse-symlinked-directories-in-ruby-with-a-glob
-        Dir["#{folder}/**{,/*/**}/*"].uniq
+        Dir[File.join(folder, "**{,/*/**}/*")].uniq
       end
     end
   end

@@ -143,6 +143,16 @@ describe 'CLI' do
     result.scan(/ENV-.?-/).should =~ ["ENV--", "ENV-2-", "ENV-3-", "ENV-4-", "ENV-5-"]
   end
 
+  it "filters test by given pattern and relative paths" do
+    write "spec/x_spec.rb", "puts 'XXX'"
+    write "spec/y_spec.rb", "puts 'YYY'"
+    write "spec/z_spec.rb", "puts 'ZZZ'"
+    result = run_tests("spec", :add => '-p "^spec/(x|z)"')
+    result.should include('XXX')
+    result.should_not include('YYY')
+    result.should include('ZZZ')
+  end
+
   context "Test::Unit" do
     it "runs" do
       write "test/x1_test.rb", "require 'test/unit'; class XTest < Test::Unit::TestCase; def test_xxx; end; end"
