@@ -49,7 +49,7 @@ module ParallelTests
 
       def self.find_results(test_output)
         test_output.split("\n").map {|line|
-          line = line.gsub(/\.|F|\*/,'')
+          line = line.gsub(/\.|F|\*/,'').gsub(/\e\[\d+m/,'')
           next unless line_is_result?(line)
           line
         }.compact

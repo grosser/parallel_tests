@@ -97,6 +97,13 @@ EOF
 
       call(output).should == ['10 tests, 20 assertions, 0 failures, 0 errors','14 tedsts, 20 assertions, 0 failures, 0 errors']
     end
+
+    it "ignores color-codes" do
+      output = <<EOF
+10 tests, 20 assertions, 0 \e[31mfailures, 0 errors
+EOF
+      call(output).should == ['10 tests, 20 assertions, 0 failures, 0 errors']
+    end
   end
 
   describe :find_tests do
