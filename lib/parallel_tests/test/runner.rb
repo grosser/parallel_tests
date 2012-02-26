@@ -121,20 +121,18 @@ module ParallelTests
       def self.find_tests(tests, options={})
         (tests||[]).map do |file_or_folder|
           if File.directory?(file_or_folder)
-            tests_in_folder(file_or_folder, options)
+            files = files_in_folder(file_or_folder)
+            files.grep(/#{Regexp.escape test_suffix}$/).grep(/#{options[:pattern]}/)
           else
             file_or_folder
           end
         end.flatten.uniq
       end
 
-      def self.tests_in_folder(folder, options)
+      def self.files_in_folder(folder)
         # follow one symlink and direct children
         # http://stackoverflow.com/questions/357754/can-i-traverse-symlinked-directories-in-ruby-with-a-glob
-        files = Dir["#{folder}/**{,/*/**}/*#{test_suffix}"].uniq
-        files = files.map{|f| f.sub(folder+'/','') }
-        files = files.grep(/#{options[:pattern]}/)
-        files.map{|f| "#{folder}/#{f}" }
+        Dir["#{folder}/**{,/*/**}/*"].uniq
       end
     end
   end

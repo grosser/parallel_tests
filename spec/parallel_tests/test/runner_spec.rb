@@ -104,45 +104,80 @@ EOF
       ParallelTests::Test::Runner.send(:find_tests, *args)
     end
 
-    it "finds test files nested in folders" do
+    def with_files(files)
       begin
         root = "/tmp/test-find_tests-#{rand(999)}"
         `mkdir #{root}`
-        `mkdir #{root}/a`
-        `mkdir #{root}/b`
-        `touch #{root}/x_test.rb`
-        `touch #{root}/a/x_test.rb`
-        `touch #{root}/a/test.rb`
-        `touch #{root}/b/y_test.rb`
-        `touch #{root}/b/test.rb`
-        `ln -s #{root}/b #{root}/c`
-        `ln -s #{root}/b #{root}/a/`
-        call([root]).sort.should == [
-          "#{root}/a/b/y_test.rb",
-            "#{root}/a/x_test.rb",
-            "#{root}/b/y_test.rb",
-            "#{root}/c/y_test.rb",
-            "#{root}/x_test.rb"
-        ]
+        files.each do |file|
+          parent = "#{root}/#{File.dirname(file)}"
+          `mkdir -p #{parent}` unless File.exist?(parent)
+          `touch #{root}/#{file}`
+        end
+        yield root
       ensure
         `rm -rf #{root}`
       end
     end
 
-    it "finds test files in folders by pattern" do
-      begin
-        root = "/tmp/test-find_tests-#{rand(999)}"
-        `mkdir #{root}`
-        `mkdir #{root}/a`
-        `touch #{root}/a/x_test.rb`
-        `touch #{root}/a/y_test.rb`
-        `touch #{root}/a/z_test.rb`
-        call([root], :pattern => '^a/(y|z)_test').sort.should == [
-          "#{root}/a/y_test.rb",
-            "#{root}/a/z_test.rb",
+    def inside_dir(dir)
+      old = Dir.pwd
+      Dir.chdir dir
+      yield
+    ensure
+      Dir.chdir old
+    end
+
+    it "finds test files nested in symlinked folders" do
+      with_files(['a/a_test.rb','b/b_test.rb']) do |root|
+        `ln -s #{root}/a #{root}/b/link`
+        call(["#{root}/b"]).sort.should == [
+          "#{root}/b/b_test.rb",
+          "#{root}/b/link/a_test.rb",
         ]
-      ensure
-        `rm -rf #{root}`
+      end
+    end
+
+    it "finds test files nested in different folders" do
+      with_files(['a/a_test.rb','b/b_test.rb', 'c/c_test.rb']) do |root|
+        call(["#{root}/a", "#{root}/b"]).sort.should == [
+          "#{root}/a/a_test.rb",
+          "#{root}/b/b_test.rb",
+        ]
+      end
+    end
+
+    it "only finds tests in folders" do
+      with_files(['a/a_test.rb', 'a/test.rb', 'a/test_helper.rb']) do |root|
+        call(["#{root}/a"]).sort.should == [
+          "#{root}/a/a_test.rb"
+        ]
+      end
+    end
+
+    it "finds tests in nested folders" do
+      with_files(['a/b/c/d/a_test.rb']) do |root|
+        call(["#{root}/a"]).sort.should == [
+          "#{root}/a/b/c/d/a_test.rb"
+        ]
+      end
+    end
+
+    it "does not expand paths" do
+      with_files(['a/x_test.rb']) do |root|
+        inside_dir root do
+          call(['a']).sort.should == [
+            "a/x_test.rb"
+          ]
+        end
+      end
+    end
+
+    it "finds test files in folders by pattern" do
+      with_files(['a/x_test.rb','a/y_test.rb','a/z_test.rb']) do |root|
+        call([root], :pattern => "^#{root}/a/(y|z)_test").sort.should == [
+          "#{root}/a/y_test.rb",
+          "#{root}/a/z_test.rb",
+        ]
       end
     end
 

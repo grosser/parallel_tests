@@ -46,7 +46,7 @@ ParallelTests uses 1 database per test-process, 2 processes will use `*_test` an
 
 Test by pattern (e.g. use one integration server per subfolder / see if you broke any 'user'-related tests)
 
-    rake parallel:test[^unit] # everything in test/unit folder (every test file matching /^unit/)
+    rake parallel:test[^test/unit] # every test file in test/unit folder
     rake parallel:test[user]  # run users_controller + user_helper + user tests
     rake parallel:test['user|product']  # run user and product related tests
 
