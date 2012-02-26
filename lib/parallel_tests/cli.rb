@@ -5,7 +5,6 @@ module ParallelTest
   module CLI
     def self.run(argv)
       options = parse_options!(argv)
-      test_results = nil
 
       num_processes = ParallelTests.determine_number_of_processes(options[:count])
       num_processes = num_processes * (options[:multiply] || 1)
@@ -13,40 +12,61 @@ module ParallelTest
       if options[:execute]
         execute_shell_command_in_parallel(options[:execute], num_processes, options)
       else
-        lib = options[:type] || 'test'
-        require "parallel_tests/#{lib}/runner"
-        runner = eval("ParallelTests::#{lib.capitalize}::Runner")
-        name = runner.test_file_name
-
-        report_time_taken do
-          groups = runner.tests_in_groups(options[:files], num_processes, options)
-          abort "no #{name}s found!" if groups.size == 0
-
-          num_processes = groups.size
-          num_tests = groups.inject(0) { |sum, item| sum + item.size }
-          puts "#{num_processes} processes for #{num_tests} #{name}s, ~ #{num_tests / groups.size} #{name}s per process"
-
-          test_results = Parallel.map(groups, :in_processes => num_processes) do |group|
-            if group.empty?
-              {:stdout => '', :exit_status => 0}
-            else
-              runner.run_tests(group, groups.index(group), options)
-            end
-          end
-
-          #parse and print results
-          results = runner.find_results(test_results.map { |result| result[:stdout] }*"")
-          puts ""
-          puts runner.summarize_results(results)
-        end
-
-        #exit with correct status code so rake parallel:test && echo 123 works
-        failed = test_results.any? { |result| result[:exit_status] != 0 }
-        abort "#{lib.capitalize}s Failed" if failed
+        run_tests_in_parallel(num_processes, options)
       end
     end
 
     private
+
+    def self.run_tests_in_parallel(num_processes, options)
+      test_results = nil
+      lib = options[:type] || 'test'
+      runner = load_runner_for(lib)
+
+      report_time_taken do
+        groups = runner.tests_in_groups(options[:files], num_processes, options)
+        report_number_of_tests runner, groups
+
+        test_results = Parallel.map(groups, :in_processes => groups.size) do |group|
+          run_tests(runner, group, groups.index(group), options)
+        end
+
+        report_results runner, test_results
+      end
+
+      abort "#{lib.capitalize}s Failed" if any_test_failed?(test_results)
+    end
+
+    def self.run_tests(runner, group, process_number, options)
+      if group.empty?
+        {:stdout => '', :exit_status => 0}
+      else
+        runner.run_tests(group, process_number, options)
+      end
+    end
+
+    def self.report_results(runner, test_results)
+      results = runner.find_results(test_results.map { |result| result[:stdout] }*"")
+      puts ""
+      puts runner.summarize_results(results)
+    end
+
+    def self.report_number_of_tests(runner, groups)
+      name = runner.test_file_name
+      num_processes = groups.size
+      num_tests = groups.map(&:size).inject(:+)
+      puts "#{num_processes} processes for #{num_tests} #{name}s, ~ #{num_tests / groups.size} #{name}s per process"
+    end
+
+    #exit with correct status code so rake parallel:test && echo 123 works
+    def self.any_test_failed?(test_results)
+      test_results.any? { |result| result[:exit_status] != 0 }
+    end
+
+    def self.load_runner_for(lib)
+      require "parallel_tests/#{lib}/runner"
+      eval("ParallelTests::#{lib.capitalize}::Runner")
+    end
 
     def self.parse_options!(argv)
       options = {}
