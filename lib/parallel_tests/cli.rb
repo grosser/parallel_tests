@@ -69,7 +69,7 @@ BANNER
         end
         opts.on("-e", '--exec [COMMAND]', "execute this code parallel and with ENV['TEST_ENV_NUM']") { |path| options[:execute] = path }
         opts.on("-o", "--test-options '[OPTIONS]'", "execute test commands with those options") { |arg| options[:test_options] = arg }
-        opts.on("-t", "--type [TYPE]", "which type of tests to run? test, spec or features") { |type| options[:type] = type }
+        opts.on("-t", "--type [TYPE]", "test(default) / spec / cucumber") { |type| options[:type] = type }
         opts.on("--non-parallel", "execute same commands but do not in parallel, needs --exec") { options[:non_parallel] = true }
         opts.on("--chunk-timeout [TIMEOUT]", "timeout before re-printing the output of a child-process") { |timeout| options[:chunk_timeout] = timeout.to_f }
         opts.on('-v', '--version', 'Show Version') { puts ParallelTests::VERSION; exit }

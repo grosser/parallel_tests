@@ -3,7 +3,7 @@ name = "parallel_tests"
 require "#{name}/version"
 
 Gem::Specification.new name, ParallelTests::VERSION do |s|
-  s.summary = "Run tests / specs / features in parallel"
+  s.summary = "Run Test::Unit / RSpec / Cucumber in parallel"
   s.authors = ["Michael Grosser"]
   s.email = "michael@grosser.it"
   s.homepage = "http://github.com/grosser/#{name}"
