@@ -1,10 +1,8 @@
-# add rake tasks if we are inside Rails 3
-if defined?(Rails::Railtie)
-  module ParallelTests
-    class Railtie < ::Rails::Railtie
-      rake_tasks do
-        load File.expand_path("../tasks.rake", __FILE__)
-      end
+# rake tasks for Rails 3+
+module ParallelTests
+  class Railtie < ::Rails::Railtie
+    rake_tasks do
+      require "parallel_tests/tasks"
     end
   end
 end

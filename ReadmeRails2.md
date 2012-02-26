@@ -19,6 +19,10 @@ OR as plugin
 
     ./script/plugin install git://github.com/grosser/parallel_tests.git
 
+    # add to Rakefile
+    begin; require 'vendor/plugins/parallel_tests/lib/parallel_tests/tasks'; rescue LoadError; end
+
+
 Even process runtimes
 -----------------
 

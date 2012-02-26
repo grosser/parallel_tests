@@ -1,6 +1,8 @@
 Speedup Test::Unit + RSpec + Cucumber by running parallel on multiple CPUs (or cores).<br/>
 ParallelTests splits tests into even groups(by number of tests or runtime) and runs each group in a single process with its own database.
 
+[upgrading from 0.6 ?](https://github.com/grosser/parallel_tests/wiki/Upgrading-0.6.x-to-0.7.x)
+
 Setup for Rails
 ===============
 [still using Rails 2?](https://github.com/grosser/parallel_tests/blob/master/ReadmeRails2.md)

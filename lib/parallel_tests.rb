@@ -1,6 +1,7 @@
 require 'parallel'
 require 'parallel_tests/version'
 require 'parallel_tests/grouper'
+require 'parallel_tests/railtie' if defined? Rails::Railtie
 
 module ParallelTests
   def self.determine_number_of_processes(count)
