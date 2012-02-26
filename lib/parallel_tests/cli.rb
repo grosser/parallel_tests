@@ -80,7 +80,7 @@ Run all tests in parallel, giving each process ENV['TEST_ENV_NUMBER'] ('', '2', 
 Options are:
 BANNER
         opts.on("-n [PROCESSES]", Integer, "How many processes to use, default: available CPUs") { |n| options[:count] = n }
-        opts.on("-p", '--pattern [PATTERN]', "run tests matching this pattern") { |pattern| options[:pattern] = pattern }
+        opts.on("-p", '--pattern [PATTERN]', "run tests matching this pattern") { |pattern| options[:pattern] = /#{pattern}/ }
         opts.on("--no-sort", "do not sort files before running them") { |no_sort| options[:no_sort] = no_sort }
         opts.on("-m [FLOAT]", "--multiply-processes [FLOAT]", Float, "use given number as a multiplier of processes to run") { |multiply| options[:multiply] = multiply }
         opts.on("-s [PATTERN]", "--single [PATTERN]", "Run all matching files in only one process") do |pattern|

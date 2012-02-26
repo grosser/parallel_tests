@@ -122,7 +122,7 @@ module ParallelTests
         (tests||[]).map do |file_or_folder|
           if File.directory?(file_or_folder)
             files = files_in_folder(file_or_folder)
-            files.grep(/#{Regexp.escape test_suffix}$/).grep(/#{options[:pattern]}/)
+            files.grep(/#{Regexp.escape test_suffix}$/).grep(options[:pattern]||//)
           else
             file_or_folder
           end

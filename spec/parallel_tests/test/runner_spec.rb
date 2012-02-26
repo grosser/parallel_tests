@@ -174,10 +174,12 @@ EOF
 
     it "finds test files in folders by pattern" do
       with_files(['a/x_test.rb','a/y_test.rb','a/z_test.rb']) do |root|
-        call([root], :pattern => "^#{root}/a/(y|z)_test").sort.should == [
-          "#{root}/a/y_test.rb",
-          "#{root}/a/z_test.rb",
-        ]
+        inside_dir root do
+          call(["a"], :pattern => /^a\/(y|z)_test/).sort.should == [
+            "a/y_test.rb",
+            "a/z_test.rb",
+          ]
+        end
       end
     end
 
