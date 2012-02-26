@@ -26,7 +26,9 @@ module ParallelTests
         'tmp/parallel_runtime_cucumber.log'
       end
 
-      protected
+      def self.test_file_name
+        "feature"
+      end
 
       def self.test_suffix
         ".feature"

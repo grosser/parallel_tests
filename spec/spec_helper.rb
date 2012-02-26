@@ -75,33 +75,6 @@ def test_tests_in_groups(klass, folder, suffix)
       `rm -f #{klass.runtime_log}`
     end
 
-    it "groups when given an array of files" do
-      list_of_files = Dir["#{test_root}/**/*#{suffix}"]
-      found = klass.with_runtime_info(list_of_files)
-      found.should =~ list_of_files.map{ |file| [file, File.stat(file).size]}
-    end
-
-    it "finds all tests" do
-      found = klass.tests_in_groups(test_root, 1)
-      all = [ Dir["#{test_root}/**/*#{suffix}"] ]
-      (found.flatten - all.flatten).should == []
-    end
-
-    it "partitions them into groups by equal size" do
-      groups = klass.tests_in_groups(test_root, 2)
-      groups.map{|g| size_of(g)}.should == [400, 400]
-    end
-
-    it 'should partition correctly with a group size of 4' do
-      groups = klass.tests_in_groups(test_root, 4)
-      groups.map{|g| size_of(g)}.should == [200, 200, 200, 200]
-    end
-
-    it 'should partition correctly with an uneven group size' do
-      groups = klass.tests_in_groups(test_root, 3)
-      groups.map{|g| size_of(g)}.should =~ [300, 300, 200]
-    end
-
     def setup_runtime_log
       File.open(@log,'w') do |f|
         @files[1..-1].each{|file| f.puts "#{file}:#{@files.index(file)}"}
@@ -109,11 +82,38 @@ def test_tests_in_groups(klass, folder, suffix)
       end
     end
 
+    it "groups when given an array of files" do
+      list_of_files = Dir["#{test_root}/**/*#{suffix}"]
+      found = klass.with_runtime_info(list_of_files)
+      found.should =~ list_of_files.map{ |file| [file, File.stat(file).size]}
+    end
+
+    it "finds all tests" do
+      found = klass.tests_in_groups([test_root], 1)
+      all = [ Dir["#{test_root}/**/*#{suffix}"] ]
+      (found.flatten - all.flatten).should == []
+    end
+
+    it "partitions them into groups by equal size" do
+      groups = klass.tests_in_groups([test_root], 2)
+      groups.map{|g| size_of(g)}.should == [400, 400]
+    end
+
+    it 'should partition correctly with a group size of 4' do
+      groups = klass.tests_in_groups([test_root], 4)
+      groups.map{|g| size_of(g)}.should == [200, 200, 200, 200]
+    end
+
+    it 'should partition correctly with an uneven group size' do
+      groups = klass.tests_in_groups([test_root], 3)
+      groups.map{|g| size_of(g)}.should =~ [300, 300, 200]
+    end
+
     it "partitions by runtime when runtime-data is available" do
       klass.stub!(:puts)
       setup_runtime_log
 
-      groups = klass.tests_in_groups(test_root, 2)
+      groups = klass.tests_in_groups([test_root], 2)
       groups.size.should == 2
       # 10 + 1 + 3 + 5 = 19
       groups[0].should == [@files[0],@files[1],@files[3],@files[5]]
@@ -125,7 +125,7 @@ def test_tests_in_groups(klass, folder, suffix)
       klass.stub!(:puts)
       setup_runtime_log
 
-      groups = klass.tests_in_groups(test_root, 2)
+      groups = klass.tests_in_groups([test_root], 2)
       groups.size.should == 2
 
       groups[0].should == groups[0].sort

@@ -27,7 +27,15 @@ module ParallelTests
         'tmp/parallel_profile.log'
       end
 
-      protected
+      def self.test_file_name
+        "spec"
+      end
+
+      def self.test_suffix
+        "_spec.rb"
+      end
+
+      private
 
       # so it can be stubbed....
       def self.run(cmd)
@@ -46,10 +54,6 @@ module ParallelTests
         options_file = ['.rspec_parallel', 'spec/parallel_spec.opts', 'spec/spec.opts'].detect{|f| File.file?(f) }
         return unless options_file
         "-O #{options_file}"
-      end
-
-      def self.test_suffix
-        "_spec.rb"
       end
     end
   end

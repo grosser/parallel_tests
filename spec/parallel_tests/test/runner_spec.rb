@@ -104,11 +104,7 @@ EOF
       ParallelTests::Test::Runner.send(:find_tests, *args)
     end
 
-    it "returns if root is an array" do
-      call([1]).should == [1]
-    end
-
-    it "finds all test files" do
+    it "finds test files nested in folders" do
       begin
         root = "/tmp/test-find_tests-#{rand(999)}"
         `mkdir #{root}`
@@ -121,7 +117,7 @@ EOF
         `touch #{root}/b/test.rb`
         `ln -s #{root}/b #{root}/c`
         `ln -s #{root}/b #{root}/a/`
-        call(root).sort.should == [
+        call([root]).sort.should == [
           "#{root}/a/b/y_test.rb",
             "#{root}/a/x_test.rb",
             "#{root}/b/y_test.rb",
@@ -133,7 +129,7 @@ EOF
       end
     end
 
-    it "finds files by pattern" do
+    it "finds test files in folders by pattern" do
       begin
         root = "/tmp/test-find_tests-#{rand(999)}"
         `mkdir #{root}`
@@ -141,13 +137,29 @@ EOF
         `touch #{root}/a/x_test.rb`
         `touch #{root}/a/y_test.rb`
         `touch #{root}/a/z_test.rb`
-        call(root, :pattern => '^a/(y|z)_test').sort.should == [
+        call([root], :pattern => '^a/(y|z)_test').sort.should == [
           "#{root}/a/y_test.rb",
             "#{root}/a/z_test.rb",
         ]
       ensure
         `rm -rf #{root}`
       end
+    end
+
+    it "finds nothing if I pass nothing" do
+      call(nil).should == []
+    end
+
+    it "finds nothing if I pass nothing (empty array)" do
+      call([]).should == []
+    end
+
+    it "keeps invalid files" do
+      call(['baz']).should == ['baz']
+    end
+
+    it "discards duplicates" do
+      call(['baz','baz']).should == ['baz']
     end
   end
 

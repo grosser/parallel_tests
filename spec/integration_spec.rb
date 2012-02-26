@@ -15,7 +15,7 @@ describe 'CLI' do
 
   def write(file, content)
     path = "#{folder}/#{file}"
-    `mkdir -p #{File.dirname(path)}` unless File.exist?(File.dirname(path))
+    ensure_folder File.dirname(path)
     File.open(path, 'w'){|f| f.write content }
     path
   end
@@ -28,15 +28,22 @@ describe 'CLI' do
     "#{bin_folder}/parallel_test"
   end
 
-  def run_tests(options={})
+  def ensure_folder(folder)
+    `mkdir -p #{folder}` unless File.exist?(folder)
+  end
+
+  def run_tests(test_folder, options={})
+    ensure_folder folder
     processes = "-n #{options[:processes]||2}" unless options[:processes] == false
-    `cd #{folder} && #{options[:export]} #{executable} --chunk-timeout 999 -t #{options[:type] || 'spec'} #{processes} #{options[:add]} 2>&1`
+    result = `cd #{folder} && #{options[:export]} #{executable} #{test_folder} --chunk-timeout 999 -t #{options[:type] || 'spec'} #{processes} #{options[:add]} 2>&1`
+    raise "FAILED #{result}" if $?.success? == !!options[:fail]
+    result
   end
 
   it "runs tests in parallel" do
     write 'spec/xxx_spec.rb', 'describe("it"){it("should"){puts "TEST1"}}'
     write 'spec/xxx2_spec.rb', 'describe("it"){it("should"){puts "TEST2"}}'
-    result = run_tests
+    result = run_tests "spec"
 
     # test ran and gave their puts
     result.should include('TEST1')
@@ -47,12 +54,11 @@ describe 'CLI' do
     result.scan('2 examples, 0 failures').size.should == 1 # 1 summary
     result.scan(/Finished in \d+\.\d+ seconds/).size.should == 2
     result.scan(/Took \d+\.\d+ seconds/).size.should == 1 # parallel summary
-    $?.success?.should == true
   end
 
   it "does not run any tests if there are none" do
     write 'spec/xxx_spec.rb', '1'
-    result = run_tests
+    result = run_tests "spec"
     result.should include('No examples found')
     result.should include('Took')
   end
@@ -60,12 +66,11 @@ describe 'CLI' do
   it "fails when tests fail" do
     write 'spec/xxx_spec.rb', 'describe("it"){it("should"){puts "TEST1"}}'
     write 'spec/xxx2_spec.rb', 'describe("it"){it("should"){1.should == 2}}'
-    result = run_tests
+    result = run_tests "spec", :fail => true
 
     result.scan('1 example, 1 failure').size.should == 1
     result.scan('1 example, 0 failure').size.should == 1
     result.scan('2 examples, 1 failure').size.should == 1
-    $?.success?.should == false
   end
 
   it "can exec given commands with ENV['TEST_ENV_NUM']" do
@@ -101,7 +106,7 @@ describe 'CLI' do
       write "spec/xxx#{i}_spec.rb",  'describe("it"){it("should"){sleep 5}}; $stderr.puts ENV["TEST_ENV_NUMBER"]'
     }
     t = Time.now
-    run_tests(:processes => 2)
+    run_tests("spec", :processes => 2)
     expected = 10
     (Time.now - t).should <= expected
   end
@@ -110,16 +115,22 @@ describe 'CLI' do
     write "spec/x1_spec.rb", "puts '111'"
     write "spec/x2_spec.rb", "puts '222'"
     write "spec/x3_spec.rb", "puts '333'"
-    result = run_tests(:add => 'spec/x1_spec.rb spec/x3_spec.rb')
+    result = run_tests("spec/x1_spec.rb spec/x3_spec.rb")
     result.should include('111')
     result.should include('333')
     result.should_not include('222')
   end
 
+  it "runs successfully without any files" do
+    results = run_tests("")
+    results.should include("2 processes for 0 specs")
+    results.should include("Took")
+  end
+
   it "can run with test-options" do
     write "spec/x1_spec.rb", "111"
     write "spec/x2_spec.rb", "111"
-    result = run_tests(:add => "--test-options ' --version'", :processes => 2)
+    result = run_tests("spec", :add => "--test-options ' --version'", :processes => 2)
     result.should =~ /\d+\.\d+\.\d+.*\d+\.\d+\.\d+/m # prints version twice
   end
 
@@ -128,22 +139,27 @@ describe 'CLI' do
     processes.times{|i|
       write "spec/x#{i}_spec.rb", "puts %{ENV-\#{ENV['TEST_ENV_NUMBER']}-}"
     }
-    result = run_tests(:export => "PARALLEL_TEST_PROCESSORS=#{processes}", :processes => processes)
+    result = run_tests("spec", :export => "PARALLEL_TEST_PROCESSORS=#{processes}", :processes => processes)
     result.scan(/ENV-.?-/).should =~ ["ENV--", "ENV-2-", "ENV-3-", "ENV-4-", "ENV-5-"]
   end
 
   context "Test::Unit" do
     it "runs" do
       write "test/x1_test.rb", "require 'test/unit'; class XTest < Test::Unit::TestCase; def test_xxx; end; end"
-      result = run_tests(:type => :test)
+      result = run_tests("test", :type => :test)
       result.should include('1 test')
-      $?.success?.should == true
     end
 
     it "passes test options" do
       write "test/x1_test.rb", "require 'test/unit'; class XTest < Test::Unit::TestCase; def test_xxx; end; end"
-      result = run_tests(:type => :test, :add => '--test-options "-v"')
+      result = run_tests("test", :type => :test, :add => '--test-options "-v"')
       result.should include('test_xxx') # verbose output of every test
+    end
+
+    it "runs successfully without any files" do
+      results = run_tests("", :type => "test")
+      results.should include("2 processes for 0 tests")
+      results.should include("Took")
     end
   end
 
@@ -154,8 +170,7 @@ describe 'CLI' do
       write "features/b.feature", "Feature: xxx\n  Scenario: xxx\n    Given I FAIL"
       write "features/steps/a.rb", "Given('I print TEST_ENV_NUMBER'){ puts \"YOUR TEST ENV IS \#{ENV['TEST_ENV_NUMBER']}!\" }"
 
-      result = run_tests :type => 'features', :add => '--pattern good'
-      $?.success?.should == true
+      result = run_tests "features", :type => "cucumber", :add => '--pattern good'
 
       result.should include('YOUR TEST ENV IS 2!')
       result.should include('YOUR TEST ENV IS !')
@@ -167,9 +182,14 @@ describe 'CLI' do
       2.times{|i|
         write "features/good#{i}.feature", "Feature: xxx\n  Scenario: xxx\n    Given I print TEST_ENV_NUMBER"
       }
-      result = run_tests :type => 'features', :add => '-n 3'
-      $?.success?.should == true
+      result = run_tests "features", :type => "cucumber", :add => '-n 3'
       result.scan(/YOUR TEST ENV IS \d?!/).sort.should == ["YOUR TEST ENV IS !", "YOUR TEST ENV IS 2!"]
+    end
+
+    it "runs successfully without any files" do
+      results = run_tests("", :type => "cucumber")
+      results.should include("2 processes for 0 features")
+      results.should include("Took")
     end
   end
 end

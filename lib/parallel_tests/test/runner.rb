@@ -1,21 +1,42 @@
 module ParallelTests
   module Test
     class Runner
-      # finds all tests and partitions them into groups
-      def self.tests_in_groups(root, num_groups, options={})
-        tests = find_tests(root, options)
-        if options[:no_sort] == true
-          Grouper.in_groups(tests, num_groups)
-        else
-          tests = with_runtime_info(tests)
-          Grouper.in_even_groups_by_size(tests, num_groups, options)
-        end
+      # --- usually overwritten by other runners
+
+      def self.runtime_log
+        'tmp/parallel_runtime_test.log'
+      end
+
+      def self.test_suffix
+        "_test.rb"
+      end
+
+      def self.test_file_name
+        "test"
       end
 
       def self.run_tests(test_files, process_number, options)
         require_list = test_files.map { |filename| %{"#{File.expand_path filename}"} }.join(",")
         cmd = "ruby -Itest -e '[#{require_list}].each {|f| require f }' -- #{options[:test_options]}"
         execute_command(cmd, process_number, options)
+      end
+
+      def self.line_is_result?(line)
+        line =~ /\d+ failure/
+      end
+
+      # --- usually used by other runners
+
+      # finds all tests and partitions them into groups
+      def self.tests_in_groups(tests, num_groups, options={})
+        tests = find_tests(tests, options)
+
+        if options[:no_sort] == true
+          Grouper.in_groups(tests, num_groups)
+        else
+          tests = with_runtime_info(tests)
+          Grouper.in_even_groups_by_size(tests, num_groups, options)
+        end
       end
 
       def self.execute_command(cmd, process_number, options)
@@ -36,10 +57,6 @@ module ParallelTests
 
       def self.test_env_number(process_number)
         process_number == 0 ? '' : process_number + 1
-      end
-
-      def self.runtime_log
-        'tmp/parallel_runtime_test.log'
       end
 
       def self.summarize_results(results)
@@ -83,14 +100,6 @@ module ParallelTests
         all
       end
 
-      def self.line_is_result?(line)
-        line =~ /\d+ failure/
-      end
-
-      def self.test_suffix
-        "_test.rb"
-      end
-
       def self.with_runtime_info(tests)
         lines = File.read(runtime_log).split("\n") rescue []
 
@@ -109,17 +118,23 @@ module ParallelTests
         end
       end
 
-      def self.find_tests(root, options={})
-        if root.is_a?(Array)
-          root
-        else
-          # follow one symlink and direct children
-          # http://stackoverflow.com/questions/357754/can-i-traverse-symlinked-directories-in-ruby-with-a-glob
-          files = Dir["#{root}/**{,/*/**}/*#{test_suffix}"].uniq
-          files = files.map{|f| f.sub(root+'/','') }
-          files = files.grep(/#{options[:pattern]}/)
-          files.map{|f| "#{root}/#{f}" }
-        end
+      def self.find_tests(tests, options={})
+        (tests||[]).map do |file_or_folder|
+          if File.directory?(file_or_folder)
+            tests_in_folder(file_or_folder, options)
+          else
+            file_or_folder
+          end
+        end.flatten.uniq
+      end
+
+      def self.tests_in_folder(folder, options)
+        # follow one symlink and direct children
+        # http://stackoverflow.com/questions/357754/can-i-traverse-symlinked-directories-in-ruby-with-a-glob
+        files = Dir["#{folder}/**{,/*/**}/*#{test_suffix}"].uniq
+        files = files.map{|f| f.sub(folder+'/','') }
+        files = files.grep(/#{options[:pattern]}/)
+        files.map{|f| "#{folder}/#{f}" }
       end
     end
   end

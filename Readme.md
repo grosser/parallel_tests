@@ -112,7 +112,9 @@ Setup for non-rails
 ===================
     gem install parallel_tests
     # go to your project dir
-    parallel_test OR parallel_spec OR parallel_cucumber
+    parallel_test test/
+    parallel_spec spec/
+    parallel_cucumber features/
 
  - use ENV['TEST_ENV_NUMBER'] inside your tests to select separate db/memcache/etc.
  - Only run selected files & folders:
@@ -125,7 +127,6 @@ Options are:
     -p, --path [PATH]                run tests inside this path only
         --no-sort                    do not sort files before running them
     -m, --multiply-processes [FLOAT] use given number as a multiplier of processes to run
-    -r, --root [PATH]                execute test commands from this path
     -e, --exec [COMMAND]             execute this code parallel and with ENV['TEST_ENV_NUM']
     -o, --test-options '[OPTIONS]'   execute test commands with those options
     -t, --type [TYPE]                which type of tests to run? test, spec or features
