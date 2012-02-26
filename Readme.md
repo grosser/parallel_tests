@@ -73,7 +73,7 @@ Rspec: Add to your `.rspec_parallel` (or `.rspec`) :
     RSpec
       If installed as plugin: -I vendor/plugins/parallel_tests/lib
       --format progress
-      --format ParallelTests::Spec::RuntimeLogger --out tmp/parallel_profile.log
+      --format ParallelTests::Spec::RuntimeLogger --out tmp/parallel_runtime_spec.log
 
 Test::Unit:  Add to your `test_helper.rb`:
 
@@ -168,7 +168,6 @@ TIPS
 TODO
 ====
  - document how to use cucumber runtime logger
- - unify runtime-log location
  - add tests for cucumber runtime formatter
  - make jRuby compatible [basics](http://yehudakatz.com/2009/07/01/new-rails-isolation-testing/)
  - make windows compatible

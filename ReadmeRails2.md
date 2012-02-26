@@ -25,7 +25,7 @@ Even process runtimes
     RSpec 1.x:
       --format progress
       --require parallel_tests/spec/runtime_logger
-      --format ParallelTests::Spec::RuntimeLogger:tmp/parallel_profile.log
+      --format ParallelTests::Spec::RuntimeLogger:tmp/parallel_runtime_spec.log
 
 SpecSummaryLogger
 --------------------
