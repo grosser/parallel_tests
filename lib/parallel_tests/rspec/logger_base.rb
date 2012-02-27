@@ -1,5 +1,5 @@
 module ParallelTests
-  module Spec
+  module RSpec
   end
 end
 
@@ -11,9 +11,9 @@ rescue LoadError
   base = Spec::Runner::Formatter::BaseTextFormatter
 end
 
-ParallelTests::Spec::LoggerBaseBase = base
+ParallelTests::RSpec::LoggerBaseBase = base
 
-class ParallelTests::Spec::LoggerBase < ParallelTests::Spec::LoggerBaseBase
+class ParallelTests::RSpec::LoggerBase < ParallelTests::RSpec::LoggerBaseBase
   RSPEC_1 = !defined?(RSpec::Core::Formatters::BaseTextFormatter) # do not test for Spec, this will trigger deprecation warning in rspec 2
 
   def initialize(*args)

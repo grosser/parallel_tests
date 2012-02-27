@@ -47,9 +47,13 @@ namespace :parallel do
       $LOAD_PATH << File.expand_path(File.join(File.dirname(__FILE__), '..'))
       require "parallel_tests"
       count, pattern, options = ParallelTests.parse_rake_args(args)
-      test_type = (type == 'features' ? 'cucumber' : type)
+      test_framework = {
+        'spec' => 'rspec',
+        'test' => 'test',
+        'features' => 'cucumber'
+      }[type]
       executable = File.join(File.dirname(__FILE__), '..', '..', 'bin', 'parallel_test')
-      command = "#{executable} #{type} --type #{test_type} -n #{count} -p '#{pattern}' -o '#{options}'"
+      command = "#{executable} #{type} --type #{test_framework} -n #{count} -p '#{pattern}' -o '#{options}'"
       abort unless system(command) # allow to chain tasks e.g. rake parallel:spec parallel:features
     end
   end

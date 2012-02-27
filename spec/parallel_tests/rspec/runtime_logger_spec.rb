@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe ParallelTests::Spec::RuntimeLogger do
+describe ParallelTests::RSpec::RuntimeLogger do
   before do
     # pretend we run in parallel or the logger will log nothing
     ENV['TEST_ENV_NUMBER'] = ''
@@ -18,7 +18,7 @@ describe ParallelTests::Spec::RuntimeLogger do
       logger = if block_given?
         yield(f)
       else
-        ParallelTests::Spec::RuntimeLogger.new(f)
+        ParallelTests::RSpec::RuntimeLogger.new(f)
       end
 
       example = (mock(:location => "#{Dir.pwd}/spec/foo.rb:123"))
@@ -59,7 +59,7 @@ describe ParallelTests::Spec::RuntimeLogger do
   it "appends to a given file" do
     result = log_for_a_file do |f|
       f.write 'FooBar'
-      ParallelTests::Spec::RuntimeLogger.new(f)
+      ParallelTests::RSpec::RuntimeLogger.new(f)
     end
     result.should include('FooBar')
     result.should include('foo.rb')
@@ -68,7 +68,7 @@ describe ParallelTests::Spec::RuntimeLogger do
   it "overwrites a given path" do
     result = log_for_a_file do |f|
       f.write 'FooBar'
-      ParallelTests::Spec::RuntimeLogger.new(f.path)
+      ParallelTests::RSpec::RuntimeLogger.new(f.path)
     end
     result.should_not include('FooBar')
     result.should include('foo.rb')

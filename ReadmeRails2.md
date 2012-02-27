@@ -28,21 +28,21 @@ Even process runtimes
 
     RSpec 1.x:
       --format progress
-      --require parallel_tests/spec/runtime_logger
-      --format ParallelTests::Spec::RuntimeLogger:tmp/parallel_runtime_spec.log
+      --require parallel_tests/rspec/runtime_logger
+      --format ParallelTests::RSpec::RuntimeLogger:tmp/parallel_runtime_rspec.log
 
 SpecSummaryLogger
 --------------------
 
     RSpec 1.x:
       --format progress
-      --require parallel_tests/spec/summary_logger
-      --format ParallelTests::Spec::SummaryLogger:tmp/spec_summary.log
+      --require parallel_tests/rspec/summary_logger
+      --format ParallelTests::RSpec::SummaryLogger:tmp/spec_summary.log
 
 SpecFailuresLogger
 -----------------------
 
     RSpec 1.x:
       --format progress
-      --require parallel_tests/spec/failures_logger
-      --format ParallelTests::Spec::FailuresLogger:tmp/failing_specs.log
+      --require parallel_tests/rspec/failures_logger
+      --format ParallelTests::RSpec::FailuresLogger:tmp/failing_specs.log

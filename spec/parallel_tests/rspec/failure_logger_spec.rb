@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe ParallelTests::Spec::FailuresLogger do
+describe ParallelTests::RSpec::FailuresLogger do
   def silence_warnings
     old_verbose, $VERBOSE = $VERBOSE, nil
     yield
@@ -14,11 +14,11 @@ describe ParallelTests::Spec::FailuresLogger do
     @example2   = mock( 'example', :location => "#{Dir.pwd}/spec/path/to/example2:456", :full_description => 'should do other stuff', :description => 'd')
     @exception1 = mock( :to_s => 'exception', :backtrace => [ '/path/to/error/line:33' ] )
     @failure1   = mock( 'example', :location => "#{Dir.pwd}/example:123", :header => 'header', :exception => @exception1 )
-    @logger = ParallelTests::Spec::FailuresLogger.new(@output)
+    @logger = ParallelTests::RSpec::FailuresLogger.new(@output)
   end
 
   after do
-    silence_warnings{ ParallelTests::Spec::LoggerBase::RSPEC_1 = false }
+    silence_warnings{ ParallelTests::RSpec::LoggerBase::RSPEC_1 = false }
   end
 
   def clean_output
@@ -37,9 +37,9 @@ describe ParallelTests::Spec::FailuresLogger do
   end
 
   it "should invoke spec for rspec 1" do
-    silence_warnings{ ParallelTests::Spec::LoggerBase::RSPEC_1 = true }
+    silence_warnings{ ParallelTests::RSpec::LoggerBase::RSPEC_1 = true }
     ParallelTests.stub!(:bundler_enabled?).and_return true
-    ParallelTests::Spec::Runner.stub!(:run).with("bundle show rspec").and_return "/foo/bar/rspec-1.0.2"
+    ParallelTests::RSpec::Runner.stub!(:run).with("bundle show rspec").and_return "/foo/bar/rspec-1.0.2"
     @logger.example_failed @example1
 
     @logger.dump_failures
@@ -50,7 +50,7 @@ describe ParallelTests::Spec::FailuresLogger do
 
   it "should invoke rspec for rspec 2" do
     ParallelTests.stub!(:bundler_enabled?).and_return true
-    ParallelTests::Spec::Runner.stub!(:run).with("bundle show rspec").and_return "/foo/bar/rspec-2.0.2"
+    ParallelTests::RSpec::Runner.stub!(:run).with("bundle show rspec").and_return "/foo/bar/rspec-2.0.2"
     @logger.example_failed @example1
 
     @logger.dump_failures

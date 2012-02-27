@@ -1,7 +1,7 @@
-require 'parallel_tests/spec/logger_base'
-require 'parallel_tests/spec/runner'
+require 'parallel_tests/rspec/logger_base'
+require 'parallel_tests/rspec/runner'
 
-class ParallelTests::Spec::FailuresLogger < ParallelTests::Spec::LoggerBase
+class ParallelTests::RSpec::FailuresLogger < ParallelTests::RSpec::LoggerBase
   # RSpec 1: does not keep track of failures, so we do
   def example_failed(example, *args)
     if RSPEC_1
@@ -38,7 +38,7 @@ class ParallelTests::Spec::FailuresLogger < ParallelTests::Spec::LoggerBase
       file, line = example.location.to_s.split(':')
       next unless file and line
       file.gsub!(%r(^.*?/spec/), './spec/')
-      @output.puts "#{ParallelTests::Spec::Runner.executable} #{file}:#{line} # #{example.description}"
+      @output.puts "#{ParallelTests::RSpec::Runner.executable} #{file}:#{line} # #{example.description}"
     end
   end
 end

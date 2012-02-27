@@ -35,7 +35,7 @@ describe 'CLI' do
   def run_tests(test_folder, options={})
     ensure_folder folder
     processes = "-n #{options[:processes]||2}" unless options[:processes] == false
-    result = `cd #{folder} && #{options[:export]} #{executable} #{test_folder} --chunk-timeout 999 -t #{options[:type] || 'spec'} #{processes} #{options[:add]} 2>&1`
+    result = `cd #{folder} && #{options[:export]} #{executable} #{test_folder} --chunk-timeout 999 -t #{options[:type] || 'rspec'} #{processes} #{options[:add]} 2>&1`
     raise "FAILED #{result}" if $?.success? == !!options[:fail]
     result
   end

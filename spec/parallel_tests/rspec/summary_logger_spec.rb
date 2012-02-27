@@ -1,8 +1,8 @@
 require 'spec_helper'
 
-describe ParallelTests::Spec::SummaryLogger do
+describe ParallelTests::RSpec::SummaryLogger do
   let(:output){ OutputLogger.new([]) }
-  let(:logger){ ParallelTests::Spec::SummaryLogger.new(output) }
+  let(:logger){ ParallelTests::RSpec::SummaryLogger.new(output) }
 
   # TODO somehow generate a real example with an exception to test this
   xit "prints failing examples" do

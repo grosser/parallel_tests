@@ -75,7 +75,7 @@ Rspec: Add to your `.rspec_parallel` (or `.rspec`) :
     RSpec
       If installed as plugin: -I vendor/plugins/parallel_tests/lib
       --format progress
-      --format ParallelTests::Spec::RuntimeLogger --out tmp/parallel_runtime_spec.log
+      --format ParallelTests::RSpec::RuntimeLogger --out tmp/parallel_runtime_rspec.log
 
 Test::Unit:  Add to your `test_helper.rb`:
 
@@ -92,7 +92,7 @@ Add the following to your `.rspec_parallel` (or `.rspec`) :
     RSpec:
       If installed as plugin: -I vendor/plugins/parallel_tests/lib
       --format progress
-      --format ParallelTests::Spec::SummaryLogger --out tmp/spec_summary.log
+      --format ParallelTests::RSpec::SummaryLogger --out tmp/spec_summary.log
 
 SpecFailuresLogger
 -----------------------
@@ -108,7 +108,7 @@ Add the following to your `.rspec_parallel` (or `.rspec`) :
     RSpec:
       If installed as plugin: -I vendor/plugins/parallel_tests/lib
       --format progress
-      --format ParallelTests::Spec::FailuresLogger --out tmp/failing_specs.log
+      --format ParallelTests::RSpec::FailuresLogger --out tmp/failing_specs.log
 
 Setup for non-rails
 ===================

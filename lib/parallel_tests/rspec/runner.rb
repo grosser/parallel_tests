@@ -1,7 +1,7 @@
 require 'parallel_tests/test/runner'
 
 module ParallelTests
-  module Spec
+  module RSpec
     class Runner < ParallelTests::Test::Runner
       def self.run_tests(test_files, process_number, options)
         exe = executable # expensive, so we cache
@@ -23,7 +23,7 @@ module ParallelTests
       end
 
       def self.runtime_log
-        'tmp/parallel_runtime_spec.log'
+        'tmp/parallel_runtime_rspec.log'
       end
 
       def self.test_file_name
