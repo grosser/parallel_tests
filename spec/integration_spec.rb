@@ -24,8 +24,8 @@ describe 'CLI' do
     "#{File.expand_path(File.dirname(__FILE__))}/../bin"
   end
 
-  def executable
-    "#{bin_folder}/parallel_test"
+  def executable(options={})
+    "#{bin_folder}/parallel_#{options[:type] || 'test'}"
   end
 
   def ensure_folder(folder)
@@ -35,15 +35,16 @@ describe 'CLI' do
   def run_tests(test_folder, options={})
     ensure_folder folder
     processes = "-n #{options[:processes]||2}" unless options[:processes] == false
-    result = `cd #{folder} && #{options[:export]} #{executable} #{test_folder} --chunk-timeout 999 -t #{options[:type] || 'rspec'} #{processes} #{options[:add]} 2>&1`
-    raise "FAILED #{result}" if $?.success? == !!options[:fail]
+    command = "cd #{folder} && #{options[:export]} #{executable(options)} #{test_folder} --chunk-timeout 999 #{processes} #{options[:add]} 2>&1"
+    result = `#{command}`
+    raise "FAILED #{command}\n#{result}" if $?.success? == !!options[:fail]
     result
   end
 
   it "runs tests in parallel" do
     write 'spec/xxx_spec.rb', 'describe("it"){it("should"){puts "TEST1"}}'
     write 'spec/xxx2_spec.rb', 'describe("it"){it("should"){puts "TEST2"}}'
-    result = run_tests "spec"
+    result = run_tests "spec", :type => 'rspec'
 
     # test ran and gave their puts
     result.should include('TEST1')
@@ -58,7 +59,7 @@ describe 'CLI' do
 
   it "does not run any tests if there are none" do
     write 'spec/xxx_spec.rb', '1'
-    result = run_tests "spec"
+    result = run_tests "spec", :type => 'rspec'
     result.should include('No examples found')
     result.should include('Took')
   end
@@ -66,37 +67,39 @@ describe 'CLI' do
   it "fails when tests fail" do
     write 'spec/xxx_spec.rb', 'describe("it"){it("should"){puts "TEST1"}}'
     write 'spec/xxx2_spec.rb', 'describe("it"){it("should"){1.should == 2}}'
-    result = run_tests "spec", :fail => true
+    result = run_tests "spec", :fail => true, :type => 'rspec'
 
     result.scan('1 example, 1 failure').size.should == 1
     result.scan('1 example, 0 failure').size.should == 1
     result.scan('2 examples, 1 failure').size.should == 1
   end
 
-  it "can exec given commands with ENV['TEST_ENV_NUM']" do
-    result = `#{executable} -e 'ruby -e "print ENV[:TEST_ENV_NUMBER.to_s].to_i"' -n 4`
-    result.gsub('"','').split('').sort.should == %w[0 2 3 4]
+  context "with given commands" do
+    it "can exec given commands with ENV['TEST_ENV_NUM']" do
+      result = `#{executable} -e 'ruby -e "print ENV[:TEST_ENV_NUMBER.to_s].to_i"' -n 4`
+      result.gsub('"','').split('').sort.should == %w[0 2 3 4]
+    end
+
+    it "can exec given command non-parallel" do
+      result = `#{executable} -e 'ruby -e "sleep(rand(10)/100.0); puts ENV[:TEST_ENV_NUMBER.to_s].inspect"' -n 4 --non-parallel`
+      result.split("\n").should == %w["" "2" "3" "4"]
+    end
+
+    it "exists with success if all sub-processes returned success" do
+      system("#{executable} -e 'cat /dev/null' -n 4").should == true
+    end
+
+    it "exists with failure if any sub-processes returned failure" do
+      system("#{executable} -e 'test -e xxxx' -n 4").should == false
+    end
   end
 
-  it "can exec given command non-parallel" do
-    result = `#{executable} -e 'ruby -e "sleep(rand(10)/100.0); puts ENV[:TEST_ENV_NUMBER.to_s].inspect"' -n 4 --non-parallel`
-    result.split("\n").should == %w["" "2" "3" "4"]
-  end
-
-  it "exists with success if all sub-processes returned success" do
-    system("#{executable} -e 'cat /dev/null' -n 4").should == true
-  end
-
-  it "exists with failure if any sub-processes returned failure" do
-    system("#{executable} -e 'test -e xxxx' -n 4").should == false
-  end
-
-  it "can run through parallel_spec" do
+  it "runs through parallel_rspec" do
     version = `#{executable} -v`
-    `#{bin_folder}/parallel_spec -v`.should == version
+    `#{bin_folder}/parallel_rspec -v`.should == version
   end
 
-  it "can run through parallel_spec" do
+  it "runs through parallel_cucumber" do
     version = `#{executable} -v`
     `#{bin_folder}/parallel_cucumber -v`.should == version
   end
@@ -106,7 +109,7 @@ describe 'CLI' do
       write "spec/xxx#{i}_spec.rb",  'describe("it"){it("should"){sleep 5}}; $stderr.puts ENV["TEST_ENV_NUMBER"]'
     }
     t = Time.now
-    run_tests("spec", :processes => 2)
+    run_tests("spec", :processes => 2, :type => 'rspec')
     expected = 10
     (Time.now - t).should <= expected
   end
@@ -115,14 +118,14 @@ describe 'CLI' do
     write "spec/x1_spec.rb", "puts '111'"
     write "spec/x2_spec.rb", "puts '222'"
     write "spec/x3_spec.rb", "puts '333'"
-    result = run_tests("spec/x1_spec.rb spec/x3_spec.rb")
+    result = run_tests "spec/x1_spec.rb spec/x3_spec.rb", :type => 'rspec'
     result.should include('111')
     result.should include('333')
     result.should_not include('222')
   end
 
   it "runs successfully without any files" do
-    results = run_tests("")
+    results = run_tests "", :type => 'rspec'
     results.should include("2 processes for 0 specs")
     results.should include("Took")
   end
@@ -130,7 +133,10 @@ describe 'CLI' do
   it "can run with test-options" do
     write "spec/x1_spec.rb", "111"
     write "spec/x2_spec.rb", "111"
-    result = run_tests("spec", :add => "--test-options ' --version'", :processes => 2)
+    result = run_tests "spec",
+      :add => "--test-options ' --version'",
+      :processes => 2,
+      :type => 'rspec'
     result.should =~ /\d+\.\d+\.\d+.*\d+\.\d+\.\d+/m # prints version twice
   end
 
@@ -139,7 +145,10 @@ describe 'CLI' do
     processes.times{|i|
       write "spec/x#{i}_spec.rb", "puts %{ENV-\#{ENV['TEST_ENV_NUMBER']}-}"
     }
-    result = run_tests("spec", :export => "PARALLEL_TEST_PROCESSORS=#{processes}", :processes => processes)
+    result = run_tests "spec",
+      :export => "PARALLEL_TEST_PROCESSORS=#{processes}",
+      :processes => processes,
+      :type => 'rspec'
     result.scan(/ENV-.?-/).should =~ ["ENV--", "ENV-2-", "ENV-3-", "ENV-4-", "ENV-5-"]
   end
 
@@ -147,7 +156,7 @@ describe 'CLI' do
     write "spec/x_spec.rb", "puts 'XXX'"
     write "spec/y_spec.rb", "puts 'YYY'"
     write "spec/z_spec.rb", "puts 'ZZZ'"
-    result = run_tests("spec", :add => '-p "^spec/(x|z)"')
+    result = run_tests "spec", :add => "-p '^spec/(x|z)'", :type => "rspec"
     result.should include('XXX')
     result.should_not include('YYY')
     result.should include('ZZZ')
@@ -156,18 +165,18 @@ describe 'CLI' do
   context "Test::Unit" do
     it "runs" do
       write "test/x1_test.rb", "require 'test/unit'; class XTest < Test::Unit::TestCase; def test_xxx; end; end"
-      result = run_tests("test", :type => :test)
+      result = run_tests("test")
       result.should include('1 test')
     end
 
     it "passes test options" do
       write "test/x1_test.rb", "require 'test/unit'; class XTest < Test::Unit::TestCase; def test_xxx; end; end"
-      result = run_tests("test", :type => :test, :add => '--test-options "-v"')
+      result = run_tests("test", :add => '--test-options "-v"')
       result.should include('test_xxx') # verbose output of every test
     end
 
     it "runs successfully without any files" do
-      results = run_tests("", :type => "test")
+      results = run_tests("")
       results.should include("2 processes for 0 tests")
       results.should include("Took")
     end
