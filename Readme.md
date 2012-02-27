@@ -115,7 +115,7 @@ Setup for non-rails
     gem install parallel_tests
     # go to your project dir
     parallel_test test/
-    parallel_spec spec/
+    parallel_rspec spec/
     parallel_cucumber features/
 
  - use ENV['TEST_ENV_NUMBER'] inside your tests to select separate db/memcache/etc.
