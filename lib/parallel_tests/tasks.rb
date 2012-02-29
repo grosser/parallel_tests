@@ -41,6 +41,11 @@ namespace :parallel do
     run_in_parallel('rake db:test:load', args)
   end
 
+  desc "load the seed data from db/seeds.rb via db:seed --> parallel::seed[num_cpus]"
+  task :seed, :count do |t,args|
+    run_in_parallel('rake db:seed RAILS_ENV=test', args)
+  end
+
   ['test', 'spec', 'features'].each do |type|
     desc "run #{type} in parallel with parallel:#{type}[num_cpus]"
     task type, [:count, :pattern, :options] => 'db:abort_if_pending_migrations' do |t,args|
