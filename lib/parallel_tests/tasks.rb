@@ -1,7 +1,7 @@
 namespace :parallel do
   def run_in_parallel(cmd, options)
     count = "-n #{options[:count]}" if options[:count]
-    executable = File.join(File.dirname(__FILE__), '..', '..', 'bin', 'parallel_test')
+    executable = ParallelTests.root_dir + "bin/parallel_test"
     command = "#{executable} --exec '#{cmd}' #{count} #{'--non-parallel' if options[:non_parallel]}"
     abort unless system(command)
   end
@@ -47,7 +47,7 @@ namespace :parallel do
       $LOAD_PATH << File.expand_path(File.join(File.dirname(__FILE__), '..'))
       require "parallel_tests"
       count, pattern, options = ParallelTests.parse_rake_args(args)
-      executable = File.join(File.dirname(__FILE__), '..', '..', 'bin', 'parallel_test')
+      executable = ParallelTests.root_dir + "bin/parallel_test"
       command = "#{executable} --type #{type} -n #{count} -p '#{pattern}' -r '#{Rails.root}' -o '#{options}'"
       abort unless system(command) # allow to chain tasks e.g. rake parallel:spec parallel:features
     end
