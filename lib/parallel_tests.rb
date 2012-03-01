@@ -165,4 +165,14 @@ class ParallelTests
       files.map{|f| "#{root}/#{f}" }
     end
   end
+
+  # @return [Pathname] path to root directory of the gem.
+  def self.root_dir
+    Pathname.new(__FILE__) + "../../"
+  end
+
+  # Loads parallel:* rake tasks.
+  def self.load_tasks
+    require File.join(root_dir, "lib", "parallel_tests", "tasks")
+  end
 end
