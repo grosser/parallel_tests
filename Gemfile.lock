@@ -36,6 +36,7 @@ PLATFORMS
 
 DEPENDENCIES
   cucumber
+  parallel
   parallel_tests!
   rake
   rspec (>= 2.4)

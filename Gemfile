@@ -6,4 +6,5 @@ group :development do
   gem 'rspec', '>=2.4'
   gem 'cucumber'
   gem 'rake'
+  gem 'parallel'
 end
