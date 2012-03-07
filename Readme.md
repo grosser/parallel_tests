@@ -170,8 +170,7 @@ TIPS
 
 TODO
 ====
- - document how to use cucumber runtime logger
- - add tests for cucumber runtime formatter
+ - add unit tests for cucumber runtime formatter
  - make jRuby compatible [basics](http://yehudakatz.com/2009/07/01/new-rails-isolation-testing/)
  - make windows compatible
 
