@@ -20,6 +20,10 @@ describe 'CLI' do
     path
   end
 
+  def read(file)
+    File.read "#{folder}/#{file}"
+  end
+
   def bin_folder
     "#{File.expand_path(File.dirname(__FILE__))}/../bin"
   end
@@ -183,6 +187,13 @@ describe 'CLI' do
   end
 
   context "Cucumber" do
+    before do
+      write "features/steps/a.rb", "
+        Given('I print TEST_ENV_NUMBER'){ puts \"YOUR TEST ENV IS \#{ENV['TEST_ENV_NUMBER']}!\" }
+        And('I sleep a bit'){ sleep 0.2 }
+      "
+    end
+
     it "passes TEST_ENV_NUMBER when running with pattern (issue #86)" do
       write "features/good1.feature", "Feature: xxx\n  Scenario: xxx\n    Given I print TEST_ENV_NUMBER"
       write "features/good2.feature", "Feature: xxx\n  Scenario: xxx\n    Given I print TEST_ENV_NUMBER"
@@ -196,8 +207,21 @@ describe 'CLI' do
       result.should_not include('I FAIL')
     end
 
+    it "writes a runtime log" do
+      log = "tmp/parallel_runtime_cucumber.log"
+      write(log, "x")
+      2.times{|i|
+        # needs sleep so that runtime loggers dont overwrite each other initially
+        write "features/good#{i}.feature", "Feature: xxx\n  Scenario: xxx\n    Given I print TEST_ENV_NUMBER\n    And I sleep a bit"
+      }
+      run_tests "features", :type => "cucumber"
+      read(log).gsub(/\.\d+/,'').split("\n").should =~ [
+        "features/good0.feature:0",
+        "features/good1.feature:0"
+      ]
+    end
+
     it "runs each feature once when there are more processes then features (issue #89)" do
-      write "features/steps/a.rb", "Given('I print TEST_ENV_NUMBER'){ puts \"YOUR TEST ENV IS \#{ENV['TEST_ENV_NUMBER']}!\" }"
       2.times{|i|
         write "features/good#{i}.feature", "Feature: xxx\n  Scenario: xxx\n    Given I print TEST_ENV_NUMBER"
       }
