@@ -7,7 +7,7 @@ Setup for Rails
 ===============
 [still using Rails 2?](https://github.com/grosser/parallel_tests/blob/master/ReadmeRails2.md)
 
-## Install
+### Install
 If you use RSpec: ensure you got >= 2.4
 
 As gem
@@ -22,21 +22,19 @@ OR as plugin
     # add to Gemfile
     gem "parallel", :group => :development
 
-## Setup
+### Add to `config/database.yml`
 ParallelTests uses 1 database per test-process, 2 processes will use `*_test` and `*_test2`.
 
-
-### 1: Add to `config/database.yml`
     test:
       database: yourproject_test<%= ENV['TEST_ENV_NUMBER'] %>
 
-### 2: Create additional database(s)
+### Create additional database(s)
     rake parallel:create
 
-### 3: Copy development schema (repeat after migrations)
+### Copy development schema (repeat after migrations)
     rake parallel:prepare
 
-### 4: Run!
+### Run!
     rake parallel:test          # Test::Unit
     rake parallel:spec          # RSpec
     rake parallel:features      # Cucumber
@@ -53,8 +51,8 @@ Test by pattern (e.g. use one integration server per subfolder / see if you brok
     rake parallel:test['user|product']  # run user and product related tests
 
 
-Example output
---------------
+### Example output
+
     2 processes for 210 specs, ~ 105 specs per process
     ... test output ...
 
@@ -72,29 +70,27 @@ Log test runtime to give each process the same runtime.
 
 Rspec: Add to your `.rspec_parallel` (or `.rspec`) :
 
-    RSpec
-      If installed as plugin: -I vendor/plugins/parallel_tests/lib
-      --format progress
-      --format ParallelTests::RSpec::RuntimeLogger --out tmp/parallel_runtime_rspec.log
+    If installed as plugin: -I vendor/plugins/parallel_tests/lib
+    --format progress
+    --format ParallelTests::RSpec::RuntimeLogger --out tmp/parallel_runtime_rspec.log
 
 Test::Unit:  Add to your `test_helper.rb`:
 
     require 'parallel_tests/test/runtime_logger'
 
 
-SpecSummaryLogger
+RSpec: SummaryLogger
 --------------------
 
 This logger logs the test output without the different processes overwriting each other.
 
 Add the following to your `.rspec_parallel` (or `.rspec`) :
 
-    RSpec:
-      If installed as plugin: -I vendor/plugins/parallel_tests/lib
-      --format progress
-      --format ParallelTests::RSpec::SummaryLogger --out tmp/spec_summary.log
+    If installed as plugin: -I vendor/plugins/parallel_tests/lib
+    --format progress
+    --format ParallelTests::RSpec::SummaryLogger --out tmp/spec_summary.log
 
-SpecFailuresLogger
+RSpec: FailuresLogger
 -----------------------
 
 This logger produces pasteable command-line snippets for each failed example.
@@ -105,10 +101,9 @@ E.g.
 
 Add the following to your `.rspec_parallel` (or `.rspec`) :
 
-    RSpec:
-      If installed as plugin: -I vendor/plugins/parallel_tests/lib
-      --format progress
-      --format ParallelTests::RSpec::FailuresLogger --out tmp/failing_specs.log
+    If installed as plugin: -I vendor/plugins/parallel_tests/lib
+    --format progress
+    --format ParallelTests::RSpec::FailuresLogger --out tmp/failing_specs.log
 
 Setup for non-rails
 ===================
