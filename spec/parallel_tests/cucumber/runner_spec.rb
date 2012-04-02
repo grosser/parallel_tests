@@ -53,25 +53,25 @@ describe ParallelTests::Cucumber do
       call(['xxx'],1,:test_options => '-p default')
     end
 
-    it "uses the contents of a .cucumber_parallel file as options" do
-      file_contents = '-f progress'
-      ParallelTests::Cucumber::Runner.should_receive(:open).with{|x,y| x =~ %r{script/cucumber .* #{file_contents}}}.and_return mocked_process
-      File.should_receive(:exists?).with('.cucumber_parallel').and_return true
-      File.should_receive(:read).with('.cucumber_parallel').and_return file_contents
+    it "uses the contents of a config/cucumber.yml file as options" do
+      file_contents = 'parallel: -f progress'
+      ParallelTests::Cucumber::Runner.should_receive(:open).with{|x,y| x =~ %r{script/cucumber .* -f progress}}.and_return mocked_process
+      File.should_receive(:exists?).with('config/cucumber.yml').and_return true
+      File.should_receive(:read).with('config/cucumber.yml').and_return file_contents
       call(['xxx'],1,{})
     end
 
-    it "doesn't use the contents of a .cucumber_parallel file when it's not available" do
+    it "doesn't use the contents of a config/cucumber.yml file when it's not available" do
       ParallelTests::Cucumber::Runner.should_receive(:open).with{|x,y| x =~ %r{script/cucumber .*}}.and_return mocked_process
-      File.should_receive(:exists?).with('.cucumber_parallel').and_return false
+      File.should_receive(:exists?).with('config/cucumber.yml').and_return false
       call(['xxx'],1,{})
     end
 
-    it "merges the contents of a .cucumber_parallel file with the current test options" do
-      file_contents = '-f progress'
-      ParallelTests::Cucumber::Runner.should_receive(:open).with{|x,y| x =~ %r{script/cucumber .* -p default #{file_contents}}}.and_return mocked_process
-      File.should_receive(:exists?).with('.cucumber_parallel').and_return true
-      File.should_receive(:read).with('.cucumber_parallel').and_return file_contents
+    it "merges the contents of a config/cucumber.yml file with the current test options" do
+      file_contents = 'parallel: -f progress'
+      ParallelTests::Cucumber::Runner.should_receive(:open).with{|x,y| x =~ %r{script/cucumber .* -p default -f progress}}.and_return mocked_process
+      File.should_receive(:exists?).with('config/cucumber.yml').and_return true
+      File.should_receive(:read).with('config/cucumber.yml').and_return file_contents
       call(['xxx'],1,:test_options => '-p default')
     end
   end
