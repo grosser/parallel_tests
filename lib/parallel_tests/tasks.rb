@@ -1,4 +1,6 @@
 namespace :parallel do
+  rails_env = ENV["RAILS_ENV"] || "test"
+
   def run_in_parallel(cmd, options)
     count = "-n #{options[:count]}" if options[:count]
     executable = File.join(File.dirname(__FILE__), '..', '..', 'bin', 'parallel_test')
@@ -8,12 +10,12 @@ namespace :parallel do
 
   desc "create test databases via db:create --> parallel:create[num_cpus]"
   task :create, :count do |t,args|
-    run_in_parallel('rake db:create RAILS_ENV=test', args)
+    run_in_parallel("rake db:create RAILS_ENV=#{rails_env}", args)
   end
 
   desc "drop test databases via db:drop --> parallel:drop[num_cpus]"
   task :drop, :count do |t,args|
-    run_in_parallel('rake db:drop RAILS_ENV=test', args)
+    run_in_parallel("rake db:drop RAILS_ENV=#{rails_env}", args)
   end
 
   desc "update test databases by dumping and loading --> parallel:prepare[num_cpus]"
@@ -25,14 +27,14 @@ namespace :parallel do
     else
       # there is no separate dump / load for schema_format :sql -> do it safe and slow
       args = args.to_hash.merge(:non_parallel => true) # normal merge returns nil
-      run_in_parallel('rake db:test:prepare --trace', args)
+      run_in_parallel("rake db:test:prepare --trace", args)
     end
   end
 
   # when dumping/resetting takes too long
   desc "update test databases via db:migrate --> parallel:migrate[num_cpus]"
   task :migrate, :count do |t,args|
-    run_in_parallel('rake db:migrate RAILS_ENV=test', args)
+    run_in_parallel("rake db:migrate RAILS_ENV=#{rails_env}", args)
   end
 
   # just load the schema (good for integration server <-> no development db)
@@ -43,7 +45,7 @@ namespace :parallel do
 
   desc "load the seed data from db/seeds.rb via db:seed --> parallel::seed[num_cpus]"
   task :seed, :count do |t,args|
-    run_in_parallel('rake db:seed RAILS_ENV=test', args)
+    run_in_parallel("rake db:seed RAILS_ENV=#{rails_env}", args)
   end
 
   ['test', 'spec', 'features'].each do |type|
