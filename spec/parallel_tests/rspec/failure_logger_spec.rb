@@ -17,10 +17,6 @@ describe ParallelTests::RSpec::FailuresLogger do
     @logger = ParallelTests::RSpec::FailuresLogger.new(@output)
   end
 
-  after do
-    silence_warnings{ ParallelTests::RSpec::LoggerBase::RSPEC_1 = false }
-  end
-
   def clean_output
     @output.output.join("\n").gsub(/\e\[\d+m/,'')
   end
@@ -37,7 +33,6 @@ describe ParallelTests::RSpec::FailuresLogger do
   end
 
   it "should invoke spec for rspec 1" do
-    silence_warnings{ ParallelTests::RSpec::LoggerBase::RSPEC_1 = true }
     ParallelTests.stub!(:bundler_enabled?).and_return true
     ParallelTests::RSpec::Runner.stub!(:run).with("bundle show rspec").and_return "/foo/bar/rspec-1.0.2"
     @logger.example_failed @example1
