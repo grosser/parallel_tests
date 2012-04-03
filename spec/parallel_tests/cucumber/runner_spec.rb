@@ -53,26 +53,26 @@ describe ParallelTests::Cucumber do
       call(['xxx'],1,:test_options => '-p default')
     end
 
-    it "uses the contents of a config/cucumber.yml file as options" do
+    it "uses parallel profile if config/cucumber.yml contains it" do
       file_contents = 'parallel: -f progress'
-      ParallelTests::Cucumber::Runner.should_receive(:open).with{|x,y| x =~ %r{script/cucumber .* -f progress}}.and_return mocked_process
+      ParallelTests::Cucumber::Runner.should_receive(:open).with{|x,y| x =~ %r{script/cucumber .* foo bar --profile parallel}}.and_return mocked_process
       File.should_receive(:exists?).with('config/cucumber.yml').and_return true
       File.should_receive(:read).with('config/cucumber.yml').and_return file_contents
-      call(['xxx'],1,{})
+      call(['xxx'],1, :test_options => 'foo bar')
     end
 
-    it "doesn't use the contents of a config/cucumber.yml file when it's not available" do
+    it "does not use parallel profile if config/cucumber.yml does not contain it" do
+      file_contents = 'blob: -f progress'
+      ParallelTests::Cucumber::Runner.should_receive(:open).with{|x,y| x =~ %r{script/cucumber .* foo bar}}.and_return mocked_process
+      File.should_receive(:exists?).with('config/cucumber.yml').and_return true
+      File.should_receive(:read).with('config/cucumber.yml').and_return file_contents
+      call(['xxx'],1,:test_options => 'foo bar')
+    end
+
+    it "does not use the parallel profile if config/cucumber.yml does not exist" do
       ParallelTests::Cucumber::Runner.should_receive(:open).with{|x,y| x =~ %r{script/cucumber .*}}.and_return mocked_process
       File.should_receive(:exists?).with('config/cucumber.yml').and_return false
       call(['xxx'],1,{})
-    end
-
-    it "merges the contents of a config/cucumber.yml file with the current test options" do
-      file_contents = 'parallel: -f progress'
-      ParallelTests::Cucumber::Runner.should_receive(:open).with{|x,y| x =~ %r{script/cucumber .* -p default -f progress}}.and_return mocked_process
-      File.should_receive(:exists?).with('config/cucumber.yml').and_return true
-      File.should_receive(:read).with('config/cucumber.yml').and_return file_contents
-      call(['xxx'],1,:test_options => '-p default')
     end
   end
 
