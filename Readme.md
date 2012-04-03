@@ -203,6 +203,7 @@ inspired by [pivotal labs](http://pivotallabs.com/users/miked/blog/articles/849-
  - [Lawrence Wang](https://github.com/levity)
  - [Potapov Sergey](https://github.com/greyblake)
  - [Łukasz Tackowiak](https://github.com/lukasztackowiak)
+ - [Pedro Carriço](https://github.com/pedrocarrico)
 
 [Michael Grosser](http://grosser.it)<br/>
 michael@grosser.it<br/>
