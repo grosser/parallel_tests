@@ -205,6 +205,7 @@ inspired by [pivotal labs](http://pivotallabs.com/users/miked/blog/articles/849-
  - [Potapov Sergey](https://github.com/greyblake)
  - [Łukasz Tackowiak](https://github.com/lukasztackowiak)
  - [Pedro Carriço](https://github.com/pedrocarrico)
+ - [Pablo Manrubia Díez](https://github.com/pmanrubia)
 
 [Michael Grosser](http://grosser.it)<br/>
 michael@grosser.it<br/>
