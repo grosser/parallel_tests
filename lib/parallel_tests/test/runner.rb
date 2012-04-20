@@ -112,7 +112,7 @@ module ParallelTests
             next unless test and time
             times[File.expand_path(test)] = time.to_f
           end
-          tests.sort.map{|test| [test, times[test]] }
+          tests.sort.map{|test| [test, times[File.expand_path(test)]] }
         else # use file sizes
           tests.sort.map{|test| [test, File.stat(test).size] }
         end
