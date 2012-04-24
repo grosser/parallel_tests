@@ -2,6 +2,6 @@
 $LOAD_PATH << File.join(File.dirname(__FILE__), '..', 'lib')
 require "parallel_tests"
 require "parallel_tests/cli"
-require "parallel_tests/cucumber/gherkin_listener.rb"
+require "parallel_tests/cucumber/gherkin_listener"
 
 ParallelTest::CLI.run(ARGV)

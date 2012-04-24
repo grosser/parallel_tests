@@ -1,5 +1,5 @@
 require 'parallel_tests/test/runner'
-require 'json'
+
 module ParallelTests
   module Cucumber
     class Runner < ParallelTests::Test::Runner
@@ -51,14 +51,17 @@ module ParallelTests
       end
 
       def self.tests_in_groups(tests, num_groups, options={})
-        tests = find_tests(tests, options)
-        if options[:by_steps] == true
-          Grouper.by_steps(tests, num_groups, Listener.new)
-        elsif options[:no_sort] == true
-            Grouper.in_groups(tests, num_groups)
+        if options[:by_steps] == true then
+          tests = find_tests(tests, options)
+          listener = Listener.new
+          parser = Gherkin::Parser::Parser.new(listener, true, 'root')
+          tests.each{|file|
+            parser.parse(File.read(file), file, 0)
+          }
+          tests = listener.collect.sort_by{|_,value| -value }
+          Grouper.by_steps(tests, num_groups)
         else
-          tests = with_runtime_info(tests)
-          Grouper.in_even_groups_by_size(tests, num_groups, options)
+          super
         end
       end
 
