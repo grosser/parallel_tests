@@ -1,5 +1,5 @@
 require 'parallel_tests/test/runner'
-
+require 'json'
 module ParallelTests
   module Cucumber
     class Runner < ParallelTests::Test::Runner
@@ -49,6 +49,19 @@ module ParallelTests
           "--profile parallel"
         end
       end
+
+      def self.tests_in_groups(tests, num_groups, options={})
+        tests = find_tests(tests, options)
+        if options[:by_steps] == true
+          Grouper.by_steps(tests, num_groups, Listener.new)
+        elsif options[:no_sort] == true
+            Grouper.in_groups(tests, num_groups)
+        else
+          tests = with_runtime_info(tests)
+          Grouper.in_even_groups_by_size(tests, num_groups, options)
+        end
+      end
+
     end
   end
 end

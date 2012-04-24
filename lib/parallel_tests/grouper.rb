@@ -45,5 +45,26 @@ module ParallelTests
       group[:items] << item
       group[:size] += size
     end
+
+    def self.by_steps(tests, num_groups, listener)
+      parser = Gherkin::Parser::Parser.new(listener, true, 'root')
+      tests.each{|file|
+          parser.parse(File.read(file), file, 0)
+      }
+      array = listener.collect.sort_by{|key, value|
+            0 - value
+      }
+        bag = Array.new(num_groups, 0)
+        groups = Array.new(num_groups){[]}
+
+        array.each{|elem|
+           groups[bag.index(bag.min)] << elem.first
+           bag[bag.index(bag.min)] += elem.last
+        }
+        puts "Steps per group: "
+        p bag
+        groups
+    end
+
   end
 end
