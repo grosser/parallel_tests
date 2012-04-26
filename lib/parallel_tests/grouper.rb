@@ -48,11 +48,6 @@ module ParallelTests
 
     def self.by_steps(tests, num_groups)
       features_with_steps = build_features_with_steps(tests)
-      group_features_by_steps(features_with_steps, num_groups)
-    end
-
-    # TODO seems farly similar to .in_even_groups_by_size
-    def self.group_features_by_steps(features_with_steps, num_groups)
       in_even_groups_by_size(features_with_steps, num_groups)
     end
 

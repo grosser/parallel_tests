@@ -25,11 +25,11 @@ describe ParallelTests::Grouper do
     end
   end
 
-  describe :group_features_by_steps do
-    let(:features_with_steps){ {"1" => 1, "2" => 2, "3" => 3, "4" => 4, "5" => 5} }
+  describe :in_even_groups_by_size do
+    let(:files_with_size){ {"1" => 1, "2" => 2, "3" => 3, "4" => 4, "5" => 5} }
 
     def call(num_groups)
-      ParallelTests::Grouper.group_features_by_steps(features_with_steps, num_groups)
+      ParallelTests::Grouper.in_even_groups_by_size(files_with_size, num_groups)
     end
 
     it "groups 1 by 1 for same groups as size" do
