@@ -7,8 +7,8 @@ module ParallelTests
 
       def initialize
         @steps, @uris = [], []
-        @examples = @outline = @outline_steps = @scenarios = @background = @background_steps = 0
         @collect = {}
+        reset_counters!
       end
 
       def background(*args)
@@ -25,9 +25,9 @@ module ParallelTests
       end
 
       def step(*args)
-        if @background > 0 then
+        if @background > 0
           @background_steps += 1
-        elsif @outline > 0 then
+        elsif @outline > 0
           @outline_steps += 1
         else
           @collect[@uri] += 1
@@ -45,11 +45,15 @@ module ParallelTests
 
       def eof(*args)
         @collect[@uri] += (@background_steps * @scenarios) + (@outline_steps * @examples)
+        reset_counters!
+      end
+
+      def reset_counters!
         @examples = @outline = @outline_steps = @background = @background_steps = @scenarios = 0
       end
 
+      # ignore lots of other possible callbacks ...
       def method_missing(*args)
-        # ignore lots of other possible callbacks ...
       end
     end
   end
