@@ -46,15 +46,33 @@ module ParallelTests
       group[:size] += size
     end
 
-    # grouping uses greedy algorithm but should be ok in that case
-    def self.by_steps(features_with_steps, num_groups)
+    def self.by_steps(tests, num_groups)
+      features_with_steps = build_features_with_steps(tests)
+      group_features_by_steps(features_with_steps, num_groups)
+    end
+
+    # TODO seems farly similar to .in_even_groups_by_size
+    def self.group_features_by_steps(features_with_steps, num_groups)
       bag = Array.new(num_groups){0}
       groups = Array.new(num_groups){[]}
-      features_with_steps.each{|first, last|
-        groups[bag.index(bag.min)] << first
-        bag[bag.index(bag.min)] += last
-      }
+
+      features_with_steps.each do |file, steps|
+        smallest_group = bag.index(bag.min)
+        groups[smallest_group] << file
+        bag[smallest_group] += steps
+      end
+
       groups
+    end
+
+    def self.build_features_with_steps(tests)
+      require 'parallel_tests/cucumber/gherkin_listener'
+      listener = Cucumber::GherkinListener.new
+      parser = Gherkin::Parser::Parser.new(listener, true, 'root')
+      tests.each{|file|
+        parser.parse(File.read(file), file, 0)
+      }
+      listener.collect.sort_by{|_,value| -value }
     end
   end
 end
