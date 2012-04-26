@@ -53,16 +53,7 @@ module ParallelTests
 
     # TODO seems farly similar to .in_even_groups_by_size
     def self.group_features_by_steps(features_with_steps, num_groups)
-      bag = Array.new(num_groups){0}
-      groups = Array.new(num_groups){[]}
-
-      features_with_steps.each do |file, steps|
-        smallest_group = bag.index(bag.min)
-        groups[smallest_group] << file
-        bag[smallest_group] += steps
-      end
-
-      groups
+      in_even_groups_by_size(features_with_steps, num_groups)
     end
 
     def self.build_features_with_steps(tests)

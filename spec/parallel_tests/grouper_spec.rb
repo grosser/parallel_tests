@@ -26,16 +26,26 @@ describe ParallelTests::Grouper do
   end
 
   describe :group_features_by_steps do
-    it "groups" do
-      features_with_steps = {"10" => 1, "9" => 2, "8" => 3, "7" => 4, "6" => 5}
-      ParallelTests::Grouper.group_features_by_steps(features_with_steps, 5).should == [["10"],["9"], ["8"], ["7"], ["6"]]
-      ParallelTests::Grouper.group_features_by_steps(features_with_steps, 2).should == [["10", "8", "6"], ["9", "7"]]
-      ParallelTests::Grouper.group_features_by_steps(features_with_steps, 1).should ==  [["10", "9", "8", "7", "6"]]
+    let(:features_with_steps){ {"1" => 1, "2" => 2, "3" => 3, "4" => 4, "5" => 5} }
+
+    def call(num_groups)
+      ParallelTests::Grouper.group_features_by_steps(features_with_steps, num_groups)
     end
 
-    it "returns an empty groups if there are more groups than feature files" do
-      features_with_steps = Hash["10", 1, "9", 2, "8", 3, "7", 4, "6", 5]
-      ParallelTests::Grouper.group_features_by_steps(features_with_steps, 6).should == [["10"], ["9"], ["8"], ["7"], ["6"], []]
+    it "groups 1 by 1 for same groups as size" do
+      call(5).should == [["5"], ["4"], ["3"], ["2"], ["1"]]
+    end
+
+    it "groups into even groups" do
+      call(2).should ==  [["1", "2", "5"], ["3", "4"]]
+    end
+
+    it "groups into a single group" do
+      call(1).should == [["1", "2", "3", "4", "5"]]
+    end
+
+    it "adds empty groups if there are more groups than feature files" do
+      call(6).should == [["5"], ["4"], ["3"], ["2"], ["1"], []]
     end
   end
 end
