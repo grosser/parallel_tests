@@ -11,20 +11,20 @@ module ParallelTests
         @collect = {}
       end
 
-      def background(background)
+      def background(*args)
         @background = 1
       end
 
-      def scenario(scenario)
+      def scenario(*args)
         @scenarios += 1
         @outline = @background = 0
       end
 
-      def scenario_outline(scenario_outline)
+      def scenario_outline(*args)
         @outline = 1
       end
 
-      def step(step)
+      def step(*args)
         if @background > 0 then
           @background_steps += 1
         elsif @outline > 0 then
@@ -39,24 +39,8 @@ module ParallelTests
         @collect[@uri] = 0
       end
 
-      def feature(*args)
-      end
-
       def examples(*args)
         @examples += 1
-      end
-
-      def comment(*args)
-      end
-
-      def tag(*args)
-      end
-
-      def table(*args)
-
-      end
-
-      def py_string(*args)
       end
 
       def eof(*args)
@@ -64,7 +48,8 @@ module ParallelTests
         @examples = @outline = @outline_steps = @background = @background_steps = @scenarios = 0
       end
 
-      def syntax_error(*args)
+      def method_missing(*args)
+        # ignore lots of other possible callbacks ...
       end
     end
   end
