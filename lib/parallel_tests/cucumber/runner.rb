@@ -51,9 +51,10 @@ module ParallelTests
       end
 
       def self.tests_in_groups(tests, num_groups, options={})
-        if options[:by_steps] == true then
+        if options[:by_steps] == true
+          require 'parallel_tests/gherkin_listener'
           tests = find_tests(tests, options)
-          listener = Listener.new
+          listener = GherkinListener.new
           parser = Gherkin::Parser::Parser.new(listener, true, 'root')
           tests.each{|file|
             parser.parse(File.read(file), file, 0)
@@ -64,7 +65,6 @@ module ParallelTests
           super
         end
       end
-
     end
   end
 end

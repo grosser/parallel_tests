@@ -2,9 +2,9 @@ require 'gherkin'
 
 module ParallelTests
   module Cucumber
-    class Listener
-
+    class GherkinListener
       attr_reader :collect
+
       def initialize
         @steps, @uris = [], []
         @examples = @outline = @outline_steps = @scenarios = @background = @background_steps = 0
@@ -39,28 +39,33 @@ module ParallelTests
         @collect[@uri] = 0
       end
 
-      def feature(*args) end
+      def feature(*args)
+      end
 
       def examples(*args)
         @examples += 1
       end
 
-      def comment(*args) end
+      def comment(*args)
+      end
 
-      def tag(*args) end
+      def tag(*args)
+      end
 
       def table(*args)
 
       end
 
-      def py_string(*args) end
+      def py_string(*args)
+      end
 
       def eof(*args)
         @collect[@uri] += (@background_steps * @scenarios) + (@outline_steps * @examples)
         @examples = @outline = @outline_steps = @background = @background_steps = @scenarios = 0
       end
 
-      def syntax_error(*args) end
+      def syntax_error(*args)
+      end
     end
   end
 end
