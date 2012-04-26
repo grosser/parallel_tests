@@ -119,15 +119,19 @@ Setup for non-rails
     parallel_test test/bar test/baz/foo_text.rb
 
 Options are:
-
     -n [PROCESSES]                   How many processes to use, default: available CPUs
-    -p, --path [PATH]                run tests inside this path only
-        --no-sort                    do not sort files before running them
+    -p, --pattern [PATTERN]          run tests matching this pattern
+        --group-by                   group tests by:
+          found - order of finding files
+          steps - number of cucumber steps
+          default - runtime or filesize
     -m, --multiply-processes [FLOAT] use given number as a multiplier of processes to run
+    -s, --single [PATTERN]           Run all matching files in only one process
     -e, --exec [COMMAND]             execute this code parallel and with ENV['TEST_ENV_NUM']
     -o, --test-options '[OPTIONS]'   execute test commands with those options
-    -t, --type [TYPE]                test(default) / spec / cucumber
+    -t, --type [TYPE]                test(default) / rspec / cucumber
         --non-parallel               execute same commands but do not in parallel, needs --exec
+        --chunk-timeout [TIMEOUT]    timeout before re-printing the output of a child-process
     -v, --version                    Show Version
     -h, --help                       Show this.
 

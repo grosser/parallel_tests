@@ -38,7 +38,7 @@ describe ParallelTests::Test::Runner do
 
     it "does not sort when passed false do_sort option" do
       ParallelTests::Test::Runner.should_not_receive(:smallest_first)
-      call [], 1, :no_sort => true
+      call [], 1, :group_by => :found
     end
 
     it "does sort when not passed do_sort option" do

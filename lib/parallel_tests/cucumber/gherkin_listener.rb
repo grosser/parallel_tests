@@ -25,7 +25,7 @@ module ParallelTests
       end
 
       def step(*args)
-        if @background == 0
+        if @background == 1
           @background_steps += 1
         elsif @outline > 0
           @outline_steps += 1
