@@ -45,5 +45,16 @@ module ParallelTests
       group[:items] << item
       group[:size] += size
     end
+
+    # grouping uses greedy algorithm but should be ok in that case
+    def self.by_steps(features_with_steps, num_groups)
+      bag = Array.new(num_groups){0}
+      groups = Array.new(num_groups){[]}
+      features_with_steps.each{|first, last|
+        groups[bag.index(bag.min)] << first
+        bag[bag.index(bag.min)] += last
+      }
+      groups
+    end
   end
 end

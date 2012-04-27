@@ -49,6 +49,22 @@ module ParallelTests
           "--profile parallel"
         end
       end
+
+      def self.tests_in_groups(tests, num_groups, options={})
+        if options[:by_steps] == true then
+          tests = find_tests(tests, options)
+          listener = Listener.new
+          parser = Gherkin::Parser::Parser.new(listener, true, 'root')
+          tests.each{|file|
+            parser.parse(File.read(file), file, 0)
+          }
+          tests = listener.collect.sort_by{|_,value| -value }
+          Grouper.by_steps(tests, num_groups)
+        else
+          super
+        end
+      end
+
     end
   end
 end
