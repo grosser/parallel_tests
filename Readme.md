@@ -151,7 +151,7 @@ TIPS
  - [Capybara + Selenium] add to env.rb: `Capybara.server_port = 8888 + ENV['TEST_ENV_NUMBER'].to_i`
  - [RSpec] add a `.rspec_parallel` to use different options, e.g. **no --drb**
  - [RSpec] delete `script/spec`
- - [RSpec] [spork](https://github.com/sporkrb/spork) does not work in parallel
+ - [[Spork](https://github.com/sporkrb/spork)] does not work with parallel_tests
  - [RSpec] remove --loadby from you spec/*.opts
  - [RSpec] Instantly see failures (instead of just a red F) with [rspec-instafail](https://github.com/grosser/rspec-instafail)
  - [Bundler] if you have a `Gemfile` then `bundle exec` will be used to run tests
