@@ -210,6 +210,7 @@ inspired by [pivotal labs](http://pivotallabs.com/users/miked/blog/articles/849-
  - [Łukasz Tackowiak](https://github.com/lukasztackowiak)
  - [Pedro Carriço](https://github.com/pedrocarrico)
  - [Pablo Manrubia Díez](https://github.com/pmanrubia)
+ - [Slawomir Smiechura](https://github.com/ssmiech)
 
 [Michael Grosser](http://grosser.it)<br/>
 michael@grosser.it<br/>
