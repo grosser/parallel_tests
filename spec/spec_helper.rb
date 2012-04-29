@@ -1,6 +1,6 @@
 $LOAD_PATH << File.expand_path("../lib", File.dirname(__FILE__))
 
-FAKE_RAILS_ROOT = '/tmp/pspecs/fixtures'
+FAKE_RAILS_ROOT = './tmp/pspecs/fixtures'
 
 require 'tempfile'
 require 'parallel_tests'
