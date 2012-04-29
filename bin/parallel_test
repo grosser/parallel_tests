@@ -2,4 +2,5 @@
 $LOAD_PATH << File.join(File.dirname(__FILE__), '..', 'lib')
 require "parallel_tests"
 require "parallel_tests/cli"
+
 ParallelTest::CLI.run(ARGV)

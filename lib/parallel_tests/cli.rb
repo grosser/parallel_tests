@@ -81,7 +81,13 @@ Options are:
 BANNER
         opts.on("-n [PROCESSES]", Integer, "How many processes to use, default: available CPUs") { |n| options[:count] = n }
         opts.on("-p", '--pattern [PATTERN]', "run tests matching this pattern") { |pattern| options[:pattern] = /#{pattern}/ }
-        opts.on("--no-sort", "do not sort files before running them") { |no_sort| options[:no_sort] = no_sort }
+        opts.on("--group-by [TYPE]", <<-TEXT
+group tests by:
+          found - order of finding files
+          steps - number of cucumber steps
+          default - runtime or filesize
+TEXT
+) { |type| options[:group_by] = type.to_sym }
         opts.on("-m [FLOAT]", "--multiply-processes [FLOAT]", Float, "use given number as a multiplier of processes to run") { |multiply| options[:multiply] = multiply }
         opts.on("-s [PATTERN]", "--single [PATTERN]", "Run all matching files in only one process") do |pattern|
           options[:single_process] ||= []
@@ -96,7 +102,7 @@ BANNER
         opts.on("-h", "--help", "Show this.") { puts opts; exit }
       end.parse!(argv)
 
-      raise "--no-sort and --single-process are not supported" if options[:no_sort] and options[:single_process]
+      raise "--group-by found and --single-process are not supported" if options[:group_by] == :found and options[:single_process]
 
       options[:files] = argv
       options

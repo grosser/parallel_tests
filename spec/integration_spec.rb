@@ -108,6 +108,12 @@ describe 'CLI' do
     `#{bin_folder}/parallel_cucumber -v`.should == version
   end
 
+  it "runs with --group-by found" do
+    # it only tests that it does not blow up, as it did before fixing...
+    write "spec/x1_spec.rb", "puts '111'"
+    run_tests "spec", :type => 'rspec', :add => '--group-by found'
+  end
+
   it "runs faster with more processes" do
     2.times{|i|
       write "spec/xxx#{i}_spec.rb",  'describe("it"){it("should"){sleep 5}}; $stderr.puts ENV["TEST_ENV_NUMBER"]'

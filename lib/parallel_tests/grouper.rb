@@ -5,7 +5,9 @@ module ParallelTests
 
       until items.empty?
         num_groups.times do |group_number|
-          groups[group_number] << items.shift
+          if item = items.shift
+            groups[group_number] << item
+          end
         end
       end
 
@@ -44,6 +46,21 @@ module ParallelTests
     def self.add_to_group(group, item, size)
       group[:items] << item
       group[:size] += size
+    end
+
+    def self.by_steps(tests, num_groups)
+      features_with_steps = build_features_with_steps(tests)
+      in_even_groups_by_size(features_with_steps, num_groups)
+    end
+
+    def self.build_features_with_steps(tests)
+      require 'parallel_tests/cucumber/gherkin_listener'
+      listener = Cucumber::GherkinListener.new
+      parser = Gherkin::Parser::Parser.new(listener, true, 'root')
+      tests.each{|file|
+        parser.parse(File.read(file), file, 0)
+      }
+      listener.collect.sort_by{|_,value| -value }
     end
   end
 end

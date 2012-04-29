@@ -49,6 +49,14 @@ module ParallelTests
           "--profile parallel"
         end
       end
+
+      def self.tests_in_groups(tests, num_groups, options={})
+        if options[:group_by] == :steps
+          Grouper.by_steps(find_tests(tests, options), num_groups)
+        else
+          super
+        end
+      end
     end
   end
 end

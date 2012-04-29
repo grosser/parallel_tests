@@ -31,7 +31,7 @@ module ParallelTests
       def self.tests_in_groups(tests, num_groups, options={})
         tests = find_tests(tests, options)
 
-        if options[:no_sort] == true
+        if options[:group_by] == :found
           Grouper.in_groups(tests, num_groups)
         else
           tests = with_runtime_info(tests)
