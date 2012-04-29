@@ -5,7 +5,9 @@ module ParallelTests
 
       until items.empty?
         num_groups.times do |group_number|
-          groups[group_number] << items.shift
+          if item = items.shift
+            groups[group_number] << item
+          end
         end
       end
 

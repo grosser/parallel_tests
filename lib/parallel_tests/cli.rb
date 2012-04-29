@@ -81,13 +81,13 @@ Options are:
 BANNER
         opts.on("-n [PROCESSES]", Integer, "How many processes to use, default: available CPUs") { |n| options[:count] = n }
         opts.on("-p", '--pattern [PATTERN]', "run tests matching this pattern") { |pattern| options[:pattern] = /#{pattern}/ }
-        opts.on("--group-by", <<-TEXT
+        opts.on("--group-by [TYPE]", <<-TEXT
 group tests by:
           found - order of finding files
           steps - number of cucumber steps
           default - runtime or filesize
 TEXT
-) { |group_by| options[:group_by] = group_by.to_sym }
+) { |type| options[:group_by] = type.to_sym }
         opts.on("-m [FLOAT]", "--multiply-processes [FLOAT]", Float, "use given number as a multiplier of processes to run") { |multiply| options[:multiply] = multiply }
         opts.on("-s [PATTERN]", "--single [PATTERN]", "Run all matching files in only one process") do |pattern|
           options[:single_process] ||= []
