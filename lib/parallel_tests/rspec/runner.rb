@@ -13,7 +13,7 @@ module ParallelTests
         cmd = if ParallelTests.bundler_enabled?
           "bundle exec rspec"
         else
-          system "rspec --version > /dev/null 2>&1"
+          "rspec" if system "rspec --version > /dev/null 2>&1"
         end
         cmd or raise("Can't find executable rspec")
       end
