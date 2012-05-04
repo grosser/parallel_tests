@@ -152,7 +152,6 @@ You can run any kind of code in parallel with -e / --execute
 
 TIPS
 ====
- - [Capybara + Selenium] add to env.rb: `Capybara.server_port = 8888 + ENV['TEST_ENV_NUMBER'].to_i`
  - [RSpec] add a `.rspec_parallel` to use different options, e.g. **no --drb**
  - [RSpec] delete `script/spec`
  - [[Spork](https://github.com/sporkrb/spork)] does not work with parallel_tests
