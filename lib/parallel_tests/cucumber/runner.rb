@@ -10,8 +10,7 @@ module ParallelTests
           color,
           executable,
           (runtime_logging if File.directory?(File.dirname(runtime_log))),
-          options[:test_options],
-          cucumber_opts,
+          cucumber_opts(options[:test_options]),
           *test_files
         ].compact.join(" ")
         execute_command(cmd, process_number, options)
@@ -43,7 +42,15 @@ module ParallelTests
         line =~ /^\d+ (steps|scenarios)/
       end
 
-      def self.cucumber_opts
+      def self.cucumber_opts(given)
+        if given =~ /--profile/ or given =~ /(^|\s)-p /
+          given
+        else
+          [given, profile_from_config].compact.join(" ")
+        end
+      end
+
+      def self.profile_from_config
         config = 'config/cucumber.yml'
         if File.exists?(config) && File.read(config) =~ /^parallel:/
           "--profile parallel"

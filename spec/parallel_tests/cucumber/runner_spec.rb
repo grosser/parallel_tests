@@ -53,12 +53,27 @@ describe ParallelTests::Cucumber do
       call(['xxx'],1,:test_options => '-p default')
     end
 
-    it "uses parallel profile if config/cucumber.yml contains it" do
-      file_contents = 'parallel: -f progress'
-      ParallelTests::Cucumber::Runner.should_receive(:open).with{|x,y| x =~ %r{script/cucumber .* foo bar --profile parallel}}.and_return mocked_process
-      File.should_receive(:exists?).with('config/cucumber.yml').and_return true
-      File.should_receive(:read).with('config/cucumber.yml').and_return file_contents
-      call(['xxx'],1, :test_options => 'foo bar')
+    context "with parallel profile in config/cucumber.yml" do
+      before do
+        file_contents = 'parallel: -f progress'
+        File.stub(:exists?).with('config/cucumber.yml').and_return true
+        File.stub(:read).with('config/cucumber.yml').and_return file_contents
+      end
+
+      it "uses parallel profile" do
+        ParallelTests::Cucumber::Runner.should_receive(:open).with{|x,y| x =~ %r{script/cucumber .* foo bar --profile parallel xxx}}.and_return mocked_process
+        call(['xxx'],1, :test_options => 'foo bar')
+      end
+
+      it "uses given profile via --profile" do
+        ParallelTests::Cucumber::Runner.should_receive(:open).with{|x,y| x =~ %r{script/cucumber .* --profile foo xxx$}}.and_return mocked_process
+        call(['xxx'],1, :test_options => '--profile foo')
+      end
+
+      it "uses given profile via -p" do
+        ParallelTests::Cucumber::Runner.should_receive(:open).with{|x,y| x =~ %r{script/cucumber .* -p foo xxx$}}.and_return mocked_process
+        call(['xxx'],1, :test_options => '-p foo')
+      end
     end
 
     it "does not use parallel profile if config/cucumber.yml does not contain it" do
