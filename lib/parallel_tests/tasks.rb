@@ -6,17 +6,15 @@ namespace :parallel do
     abort unless system(command)
   end
   
-  def rails_env
-    ENV['RAILS_ENV'] || 'test'
-  end
-
   desc "create test databases via db:create --> parallel:create[num_cpus]"
   task :create, :count do |t,args|
+    rails_env = ENV['RAILS_ENV'] || 'test'
     run_in_parallel("rake db:create RAILS_ENV=#{rails_env}", args)
   end
 
   desc "drop test databases via db:drop --> parallel:drop[num_cpus]"
   task :drop, :count do |t,args|
+    rails_env = ENV['RAILS_ENV'] || 'test'
     run_in_parallel("rake db:drop RAILS_ENV=#{rails_env}", args)
   end
 
@@ -36,17 +34,20 @@ namespace :parallel do
   # when dumping/resetting takes too long
   desc "update test databases via db:migrate --> parallel:migrate[num_cpus]"
   task :migrate, :count do |t,args|
+    rails_env = ENV['RAILS_ENV'] || 'test'
     run_in_parallel("rake db:migrate RAILS_ENV=#{rails_env}", args)
   end
 
   # just load the schema (good for integration server <-> no development db)
   desc "load dumped schema for test databases via db:schema:load --> parallel:load_schema[num_cpus]"
   task :load_schema, :count do |t,args|
+    rails_env = ENV['RAILS_ENV'] || 'test'
     run_in_parallel("rake db:schema:load RAILS_ENV=#{rails_env}", args)
   end
 
   desc "load the seed data from db/seeds.rb via db:seed --> parallel:seed[num_cpus]"
   task :seed, :count do |t,args|
+    rails_env = ENV['RAILS_ENV'] || 'test'
     run_in_parallel("rake db:seed RAILS_ENV=#{rails_env}", args)
   end
 
