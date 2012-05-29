@@ -5,7 +5,7 @@ namespace :parallel do
     command = "#{executable} --exec '#{cmd}' #{count} #{'--non-parallel' if options[:non_parallel]}"
     abort unless system(command)
   end
-  
+
   desc "create test databases via db:create --> parallel:create[num_cpus]"
   task :create, :count do |t,args|
     rails_env = ENV['RAILS_ENV'] || 'test'
