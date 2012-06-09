@@ -119,6 +119,7 @@ Setup for non-rails
     parallel_test test/bar test/baz/foo_text.rb
 
 Options are:
+
     -n [PROCESSES]                   How many processes to use, default: available CPUs
     -p, --pattern [PATTERN]          run tests matching this pattern
         --group-by                   group tests by:
