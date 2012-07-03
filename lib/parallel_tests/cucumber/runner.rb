@@ -39,7 +39,43 @@ module ParallelTests
       end
 
       def self.line_is_result?(line)
-        line =~ /^\d+ (steps|scenarios)/
+        line =~ /^\d+ (steps?|scenarios?)/
+      end
+
+      def self.summarize_results(results)
+
+        summarized_results = []
+
+        %w[scenario step].each do |group|
+
+          counts = results.select{|v| v =~ /^\d+ #{group}s?/}.join(' ').gsub(/s\b/,'').scan(/(\d+) (\w+)/)
+          sums = counts.inject(Hash.new(0)) do |sum, (number, word)|
+            sum[word] += number.to_i
+            sum
+          end
+
+          group_results = sums.map do |word, number|
+            "#{number} #{word}"
+          end
+
+          sort_order = %w[scenario step failed skipped pending passed]
+          group_results = group_results.sort do |a, b|
+            (sort_order.index{|order_item| a.include?(order_item) } || sort_order.size)  <=> (sort_order.index{|order_item| b.include?(order_item) } || sort_order.size)
+          end
+
+          unless group_results.empty?
+            group_results[0] += 's' if group_results.first && group_results.first.scan(/\d+/).first.to_i > 1
+            summarized_results << "#{group_results[0]} (#{group_results[1..-1].join(", ")})"
+          end
+
+        end
+
+        unless summarized_results.empty?
+          summarized_results.unshift ">>>>> parallel_tests summary >>>>>".ljust(80, ">") + "\n"
+          summarized_results <<      "\n" + ("<" * 80)
+        end
+
+        summarized_results.join("\n")
       end
 
       def self.cucumber_opts(given)
