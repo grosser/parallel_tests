@@ -42,6 +42,44 @@ module ParallelTests
         line =~ /^\d+ (steps?|scenarios?)/
       end
 
+      def self.colorize?
+        colorizer != false
+      end
+
+      def self.colorizer
+        if @colorizer.nil?
+          @colorizer = begin
+            if $stdout.tty?
+              begin
+                require 'term/ansicolor'
+                Term::ANSIColor
+              rescue
+                false # no colors
+              end
+            else
+              false # no colors
+            end
+          end
+        end
+        @colorizer
+      end
+
+      def self.colorize(text, status)
+        color = {
+          "passed"    => "green",
+          "failed"    => "red",
+          "pending"   => "yellow",
+          "skipped"   => "cyan",
+          "undefined" => "yellow",
+        }[status]
+
+        if colorize? and color
+          colorizer.send(color.to_sym) + text + colorizer.reset
+        else
+          text
+        end
+      end
+
       def self.summarize_results(results)
 
         summarized_results = []
@@ -55,7 +93,7 @@ module ParallelTests
           end
 
           group_results = sums.map do |word, number|
-            "#{number} #{word}"
+            colorize "#{number} #{word}", word
           end
 
           sort_order = %w[scenario step failed skipped pending passed]
