@@ -104,6 +104,11 @@ TEXT
 
       raise "--group-by found and --single-process are not supported" if options[:group_by] == :found and options[:single_process]
 
+      if options[:count] == 0
+        options.delete(:count)
+        options[:non_parallel] = true
+      end
+
       options[:files] = argv
       options
     end
