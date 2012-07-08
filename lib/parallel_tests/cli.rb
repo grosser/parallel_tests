@@ -100,6 +100,7 @@ TEXT
         opts.on("--chunk-timeout [TIMEOUT]", "timeout before re-printing the output of a child-process") { |timeout| options[:chunk_timeout] = timeout.to_f }
         opts.on('-v', '--version', 'Show Version') { puts ParallelTests::VERSION; exit }
         opts.on("-h", "--help", "Show this.") { puts opts; exit }
+        opts.on('--symlinks', 'Traverse symbolic links to find test files') { options[:symlinks] = true }
       end.parse!(argv)
 
       raise "--group-by found and --single-process are not supported" if options[:group_by] == :found and options[:single_process]

@@ -121,7 +121,7 @@ module ParallelTests
       def self.find_tests(tests, options={})
         (tests||[]).map do |file_or_folder|
           if File.directory?(file_or_folder)
-            files = files_in_folder(file_or_folder)
+            files = files_in_folder(file_or_folder, options)
             files.grep(/#{Regexp.escape test_suffix}$/).grep(options[:pattern]||//)
           else
             file_or_folder
@@ -129,10 +129,14 @@ module ParallelTests
         end.flatten.uniq
       end
 
-      def self.files_in_folder(folder)
+      def self.files_in_folder(folder, options={})
         # follow one symlink and direct children
         # http://stackoverflow.com/questions/357754/can-i-traverse-symlinked-directories-in-ruby-with-a-glob
-        Dir[File.join(folder, "**{,/*/**}/*")].uniq
+        if options[:symlinks]
+          Dir[File.join(folder, "**{,/*/**}/*")].uniq
+        else
+          Dir[File.join(folder, "**/*")].uniq
+        end
       end
     end
   end
