@@ -145,9 +145,18 @@ EOF
     it "finds test files nested in symlinked folders" do
       with_files(['a/a_test.rb','b/b_test.rb']) do |root|
         `ln -s #{root}/a #{root}/b/link`
-        call(["#{root}/b"]).sort.should == [
+        call(["#{root}/b"], :symlinks => true).sort.should == [
           "#{root}/b/b_test.rb",
           "#{root}/b/link/a_test.rb",
+        ]
+      end
+    end
+
+    it "finds test files but ignores those in symlinked folders" do
+      with_files(['a/a_test.rb','b/b_test.rb']) do |root|
+        `ln -s #{root}/a #{root}/b/link`
+        call(["#{root}/b"]).sort.should == [
+          "#{root}/b/b_test.rb",
         ]
       end
     end
