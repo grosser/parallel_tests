@@ -213,6 +213,7 @@ inspired by [pivotal labs](http://pivotallabs.com/users/miked/blog/articles/849-
  - [Pablo Manrubia Díez](https://github.com/pmanrubia)
  - [Slawomir Smiechura](https://github.com/ssmiech)
  - [Georg Friedrich](https://github.com/georg)
+ - [R. Tyler Croy](https://github.com/rtyler)
 
 [Michael Grosser](http://grosser.it)<br/>
 michael@grosser.it<br/>
