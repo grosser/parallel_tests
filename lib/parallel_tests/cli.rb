@@ -80,7 +80,7 @@ Run all tests in parallel, giving each process ENV['TEST_ENV_NUMBER'] ('', '2', 
 Options are:
 BANNER
         opts.on("-n [PROCESSES]", Integer, "How many processes to use, default: available CPUs") { |n| options[:count] = n }
-        opts.on("-p", '--pattern [PATTERN]', "run tests matching this pattern") { |pattern| options[:pattern] = /#{pattern}/ }
+        opts.on("-p", "--pattern [PATTERN]", "run tests matching this pattern") { |pattern| options[:pattern] = /#{pattern}/ }
         opts.on("--group-by [TYPE]", <<-TEXT
 group tests by:
           found - order of finding files
@@ -93,14 +93,14 @@ TEXT
           options[:single_process] ||= []
           options[:single_process] << /#{pattern}/
         end
-        opts.on("-e", '--exec [COMMAND]', "execute this code parallel and with ENV['TEST_ENV_NUM']") { |path| options[:execute] = path }
+        opts.on("-e", "--exec [COMMAND]", "execute this code parallel and with ENV['TEST_ENV_NUM']") { |path| options[:execute] = path }
         opts.on("-o", "--test-options '[OPTIONS]'", "execute test commands with those options") { |arg| options[:test_options] = arg }
         opts.on("-t", "--type [TYPE]", "test(default) / rspec / cucumber") { |type| options[:type] = type }
         opts.on("--non-parallel", "execute same commands but do not in parallel, needs --exec") { options[:non_parallel] = true }
         opts.on("--chunk-timeout [TIMEOUT]", "timeout before re-printing the output of a child-process") { |timeout| options[:chunk_timeout] = timeout.to_f }
-        opts.on('-v', '--version', 'Show Version') { puts ParallelTests::VERSION; exit }
+        opts.on("-v", "--version", "Show Version") { puts ParallelTests::VERSION; exit }
         opts.on("-h", "--help", "Show this.") { puts opts; exit }
-        opts.on('--symlinks', 'Traverse symbolic links to find test files') { options[:symlinks] = true }
+        opts.on("--no-symlinks", "Do not traverse symbolic links to find test files") { options[:symlinks] = false }
       end.parse!(argv)
 
       raise "--group-by found and --single-process are not supported" if options[:group_by] == :found and options[:single_process]
