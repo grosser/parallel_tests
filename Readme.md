@@ -122,7 +122,7 @@ Options are:
 
     -n [PROCESSES]                   How many processes to use, default: available CPUs
     -p, --pattern [PATTERN]          run tests matching this pattern
-        --group-by                   group tests by:
+        --group-by [TYPE]            group tests by:
           found - order of finding files
           steps - number of cucumber steps
           default - runtime or filesize
@@ -133,6 +133,7 @@ Options are:
     -t, --type [TYPE]                test(default) / rspec / cucumber
         --non-parallel               execute same commands but do not in parallel, needs --exec
         --chunk-timeout [TIMEOUT]    timeout before re-printing the output of a child-process
+        --no-symlinks                Do not traverse symbolic links to find test files
     -v, --version                    Show Version
     -h, --help                       Show this.
 

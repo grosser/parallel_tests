@@ -98,9 +98,9 @@ TEXT
         opts.on("-t", "--type [TYPE]", "test(default) / rspec / cucumber") { |type| options[:type] = type }
         opts.on("--non-parallel", "execute same commands but do not in parallel, needs --exec") { options[:non_parallel] = true }
         opts.on("--chunk-timeout [TIMEOUT]", "timeout before re-printing the output of a child-process") { |timeout| options[:chunk_timeout] = timeout.to_f }
+        opts.on("--no-symlinks", "Do not traverse symbolic links to find test files") { options[:symlinks] = false }
         opts.on("-v", "--version", "Show Version") { puts ParallelTests::VERSION; exit }
         opts.on("-h", "--help", "Show this.") { puts opts; exit }
-        opts.on("--no-symlinks", "Do not traverse symbolic links to find test files") { options[:symlinks] = false }
       end.parse!(argv)
 
       raise "--group-by found and --single-process are not supported" if options[:group_by] == :found and options[:single_process]
