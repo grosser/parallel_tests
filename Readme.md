@@ -169,7 +169,7 @@ TIPS
  - `export PARALLEL_TEST_PROCESSORS=X` in your environment and parallel_tests will use this number of processors by default
  - [ZSH] use quotes to use rake arguments `rake "parallel:prepare[3]"`
  - [email_spec and/or action_mailer_cache_delivery](https://github.com/grosser/parallel_tests/wiki)
- - [Memcached] use different namespaces e.g. `config.cache_store = ..., :namespace => "test_#{ENV['TEST_ENV_NUMBER']}"
+ - [Memcached] use different namespaces e.g. `config.cache_store = ..., :namespace => "test_#{ENV['TEST_ENV_NUMBER']}"`
 
 TODO
 ====
