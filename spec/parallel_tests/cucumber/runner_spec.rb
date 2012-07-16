@@ -91,6 +91,33 @@ describe ParallelTests::Cucumber do
     end
   end
 
+  describe :line_is_result? do
+    it "should match lines with only one scenario" do
+      line = "1 scenario (1 failed)"
+      ParallelTests::Cucumber::Runner.line_is_result?(line).should be_true
+    end
+
+    it "should match lines with multiple scenarios" do
+      line = "2 scenarios (1 failed, 1 passed)"
+      ParallelTests::Cucumber::Runner.line_is_result?(line).should be_true
+    end
+
+    it "should match lines with only one step" do
+      line = "1 step (1 failed)"
+      ParallelTests::Cucumber::Runner.line_is_result?(line).should be_true
+    end
+
+    it "should match lines with multiple steps" do
+      line = "5 steps (1 failed, 4 passed)"
+      ParallelTests::Cucumber::Runner.line_is_result?(line).should be_true
+    end
+
+    it "should not match other lines" do
+      line = '    And I should have "2" emails                                # features/step_definitions/user_steps.rb:25'
+      ParallelTests::Cucumber::Runner.line_is_result?(line).should be_false
+    end
+  end
+
   describe :find_results do
     it "finds multiple results in test output" do
       output = <<EOF
@@ -106,8 +133,41 @@ And I should not see "/en/"                                       # features/ste
 4 scenarios (4 passed)
 40 steps (40 passed)
 
+And I should not see "foo"                                       # features/step_definitions/webrat_steps.rb:87
+
+1 scenario (1 passed)
+1 step (1 passed)
+
 EOF
-      ParallelTests::Cucumber::Runner.find_results(output).should == ["7 scenarios (3 failed, 4 passed)", "33 steps (3 failed, 2 skipped, 28 passed)", "4 scenarios (4 passed)", "40 steps (40 passed)"]
+      ParallelTests::Cucumber::Runner.find_results(output).should == ["7 scenarios (3 failed, 4 passed)", "33 steps (3 failed, 2 skipped, 28 passed)", "4 scenarios (4 passed)", "40 steps (40 passed)", "1 scenario (1 passed)", "1 step (1 passed)"]
+    end
+  end
+
+  describe :summarize_results do
+    def call(*args)
+      ParallelTests::Cucumber::Runner.summarize_results(*args)
+    end
+
+    it "sums up results for scenarios and steps separately from each other" do
+      results = ["7 scenarios (3 failed, 4 passed)", "33 steps (3 failed, 2 skipped, 28 passed)", "4 scenarios (4 passed)",
+                 "40 steps (40 passed)", "1 scenario (1 passed)", "1 step (1 passed)"]
+      call(results).should == "12 scenarios (3 failed, 9 passed)\n74 steps (3 failed, 2 skipped, 69 passed)"
+    end
+
+    it "adds same results with plurals" do
+      results = ["1 scenario (1 passed)", "2 steps (2 passed)",
+                 "2 scenarios (2 passed)", "7 steps (7 passed)"]
+      call(results).should == "3 scenarios (3 passed)\n9 steps (9 passed)"
+    end
+
+    it "adds non-similar results" do
+      results = ["1 scenario (1 passed)", "1 step (1 passed)",
+                 "2 scenarios (1 failed, 1 pending)", "2 steps (1 failed, 1 pending)"]
+      call(results).should == "3 scenarios (1 failed, 1 pending, 1 passed)\n3 steps (1 failed, 1 pending, 1 passed)"
+    end
+
+    it "does not pluralize 1" do
+      call(["1 scenario (1 passed)", "1 step (1 passed)"]).should == "1 scenario (1 passed)\n1 step (1 passed)"
     end
   end
 end
