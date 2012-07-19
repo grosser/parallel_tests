@@ -42,28 +42,23 @@ module ParallelTests
         line =~ /^\d+ (steps?|scenarios?)/
       end
 
+      # cucumber has 2 result lines per test run, that cannot be added
+      # 1 scenario (1 failed)
+      # 1 step (1 failed)
       def self.summarize_results(results)
         sort_order = %w[scenario step failed undefined skipped pending passed]
 
         %w[scenario step].map do |group|
-          all_group_results = results.select{|v| v =~ /^\d+ #{group}s?/}
-          next if all_group_results.empty?
+          group_results = results.grep /^\d+ #{group}/
+          next if group_results.empty?
 
-          sums = sum_up_results(all_group_results)
-
-          group_results = sums.map do |word, number|
-            "#{number} #{word}"
+          sums = sum_up_results(group_results)
+          sums = sums.sort_by { |word, _| sort_order.index(word) || 999 }
+          sums.map! do |word, number|
+            plural = "s" if word == group and number != 1
+            "#{number} #{word}#{plural}"
           end
-
-          # sort results like cucumber does it
-          group_results = group_results.sort do |a, b|
-            (sort_order.index{|order_item| a.include?(order_item) } || sort_order.size)  <=> (sort_order.index{|order_item| b.include?(order_item) } || sort_order.size)
-          end
-
-          # pluralize group results
-          group_results[0] += 's' if sums[group] > 1
-          "#{group_results[0]} (#{group_results[1..-1].join(", ")})"
-
+          "#{sums[0]} (#{sums[1..-1].join(", ")})"
         end.compact.join("\n")
       end
 
