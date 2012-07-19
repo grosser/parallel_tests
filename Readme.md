@@ -215,6 +215,7 @@ inspired by [pivotal labs](http://pivotallabs.com/users/miked/blog/articles/849-
  - [Slawomir Smiechura](https://github.com/ssmiech)
  - [Georg Friedrich](https://github.com/georg)
  - [R. Tyler Croy](https://github.com/rtyler)
+ - [Ulrich Berkmüller](https://github.com/ulrich-berkmueller)
 
 [Michael Grosser](http://grosser.it)<br/>
 michael@grosser.it<br/>
