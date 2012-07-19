@@ -39,7 +39,32 @@ module ParallelTests
       end
 
       def self.line_is_result?(line)
-        line =~ /^\d+ (steps|scenarios)/
+        line =~ /^\d+ (steps?|scenarios?)/
+      end
+
+      def self.summarize_results(results)
+        sort_order = %w[scenario step failed undefined skipped pending passed]
+
+        %w[scenario step].map do |group|
+          all_group_results = results.select{|v| v =~ /^\d+ #{group}s?/}
+          next if all_group_results.empty?
+
+          sums = sum_up_results(all_group_results)
+
+          group_results = sums.map do |word, number|
+            "#{number} #{word}"
+          end
+
+          # sort results like cucumber does it
+          group_results = group_results.sort do |a, b|
+            (sort_order.index{|order_item| a.include?(order_item) } || sort_order.size)  <=> (sort_order.index{|order_item| b.include?(order_item) } || sort_order.size)
+          end
+
+          # pluralize group results
+          group_results[0] += 's' if sums[group] > 1
+          "#{group_results[0]} (#{group_results[1..-1].join(", ")})"
+
+        end.compact.join("\n")
       end
 
       def self.cucumber_opts(given)
