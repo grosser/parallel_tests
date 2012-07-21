@@ -132,7 +132,6 @@ Options are:
     -o, --test-options '[OPTIONS]'   execute test commands with those options
     -t, --type [TYPE]                test(default) / rspec / cucumber
         --non-parallel               execute same commands but do not in parallel, needs --exec
-        --chunk-timeout [TIMEOUT]    timeout before re-printing the output of a child-process
         --no-symlinks                Do not traverse symbolic links to find test files
     -v, --version                    Show Version
     -h, --help                       Show this.

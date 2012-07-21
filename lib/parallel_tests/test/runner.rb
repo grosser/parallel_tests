@@ -42,7 +42,7 @@ module ParallelTests
       def self.execute_command(cmd, process_number, options)
         cmd = "TEST_ENV_NUMBER=#{test_env_number(process_number)} ; export TEST_ENV_NUMBER; #{cmd}"
         f = open("|#{cmd}", 'r')
-        output = fetch_output(f, options)
+        output = fetch_output(f)
         f.close
         {:stdout => output, :exit_status => $?.exitstatus}
       end
@@ -77,31 +77,13 @@ module ParallelTests
       end
 
       # read output of the process and print in in chucks
-      def self.fetch_output(process, options)
+      def self.fetch_output(process)
         all = ''
-        buffer = ''
-        timeout = options[:chunk_timeout] || 0.2
-        flushed = Time.now.to_f
-
-        while char = process.getc
-          char = (char.is_a?(Fixnum) ? char.chr : char) # 1.8 <-> 1.9
-          all << char
-
-          # print in chunks so large blocks stay together
-          now = Time.now.to_f
-          buffer << char
-          if flushed + timeout < now
-            $stdout.print buffer
-            $stdout.flush
-            buffer = ''
-            flushed = now
-          end
-        end
-
-        # print the remainder
-        $stdout.print buffer
-        $stdout.flush
-
+        while buffer = process.readpartial(1000000)
+          all << buffer
+          $stdout.print buffer
+          $stdout.flush
+        end rescue EOFError
         all
       end
 
