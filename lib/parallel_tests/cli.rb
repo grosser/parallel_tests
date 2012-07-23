@@ -34,7 +34,7 @@ module ParallelTest
         report_results runner, test_results
       end
 
-      abort "#{lib.capitalize}s Failed" if any_test_failed?(test_results)
+      abort final_fail_message(lib) if any_test_failed?(test_results)
     end
 
     def self.run_tests(runner, group, process_number, options)
@@ -133,6 +133,16 @@ TEXT
       yield
       puts ""
       puts "Took #{Time.now - start} seconds"
+    end
+
+    def self.final_fail_message(lib)
+      fail_message = "#{lib.capitalize}s Failed"
+      fail_message = "\e[31m#{fail_message}\e[0m" if use_colors?
+      fail_message
+    end
+
+    def self.use_colors?
+      $stdout.tty?
     end
   end
 end
