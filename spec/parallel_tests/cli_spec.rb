@@ -21,4 +21,16 @@ describe ParallelTest::CLI do
       call(["--non-parallel"]).should == defaults.merge(:non_parallel => true)
     end
   end
+
+  describe ".final_fail_message" do
+    it 'returns a plain fail message if colors are nor supported' do
+      ParallelTest::CLI.stub(:use_colors? => false, :lib => "Test")
+      ParallelTest::CLI.send(:final_fail_message).should ==  "Tests Failed"
+    end
+
+    it 'returns a colorized fail message if colors are supported' do
+      ParallelTest::CLI.stub(:use_colors? => true, :lib => "Test")
+      ParallelTest::CLI.send(:final_fail_message).should == "\e[31mTests Failed\e[0m"
+    end
+  end
 end
