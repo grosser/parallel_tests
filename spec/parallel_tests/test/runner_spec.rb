@@ -38,19 +38,41 @@ describe ParallelTests::Test::Runner do
 
     it "does not sort when passed false do_sort option" do
       ParallelTests::Test::Runner.should_not_receive(:smallest_first)
-      call [], 1, :group_by => :found
+      call([], 1, :group_by => :found)
     end
 
     it "does sort when not passed do_sort option" do
       ParallelTests::Test::Runner.stub!(:tests_with_runtime).and_return([])
       ParallelTests::Grouper.should_receive(:largest_first).and_return([])
-      call [], 1
+      call([], 1)
     end
 
     it "groups by single_process pattern and then via size" do
-      ParallelTests::Test::Runner.should_receive(:with_runtime_info).and_return([['aaa',5],['aaa2',5],['bbb',2],['ccc',1],['ddd',1]])
-      result = call [], 3, :single_process => [/^a.a/]
+      ParallelTests::Test::Runner.should_receive(:with_runtime_info).
+        and_return([
+          ['aaa', 5],
+          ['aaa2', 5],
+          ['bbb', 2],
+          ['ccc', 1],
+          ['ddd', 1]
+        ])
+      result = call([], 3, :single_process => [/^a.a/])
       result.should == [["aaa", "aaa2"], ["bbb"], ["ccc", "ddd"]]
+    end
+
+    it "groups by size and adds isolated separately" do
+      ParallelTests::Grouper.should_receive(:isolated).with([], [/^aaa/]).
+        and_return([[['aaa']], %w[bbb ccc ddd eee]])
+      ParallelTests::Test::Runner.should_receive(:with_runtime_info).
+        and_return([
+          ['bbb', 3],
+          ['ccc', 1],
+          ['ddd', 2],
+          ['eee', 1]
+        ])
+
+      result = call([], 3, :isolate => true, :single_process => [/^aaa/])
+      result.should == [["bbb"], ["ddd"], ["ccc", "eee"], ["aaa"]]
     end
   end
 
