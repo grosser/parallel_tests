@@ -24,13 +24,13 @@ describe ParallelTest::CLI do
 
   describe ".final_fail_message" do
     it 'returns a plain fail message if colors are nor supported' do
-      ParallelTest::CLI.stub(:use_colors? => false, :lib => "Test")
-      ParallelTest::CLI.send(:final_fail_message).should ==  "Tests Failed"
+      ParallelTest::CLI.should_receive(:use_colors?).and_return false
+      ParallelTest::CLI.send(:final_fail_message, "Test").should ==  "Tests Failed"
     end
 
     it 'returns a colorized fail message if colors are supported' do
-      ParallelTest::CLI.stub(:use_colors? => true, :lib => "Test")
-      ParallelTest::CLI.send(:final_fail_message).should == "\e[31mTests Failed\e[0m"
+      ParallelTest::CLI.should_receive(:use_colors?).and_return true
+      ParallelTest::CLI.send(:final_fail_message, "Test").should == "\e[31mTests Failed\e[0m"
     end
   end
 end
