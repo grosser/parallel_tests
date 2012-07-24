@@ -31,12 +31,19 @@ module ParallelTests
       def self.tests_in_groups(tests, num_groups, options={})
         tests = find_tests(tests, options)
 
-        if options[:group_by] == :found
+        if options[:isolate]
+          isolated = Grouper.isolate!(tests, options[:isolate])
+          num_groups -= 1
+        end
+
+        groups = if options[:group_by] == :found
           Grouper.in_groups(tests, num_groups)
         else
           tests = with_runtime_info(tests)
           Grouper.in_even_groups_by_size(tests, num_groups, options)
         end
+
+        groups + [isolated].compact
       end
 
       def self.execute_command(cmd, process_number, options)

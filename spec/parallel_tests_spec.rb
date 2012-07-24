@@ -4,22 +4,37 @@ describe ParallelTests do
   describe :parse_rake_args do
     it "should return the count" do
       args = {:count => 2}
-      ParallelTests.parse_rake_args(args).should == [2, '', ""]
+      ParallelTests.parse_rake_args(args).should == [2, '', '', ""]
     end
 
     it "should default to the prefix" do
       args = {:count => "models"}
-      ParallelTests.parse_rake_args(args).should == [nil, "models", ""]
+      ParallelTests.parse_rake_args(args).should == [nil, "models", '', ""]
+    end
+
+    it "should default to the prefix" do
+      args = {:count => "||isolated"}
+      ParallelTests.parse_rake_args(args).should == [nil, "", 'isolated', ""]
     end
 
     it "should return the count and pattern" do
-      args = {:count => 2, :pattern => "models"}
-      ParallelTests.parse_rake_args(args).should == [2, "models", ""]
+      args = {:count => 2, :modifiers => "models"}
+      ParallelTests.parse_rake_args(args).should == [2, "models", '', ""]
+    end
+
+    it "should return the count and isolated" do
+      args = {:count => 2, :modifiers => "||isolated"}
+      ParallelTests.parse_rake_args(args).should == [2, "", 'isolated', ""]
+    end
+
+    it "should return the count, pattern and isolated" do
+      args = {:count => 2, :modifiers => "models||isolated"}
+      ParallelTests.parse_rake_args(args).should == [2, "models", 'isolated', ""]
     end
 
     it "should return the count, pattern, and options" do
-      args = {:count => 2, :pattern => "plain", :options => "-p default" }
-      ParallelTests.parse_rake_args(args).should == [2, "plain", "-p default"]
+      args = {:count => 2, :modifiers => "plain", :options => "-p default" }
+      ParallelTests.parse_rake_args(args).should == [2, "plain", '', "-p default"]
     end
   end
 

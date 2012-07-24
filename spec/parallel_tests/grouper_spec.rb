@@ -59,4 +59,13 @@ describe ParallelTests::Grouper do
       ParallelTests::Grouper.in_groups([3,2,1],2).should == [[1,3],[2]]
     end
   end
+
+  describe :isolate do
+    let(:tests){ %w(foo bar baz) }
+
+    it "should isolate by pattern" do
+      ParallelTests::Grouper.isolate!(tests, /bar/).should == ['bar']
+      tests.should == ['foo', 'baz']
+    end
+  end
 end
