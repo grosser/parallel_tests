@@ -37,6 +37,13 @@ module ParallelTests
       files.sort_by{|item, size| size }.reverse
     end
 
+    def self.isolate!(tests, pattern)
+      isolated = tests.grep(pattern)
+      return nil if isolated.empty?
+      tests.replace(tests - isolated)
+      isolated
+    end
+
     private
 
     def self.smallest_group(groups)

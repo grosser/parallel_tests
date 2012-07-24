@@ -54,10 +54,12 @@ module ParallelTests
         # parallel:spec[,models,options]
         count = args.shift if args.first.to_s =~ /^\d*$/
         num_processes = count.to_i unless count.to_s.empty?
-        pattern = args.shift
-        options = args.shift
+        modifiers = args.shift
+        options   = args.shift
 
-        [num_processes, pattern.to_s, options.to_s]
+        pattern, isolate = modifiers.to_s.split('||')
+
+        [num_processes, pattern.to_s, isolate.to_s, options.to_s]
       end
     end
   end
@@ -108,18 +110,18 @@ namespace :parallel do
 
   ['test', 'spec', 'features'].each do |type|
     desc "run #{type} in parallel with parallel:#{type}[num_cpus]"
-    task type, [:count, :pattern, :options] do |t,args|
+    task type, [:count, :modifiers, :options] do |t,args|
       ParallelTests::Tasks.check_for_pending_migrations
       $LOAD_PATH << File.expand_path(File.join(File.dirname(__FILE__), '..'))
       require "parallel_tests"
-      count, pattern, options = ParallelTests::Tasks.parse_args(args)
+      count, pattern, isolate, options = ParallelTests::Tasks.parse_args(args)
       test_framework = {
         'spec' => 'rspec',
         'test' => 'test',
         'features' => 'cucumber'
       }[type]
       executable = File.join(File.dirname(__FILE__), '..', '..', 'bin', 'parallel_test')
-      command = "#{executable} #{type} --type #{test_framework} -n #{count} -p '#{pattern}' -o '#{options}'"
+      command = "#{executable} #{type} --type #{test_framework} -n #{count} -p '#{pattern}' -i '#{isolate}' -o '#{options}'"
       abort unless system(command) # allow to chain tasks e.g. rake parallel:spec parallel:features
     end
   end

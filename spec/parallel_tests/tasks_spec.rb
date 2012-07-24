@@ -13,9 +13,24 @@ describe ParallelTests::Tasks do
       ParallelTests::Tasks.parse_args(args).should == [nil, "models", ""]
     end
 
+    it "should default to the prefix" do
+      args = {:count => "||isolated"}
+      ParallelTests.parse_rake_args(args).should == [nil, "", 'isolated', ""]
+    end
+
     it "should return the count and pattern" do
       args = {:count => 2, :pattern => "models"}
       ParallelTests::Tasks.parse_args(args).should == [2, "models", ""]
+    end
+
+    it "should return the count and isolated" do
+      args = {:count => 2, :modifiers => "||isolated"}
+      ParallelTests.parse_rake_args(args).should == [2, "", 'isolated', ""]
+    end
+
+    it "should return the count, pattern and isolated" do
+      args = {:count => 2, :modifiers => "models||isolated"}
+      ParallelTests.parse_rake_args(args).should == [2, "models", 'isolated', ""]
     end
 
     it "should return the count, pattern, and options" do

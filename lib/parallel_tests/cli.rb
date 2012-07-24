@@ -93,6 +93,9 @@ TEXT
           options[:single_process] ||= []
           options[:single_process] << /#{pattern}/
         end
+        opts.on("-i [PATTERN]", "--isolate [PATTERN]", "Isolate all matching files into separate tests group") do |pattern|
+          options[:isolate] = /#{Regexp.escape pattern}/
+        end
         opts.on("-e", "--exec [COMMAND]", "execute this code parallel and with ENV['TEST_ENV_NUM']") { |path| options[:execute] = path }
         opts.on("-o", "--test-options '[OPTIONS]'", "execute test commands with those options") { |arg| options[:test_options] = arg }
         opts.on("-t", "--type [TYPE]", "test(default) / rspec / cucumber") { |type| options[:type] = type }
