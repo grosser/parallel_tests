@@ -40,7 +40,7 @@ namespace :parallel do
   # just load the schema (good for integration server <-> no development db)
   desc "load dumped schema for test databases via db:schema:load --> parallel:load_schema[num_cpus]"
   task :load_schema, :count do |t,args|
-    run_in_parallel("rake db:schema:load_silently RAILS_ENV=#{rails_env}", args)
+    run_in_parallel("rake db:schema:silence db:schema:load RAILS_ENV=#{rails_env}", args)
   end
 
   desc "load the seed data from db/seeds.rb via db:seed --> parallel:seed[num_cpus]"
@@ -68,9 +68,8 @@ end
 
 namespace :db do
   namespace :schema do
-    task :load_silently => :environment do
+    task :silence => :environment do
       ActiveRecord::Schema.verbose = false
-      Rake::Task['db:schema:load'].invoke
     end
   end
 end
