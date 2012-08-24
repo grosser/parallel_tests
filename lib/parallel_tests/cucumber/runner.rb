@@ -71,8 +71,9 @@ module ParallelTests
       end
 
       def self.profile_from_config
+        # copied from https://github.com/cucumber/cucumber/blob/master/lib/cucumber/cli/profile_loader.rb#L85
         config = Dir.glob('{,.config/,config/}cucumber{.yml,.yaml}').first
-        if File.exists?(config) && File.read(config) =~ /^parallel:/
+        if config && File.read(config) =~ /^parallel:/
           "--profile parallel"
         end
       end

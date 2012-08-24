@@ -56,7 +56,7 @@ describe ParallelTests::Cucumber do
     context "with parallel profile in config/cucumber.yml" do
       before do
         file_contents = 'parallel: -f progress'
-        File.stub(:exists?).with('config/cucumber.yml').and_return true
+        Dir.stub(:glob).and_return ['config/cucumber.yml']
         File.stub(:read).with('config/cucumber.yml').and_return file_contents
       end
 
@@ -79,14 +79,14 @@ describe ParallelTests::Cucumber do
     it "does not use parallel profile if config/cucumber.yml does not contain it" do
       file_contents = 'blob: -f progress'
       ParallelTests::Cucumber::Runner.should_receive(:open).with{|x,y| x =~ %r{script/cucumber .* foo bar}}.and_return mocked_process
-      File.should_receive(:exists?).with('config/cucumber.yml').and_return true
+      Dir.should_receive(:glob).and_return ['config/cucumber.yml']
       File.should_receive(:read).with('config/cucumber.yml').and_return file_contents
       call(['xxx'],1,:test_options => 'foo bar')
     end
 
     it "does not use the parallel profile if config/cucumber.yml does not exist" do
       ParallelTests::Cucumber::Runner.should_receive(:open).with{|x,y| x =~ %r{script/cucumber .*}}.and_return mocked_process
-      File.should_receive(:exists?).with('config/cucumber.yml').and_return false
+      Dir.should_receive(:glob).and_return []
       call(['xxx'],1,{})
     end
   end
