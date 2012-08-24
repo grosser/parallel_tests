@@ -71,7 +71,7 @@ module ParallelTests
       end
 
       def self.profile_from_config
-        config = 'config/cucumber.yml'
+        config = Dir.glob('{,.config/,config/}cucumber{.yml,.yaml}').first
         if File.exists?(config) && File.read(config) =~ /^parallel:/
           "--profile parallel"
         end
