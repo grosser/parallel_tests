@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    parallel_tests (0.8.9)
+    parallel_tests (0.8.10)
       parallel
 
 GEM
@@ -18,7 +18,7 @@ GEM
     gherkin (2.7.6)
       json (>= 1.4.6)
     json (1.6.4)
-    parallel (0.5.17)
+    parallel (0.5.18)
     rake (0.8.7)
     rspec (2.6.0)
       rspec-core (~> 2.6.0)
