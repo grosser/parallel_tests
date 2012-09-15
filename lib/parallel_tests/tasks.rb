@@ -40,8 +40,12 @@ namespace :parallel do
   # just load the schema (good for integration server <-> no development db)
   desc "load dumped schema for test databases via db:schema:load --> parallel:load_schema[num_cpus]"
   task :load_schema, :count do |t,args|
-    suppress_schema_noise = '| grep -v "^-- \|^   ->"'
-    run_in_parallel("rake db:schema:load RAILS_ENV=#{rails_env} #{suppress_schema_noise}", args)
+    # sed does not support | without -r -> stay basic
+    # grep changes the exitstatus if nothing matches
+    # without pipefail parallel:prepare would exit 0 even if it failed due to sed exiting with 0
+    # defining a new rake task like silence_schema would force users to load parallel_tests in test env
+    suppress_schema_noise = '| sed "/^-- /d" | sed "/^   ->/d"'
+    run_in_parallel("set -o pipefail ; rake db:schema:load RAILS_ENV=#{rails_env} #{suppress_schema_noise}", args)
   end
 
   desc "load the seed data from db/seeds.rb via db:seed --> parallel:seed[num_cpus]"
