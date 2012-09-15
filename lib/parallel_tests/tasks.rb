@@ -8,6 +8,29 @@ namespace :parallel do
     abort unless system(command)
   end
 
+  # this is a crazy-complex solution for a very simple problem:
+  # removing certain lines from the output without chaning the exit-status
+  # normally I'd not do this, but it has been lots of fun and a great learning experience :)
+  #
+  # - sed does not support | without -r
+  # - grep changes 0 exitstatus to 1 if nothing matches
+  # - sed changes 1 exitstatus to 0
+  # - pipefail makes pipe fail with exitstatus of first failed command
+  # - pipefail is not supported in (zsh)
+  # - defining a new rake task like silence_schema would force users to load parallel_tests in test env
+  # - do not use ' since run_in_parallel uses them to quote stuff
+  # - simple system "set -o pipefail" returns nil even though set -o pipefail exists with 0
+  def parallel_tests_suppress_output(command, ignore_regex)
+    activate_pipefail = "set -o pipefail"
+    remove_ignored_lines = %Q{(grep -v "#{ignore_regex}" || test 1)}
+
+    if system("#{activate_pipefail} && test 1")
+      "#{activate_pipefail} && (#{command}) | #{remove_ignored_lines}"
+    else
+      command
+    end
+  end
+
   desc "create test databases via db:create --> parallel:create[num_cpus]"
   task :create, :count do |t,args|
     run_in_parallel("rake db:create RAILS_ENV=#{rails_env}", args)
@@ -40,12 +63,8 @@ namespace :parallel do
   # just load the schema (good for integration server <-> no development db)
   desc "load dumped schema for test databases via db:schema:load --> parallel:load_schema[num_cpus]"
   task :load_schema, :count do |t,args|
-    # sed does not support | without -r -> stay basic
-    # grep changes the exitstatus if nothing matches
-    # without pipefail parallel:prepare would exit 0 even if it failed due to sed exiting with 0
-    # defining a new rake task like silence_schema would force users to load parallel_tests in test env
-    suppress_schema_noise = '| sed "/^-- /d" | sed "/^   ->/d"'
-    run_in_parallel("set -o pipefail ; rake db:schema:load RAILS_ENV=#{rails_env} #{suppress_schema_noise}", args)
+    command = "rake db:schema:load RAILS_ENV=#{rails_env}"
+    run_in_parallel(parallel_tests_suppress_output(command, "^   ->\\|^-- "), args)
   end
 
   desc "load the seed data from db/seeds.rb via db:seed --> parallel:seed[num_cpus]"
