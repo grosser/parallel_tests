@@ -50,6 +50,10 @@ Test by pattern (e.g. use one integration server per subfolder / see if you brok
     rake parallel:test[user]  # run users_controller + user_helper + user tests
     rake parallel:test['user|product']  # run user and product related tests
 
+Force number of processors
+
+    ENV['PARALLEL_TEST_PROCESSORS'] = 2
+    rake parallel:test
 
 ### Example output
 
