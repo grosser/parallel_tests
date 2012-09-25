@@ -42,7 +42,8 @@ namespace :parallel do
   end
 
   desc "update test databases by dumping and loading --> parallel:prepare[num_cpus]"
-  task(:prepare, [:count] => 'db:abort_if_pending_migrations') do |t,args|
+  task(:prepare, [:count]) do |t,args|
+    check_for_pending_migrations
     if defined?(ActiveRecord) && ActiveRecord::Base.schema_format == :ruby
       # dump then load in parallel
       Rake::Task['db:schema:dump'].invoke
@@ -74,7 +75,8 @@ namespace :parallel do
 
   ['test', 'spec', 'features'].each do |type|
     desc "run #{type} in parallel with parallel:#{type}[num_cpus]"
-    task type, [:count, :pattern, :options] => 'db:abort_if_pending_migrations' do |t,args|
+    task type, [:count, :pattern, :options] do |t,args|
+      check_for_pending_migrations
       $LOAD_PATH << File.expand_path(File.join(File.dirname(__FILE__), '..'))
       require "parallel_tests"
       count, pattern, options = ParallelTests.parse_rake_args(args)
@@ -86,6 +88,13 @@ namespace :parallel do
       executable = File.join(File.dirname(__FILE__), '..', '..', 'bin', 'parallel_test')
       command = "#{executable} #{type} --type #{test_framework} -n #{count} -p '#{pattern}' -o '#{options}'"
       abort unless system(command) # allow to chain tasks e.g. rake parallel:spec parallel:features
+    end
+  end
+
+  def check_for_pending_migrations
+    abort_migrations = "db:abort_if_pending_migrations"
+    if Rake::Task.task_defined?(abort_migrations)
+      Rake::Task[abort_migrations].invoke
     end
   end
 end
