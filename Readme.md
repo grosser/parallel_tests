@@ -164,7 +164,6 @@ TIPS
  - [Sphinx setup](https://github.com/grosser/parallel_tests/wiki)
  - [Capistrano setup](https://github.com/grosser/parallel_tests/wiki/Remotely-with-capistrano) let your tests run on a big box instead of your laptop
  - [SQL schema format] use :ruby schema format to get faster parallel:prepare`
- - [ActiveRecord] if you do not have `db:abort_if_pending_migrations` add this to your Rakefile: `task('db:abort_if_pending_migrations'){}`
  - `export PARALLEL_TEST_PROCESSORS=X` in your environment and parallel_tests will use this number of processors by default
  - [ZSH] use quotes to use rake arguments `rake "parallel:prepare[3]"`
  - [email_spec and/or action_mailer_cache_delivery](https://github.com/grosser/parallel_tests/wiki)
@@ -216,7 +215,8 @@ inspired by [pivotal labs](http://pivotallabs.com/users/miked/blog/articles/849-
  - [Georg Friedrich](https://github.com/georg)
  - [R. Tyler Croy](https://github.com/rtyler)
  - [Ulrich Berkmüller](https://github.com/ulrich-berkmueller)
- - [https://github.com/madmax](https://github.com/madmax)
+ - [Grzegorz Derebecki](https://github.com/madmax)
+ - [Florian Motlik](https://github.com/flomotlik)
 
 [Michael Grosser](http://grosser.it)<br/>
 michael@grosser.it<br/>
