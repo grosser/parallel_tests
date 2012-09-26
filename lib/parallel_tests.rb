@@ -12,22 +12,6 @@ module ParallelTests
     ].detect{|c| not c.to_s.strip.empty? }.to_i
   end
 
-  # parallel:spec[:count, :pattern, :options]
-  def self.parse_rake_args(args)
-    # order as given by user
-    args = [args[:count], args[:pattern], args[:options]]
-
-    # count given or empty ?
-    # parallel:spec[2,models,options]
-    # parallel:spec[,models,options]
-    count = args.shift if args.first.to_s =~ /^\d*$/
-    num_processes = count.to_i unless count.to_s.empty?
-    pattern = args.shift
-    options = args.shift
-
-    [num_processes, pattern.to_s, options.to_s]
-  end
-
   # copied from http://github.com/carlhuda/bundler Bundler::SharedHelpers#find_gemfile
   def self.bundler_enabled?
     return true if Object.const_defined?(:Bundler)
