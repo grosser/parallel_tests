@@ -2,6 +2,13 @@ require 'spec_helper'
 
 describe ParallelTests::Test::RuntimeLogger do
   describe :writing do
+    around do |example|
+      use_temporary_directory_for do
+        FileUtils.mkdir_p(File.dirname(log))
+        example.call
+      end
+    end
+
     let(:log) { ParallelTests::Test::Runner.runtime_log }
 
     it "overwrites the runtime_log file on first log invocation" do
