@@ -103,7 +103,7 @@ namespace :parallel do
 
   desc "load the seed data from db/seeds.rb via db:seed --> parallel:seed[num_cpus]"
   task :seed, :count do |t,args|
-    run_in_parallel("rake db:seed RAILS_ENV=#{ParallelTests::Tasks.rails_env}", args)
+    ParallelTests::Tasks.run_in_parallel("rake db:seed RAILS_ENV=#{ParallelTests::Tasks.rails_env}", args)
   end
 
   ['test', 'spec', 'features'].each do |type|
