@@ -47,7 +47,7 @@ module ParallelTests
       # parallel:spec[:count, :pattern, :options]
       def parse_args(args)
         # order as given by user
-        args = [args[:count], args[:pattern], args[:options]]
+        args = [args[:count], args[:modifiers], args[:options]]
 
         # count given or empty ?
         # parallel:spec[2,models,options]
