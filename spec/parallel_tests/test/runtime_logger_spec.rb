@@ -4,6 +4,9 @@ describe ParallelTests::Test::RuntimeLogger do
   describe :writing do
     let(:log) { ParallelTests::Test::Runner.runtime_log }
 
+    before { FileUtils.touch log }
+    after  { FileUtils.rm log, :force => true }
+
     it "overwrites the runtime_log file on first log invocation" do
       class FakeTest
       end
