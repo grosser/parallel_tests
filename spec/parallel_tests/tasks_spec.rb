@@ -81,25 +81,42 @@ describe ParallelTests::Tasks do
       [result, $?.success?]
     end
 
-    it "should hide offending lines" do
-      call("echo 123", "123").should == ["", true]
+    context "with pipefail supported" do
+      before :all do
+        if not system("set -o pipefail && test 1")
+          pending "pipefail is not supported on your system"
+        end
+      end
+
+      it "should hide offending lines" do
+        call("echo 123", "123").should == ["", true]
+      end
+
+      it "should not hide other lines" do
+        call("echo 124", "123").should == ["124\n", true]
+      end
+
+      it "should fail if command fails and the pattern matches" do
+        call("echo 123 && test", "123").should == ["", false]
+      end
+
+      it "should fail if command fails and the pattern fails" do
+        call("echo 124 && test", "123").should == ["124\n", false]
+      end
     end
 
-    it "should not hide other lines" do
-      call("echo 124", "123").should == ["124\n", true]
-    end
+    context "without pipefail supported" do
+      before do
+        ParallelTests::Tasks.should_receive(:system).with("set -o pipefail && test 1").and_return false
+      end
 
-    it "should fail if command fails and the pattern matches" do
-      call("echo 123 && test", "123").should == ["", false]
-    end
+      it "should not filter and succeed" do
+        call("echo 123", "123").should == ["123\n", true]
+      end
 
-    it "should fail if command fails and the pattern fails" do
-      call("echo 124 && test", "123").should == ["124\n", false]
-    end
-
-    it "should not filter if pipefail is not possible" do
-      ParallelTests::Tasks.should_receive(:system).with("set -o pipefail && test 1").and_return false
-      call("echo 123", "123").should == ["123\n", true]
+      it "should not filter and fail" do
+        call("echo 123 && test", "123").should == ["123\n", false]
+      end
     end
   end
 
