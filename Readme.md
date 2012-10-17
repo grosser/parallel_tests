@@ -12,21 +12,25 @@ If you use RSpec: ensure you got >= 2.4
 
 As gem
 
+```ruby
     # add to Gemfile
     gem "parallel_tests", :group => :development
-
+```
 OR as plugin
-
+```bash
     rails plugin install git://github.com/grosser/parallel_tests.git
-
+```
+```ruby
     # add to Gemfile
     gem "parallel", :group => :development
-
+```
 ### Add to `config/database.yml`
 ParallelTests uses 1 database per test-process, 2 processes will use `*_test` and `*_test2`.
 
+```yaml
     test:
       database: yourproject_test<%= ENV['TEST_ENV_NUMBER'] %>
+```
 
 ### Create additional database(s)
     rake parallel:create
@@ -75,9 +79,9 @@ Rspec: Add to your `.rspec_parallel` (or `.rspec`) :
     --format ParallelTests::RSpec::RuntimeLogger --out tmp/parallel_runtime_rspec.log
 
 Test::Unit:  Add to your `test_helper.rb`:
-
+```ruby
     require 'parallel_tests/test/runtime_logger'
-
+```
 
 RSpec: SummaryLogger
 --------------------
