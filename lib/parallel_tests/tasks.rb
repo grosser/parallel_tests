@@ -106,6 +106,14 @@ namespace :parallel do
     ParallelTests::Tasks.run_in_parallel("rake db:seed RAILS_ENV=#{ParallelTests::Tasks.rails_env}", args)
   end
 
+  desc "run passed task in parallel --> parallel:run_task[task,num_cups]"
+  task :run_task, :task, :count do |t,args|
+    task = args[:task]
+    args = args.to_hash
+    args.shift
+    ParallelTests::Tasks.run_in_parallel("rake #{task} RAILS_ENV=#{ParallelTests::Tasks.rails_env}", args)
+  end
+
   ['test', 'spec', 'features'].each do |type|
     desc "run #{type} in parallel with parallel:#{type}[num_cpus]"
     task type, [:count, :pattern, :options] do |t,args|
