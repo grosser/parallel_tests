@@ -48,15 +48,29 @@ describe ParallelTests::Test::Runner do
     end
 
     it 'groups by single_process pattern and then via size' do
-      ParallelTests::Test::Runner.should_receive(:with_runtime_info).and_return([['aaa',5],['aaa2',5],['bbb',2],['ccc',1],['ddd',1]])
-      result = call [], 3, :single_process => [/^a.a/]
+      ParallelTests::Test::Runner.should_receive(:with_runtime_info).
+        and_return([
+          ['aaa', 5],
+          ['aaa2', 5],
+          ['bbb', 2],
+          ['ccc', 1],
+          ['ddd', 1]
+        ])
+      result = call([], 3, :single_process => [/^a.a/])
       result.should == [['aaa', 'aaa2'], ['bbb'], ['ccc', 'ddd']]
     end
 
     it 'groups by size and adds isolated separately' do
-      ParallelTests::Grouper.should_receive(:isolate!).with([], /^aaa/).and_return(['aaa'])
-      ParallelTests::Test::Runner.should_receive(:with_runtime_info).and_return([['bbb',3],['ccc',1],['ddd',2]])
-      result = call [], 3, :isolate => /^aaa/
+      ParallelTests::Grouper.should_receive(:isolate!).with([], /^aaa/).
+        and_return(['aaa'])
+      ParallelTests::Test::Runner.should_receive(:with_runtime_info).
+        and_return([
+          ['bbb', 3],
+          ['ccc', 1],
+          ['ddd', 2]
+        ])
+
+      result = call([], 3, :isolate => /^aaa/)
       result.should == [['bbb'], ['ccc', 'ddd'], ['aaa']]
     end
   end

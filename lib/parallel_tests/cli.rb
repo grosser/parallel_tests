@@ -25,13 +25,13 @@ module ParallelTest
 
       report_time_taken do
         groups = runner.tests_in_groups(options[:files], num_processes, options)
-        report_number_of_tests runner, groups
+        report_number_of_tests(runner, groups)
 
         test_results = Parallel.map(groups, :in_processes => groups.size) do |group|
           run_tests(runner, group, groups.index(group), options)
         end
 
-        report_results runner, test_results
+        report_results(runner, test_results)
       end
 
       abort final_fail_message(lib) if any_test_failed?(test_results)
@@ -96,6 +96,7 @@ TEXT
         opts.on("-i [PATTERN]", "--isolate [PATTERN]", "Isolate all matching files into separate tests group") do |pattern|
           options[:isolate] = /#{Regexp.escape pattern}/
         end
+
         opts.on("-e", "--exec [COMMAND]", "execute this code parallel and with ENV['TEST_ENV_NUM']") { |path| options[:execute] = path }
         opts.on("-o", "--test-options '[OPTIONS]'", "execute test commands with those options") { |arg| options[:test_options] = arg }
         opts.on("-t", "--type [TYPE]", "test(default) / rspec / cucumber") { |type| options[:type] = type }
@@ -141,6 +142,7 @@ TEXT
     def self.final_fail_message(lib)
       fail_message = "#{lib.capitalize}s Failed"
       fail_message = "\e[31m#{fail_message}\e[0m" if use_colors?
+
       fail_message
     end
 

@@ -80,10 +80,11 @@ module ParallelTests
           sum[word] += number.to_i
           sum
         end
+
         sums
       end
 
-      # read output of the process and print in in chucks
+      # read output of the process and print it in chunks
       def self.fetch_output(process)
         all = ''
         while buffer = process.readpartial(1000000)
@@ -91,6 +92,7 @@ module ParallelTests
           $stdout.print buffer
           $stdout.flush
         end rescue EOFError
+
         all
       end
 
@@ -112,8 +114,8 @@ module ParallelTests
         end
       end
 
-      def self.find_tests(tests, options={})
-        (tests||[]).map do |file_or_folder|
+      def self.find_tests(tests, options = {})
+        (tests || []).map do |file_or_folder|
           if File.directory?(file_or_folder)
             files = files_in_folder(file_or_folder, options)
             files.grep(/#{Regexp.escape test_suffix}$/).grep(options[:pattern]||//)
