@@ -61,7 +61,7 @@ describe ParallelTests::Grouper do
   end
 
   describe :isolate do
-    let(:tests){ %w(foo bar baz) }
+    let(:tests){ %w[foo bar baz] }
 
     it "should isolate by pattern" do
       ParallelTests::Grouper.isolate!(tests, /bar/).should == ['bar']

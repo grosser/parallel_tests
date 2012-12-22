@@ -38,13 +38,13 @@ describe ParallelTests::Test::Runner do
 
     it 'does not sort when passed false do_sort option' do
       ParallelTests::Test::Runner.should_not_receive(:smallest_first)
-      call [], 1, :group_by => :found
+      call([], 1, :group_by => :found)
     end
 
     it 'does sort when not passed do_sort option' do
       ParallelTests::Test::Runner.stub!(:tests_with_runtime).and_return([])
       ParallelTests::Grouper.should_receive(:largest_first).and_return([])
-      call [], 1
+      call([], 2)
     end
 
     it 'groups by single_process pattern and then via size' do

@@ -135,8 +135,7 @@ TEXT
     def self.report_time_taken
       start = Time.now
       yield
-      puts ""
-      puts "Took #{Time.now - start} seconds"
+      puts "\nTook #{Time.now - start} seconds"
     end
 
     def self.final_fail_message(lib)
