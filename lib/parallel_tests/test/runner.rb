@@ -31,9 +31,18 @@ module ParallelTests
       def self.tests_in_groups(tests, num_groups, options={})
         tests = find_tests(tests, options)
 
+        isolated_groups = []
         if options[:isolate]
-          isolated = Grouper.isolate!(tests, options[:isolate])
-          num_groups -= 1
+          isolated_groups, tests = Grouper.isolated(tests, options[:single_process])
+        end
+
+        # GOTCHA:
+        #   There is no sense try to split tests into groups when planned
+        #   number of processes have been already exceeded or matched to planned
+        #   -- zekefast 2012-10-17
+        new_num_groups = num_groups - isolated_groups.size
+        if new_num_groups <= 1
+          return isolated_groups << [tests]
         end
 
         groups = if options[:group_by] == :found
@@ -43,7 +52,7 @@ module ParallelTests
           Grouper.in_even_groups_by_size(tests, num_groups, options)
         end
 
-        groups + [isolated].compact
+        groups + isolated_groups
       end
 
       def self.execute_command(cmd, process_number, options)

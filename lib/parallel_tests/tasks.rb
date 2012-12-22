@@ -124,7 +124,12 @@ namespace :parallel do
       }[type]
 
       executable = File.join(File.dirname(__FILE__), '..', '..', 'bin', 'parallel_test')
-      command = "#{executable} #{type} --type #{test_framework} -n #{count} -p '#{pattern}' -i '#{isolation_pattern}' -o '#{options}'"
+      command = "#{executable} #{type} --type #{test_framework} " \
+        "-n #{count} "                     \
+        "--pattern '#{pattern}' "          \
+        "--single '#{isolation_pattern}' " \
+        "--isolate "                       \
+        "--test-options '#{options}'"
 
       abort unless system(command) # allow to chain tasks e.g. rake parallel:spec parallel:features
     end

@@ -47,6 +47,14 @@ describe ParallelTests::Test::Runner do
       call([], 2)
     end
 
+    it 'does not try to group when no free processes exist' do
+      ParallelTests::Test::Runner.stub!(:tests_with_runtime).and_return([])
+      ParallelTests::Grouper.should_not_receive(:in_groups)
+      ParallelTests::Grouper.should_not_receive(:in_even_groups_by_size)
+
+      call([], 1)
+    end
+
     it 'groups by single_process pattern and then via size' do
       ParallelTests::Test::Runner.should_receive(:with_runtime_info).
         and_return([
@@ -61,17 +69,18 @@ describe ParallelTests::Test::Runner do
     end
 
     it 'groups by size and adds isolated separately' do
-      ParallelTests::Grouper.should_receive(:isolate!).with([], /^aaa/).
-        and_return(['aaa'])
+      ParallelTests::Grouper.should_receive(:isolated).with([], [/^aaa/]).
+        and_return([[['aaa']], %w[bbb ccc ddd eee]])
       ParallelTests::Test::Runner.should_receive(:with_runtime_info).
         and_return([
           ['bbb', 3],
           ['ccc', 1],
-          ['ddd', 2]
+          ['ddd', 2],
+          ['eee', 1]
         ])
 
-      result = call([], 3, :isolate => /^aaa/)
-      result.should == [['bbb'], ['ccc', 'ddd'], ['aaa']]
+      result = call([], 3, :isolate => true, :single_process => [/^aaa/])
+      result.should == [['bbb'], ['ddd'], ['ccc', 'eee'], ['aaa']]
     end
   end
 

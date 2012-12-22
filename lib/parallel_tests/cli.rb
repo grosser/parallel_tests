@@ -89,12 +89,20 @@ group tests by:
 TEXT
 ) { |type| options[:group_by] = type.to_sym }
         opts.on("-m [FLOAT]", "--multiply-processes [FLOAT]", Float, "use given number as a multiplier of processes to run") { |multiply| options[:multiply] = multiply }
-        opts.on("-s [PATTERN]", "--single [PATTERN]", "Run all matching files in only one process") do |pattern|
+
+        opts.on("-s [PATTERN]", "--single [PATTERN]",
+          "Guarantees that all matching files run in the same process.") do |pattern|
+
           options[:single_process] ||= []
           options[:single_process] << /#{pattern}/
         end
-        opts.on("-i [PATTERN]", "--isolate [PATTERN]", "Isolate all matching files into separate tests group") do |pattern|
-          options[:isolate] = /#{Regexp.escape pattern}/
+
+        opts.on("-i", "--isolate",
+          "Isolates files matching the pattern given with --single(-s) option " \
+          "into separate tests' group. Only matched files run in the specified" \
+          "groups.") do |pattern|
+
+          options[:isolate] = true
         end
 
         opts.on("-e", "--exec [COMMAND]", "execute this code parallel and with ENV['TEST_ENV_NUM']") { |path| options[:execute] = path }
