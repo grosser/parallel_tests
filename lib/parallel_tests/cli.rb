@@ -97,10 +97,12 @@ TEXT
           options[:single_process] << /#{pattern}/
         end
 
-        opts.on("-i", "--isolate",
-          "Isolates files matching the pattern given with --single(-s) option " \
-          "into separate tests' group. Only matched files run in the specified" \
-          "groups.") do |pattern|
+        opts.on("-i", "--isolate", <<-TEXT
+Isolates files matching the pattern given with --single(-s)
+#{' '*36} option into separate tests' group. Only matched files run
+#{' '*36} in the specified groups.
+          TEXT
+          ) do |pattern|
 
           options[:isolate] = true
         end
