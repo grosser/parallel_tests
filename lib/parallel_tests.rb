@@ -1,4 +1,3 @@
-require 'rubygems'
 require 'parallel'
 require 'parallel_tests/version'
 require 'parallel_tests/grouper'
