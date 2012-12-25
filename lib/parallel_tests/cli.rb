@@ -91,18 +91,14 @@ TEXT
         opts.on("-m [FLOAT]", "--multiply-processes [FLOAT]", Float, "use given number as a multiplier of processes to run") { |multiply| options[:multiply] = multiply }
 
         opts.on("-s [PATTERN]", "--single [PATTERN]",
-          "Guarantees that all matching files run in the same process.") do |pattern|
+          "Run all matching files in the same process") do |pattern|
 
           options[:single_process] ||= []
           options[:single_process] << /#{pattern}/
         end
 
-        opts.on("-i", "--isolate", <<-TEXT
-Isolates files matching the pattern given with --single(-s)
-#{' '*36} option into separate tests' group. Only matched files run
-#{' '*36} in the specified groups.
-          TEXT
-          ) do |pattern|
+        opts.on("-i", "--isolate",
+          "Do not run any other tests in the group used by --single(-s)") do |pattern|
 
           options[:isolate] = true
         end

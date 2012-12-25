@@ -132,10 +132,8 @@ Options are:
           steps - number of cucumber steps
           default - runtime or filesize
     -m, --multiply-processes [FLOAT] use given number as a multiplier of processes to run
-    -s, --single [PATTERN]           Guarantees that all matching files run in the same process.
-    -i, --isolate                    Isolates files matching the pattern given with --single(-s)
-                                     option into separate tests' group. Only matched files run
-                                     in the specified groups.
+    -s, --single [PATTERN]           Run all matching files in the same process
+    -i, --isolate                    Do not run any other tests in the group used by --single(-s)
     -e, --exec [COMMAND]             execute this code parallel and with ENV['TEST_ENV_NUM']
     -o, --test-options '[OPTIONS]'   execute test commands with those options
     -t, --type [TYPE]                test(default) / rspec / cucumber
