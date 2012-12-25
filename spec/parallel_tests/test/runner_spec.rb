@@ -44,14 +44,6 @@ describe ParallelTests::Test::Runner do
     it "does sort when not passed do_sort option" do
       ParallelTests::Test::Runner.stub!(:tests_with_runtime).and_return([])
       ParallelTests::Grouper.should_receive(:largest_first).and_return([])
-      call([], 2)
-    end
-
-    it 'does not try to group when no free processes exist' do
-      ParallelTests::Test::Runner.stub!(:tests_with_runtime).and_return([])
-      ParallelTests::Grouper.should_not_receive(:in_groups)
-      ParallelTests::Grouper.should_not_receive(:in_even_groups_by_size)
-
       call([], 1)
     end
 

@@ -36,15 +36,6 @@ module ParallelTests
           isolated_groups, tests = Grouper.isolated(tests, options[:single_process])
         end
 
-        # GOTCHA:
-        #   There is no sense try to split tests into groups when planned
-        #   number of processes have been already exceeded or matched to planned
-        #   -- zekefast 2012-10-17
-        new_num_groups = num_groups - isolated_groups.size
-        if new_num_groups <= 1
-          return isolated_groups << [tests]
-        end
-
         groups = if options[:group_by] == :found
           Grouper.in_groups(tests, num_groups)
         else

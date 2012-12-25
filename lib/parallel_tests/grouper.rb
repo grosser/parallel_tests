@@ -3,10 +3,14 @@ module ParallelTests
     def self.in_groups(items, num_groups)
       groups = Array.new(num_groups) { [] }
 
-      until items.empty?
-        num_groups.times do |group_number|
-          if item = items.shift
-            groups[group_number] << item
+      if num_groups == 1
+        groups[0] = items
+      else
+        until items.empty?
+          num_groups.times do |group_number|
+            if item = items.shift
+              groups[group_number] << item
+            end
           end
         end
       end
