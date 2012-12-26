@@ -25,13 +25,13 @@ module ParallelTest
 
       report_time_taken do
         groups = runner.tests_in_groups(options[:files], num_processes, options)
-        report_number_of_tests runner, groups
+        report_number_of_tests(runner, groups)
 
         test_results = Parallel.map(groups, :in_processes => groups.size) do |group|
           run_tests(runner, group, groups.index(group), options)
         end
 
-        report_results runner, test_results
+        report_results(runner, test_results)
       end
 
       abort final_fail_message(lib) if any_test_failed?(test_results)
@@ -89,10 +89,20 @@ group tests by:
 TEXT
 ) { |type| options[:group_by] = type.to_sym }
         opts.on("-m [FLOAT]", "--multiply-processes [FLOAT]", Float, "use given number as a multiplier of processes to run") { |multiply| options[:multiply] = multiply }
-        opts.on("-s [PATTERN]", "--single [PATTERN]", "Run all matching files in only one process") do |pattern|
+
+        opts.on("-s [PATTERN]", "--single [PATTERN]",
+          "Run all matching files in the same process") do |pattern|
+
           options[:single_process] ||= []
           options[:single_process] << /#{pattern}/
         end
+
+        opts.on("-i", "--isolate",
+          "Do not run any other tests in the group used by --single(-s)") do |pattern|
+
+          options[:isolate] = true
+        end
+
         opts.on("-e", "--exec [COMMAND]", "execute this code parallel and with ENV['TEST_ENV_NUM']") { |path| options[:execute] = path }
         opts.on("-o", "--test-options '[OPTIONS]'", "execute test commands with those options") { |arg| options[:test_options] = arg }
         opts.on("-t", "--type [TYPE]", "test(default) / rspec / cucumber") { |type| options[:type] = type }
@@ -131,13 +141,13 @@ TEXT
     def self.report_time_taken
       start = Time.now
       yield
-      puts ""
-      puts "Took #{Time.now - start} seconds"
+      puts "\nTook #{Time.now - start} seconds"
     end
 
     def self.final_fail_message(lib)
       fail_message = "#{lib.capitalize}s Failed"
       fail_message = "\e[31m#{fail_message}\e[0m" if use_colors?
+
       fail_message
     end
 

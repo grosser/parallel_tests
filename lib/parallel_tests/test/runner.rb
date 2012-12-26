@@ -31,12 +31,19 @@ module ParallelTests
       def self.tests_in_groups(tests, num_groups, options={})
         tests = find_tests(tests, options)
 
-        if options[:group_by] == :found
+        isolated_groups = []
+        if options[:isolate]
+          isolated_groups, tests = Grouper.isolated(tests, options[:single_process])
+        end
+
+        groups = if options[:group_by] == :found
           Grouper.in_groups(tests, num_groups)
         else
           tests = with_runtime_info(tests)
           Grouper.in_even_groups_by_size(tests, num_groups, options)
         end
+
+        groups + isolated_groups
       end
 
       def self.execute_command(cmd, process_number, options)
@@ -73,10 +80,11 @@ module ParallelTests
           sum[word] += number.to_i
           sum
         end
+
         sums
       end
 
-      # read output of the process and print in in chucks
+      # read output of the process and print it in chunks
       def self.fetch_output(process)
         all = ''
         while buffer = process.readpartial(1000000)
@@ -84,6 +92,7 @@ module ParallelTests
           $stdout.print buffer
           $stdout.flush
         end rescue EOFError
+
         all
       end
 
@@ -105,8 +114,8 @@ module ParallelTests
         end
       end
 
-      def self.find_tests(tests, options={})
-        (tests||[]).map do |file_or_folder|
+      def self.find_tests(tests, options = {})
+        (tests || []).map do |file_or_folder|
           if File.directory?(file_or_folder)
             files = files_in_folder(file_or_folder, options)
             files.grep(/#{Regexp.escape test_suffix}$/).grep(options[:pattern]||//)
