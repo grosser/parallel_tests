@@ -44,22 +44,20 @@ module ParallelTests
         end
       end
 
-      # parallel:spec[:count, :pattern||:isolation_pattern, :options]
+      # parallel:spec[:count, :pattern, :options]
       def parse_args(args)
         # order as given by user
-        args = [args[:count], args[:modifiers], args[:options]]
+        args = [args[:count], args[:pattern], args[:options]]
 
         # count given or empty ?
         # parallel:spec[2,models,options]
         # parallel:spec[,models,options]
         count = args.shift if args.first.to_s =~ /^\d*$/
         num_processes = count.to_i unless count.to_s.empty?
-        modifiers = args.shift
-        options   = args.shift
+        pattern = args.shift
+        options = args.shift
 
-        pattern, isolation_pattern = modifiers.to_s.split('||')
-
-        [num_processes, pattern.to_s, isolation_pattern.to_s, options.to_s]
+        [num_processes, pattern.to_s, options.to_s]
       end
     end
   end
@@ -110,13 +108,13 @@ namespace :parallel do
 
   ['test', 'spec', 'features'].each do |type|
     desc "run #{type} in parallel with parallel:#{type}[num_cpus]"
-    task type, [:count, :modifiers, :options] do |t, args|
+    task type, [:count, :pattern, :options] do |t, args|
       ParallelTests::Tasks.check_for_pending_migrations
 
       $LOAD_PATH << File.expand_path(File.join(File.dirname(__FILE__), '..'))
       require "parallel_tests"
 
-      count, pattern, isolation_pattern, options = ParallelTests::Tasks.parse_args(args)
+      count, pattern, options = ParallelTests::Tasks.parse_args(args)
       test_framework = {
         'spec'     => 'rspec',
         'test'     => 'test',
@@ -127,8 +125,6 @@ namespace :parallel do
       command = "#{executable} #{type} --type #{test_framework} " \
         "-n #{count} "                     \
         "--pattern '#{pattern}' "          \
-        "--single '#{isolation_pattern}' " \
-        "--isolate "                       \
         "--test-options '#{options}'"
 
       abort unless system(command) # allow to chain tasks e.g. rake parallel:spec parallel:features
