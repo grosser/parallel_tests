@@ -1,43 +1,19 @@
 module ParallelTests
   class Grouper
-    def self.in_groups(items, num_groups)
-      groups = Array.new(num_groups) { [] }
-
-      if num_groups == 1
-        groups[0] = items
-      else
-        until items.empty?
-          num_groups.times do |group_number|
-            if item = items.shift
-              groups[group_number] << item
-            end
-          end
-        end
-      end
-
-      groups.map!(&:sort!)
-    end
-
     def self.in_even_groups_by_size(items_with_sizes, num_groups, options = {})
       groups = Array.new(num_groups) { {:items => [], :size => 0} }
 
-      # GOTCHA:
-      #  When isolate option is set all tests matched to patterns in
-      #  :single_process will be selected earlier and there is no sense to run
-      #  through tests one more time, because there wouldn't be any matched tests.
-      #  -- zekefast 2012-10-17
-      unless options[:isolate]
-        # add all files that should run in a single process to one group
-        (options[:single_process] || []).each do |pattern|
-          matched, items_with_sizes = items_with_sizes.partition { |item, size| item =~ pattern }
-          smallest = smallest_group(groups)
-          matched.each { |item, size| add_to_group(smallest, item, size) }
-        end
+      # add all files that should run in a single process to one group
+      (options[:single_process] || []).each do |pattern|
+        matched, items_with_sizes = items_with_sizes.partition { |item, size| item =~ pattern }
+        matched.each { |item, size| add_to_group(groups.first, item, size) }
       end
+
+      groups_to_fill = (options[:isolate] ? groups[1..-1] : groups)
 
       # add all other files
       largest_first(items_with_sizes).each do |item, size|
-        smallest = smallest_group(groups)
+        smallest = smallest_group(groups_to_fill)
         add_to_group(smallest, item, size)
       end
 
@@ -46,22 +22,6 @@ module ParallelTests
 
     def self.largest_first(files)
       files.sort_by{|item, size| size }.reverse
-    end
-
-    # Splits tests into groups by patterns.
-    #
-    # @param [Array]         items     files with tests
-    # @param [Array<Regexp>] patterns
-    #
-    # @return [Array<Array, Array>]
-    def self.isolated(items, patterns)
-      groups, rest = [], []
-      (patterns || []).each do |pattern|
-        matched, rest = items.partition { |item| item =~ pattern }
-        groups << matched unless matched.empty?
-      end
-
-      [groups, rest]
     end
 
     private

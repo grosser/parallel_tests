@@ -61,10 +61,9 @@ describe ParallelTests::Test::Runner do
     end
 
     it "groups by size and adds isolated separately" do
-      ParallelTests::Grouper.should_receive(:isolated).with([], [/^aaa/]).
-        and_return([[['aaa']], %w[bbb ccc ddd eee]])
       ParallelTests::Test::Runner.should_receive(:with_runtime_info).
         and_return([
+          ['aaa', 0],
           ['bbb', 3],
           ['ccc', 1],
           ['ddd', 2],
@@ -72,7 +71,7 @@ describe ParallelTests::Test::Runner do
         ])
 
       result = call([], 3, :isolate => true, :single_process => [/^aaa/])
-      result.should == [["bbb"], ["ddd"], ["ccc", "eee"], ["aaa"]]
+      result.should == [["aaa"], ["bbb", "eee"], ["ccc", "ddd"]]
     end
   end
 

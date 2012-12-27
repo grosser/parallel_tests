@@ -49,26 +49,4 @@ describe ParallelTests::Grouper do
       call(6).should == [["5"], ["4"], ["3"], ["2"], ["1"], []]
     end
   end
-
-  describe :in_groups do
-    it "groups" do
-      ParallelTests::Grouper.in_groups([1,2,3],2).should == [[1,3],[2]]
-    end
-
-    it "keeps groups sorted" do
-      ParallelTests::Grouper.in_groups([3,2,1],2).should == [[1,3],[2]]
-    end
-  end
-
-  describe :isolated do
-    let(:tests){ %w[foo bar baz] }
-
-    it "should isolate by pattern" do
-      grouped, ungrouped = ParallelTests::Grouper.isolated(tests, [/bar/])
-
-      tests.should     == %w[foo bar baz]
-      grouped.should   == [['bar']]
-      ungrouped.should == %w[foo baz]
-    end
-  end
 end
