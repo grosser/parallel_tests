@@ -223,6 +223,8 @@ inspired by [pivotal labs](http://pivotallabs.com/users/miked/blog/articles/849-
  - [Ulrich Berkmüller](https://github.com/ulrich-berkmueller)
  - [Grzegorz Derebecki](https://github.com/madmax)
  - [Florian Motlik](https://github.com/flomotlik)
+ - [Artem Kuzko](https://github.com/akuzko)
+ - [Zeke Fast](https://github.com/zekefast)
 
 [Michael Grosser](http://grosser.it)<br/>
 michael@grosser.it<br/>
