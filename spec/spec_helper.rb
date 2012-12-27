@@ -135,7 +135,7 @@ def test_tests_in_groups(klass, folder, suffix)
     it "partitions by round-robin when not sorting" do
       files = ["file1.rb", "file2.rb", "file3.rb", "file4.rb"]
       klass.should_receive(:find_tests).and_return(files)
-      groups = klass.tests_in_groups(files, 2, :group_by => :found)
+      groups = klass.tests_in_groups(files, 2, :group_by => :found).sort
       groups[0].should == ["file1.rb", "file3.rb"]
       groups[1].should == ["file2.rb", "file4.rb"]
     end
@@ -143,7 +143,7 @@ def test_tests_in_groups(klass, folder, suffix)
     it "alpha-sorts partitions when not sorting by runtime" do
       files = %w[q w e r t y u i o p a s d f g h j k l z x c v b n m]
       klass.should_receive(:find_tests).and_return(files)
-      groups = klass.tests_in_groups(files, 2, :group_by => :found)
+      groups = klass.tests_in_groups(files, 2, :group_by => :found).sort
       groups[0].should == groups[0].sort
       groups[1].should == groups[1].sort
     end
