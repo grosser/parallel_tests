@@ -108,6 +108,7 @@ TEXT
         opts.on("-t", "--type [TYPE]", "test(default) / rspec / cucumber") { |type| options[:type] = type }
         opts.on("--non-parallel", "execute same commands but do not in parallel, needs --exec") { options[:non_parallel] = true }
         opts.on("--no-symlinks", "Do not traverse symbolic links to find test files") { options[:symlinks] = false }
+        opts.on("--advance-number [NUMBER]", Integer, "Advance test env number by specified number") { |n| options[:advance_number] = n }
         opts.on("-v", "--version", "Show Version") { puts ParallelTests::VERSION; exit }
         opts.on("-h", "--help", "Show this.") { puts opts; exit }
       end.parse!(argv)

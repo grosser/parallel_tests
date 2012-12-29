@@ -40,7 +40,7 @@ module ParallelTests
       end
 
       def self.execute_command(cmd, process_number, options)
-        cmd = "TEST_ENV_NUMBER=#{test_env_number(process_number)} ; export TEST_ENV_NUMBER; #{cmd}"
+        cmd = "TEST_ENV_NUMBER=#{test_env_number(process_number, options)} ; export TEST_ENV_NUMBER; #{cmd}"
         f = open("|#{cmd}", 'r')
         output = fetch_output(f)
         f.close
@@ -55,8 +55,9 @@ module ParallelTests
         }.compact
       end
 
-      def self.test_env_number(process_number)
-        process_number == 0 ? '' : process_number + 1
+      def self.test_env_number(process_number, options)
+        n = options[:advance_number].to_i + process_number + 1
+        n == 0 ? '' : n
       end
 
       def self.summarize_results(results)
