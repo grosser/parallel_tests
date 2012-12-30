@@ -40,7 +40,7 @@ module ParallelTests
       end
 
       def self.execute_command(cmd, process_number, options)
-        cmd = "TEST_ENV_NUMBER=#{test_env_number(process_number)} ; export TEST_ENV_NUMBER; #{cmd}"
+        cmd = "PARALLEL_TEST= ; export PARALLEL_TEST; TEST_ENV_NUMBER=#{test_env_number(process_number)} ; export TEST_ENV_NUMBER; #{cmd}"
         f = open("|#{cmd}", 'r')
         output = fetch_output(f)
         f.close
