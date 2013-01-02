@@ -18,9 +18,7 @@ describe ParallelTests::Test::Runner do
       call(['xxx'],1,{})
     end
 
-    # The PARALLEL_TESTS environment variable being set lets child processes know they are being run
-    # inside parallel_tests.  The actual value doesn't matter.
-    it 'sets PARALLEL_TESTS' do
+    it 'sets PARALLEL_TESTS so child processes know that they are being run under parallel_tests' do
       ParallelTests::Test::Runner.should_receive(:open).with{|x,y| x=~/PARALLEL_TESTS=/}.and_return mocked_process
       call(['xxx'],1,{})
     end
