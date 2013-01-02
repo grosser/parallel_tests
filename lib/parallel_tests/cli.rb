@@ -28,7 +28,7 @@ module ParallelTest
         report_number_of_tests runner, groups
 
         test_results = Parallel.map(groups, :in_processes => groups.size) do |group|
-          run_tests(runner, group, groups.index(group), options)
+          run_tests(runner, group, groups.index(group), (options || {}).merge({:num_processes => num_processes}) )
         end
 
         report_results runner, test_results

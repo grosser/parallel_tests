@@ -24,6 +24,13 @@ describe ParallelTests::Cucumber do
       call(['xxx'],1,{})
     end
 
+    # The PARALLEL_TESTS environment variable being set lets child processes know they are being run
+    # inside parallel_tests.  The actual value doesn't matter.
+    it 'sets PARALLEL_TESTS' do
+      ParallelTests::Cucumber::Runner.should_receive(:open).with{|x,y| x=~/PARALLEL_TESTS=/}.and_return mocked_process
+      call(['xxx'],1,{})
+    end
+
     it "returns the output" do
       io = open('spec/spec_helper.rb')
       $stdout.stub!(:print)

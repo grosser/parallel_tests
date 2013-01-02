@@ -18,6 +18,13 @@ describe ParallelTests::Test::Runner do
       call(['xxx'],1,{})
     end
 
+    # The PARALLEL_TESTS environment variable being set lets child processes know they are being run
+    # inside parallel_tests.  The actual value doesn't matter.
+    it 'sets PARALLEL_TESTS' do
+      ParallelTests::Test::Runner.should_receive(:open).with{|x,y| x=~/PARALLEL_TESTS=/}.and_return mocked_process
+      call(['xxx'],1,{})
+    end
+
     it "uses options" do
       ParallelTests::Test::Runner.should_receive(:open).with{|x,y| x=~ %r{ruby -Itest .* -- -v}}.and_return mocked_process
       call(['xxx'],1,:test_options => '-v')
