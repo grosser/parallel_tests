@@ -15,7 +15,7 @@ describe ParallelTests::Grouper do
         write("#{dir}/a.feature", "Feature: xxx\n  Scenario: xxx\n    Given something")
         write("#{dir}/b.feature", "Feature: xxx\n  Scenario: xxx\n    Given something\n  Scenario: yyy\n    Given something")
         write("#{dir}/c.feature", "Feature: xxx\n  Scenario: xxx\n    Given something")
-        ParallelTests::Grouper.by_steps(["#{dir}/a.feature", "#{dir}/b.feature", "#{dir}/c.feature"],2)
+        ParallelTests::Grouper.by_steps(["#{dir}/a.feature", "#{dir}/b.feature", "#{dir}/c.feature"], 2, {})
       end
 
       # testing inside mktmpdir is always green
