@@ -10,24 +10,31 @@ describe ParallelTests::Test::Runner do
 
     it "uses TEST_ENV_NUMBER=blank when called for process 0" do
       ParallelTests::Test::Runner.should_receive(:open).with{|x,y|x=~/TEST_ENV_NUMBER= /}.and_return mocked_process
-      call(['xxx'],0,{})
+      call(['xxx'],0,22,{})
     end
 
     it "uses TEST_ENV_NUMBER=2 when called for process 1" do
       ParallelTests::Test::Runner.should_receive(:open).with{|x,y| x=~/TEST_ENV_NUMBER=2/}.and_return mocked_process
-      call(['xxx'],1,{})
+      call(['xxx'],1,22,{})
+    end
+
+    it 'sets PARALLEL_TEST_GROUPS so child processes know that they are being run under parallel_tests' do
+      ENV['PARALLEL_TEST_PROCESSORS'] = '22'
+      ParallelTests::Test::Runner.should_receive(:open).with{|x,y| x=~/PARALLEL_TEST_GROUPS=22/}.and_return mocked_process
+      call(['xxx'],1,22,{})
+      ENV.delete('PARALLEL_TEST_PROCESSORS')
     end
 
     it "uses options" do
       ParallelTests::Test::Runner.should_receive(:open).with{|x,y| x=~ %r{ruby -Itest .* -- -v}}.and_return mocked_process
-      call(['xxx'],1,:test_options => '-v')
+      call(['xxx'],1,22,:test_options => '-v')
     end
 
     it "returns the output" do
       io = open('spec/spec_helper.rb')
       $stdout.stub!(:print)
       ParallelTests::Test::Runner.should_receive(:open).and_return io
-      call(['xxx'],1,{})[:stdout].should =~ /\$LOAD_PATH << File/
+      call(['xxx'],1,22,{})[:stdout].should =~ /\$LOAD_PATH << File/
     end
   end
 
