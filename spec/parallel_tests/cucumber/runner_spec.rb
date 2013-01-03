@@ -24,8 +24,8 @@ describe ParallelTests::Cucumber do
       call(['xxx'],1,22,{})
     end
 
-    it 'sets PARALLEL_TESTS so child processes know that they are being run under parallel_tests' do
-      ParallelTests::Cucumber::Runner.should_receive(:open).with{|x,y| x=~/PARALLEL_TESTS=22/}.and_return mocked_process
+    it 'sets PARALLEL_TEST_GROUPS so child processes know that they are being run under parallel_tests' do
+      ParallelTests::Cucumber::Runner.should_receive(:open).with{|x,y| x=~/PARALLEL_TEST_GROUPS=22/}.and_return mocked_process
       call(['xxx'],1,22,{})
     end
 

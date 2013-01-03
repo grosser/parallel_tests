@@ -18,9 +18,9 @@ describe ParallelTests::Test::Runner do
       call(['xxx'],1,22,{})
     end
 
-    it 'sets PARALLEL_TESTS so child processes know that they are being run under parallel_tests' do
+    it 'sets PARALLEL_TEST_GROUPS so child processes know that they are being run under parallel_tests' do
       ENV['PARALLEL_TEST_PROCESSORS'] = '22'
-      ParallelTests::Test::Runner.should_receive(:open).with{|x,y| x=~/PARALLEL_TESTS=22/}.and_return mocked_process
+      ParallelTests::Test::Runner.should_receive(:open).with{|x,y| x=~/PARALLEL_TEST_GROUPS=22/}.and_return mocked_process
       call(['xxx'],1,22,{})
       ENV.delete('PARALLEL_TEST_PROCESSORS')
     end

@@ -40,7 +40,7 @@ module ParallelTests
       end
 
       def self.execute_command(cmd, process_number,  num_processes, options)
-        prefix = "PARALLEL_TESTS=#{ num_processes } ; export PARALLEL_TESTS;"
+        prefix = "PARALLEL_TEST_GROUPS=#{ num_processes } ; export PARALLEL_TEST_GROUPS;"
         cmd = "#{prefix} TEST_ENV_NUMBER=#{test_env_number(process_number)} ; export TEST_ENV_NUMBER; #{cmd}"
         f = open("|#{cmd}", 'r')
         output = fetch_output(f)
