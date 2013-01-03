@@ -139,6 +139,7 @@ Options are:
     -t, --type [TYPE]                test(default) / rspec / cucumber
         --non-parallel               execute same commands but do not in parallel, needs --exec
         --no-symlinks                Do not traverse symbolic links to find test files
+        --ignore-tags [PATTERN]      When counting steps ignore scenarios with tags that match this pattern
     -v, --version                    Show Version
     -h, --help                       Show this.
 
@@ -226,6 +227,7 @@ inspired by [pivotal labs](http://pivotallabs.com/users/miked/blog/articles/849-
  - [Florian Motlik](https://github.com/flomotlik)
  - [Artem Kuzko](https://github.com/akuzko)
  - [Zeke Fast](https://github.com/zekefast)
+ - [Joseph Shraibman](https://github.com/jshraibman-mdsol)
 
 [Michael Grosser](http://grosser.it)<br/>
 michael@grosser.it<br/>
