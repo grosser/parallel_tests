@@ -35,14 +35,17 @@ module ParallelTests
       group[:size] += size
     end
 
-    def self.by_steps(tests, num_groups)
-      features_with_steps = build_features_with_steps(tests)
+    def self.by_steps(tests, num_groups, options)
+      features_with_steps = build_features_with_steps(tests, options)
       in_even_groups_by_size(features_with_steps, num_groups)
     end
 
-    def self.build_features_with_steps(tests)
+    private
+
+    def self.build_features_with_steps(tests, options)
       require 'parallel_tests/cucumber/gherkin_listener'
       listener = Cucumber::GherkinListener.new
+      listener.ignore_tag_pattern = Regexp.compile(options[:ignore_tag_pattern]) if options[:ignore_tag_pattern]
       parser = Gherkin::Parser::Parser.new(listener, true, 'root')
       tests.each{|file|
         parser.parse(File.read(file), file, 0)
