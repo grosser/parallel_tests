@@ -80,7 +80,7 @@ module ParallelTests
 
       def self.tests_in_groups(tests, num_groups, options={})
         if options[:group_by] == :steps
-          Grouper.by_steps(find_tests(tests, options), num_groups)
+          Grouper.by_steps(find_tests(tests, options), num_groups, options)
         else
           super
         end
