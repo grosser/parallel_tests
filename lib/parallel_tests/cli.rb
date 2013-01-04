@@ -128,11 +128,11 @@ TEXT
       runs = (0...num_processes).to_a
       results = if options[:non_parallel]
         runs.map do |i|
-          ParallelTests::Test::Runner.execute_command(command, i, num_processes, options)
+          ParallelTests::Test::Runner.execute_command(command, i, num_processes)
         end
       else
         Parallel.map(runs, :in_processes => num_processes) do |i|
-          ParallelTests::Test::Runner.execute_command(command, i, num_processes, options)
+          ParallelTests::Test::Runner.execute_command(command, i, num_processes)
         end
       end.flatten
 

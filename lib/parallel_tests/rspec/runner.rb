@@ -7,7 +7,7 @@ module ParallelTests
         exe = executable # expensive, so we cache
         version = (exe =~ /\brspec\b/ ? 2 : 1)
         cmd = "#{rspec_1_color if version == 1}#{exe} #{options[:test_options]} #{rspec_2_color if version == 2}#{spec_opts} #{test_files*' '}"
-        execute_command(cmd, process_number, num_processes, options)
+        execute_command(cmd, process_number, num_processes)
       end
 
       def self.executable

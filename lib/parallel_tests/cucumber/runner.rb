@@ -13,7 +13,7 @@ module ParallelTests
           cucumber_opts(options[:test_options]),
           *test_files
         ].compact.join(" ")
-        execute_command(cmd, process_number, num_processes, options)
+        execute_command(cmd, process_number, num_processes)
       end
 
       def self.executable
