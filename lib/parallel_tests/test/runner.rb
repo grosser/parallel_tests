@@ -15,10 +15,10 @@ module ParallelTests
         "test"
       end
 
-      def self.run_tests(test_files, process_number, options)
+      def self.run_tests(test_files, process_number, num_processes, options)
         require_list = test_files.map { |filename| %{"#{File.expand_path filename}"} }.join(",")
         cmd = "ruby -Itest -e '[#{require_list}].each {|f| require f }' -- #{options[:test_options]}"
-        execute_command(cmd, process_number, options)
+        execute_command(cmd, process_number, num_processes, options)
       end
 
       def self.line_is_result?(line)
@@ -39,8 +39,9 @@ module ParallelTests
         Grouper.in_even_groups_by_size(tests, num_groups, options)
       end
 
-      def self.execute_command(cmd, process_number, options)
-        cmd = "TEST_ENV_NUMBER=#{test_env_number(process_number)} ; export TEST_ENV_NUMBER; #{cmd}"
+      def self.execute_command(cmd, process_number,  num_processes, options)
+        prefix = "PARALLEL_TEST_GROUPS=#{ num_processes } ; export PARALLEL_TEST_GROUPS;"
+        cmd = "#{prefix} TEST_ENV_NUMBER=#{test_env_number(process_number)} ; export TEST_ENV_NUMBER; #{cmd}"
         f = open("|#{cmd}", 'r')
         output = fetch_output(f)
         f.close

@@ -28,7 +28,7 @@ module ParallelTest
         report_number_of_tests(runner, groups)
 
         test_results = Parallel.map(groups, :in_processes => groups.size) do |group|
-          run_tests(runner, group, groups.index(group), options)
+          run_tests(runner, group, groups.index(group), num_processes, options)
         end
 
         report_results(runner, test_results)
@@ -37,11 +37,11 @@ module ParallelTest
       abort final_fail_message(lib) if any_test_failed?(test_results)
     end
 
-    def self.run_tests(runner, group, process_number, options)
+    def self.run_tests(runner, group, process_number, num_processes, options)
       if group.empty?
         {:stdout => '', :exit_status => 0}
       else
-        runner.run_tests(group, process_number, options)
+        runner.run_tests(group, process_number, num_processes, options)
       end
     end
 
@@ -128,11 +128,11 @@ TEXT
       runs = (0...num_processes).to_a
       results = if options[:non_parallel]
         runs.map do |i|
-          ParallelTests::Test::Runner.execute_command(command, i, options)
+          ParallelTests::Test::Runner.execute_command(command, i, num_processes, options)
         end
       else
         Parallel.map(runs, :in_processes => num_processes) do |i|
-          ParallelTests::Test::Runner.execute_command(command, i, options)
+          ParallelTests::Test::Runner.execute_command(command, i, num_processes, options)
         end
       end.flatten
 
