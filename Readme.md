@@ -178,8 +178,9 @@ TIPS
 
 TODO
 ====
+ - make tests consistently pass with `--order random` in .rspec
  - fix tests vs cucumber >= 1.2 `unknown option --format`
- - add tests for the rake tasks, maybe generate a rails project ...
+ - add integration tests for the rake tasks, maybe generate a rails project ...
  - add unit tests for cucumber runtime formatter
  - make jRuby compatible [basics](http://yehudakatz.com/2009/07/01/new-rails-isolation-testing/)
  - make windows compatible
