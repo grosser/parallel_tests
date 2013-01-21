@@ -65,6 +65,20 @@ Test by pattern (e.g. use one integration server per subfolder / see if you brok
 
     Took 29.925333 seconds
 
+Running things once
+===================
+
+```Ruby
+# effected by race-condition: first process may boot slower the second
+# either sleep a bit or use a lock for example File.lock
+ParallelTests.first_process? ? do_something : sleep(1)
+
+at_exit do
+  ParallelTests.wait_for_other_processes_to_finish
+  undo_something
+end
+```
+
 Loggers
 ===================
 

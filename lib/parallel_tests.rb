@@ -30,6 +30,10 @@ module ParallelTests
     false
   end
 
+  def self.first_process?
+    !ENV["TEST_ENV_NUMBER"] || ENV["TEST_ENV_NUMBER"].to_i == 0
+  end
+
   def self.wait_for_other_processes_to_finish
     return unless ENV["TEST_ENV_NUMBER"]
     sleep 1 until number_of_running_processes <= 1

@@ -20,6 +20,12 @@ OutputLogger = Struct.new(:output) do
   end
 end
 
+RSpec.configure do |config|
+  config.after do
+    ENV.delete("TEST_ENV_NUMBER")
+  end
+end
+
 def mocked_process
   open('|cat /dev/null')
 end

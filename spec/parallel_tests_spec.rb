@@ -67,15 +67,7 @@ describe ParallelTests do
     end
   end
 
-  # real test is in integration
   describe ".wait_for_other_processes_to_finish" do
-    def with_test_env_number
-      old, ENV["TEST_ENV_NUMBER"] = ENV["TEST_ENV_NUMBER"], "1"
-      yield
-    ensure
-      ENV["TEST_ENV_NUMBER"] = old
-    end
-
     def with_running_processes(count, wait=0.2)
       count.times { Thread.new{ `TEST_ENV_NUMBER=1; sleep #{wait}` } }
       sleep 0.1
@@ -90,23 +82,21 @@ describe ParallelTests do
     end
 
     it "stops if only itself is running" do
-      with_test_env_number do
-        ParallelTests.should_not_receive(:sleep)
-        with_running_processes(1) do
+      ENV["TEST_ENV_NUMBER"] = "2"
+      ParallelTests.should_not_receive(:sleep)
+      with_running_processes(1) do
           ParallelTests.wait_for_other_processes_to_finish
         end
-      end
     end
 
     it "waits for other processes to finish" do
-      with_test_env_number do
-        counter = 0
-        ParallelTests.stub(:sleep).with{ sleep 0.1; counter += 1 }
-        with_running_processes(2, 0.4) do
-          ParallelTests.wait_for_other_processes_to_finish
-        end
-        counter.should == 3
+      ENV["TEST_ENV_NUMBER"] = "2"
+      counter = 0
+      ParallelTests.stub(:sleep).with{ sleep 0.1; counter += 1 }
+      with_running_processes(2, 0.4) do
+        ParallelTests.wait_for_other_processes_to_finish
       end
+      counter.should == 3
     end
   end
 
@@ -121,6 +111,22 @@ describe ParallelTests do
       sleep 0.1
       ParallelTests.number_of_running_processes.should == 2
       sleep wait
+    end
+  end
+
+  describe ".first_process?" do
+    it "is first if no env is set" do
+      ParallelTests.first_process?.should == true
+    end
+
+    it "is first if env is set to blank" do
+      ENV["TEST_ENV_NUMBER"] = ""
+      ParallelTests.first_process?.should == true
+    end
+
+    it "is not first if env is set to something" do
+      ENV["TEST_ENV_NUMBER"] = "2"
+      ParallelTests.first_process?.should == false
     end
   end
 
