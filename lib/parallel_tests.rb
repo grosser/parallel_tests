@@ -4,6 +4,8 @@ require 'parallel_tests/grouper'
 require 'parallel_tests/railtie' if defined? Rails::Railtie
 
 module ParallelTests
+  GREP_PROCESSES_COMMAND = "ps -ef | grep [T]EST_ENV_NUMBER= 2>&1"
+
   def self.determine_number_of_processes(count)
     [
       count,
@@ -26,5 +28,17 @@ module ParallelTests
     end
 
     false
+  end
+
+  def self.wait_for_other_processes_to_finish
+    return unless ENV["TEST_ENV_NUMBER"]
+    sleep 1 until number_of_running_processes <= 1
+  end
+
+  # Fun fact: this includes the current process if it's run via parallel_tests
+  def self.number_of_running_processes
+    result = `#{GREP_PROCESSES_COMMAND}`
+    raise "Could not grep for processes -> #{result}" if result.strip != "" && !$?.success?
+    result.split("\n").size
   end
 end

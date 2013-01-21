@@ -172,6 +172,14 @@ describe 'CLI' do
     result.should include('ZZZ')
   end
 
+  it "can wait_for_other_processes_to_finish" do
+    write "test/a_test.rb", "require 'parallel_tests'; ParallelTests.wait_for_other_processes_to_finish; puts 'a'"
+    write "test/b_test.rb", "sleep 1; puts 'b'"
+    write "test/c_test.rb", "sleep 1.5; puts 'c'"
+    write "test/d_test.rb", "sleep 2; puts 'd'"
+    run_tests("test", :processes => 4).should include("b\nc\nd\na\n")
+  end
+
   context "Test::Unit" do
     it "runs" do
       write "test/x1_test.rb", "require 'test/unit'; class XTest < Test::Unit::TestCase; def test_xxx; end; end"
