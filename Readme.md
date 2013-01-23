@@ -74,8 +74,10 @@ Running things once
 ParallelTests.first_process? ? do_something : sleep(1)
 
 at_exit do
-  ParallelTests.wait_for_other_processes_to_finish
-  undo_something
+  if ParallelTests.first_process?
+    ParallelTests.wait_for_other_processes_to_finish
+    undo_something
+  end
 end
 ```
 
