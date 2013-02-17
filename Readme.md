@@ -66,10 +66,9 @@ but can be changed with `PARALLEL_TEST_PROCESSORS` environment variable.
 To distinct processes in `my:custom:task` `TEST_ENV_NUMBER` can be used.
 For example, when you run three processes `TEST_ENV_NUMBER` will receive values as follow.
 <table>
-<thead>
+<tr>
   <td>Process number</td><td>TEST_ENV_NUMBER value</td>
-</thead>
-<tbody>
+</tr>
 <tr>
   <td>1</td><td></td>
 </tr>
@@ -79,8 +78,8 @@ For example, when you run three processes `TEST_ENV_NUMBER` will receive values 
 <tr>
   <td>3</td><td>3</td>
 </tr>
-</tbody>
-</table
+</table>
+
 
 ### Example output
 
