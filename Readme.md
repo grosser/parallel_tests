@@ -26,7 +26,11 @@ gem "parallel", :group => :development
 ```
 
 ### Add to `config/database.yml`
-ParallelTests uses 1 database per test-process, 2 processes will use `*_test` and `*_test2`.
+ParallelTests uses 1 database per test-process.
+<table>
+  <tr><td>Process number</td><td>1</td><td>2</td><td>3</td></tr>
+  <tr><td>`ENV['TEST_ENV_NUMBER']`</td><td>''</td><td>'2'</td><td>'3'</td></tr>
+</table>
 
 ```yaml
 test:
