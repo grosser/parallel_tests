@@ -6,7 +6,7 @@ describe ParallelTest::Cli do
     let(:defaults){ {:files => []} }
 
     def call(*args)
-      ParallelTest::Cli.send(:parse_options!, *args)
+      subject.send(:parse_options!, *args)
     end
 
     it "parses regular count" do
@@ -24,13 +24,13 @@ describe ParallelTest::Cli do
 
   describe ".final_fail_message" do
     it 'returns a plain fail message if colors are nor supported' do
-      ParallelTest::Cli.should_receive(:use_colors?).and_return false
-      ParallelTest::Cli.send(:final_fail_message, "Test").should ==  "Tests Failed"
+      subject.should_receive(:use_colors?).and_return(false)
+      subject.send(:final_fail_message, "Test").should ==  "Tests Failed"
     end
 
     it 'returns a colorized fail message if colors are supported' do
-      ParallelTest::Cli.should_receive(:use_colors?).and_return true
-      ParallelTest::Cli.send(:final_fail_message, "Test").should == "\e[31mTests Failed\e[0m"
+      subject.should_receive(:use_colors?).and_return(true)
+      subject.send(:final_fail_message, "Test").should == "\e[31mTests Failed\e[0m"
     end
   end
 end

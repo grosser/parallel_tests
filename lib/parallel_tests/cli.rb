@@ -2,8 +2,8 @@ require 'optparse'
 require 'parallel_tests/test/runner'
 
 module ParallelTest
-  module Cli
-    def self.run(argv)
+  class Cli
+    def run(argv)
       options = parse_options!(argv)
 
       num_processes = ParallelTests.determine_number_of_processes(options[:count])
@@ -18,7 +18,7 @@ module ParallelTest
 
     private
 
-    def self.run_tests_in_parallel(num_processes, options)
+    def run_tests_in_parallel(num_processes, options)
       test_results = nil
       lib = options[:type] || 'test'
       runner = load_runner_for(lib)
@@ -37,7 +37,7 @@ module ParallelTest
       abort final_fail_message(lib) if any_test_failed?(test_results)
     end
 
-    def self.run_tests(runner, group, process_number, num_processes, options)
+    def run_tests(runner, group, process_number, num_processes, options)
       if group.empty?
         {:stdout => '', :exit_status => 0}
       else
@@ -45,13 +45,13 @@ module ParallelTest
       end
     end
 
-    def self.report_results(runner, test_results)
+    def report_results(runner, test_results)
       results = runner.find_results(test_results.map { |result| result[:stdout] }*"")
       puts ""
       puts runner.summarize_results(results)
     end
 
-    def self.report_number_of_tests(runner, groups)
+    def report_number_of_tests(runner, groups)
       name = runner.test_file_name
       num_processes = groups.size
       num_tests = groups.map(&:size).inject(:+)
@@ -59,16 +59,16 @@ module ParallelTest
     end
 
     #exit with correct status code so rake parallel:test && echo 123 works
-    def self.any_test_failed?(test_results)
+    def any_test_failed?(test_results)
       test_results.any? { |result| result[:exit_status] != 0 }
     end
 
-    def self.load_runner_for(lib)
+    def load_runner_for(lib)
       require "parallel_tests/#{lib}/runner"
       eval("ParallelTests::#{lib.capitalize.sub('Rspec','RSpec')}::Runner")
     end
 
-    def self.parse_options!(argv)
+    def parse_options!(argv)
       options = {}
       OptionParser.new do |opts|
         opts.banner = <<BANNER
@@ -124,7 +124,7 @@ TEXT
       options
     end
 
-    def self.execute_shell_command_in_parallel(command, num_processes, options)
+    def execute_shell_command_in_parallel(command, num_processes, options)
       runs = (0...num_processes).to_a
       results = if options[:non_parallel]
         runs.map do |i|
@@ -139,20 +139,20 @@ TEXT
       abort if results.any? { |r| r[:exit_status] != 0 }
     end
 
-    def self.report_time_taken
+    def report_time_taken
       start = Time.now
       yield
       puts "\nTook #{Time.now - start} seconds"
     end
 
-    def self.final_fail_message(lib)
+    def final_fail_message(lib)
       fail_message = "#{lib.capitalize}s Failed"
       fail_message = "\e[31m#{fail_message}\e[0m" if use_colors?
 
       fail_message
     end
 
-    def self.use_colors?
+    def use_colors?
       $stdout.tty?
     end
   end
