@@ -33,13 +33,15 @@ test:
   database: yourproject_test<%= ENV['TEST_ENV_NUMBER'] %>
 ```
 
-### Create additional database(s)
+# Rake's tasks
+
+## Create additional database(s)
     rake parallel:create
 
-### Copy development schema (repeat after migrations)
+## Copy development schema (repeat after migrations)
     rake parallel:prepare
 
-### Run!
+## Run!
     rake parallel:test          # Test::Unit
     rake parallel:spec          # RSpec
     rake parallel:features      # Cucumber
@@ -54,6 +56,29 @@ Test by pattern (e.g. use one integration server per subfolder / see if you brok
     rake parallel:test[^test/unit] # every test file in test/unit folder
     rake parallel:test[user]  # run users_controller + user_helper + user tests
     rake parallel:test['user|product']  # run user and product related tests
+
+## Run rake tasks in parallel
+    rake parallel:rake[my:custom:task]
+    
+Run `my:custom:task` in several processes. By default, number of processes equal to number of available CPUs, 
+but can be changed with `PARALLEL_TEST_PROCESSORS` environment variable.
+
+To distinct processes in `my:custom:task` `TEST_ENV_NUMBER` can be used.
+For example, when you run three processes `TEST_ENV_NUMBER` will receive values as follow.
+<table>
+<tr>
+  <td>Process number</td><td>TEST_ENV_NUMBER value</td>
+</tr>
+<tr>
+  <td>1</td><td></td>
+</tr>
+<tr>
+  <td>2</td><td>2</td>
+</tr>
+<tr>
+  <td>3</td><td>3</td>
+</tr>
+</table>
 
 
 ### Example output
