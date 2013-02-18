@@ -2,7 +2,7 @@ module ParallelTests
   module RSpec
     class Runner < ParallelTests::Test::Runner
       # @!attribute [r] NAME
-      #   @return [String]
+      #   @return [String] runner's name used in user faced messages
       NAME = 'RSpec'
 
 
