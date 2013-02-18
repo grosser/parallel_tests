@@ -1,8 +1,8 @@
 require 'spec_helper'
 
 
-describe ParallelTests::Cli do
-  subject { ParallelTests::Cli.new(ParallelTests::Test::Runner) }
+describe ParallelTests::CLI do
+  subject { ParallelTests::CLI.new(ParallelTests::Test::Runner) }
 
 
   describe ".parse_options" do

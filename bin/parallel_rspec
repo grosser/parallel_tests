@@ -4,4 +4,4 @@ $LOAD_PATH << File.join(File.dirname(__FILE__), '..', 'lib')
 require "parallel_tests"
 
 
-ParallelTests::Cli.new(ParallelTests::RSpec::Runner).run(ARGV)
+ParallelTests::CLI.new(ParallelTests::RSpec::Runner).run(ARGV)

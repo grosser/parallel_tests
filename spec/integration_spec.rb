@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe 'Cli' do
+describe 'CLI' do
   before do
     `rm -rf #{folder}`
   end
