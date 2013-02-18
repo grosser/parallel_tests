@@ -1,7 +1,7 @@
 require 'optparse'
 
 
-module ParallelTest
+module ParallelTests
   class Cli
 
     # @param runner [Class] one of the test runner classes like test unit, rspec or
