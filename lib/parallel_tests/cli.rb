@@ -1,8 +1,17 @@
 require 'optparse'
-require 'parallel_tests/test/runner'
+
 
 module ParallelTest
   class Cli
+
+    # @param runner [Class] one of the test runner classes like test unit, rspec or
+    #  cucumber runners.
+    #
+    # @return [void]
+    def initialize(runner)
+      @runner = runner
+    end
+
     def run(argv)
       options = parse_options!(argv)
 
@@ -20,39 +29,37 @@ module ParallelTest
 
     def run_tests_in_parallel(num_processes, options)
       test_results = nil
-      lib = options[:type] || 'test'
-      runner = load_runner_for(lib)
 
       report_time_taken do
-        groups = runner.tests_in_groups(options[:files], num_processes, options)
-        report_number_of_tests(runner, groups)
+        groups = @runner.tests_in_groups(options[:files], num_processes, options)
+        report_number_of_tests(groups)
 
         test_results = Parallel.map(groups, :in_processes => groups.size) do |group|
-          run_tests(runner, group, groups.index(group), num_processes, options)
+          run_tests(group, groups.index(group), num_processes, options)
         end
 
-        report_results(runner, test_results)
+        report_results(test_results)
       end
 
-      abort final_fail_message(lib) if any_test_failed?(test_results)
+      abort final_fail_message if any_test_failed?(test_results)
     end
 
-    def run_tests(runner, group, process_number, num_processes, options)
+    def run_tests(group, process_number, num_processes, options)
       if group.empty?
         {:stdout => '', :exit_status => 0}
       else
-        runner.run_tests(group, process_number, num_processes, options)
+        @runner.run_tests(group, process_number, num_processes, options)
       end
     end
 
-    def report_results(runner, test_results)
-      results = runner.find_results(test_results.map { |result| result[:stdout] }*"")
+    def report_results(test_results)
+      results = @runner.find_results(test_results.map { |result| result[:stdout] }*"")
       puts ""
-      puts runner.summarize_results(results)
+      puts @runner.summarize_results(results)
     end
 
-    def report_number_of_tests(runner, groups)
-      name = runner.test_file_name
+    def report_number_of_tests(groups)
+      name = @runner.test_file_name
       num_processes = groups.size
       num_tests = groups.map(&:size).inject(:+)
       puts "#{num_processes} processes for #{num_tests} #{name}s, ~ #{num_tests / groups.size} #{name}s per process"
@@ -61,11 +68,6 @@ module ParallelTest
     #exit with correct status code so rake parallel:test && echo 123 works
     def any_test_failed?(test_results)
       test_results.any? { |result| result[:exit_status] != 0 }
-    end
-
-    def load_runner_for(lib)
-      require "parallel_tests/#{lib}/runner"
-      eval("ParallelTests::#{lib.capitalize.sub('Rspec','RSpec')}::Runner")
     end
 
     def parse_options!(argv)
@@ -105,7 +107,18 @@ TEXT
 
         opts.on("-e", "--exec [COMMAND]", "execute this code parallel and with ENV['TEST_ENV_NUM']") { |path| options[:execute] = path }
         opts.on("-o", "--test-options '[OPTIONS]'", "execute test commands with those options") { |arg| options[:test_options] = arg }
-        opts.on("-t", "--type [TYPE]", "test(default) / rspec / cucumber") { |type| options[:type] = type }
+        opts.on("-t", "--type [TYPE]", "test(default) / rspec / cucumber") do |type|
+          klass_name = "ParallelTests::#{type.capitalize.sub('Rspec', 'RSpec')}::Runner"
+          begin
+            klass = klass_name.split('::').inject(Object) { |x, y| x.const_get(y) }
+            @runner = klass
+          rescue NameError => e
+            puts "Unknown type: #{type}"
+            puts "Runner `#{klass_name}` for `#{type}` type has not been found!\n"
+
+            abort
+          end
+        end
         opts.on("--non-parallel", "execute same commands but do not in parallel, needs --exec") { options[:non_parallel] = true }
         opts.on("--no-symlinks", "Do not traverse symbolic links to find test files") { options[:symlinks] = false }
         opts.on('--ignore-tags [PATTERN]', 'When counting steps ignore scenarios with tags that match this pattern')  { |arg| options[:ignore_tag_pattern] = arg }
@@ -145,8 +158,8 @@ TEXT
       puts "\nTook #{Time.now - start} seconds"
     end
 
-    def final_fail_message(lib)
-      fail_message = "#{lib.capitalize}s Failed"
+    def final_fail_message
+      fail_message = "#{@runner.name}s Failed"
       fail_message = "\e[31m#{fail_message}\e[0m" if use_colors?
 
       fail_message

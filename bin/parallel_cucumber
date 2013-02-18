@@ -1,2 +1,7 @@
 #!/usr/bin/env ruby
-exec "#{File.join(File.dirname(__FILE__), 'parallel_test')} -t cucumber #{ARGV.map{|a| "'#{a}'" } * ' '}"
+
+$LOAD_PATH << File.join(File.dirname(__FILE__), '..', 'lib')
+require "parallel_tests"
+
+
+ParallelTest::Cli.new(ParallelTests::Cucumber::Runner).run(ARGV)

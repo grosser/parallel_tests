@@ -1,8 +1,11 @@
-require 'parallel_tests/test/runner'
-
 module ParallelTests
   module RSpec
     class Runner < ParallelTests::Test::Runner
+      # @!attribute [r] NAME
+      #   @return [String]
+      NAME = 'RSpec'
+
+
       def self.run_tests(test_files, process_number, num_processes, options)
         exe = executable # expensive, so we cache
         version = (exe =~ /\brspec\b/ ? 2 : 1)
