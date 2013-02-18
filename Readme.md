@@ -65,6 +65,14 @@ Test by pattern (e.g. use one integration server per subfolder / see if you brok
 
     Took 29.925333 seconds
 
+### Run an arbitrary task in parallel
+```Bash
+RAILS_ENV=test parallel_test -e "rake my:custom:task"
+# or
+rake parallel:rake[my:custom:task]
+```
+
+
 Running things once
 ===================
 
