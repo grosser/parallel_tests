@@ -1,7 +1,15 @@
 require 'parallel'
+
 require 'parallel_tests/version'
+
+require 'parallel_tests/test/runner'
+require 'parallel_tests/rspec/runner'
+require 'parallel_tests/cucumber/runner'
+require 'parallel_tests/cli'
+
 require 'parallel_tests/grouper'
 require 'parallel_tests/railtie' if defined? Rails::Railtie
+
 
 module ParallelTests
   GREP_PROCESSES_COMMAND = "ps -ef | grep [T]EST_ENV_NUMBER= 2>&1"

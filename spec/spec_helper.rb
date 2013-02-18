@@ -3,15 +3,13 @@ $LOAD_PATH << File.expand_path("../lib", File.dirname(__FILE__))
 FAKE_RAILS_ROOT = './tmp/pspecs/fixtures'
 
 require 'tempfile'
+
 require 'parallel_tests'
-require 'parallel_tests/test/runner'
 require 'parallel_tests/test/runtime_logger'
 
-require 'parallel_tests/rspec/runner'
 require 'parallel_tests/rspec/runtime_logger'
 require 'parallel_tests/rspec/summary_logger'
 
-require 'parallel_tests/cucumber/runner'
 
 OutputLogger = Struct.new(:output) do
   attr_reader :flock, :flush
