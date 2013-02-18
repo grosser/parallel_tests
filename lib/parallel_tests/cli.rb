@@ -2,7 +2,7 @@ require 'optparse'
 require 'parallel_tests/test/runner'
 
 module ParallelTest
-  module CLI
+  module Cli
     def self.run(argv)
       options = parse_options!(argv)
 

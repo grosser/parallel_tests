@@ -1,12 +1,12 @@
 require 'spec_helper'
 require 'parallel_tests/cli'
 
-describe ParallelTest::CLI do
+describe ParallelTest::Cli do
   describe ".parse_options" do
     let(:defaults){ {:files => []} }
 
     def call(*args)
-      ParallelTest::CLI.send(:parse_options!, *args)
+      ParallelTest::Cli.send(:parse_options!, *args)
     end
 
     it "parses regular count" do
@@ -24,13 +24,13 @@ describe ParallelTest::CLI do
 
   describe ".final_fail_message" do
     it 'returns a plain fail message if colors are nor supported' do
-      ParallelTest::CLI.should_receive(:use_colors?).and_return false
-      ParallelTest::CLI.send(:final_fail_message, "Test").should ==  "Tests Failed"
+      ParallelTest::Cli.should_receive(:use_colors?).and_return false
+      ParallelTest::Cli.send(:final_fail_message, "Test").should ==  "Tests Failed"
     end
 
     it 'returns a colorized fail message if colors are supported' do
-      ParallelTest::CLI.should_receive(:use_colors?).and_return true
-      ParallelTest::CLI.send(:final_fail_message, "Test").should == "\e[31mTests Failed\e[0m"
+      ParallelTest::Cli.should_receive(:use_colors?).and_return true
+      ParallelTest::Cli.send(:final_fail_message, "Test").should == "\e[31mTests Failed\e[0m"
     end
   end
 end
