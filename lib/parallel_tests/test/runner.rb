@@ -1,14 +1,11 @@
 module ParallelTests
   module Test
     class Runner
-      # @!attribute [r] NAME
-      #   @return [String] runner's name used in user faced messages
       NAME = 'Test'
-
 
       # --- usually overwritten by other runners
 
-      # @return [String] runner's name used in user faced messages
+      class << self
       def self.name
         NAME
       end
