@@ -1,3 +1,5 @@
+require "parallel_tests/test/runner"
+
 module ParallelTests
   module RSpec
     class Runner < ParallelTests::Test::Runner

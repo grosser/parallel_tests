@@ -1,4 +1,5 @@
-require 'spec_helper'
+require "spec_helper"
+require "parallel_tests/test/runner"
 
 describe ParallelTests::Test::Runner do
   test_tests_in_groups(ParallelTests::Test::Runner, 'test', '_test.rb')

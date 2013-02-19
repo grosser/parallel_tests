@@ -1,4 +1,5 @@
-require 'spec_helper'
+require "spec_helper"
+require "parallel_tests/cucumber/runner"
 
 describe ParallelTests::Cucumber do
   test_tests_in_groups(ParallelTests::Cucumber::Runner, 'features', ".feature")

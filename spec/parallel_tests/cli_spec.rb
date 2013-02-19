@@ -1,9 +1,8 @@
-require 'spec_helper'
-
+require "spec_helper"
+require "parallel_tests/cli"
 
 describe ParallelTests::CLI do
   subject { ParallelTests::CLI.new(ParallelTests::Test::Runner) }
-
 
   describe ".parse_options" do
     let(:defaults){ {:files => []} }

@@ -1,7 +1,7 @@
 #!/usr/bin/env ruby
-
-$LOAD_PATH << File.join(File.dirname(__FILE__), '..', 'lib')
+$LOAD_PATH << File.expand_path("../../lib", __FILE__)
 require "parallel_tests"
-
+require "parallel_tests/cli"
+require "parallel_tests/rspec/runner"
 
 ParallelTests::CLI.new(ParallelTests::RSpec::Runner).run(ARGV)
