@@ -1,8 +1,11 @@
-require 'parallel_tests/test/runner'
-
 module ParallelTests
   module Cucumber
     class Runner < ParallelTests::Test::Runner
+      # @!attribute [r] NAME
+      #   @return [String] runner's name used in user faced messages
+      NAME = 'Cucumber'
+
+
       def self.run_tests(test_files, process_number, num_processes, options)
         color = ($stdout.tty? ? 'AUTOTEST=1 ; export AUTOTEST ;' : '')#display color when we are in a terminal
         runtime_logging = " --format ParallelTests::Cucumber::RuntimeLogger --out #{runtime_log}"
