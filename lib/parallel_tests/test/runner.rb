@@ -5,7 +5,6 @@ module ParallelTests
 
       # --- usually overwritten by other runners
 
-      class << self
       def self.name
         NAME
       end

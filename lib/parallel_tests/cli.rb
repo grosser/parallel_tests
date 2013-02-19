@@ -1,12 +1,7 @@
 require 'optparse'
 
-
 module ParallelTests
   class CLI
-    def initialize(runner)
-      @runner = runner
-    end
-
     def run(argv)
       options = parse_options!(argv)
 
@@ -103,14 +98,10 @@ TEXT
         opts.on("-e", "--exec [COMMAND]", "execute this code parallel and with ENV['TEST_ENV_NUM']") { |path| options[:execute] = path }
         opts.on("-o", "--test-options '[OPTIONS]'", "execute test commands with those options") { |arg| options[:test_options] = arg }
         opts.on("-t", "--type [TYPE]", "test(default) / rspec / cucumber") do |type|
-          klass_name = "ParallelTests::#{type.capitalize.sub('Rspec', 'RSpec')}::Runner"
           begin
-            klass = klass_name.split('::').inject(Object) { |x, y| x.const_get(y) }
-            @runner = klass
-          rescue NameError => e
-            puts "Unknown type: #{type}"
-            puts "Runner `#{klass_name}` for `#{type}` type has not been found!\n"
-
+            @runner = load_runner(type)
+          rescue NameError, LoadError => e
+            puts "Runner for `#{type}` type has not been found! (#{e})"
             abort
           end
         end
@@ -130,6 +121,12 @@ TEXT
 
       options[:files] = argv
       options
+    end
+
+    def load_runner(type)
+      require "parallel_tests/#{type}/runner"
+      klass_name = "ParallelTests::#{type.capitalize.sub("Rspec", "RSpec")}::Runner"
+      klass_name.split('::').inject(Object) { |x, y| x.const_get(y) }
     end
 
     def execute_shell_command_in_parallel(command, num_processes, options)

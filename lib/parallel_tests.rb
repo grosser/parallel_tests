@@ -1,11 +1,12 @@
 require "parallel"
-
-require "parallel_tests/version"
-require "parallel_tests/grouper"
 require "parallel_tests/railtie" if defined? Rails::Railtie
 
 module ParallelTests
   GREP_PROCESSES_COMMAND = "ps -ef | grep [T]EST_ENV_NUMBER= 2>&1"
+
+  autoload :CLI, "parallel_tests/cli"
+  autoload :VERSION, "parallel_tests/version"
+  autoload :Grouper, "parallel_tests/grouper"
 
   def self.determine_number_of_processes(count)
     [

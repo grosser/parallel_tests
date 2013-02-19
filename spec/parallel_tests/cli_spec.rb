@@ -2,9 +2,9 @@ require "spec_helper"
 require "parallel_tests/cli"
 
 describe ParallelTests::CLI do
-  subject { ParallelTests::CLI.new(ParallelTests::Test::Runner) }
+  subject { ParallelTests::CLI.new }
 
-  describe ".parse_options" do
+  describe "#parse_options" do
     let(:defaults){ {:files => []} }
 
     def call(*args)
@@ -24,7 +24,29 @@ describe ParallelTests::CLI do
     end
   end
 
-  describe ".final_fail_message" do
+  describe "#load_runner" do
+    it "requires and loads default runner" do
+      subject.should_receive(:require).with("parallel_tests/test/runner")
+      subject.send(:load_runner, "test").should == ParallelTests::Test::Runner
+    end
+
+    it "requires and loads rspec runner" do
+      subject.should_receive(:require).with("parallel_tests/rspec/runner")
+      subject.send(:load_runner, "rspec").should == ParallelTests::RSpec::Runner
+    end
+
+    it "fails to load unfindable runner" do
+      expect{
+        subject.send(:load_runner, "foo").should == ParallelTests::RSpec::Runner
+      }.to raise_error(LoadError)
+    end
+  end
+
+  describe "#final_fail_message" do
+    before do
+      subject.instance_variable_set(:@runner, ParallelTests::Test::Runner)
+    end
+
     it 'returns a plain fail message if colors are nor supported' do
       subject.should_receive(:use_colors?).and_return(false)
       subject.send(:final_fail_message).should ==  "Tests Failed"
