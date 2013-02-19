@@ -6,7 +6,6 @@ require 'tempfile'
 
 require 'parallel_tests'
 require 'parallel_tests/test/runtime_logger'
-
 require 'parallel_tests/rspec/runtime_logger'
 require 'parallel_tests/rspec/summary_logger'
 

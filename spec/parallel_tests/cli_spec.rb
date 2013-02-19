@@ -1,5 +1,7 @@
 require "spec_helper"
 require "parallel_tests/cli"
+require "parallel_tests/rspec/runner"
+
 
 describe ParallelTests::CLI do
   subject { ParallelTests::CLI.new }
@@ -21,6 +23,11 @@ describe ParallelTests::CLI do
 
     it "parses non-parallel as non-parallel" do
       call(["--non-parallel"]).should == defaults.merge(:non_parallel => true)
+    end
+
+    it "finds the correct type when multiple are given" do
+      call(["--type", "test", "-t", "rspec"])
+      subject.instance_variable_get(:@runner).should == ParallelTests::RSpec::Runner
     end
   end
 
