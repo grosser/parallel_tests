@@ -60,7 +60,7 @@ def test_tests_in_groups(klass, folder, suffix)
   test_root = "#{FAKE_RAILS_ROOT}/#{folder}"
 
   describe :tests_in_groups do
-    before :all do
+    before do
       system "rm -rf #{FAKE_RAILS_ROOT}; mkdir -p #{test_root}/temp"
 
       @files = [0,1,2,3,4,5,6,7].map do |i|
@@ -75,8 +75,8 @@ def test_tests_in_groups(klass, folder, suffix)
       `rm -f #{@log}`
     end
 
-    after :all do
-      `rm -f #{klass.runtime_log}`
+    after do
+      `rm -f #{@log}`
     end
 
     def setup_runtime_log
