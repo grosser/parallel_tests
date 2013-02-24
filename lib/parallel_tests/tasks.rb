@@ -11,6 +11,7 @@ module ParallelTests
         count = " -n #{options[:count]}" if options[:count]
         executable = File.expand_path("../../../bin/parallel_test", __FILE__)
         command = "#{executable} --exec '#{cmd}'#{count}#{' --non-parallel' if options[:non_parallel]}"
+        command << " --advance-number #{options[:advance_number]}" if options[:advance_number]
         abort unless system(command)
       end
 

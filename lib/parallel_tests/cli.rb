@@ -107,6 +107,7 @@ TEXT
         end
         opts.on("--non-parallel", "execute same commands but do not in parallel, needs --exec") { options[:non_parallel] = true }
         opts.on("--no-symlinks", "Do not traverse symbolic links to find test files") { options[:symlinks] = false }
+        opts.on("--advance-number [NUMBER]", Integer, "Advance test env number by specified number") { |n| options[:advance_number] = n }
         opts.on('--ignore-tags [PATTERN]', 'When counting steps ignore scenarios with tags that match this pattern')  { |arg| options[:ignore_tag_pattern] = arg }
         opts.on("-v", "--version", "Show Version") { puts ParallelTests::VERSION; exit }
         opts.on("-h", "--help", "Show this.") { puts opts; exit }
@@ -133,11 +134,11 @@ TEXT
       runs = (0...num_processes).to_a
       results = if options[:non_parallel]
         runs.map do |i|
-          ParallelTests::Test::Runner.execute_command(command, i, num_processes)
+          ParallelTests::Test::Runner.execute_command(command, i, num_processes, options)
         end
       else
         Parallel.map(runs, :in_processes => num_processes) do |i|
-          ParallelTests::Test::Runner.execute_command(command, i, num_processes)
+          ParallelTests::Test::Runner.execute_command(command, i, num_processes, options)
         end
       end.flatten
 
