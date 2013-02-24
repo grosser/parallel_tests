@@ -26,7 +26,11 @@ gem "parallel", :group => :development
 ```
 
 ### Add to `config/database.yml`
-ParallelTests uses 1 database per test-process, 2 processes will use `*_test` and `*_test2`.
+ParallelTests uses 1 database per test-process.
+<table>
+  <tr><td>Process number</td><td>1</td><td>2</td><td>3</td></tr>
+  <tr><td>`ENV['TEST_ENV_NUMBER']`</td><td>''</td><td>'2'</td><td>'3'</td></tr>
+</table>
 
 ```yaml
 test:
@@ -64,6 +68,30 @@ Test by pattern (e.g. use one integration server per subfolder / see if you brok
     843 examples, 0 failures, 1 pending
 
     Took 29.925333 seconds
+
+### Run an arbitrary task in parallel
+```Bash
+RAILS_ENV=test parallel_test -e "rake my:custom:task"
+# or
+rake parallel:rake[my:custom:task]
+```
+
+
+Running things once
+===================
+
+```Ruby
+# effected by race-condition: first process may boot slower the second
+# either sleep a bit or use a lock for example File.lock
+ParallelTests.first_process? ? do_something : sleep(1)
+
+at_exit do
+  if ParallelTests.first_process?
+    ParallelTests.wait_for_other_processes_to_finish
+    undo_something
+  end
+end
+```
 
 Loggers
 ===================
@@ -139,6 +167,7 @@ Options are:
     -t, --type [TYPE]                test(default) / rspec / cucumber
         --non-parallel               execute same commands but do not in parallel, needs --exec
         --no-symlinks                Do not traverse symbolic links to find test files
+        --ignore-tags [PATTERN]      When counting steps ignore scenarios with tags that match this pattern
     -v, --version                    Show Version
     -h, --help                       Show this.
 
@@ -177,8 +206,9 @@ TIPS
 
 TODO
 ====
+ - make tests consistently pass with `--order random` in .rspec
  - fix tests vs cucumber >= 1.2 `unknown option --format`
- - add tests for the rake tasks, maybe generate a rails project ...
+ - add integration tests for the rake tasks, maybe generate a rails project ...
  - add unit tests for cucumber runtime formatter
  - make jRuby compatible [basics](http://yehudakatz.com/2009/07/01/new-rails-isolation-testing/)
  - make windows compatible
@@ -226,6 +256,7 @@ inspired by [pivotal labs](http://pivotallabs.com/users/miked/blog/articles/849-
  - [Florian Motlik](https://github.com/flomotlik)
  - [Artem Kuzko](https://github.com/akuzko)
  - [Zeke Fast](https://github.com/zekefast)
+ - [Joseph Shraibman](https://github.com/jshraibman-mdsol)
 
 [Michael Grosser](http://grosser.it)<br/>
 michael@grosser.it<br/>

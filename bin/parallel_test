@@ -1,6 +1,5 @@
 #!/usr/bin/env ruby
-$LOAD_PATH << File.join(File.dirname(__FILE__), '..', 'lib')
+$LOAD_PATH << File.expand_path("../../lib", __FILE__)
 require "parallel_tests"
-require "parallel_tests/cli"
 
-ParallelTest::CLI.run(ARGV)
+ParallelTests::CLI.new.run(["--type", "test"] + ARGV)

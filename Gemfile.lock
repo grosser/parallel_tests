@@ -1,11 +1,11 @@
 PATH
   remote: .
   specs:
-    parallel_tests (0.9.0)
+    parallel_tests (0.10.0)
       parallel
 
 GEM
-  remote: http://rubygems.org/
+  remote: https://rubygems.org/
   specs:
     builder (3.0.0)
     bump (0.3.8)
@@ -19,7 +19,7 @@ GEM
     gherkin (2.7.6)
       json (>= 1.4.6)
     json (1.7.5)
-    parallel (0.6.1)
+    parallel (0.6.2)
     rake (10.0.3)
     rspec (2.12.0)
       rspec-core (~> 2.12.0)

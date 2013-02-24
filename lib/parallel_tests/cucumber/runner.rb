@@ -1,9 +1,11 @@
-require 'parallel_tests/test/runner'
+require "parallel_tests/test/runner"
 
 module ParallelTests
   module Cucumber
     class Runner < ParallelTests::Test::Runner
-      def self.run_tests(test_files, process_number, options)
+      NAME = 'Cucumber'
+
+      def self.run_tests(test_files, process_number, num_processes, options)
         color = ($stdout.tty? ? 'AUTOTEST=1 ; export AUTOTEST ;' : '')#display color when we are in a terminal
         runtime_logging = " --format ParallelTests::Cucumber::RuntimeLogger --out #{runtime_log}"
         cmd = [
@@ -13,7 +15,7 @@ module ParallelTests
           cucumber_opts(options[:test_options]),
           *test_files
         ].compact.join(" ")
-        execute_command(cmd, process_number, options)
+        execute_command(cmd, process_number, num_processes, options)
       end
 
       def self.executable
@@ -80,7 +82,7 @@ module ParallelTests
 
       def self.tests_in_groups(tests, num_groups, options={})
         if options[:group_by] == :steps
-          Grouper.by_steps(find_tests(tests, options), num_groups)
+          Grouper.by_steps(find_tests(tests, options), num_groups, options)
         else
           super
         end

@@ -44,5 +44,54 @@ describe ParallelTests::Cucumber::GherkinListener do
       @listener.eof
       @listener.collect.should == {"feature_file" => 17}
     end
+
+    it 'counts scenarios that should not be ignored' do
+      @listener.ignore_tag_pattern = nil
+      @listener.scenario( stub('scenario', :tags =>[ stub('tag', :name => '@WIP' )]) )
+      @listener.step(nil)
+      @listener.eof
+      @listener.collect.should == {"feature_file" => 1}
+
+      @listener.ignore_tag_pattern = /@something_other_than_WIP/
+      @listener.scenario( stub('scenario', :tags =>[ stub('tag', :name => '@WIP' )]) )
+      @listener.step(nil)
+      @listener.eof
+      @listener.collect.should == {"feature_file" => 2}
+    end
+
+    it 'does not count scenarios that should be ignored' do
+      @listener.ignore_tag_pattern = /@WIP/
+      @listener.scenario( stub('scenario', :tags =>[ stub('tag', :name => '@WIP' )]))
+      @listener.step(nil)
+      @listener.eof
+      @listener.collect.should == {"feature_file" => 0}
+    end
+
+    it 'counts outlines that should not be ignored' do
+      @listener.ignore_tag_pattern = nil
+      @listener.scenario_outline( stub('scenario', :tags =>[ stub('tag', :name => '@WIP' )]) )
+      @listener.step(nil)
+      3.times {@listener.examples}
+      @listener.eof
+      @listener.collect.should == {"feature_file" => 3}
+
+
+      @listener.ignore_tag_pattern = /@something_other_than_WIP/
+      @listener.scenario_outline( stub('scenario', :tags =>[ stub('tag', :name => '@WIP' )]) )
+      @listener.step(nil)
+      3.times {@listener.examples}
+      @listener.eof
+      @listener.collect.should == {"feature_file" => 6}
+    end
+
+    it 'does not count outlines that should be ignored' do
+      @listener.ignore_tag_pattern = /@WIP/
+      @listener.scenario_outline( stub('scenario', :tags =>[ stub('tag', :name => '@WIP' )]) )
+      @listener.step(nil)
+      3.times {@listener.examples}
+      @listener.eof
+      @listener.collect.should == {"feature_file" => 0}
+    end
+
   end
 end

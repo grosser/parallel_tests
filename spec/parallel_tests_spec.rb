@@ -34,7 +34,7 @@ describe ParallelTests do
     end
   end
 
-  describe :bundler_enabled? do
+  describe ".bundler_enabled?" do
     before do
       Object.stub!(:const_defined?).with(:Bundler).and_return false
     end
@@ -64,6 +64,69 @@ describe ParallelTests do
         FileUtils.touch(File.join("..", "Gemfile"))
         ParallelTests.send(:bundler_enabled?).should == true
       end
+    end
+  end
+
+  describe ".wait_for_other_processes_to_finish" do
+    def with_running_processes(count, wait=0.2)
+      count.times { Thread.new{ `TEST_ENV_NUMBER=1; sleep #{wait}` } }
+      sleep 0.1
+      yield
+    ensure
+      sleep wait # make sure the threads have finished
+    end
+
+    it "does not wait if not run in parallel" do
+      ParallelTests.should_not_receive(:sleep)
+      ParallelTests.wait_for_other_processes_to_finish
+    end
+
+    it "stops if only itself is running" do
+      ENV["TEST_ENV_NUMBER"] = "2"
+      ParallelTests.should_not_receive(:sleep)
+      with_running_processes(1) do
+          ParallelTests.wait_for_other_processes_to_finish
+        end
+    end
+
+    it "waits for other processes to finish" do
+      ENV["TEST_ENV_NUMBER"] = "2"
+      counter = 0
+      ParallelTests.stub(:sleep).with{ sleep 0.1; counter += 1 }
+      with_running_processes(2, 0.4) do
+        ParallelTests.wait_for_other_processes_to_finish
+      end
+      counter.should == 3
+    end
+  end
+
+  describe ".number_of_running_processes" do
+    it "is 0 for nothing" do
+      ParallelTests.number_of_running_processes.should == 0
+    end
+
+    it "is 2 when 2 are running" do
+      wait = 0.2
+      2.times { Thread.new{ `TEST_ENV_NUMBER=1; sleep #{wait}` } }
+      sleep 0.1
+      ParallelTests.number_of_running_processes.should == 2
+      sleep wait
+    end
+  end
+
+  describe ".first_process?" do
+    it "is first if no env is set" do
+      ParallelTests.first_process?.should == true
+    end
+
+    it "is first if env is set to blank" do
+      ENV["TEST_ENV_NUMBER"] = ""
+      ParallelTests.first_process?.should == true
+    end
+
+    it "is not first if env is set to something" do
+      ENV["TEST_ENV_NUMBER"] = "2"
+      ParallelTests.first_process?.should == false
     end
   end
 

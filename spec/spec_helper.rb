@@ -3,20 +3,23 @@ $LOAD_PATH << File.expand_path("../lib", File.dirname(__FILE__))
 FAKE_RAILS_ROOT = './tmp/pspecs/fixtures'
 
 require 'tempfile'
-require 'parallel_tests'
-require 'parallel_tests/test/runner'
-require 'parallel_tests/test/runtime_logger'
 
-require 'parallel_tests/rspec/runner'
+require 'parallel_tests'
+require 'parallel_tests/test/runtime_logger'
 require 'parallel_tests/rspec/runtime_logger'
 require 'parallel_tests/rspec/summary_logger'
 
-require 'parallel_tests/cucumber/runner'
 
 OutputLogger = Struct.new(:output) do
   attr_reader :flock, :flush
   def puts(s=nil)
     self.output << s.to_s
+  end
+end
+
+RSpec.configure do |config|
+  config.after do
+    ENV.delete("TEST_ENV_NUMBER")
   end
 end
 
@@ -56,7 +59,7 @@ def test_tests_in_groups(klass, folder, suffix)
   test_root = "#{FAKE_RAILS_ROOT}/#{folder}"
 
   describe :tests_in_groups do
-    before :all do
+    before do
       system "rm -rf #{FAKE_RAILS_ROOT}; mkdir -p #{test_root}/temp"
 
       @files = [0,1,2,3,4,5,6,7].map do |i|
@@ -71,8 +74,8 @@ def test_tests_in_groups(klass, folder, suffix)
       `rm -f #{@log}`
     end
 
-    after :all do
-      `rm -f #{klass.runtime_log}`
+    after do
+      `rm -f #{@log}`
     end
 
     def setup_runtime_log
