@@ -78,6 +78,15 @@ describe 'CLI' do
     result.scan('2 examples, 1 failure').size.should == 1
   end
 
+  it "can serialize stdout" do
+    write 'spec/xxx_spec.rb', '5.times{describe("it"){it("should"){sleep 0.01; puts "TEST1"}}}'
+    write 'spec/xxx2_spec.rb', 'sleep 0.01; 5.times{describe("it"){it("should"){sleep 0.01; puts "TEST2"}}}'
+    result = run_tests "spec", :type => 'rspec', :add => "--serialize-stdout"
+
+    result.should_not =~ /TEST1.*TEST2.*TEST1/m
+    result.should_not =~ /TEST2.*TEST1.*TEST2/m
+  end
+
   context "with given commands" do
     it "can exec given commands with ENV['TEST_ENV_NUM']" do
       result = `#{executable} -e 'ruby -e "print ENV[:TEST_ENV_NUMBER.to_s].to_i"' -n 4`
@@ -87,6 +96,12 @@ describe 'CLI' do
     it "can exec given command non-parallel" do
       result = `#{executable} -e 'ruby -e "sleep(rand(10)/100.0); puts ENV[:TEST_ENV_NUMBER.to_s].inspect"' -n 4 --non-parallel`
       result.split("\n").should == %w["" "2" "3" "4"]
+    end
+
+    it "can serialize stdout" do
+      result = `#{executable} -e 'ruby -e "5.times{sleep 0.01;puts ENV[:TEST_ENV_NUMBER.to_s].to_i;STDOUT.flush}"' -n 2 --serialize-stdout`
+      result.should_not =~ /0.*2.*0/m
+      result.should_not =~ /2.*0.*2/m
     end
 
     it "exists with success if all sub-processes returned success" do
