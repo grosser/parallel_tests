@@ -18,6 +18,9 @@ OutputLogger = Struct.new(:output) do
 end
 
 RSpec.configure do |config|
+  config.filter_run :focus => true
+  config.run_all_when_everything_filtered = true
+
   config.after do
     ENV.delete("TEST_ENV_NUMBER")
   end
