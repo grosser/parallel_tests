@@ -15,7 +15,7 @@ module ParallelTests
           cucumber_opts(options[:test_options]),
           *test_files
         ].compact.join(" ")
-        execute_command(cmd, process_number, num_processes)
+        execute_command(cmd, process_number, num_processes, !options[:serialize_stdout])
       end
 
       def self.executable

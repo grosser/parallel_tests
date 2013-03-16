@@ -1,4 +1,5 @@
 require 'optparse'
+require 'tempfile'
 
 module ParallelTests
   class CLI
@@ -17,6 +18,19 @@ module ParallelTests
 
     private
 
+    def execute_in_parallel(items, num_processes, options)
+      @lock = Tempfile.new 'lock'
+
+      Parallel.map(items, :in_processes => num_processes) do |item|
+        result = yield(item)
+        report_output(result) if options[:serialize_stdout]
+        result
+      end
+    ensure
+      @lock.close
+      @lock.unlink
+    end
+
     def run_tests_in_parallel(num_processes, options)
       test_results = nil
 
@@ -24,7 +38,7 @@ module ParallelTests
         groups = @runner.tests_in_groups(options[:files], num_processes, options)
         report_number_of_tests(groups)
 
-        test_results = Parallel.map(groups, :in_processes => groups.size) do |group|
+        test_results = execute_in_parallel(groups, groups.size, options) do |group|
           run_tests(group, groups.index(group), num_processes, options)
         end
 
@@ -40,6 +54,14 @@ module ParallelTests
       else
         @runner.run_tests(group, process_number, num_processes, options)
       end
+    end
+
+    def report_output(result)
+      @lock.flock File::LOCK_EX
+      $stdout.puts result[:stdout]
+      $stdout.flush
+    ensure
+      @lock.flock File::LOCK_UN
     end
 
     def report_results(test_results)
@@ -105,6 +127,7 @@ TEXT
             abort
           end
         end
+        opts.on("--serialize-stdout", "Serialize stdout output, nothing will be written until everything is done. Ignored if --non-parallel.") { options[:serialize_stdout] = true }
         opts.on("--non-parallel", "execute same commands but do not in parallel, needs --exec") { options[:non_parallel] = true }
         opts.on("--no-symlinks", "Do not traverse symbolic links to find test files") { options[:symlinks] = false }
         opts.on('--ignore-tags [PATTERN]', 'When counting steps ignore scenarios with tags that match this pattern')  { |arg| options[:ignore_tag_pattern] = arg }
@@ -133,11 +156,11 @@ TEXT
       runs = (0...num_processes).to_a
       results = if options[:non_parallel]
         runs.map do |i|
-          ParallelTests::Test::Runner.execute_command(command, i, num_processes)
+          ParallelTests::Test::Runner.execute_command(command, i, num_processes, true)
         end
       else
-        Parallel.map(runs, :in_processes => num_processes) do |i|
-          ParallelTests::Test::Runner.execute_command(command, i, num_processes)
+        execute_in_parallel(runs, num_processes, options) do |i|
+          ParallelTests::Test::Runner.execute_command(command, i, num_processes, !options[:serialize_stdout])
         end
       end.flatten
 

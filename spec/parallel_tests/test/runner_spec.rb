@@ -37,6 +37,14 @@ describe ParallelTests::Test::Runner do
       ParallelTests::Test::Runner.should_receive(:open).and_return io
       call(['xxx'],1,22,{})[:stdout].should =~ /\$LOAD_PATH << File/
     end
+
+    it "does not output to stdout when serializing output" do
+      io = open('spec/spec_helper.rb')
+      $stdout.should_not_receive(:print)
+      $stdout.should_not_receive(:flush)
+      ParallelTests::Test::Runner.should_receive(:open).and_return io
+      call(['xxx'],1,22,{:serialize_stdout => true})[:stdout]
+    end
   end
 
   describe :test_in_groups do

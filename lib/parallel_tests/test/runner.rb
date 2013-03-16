@@ -24,7 +24,7 @@ module ParallelTests
       def self.run_tests(test_files, process_number, num_processes, options)
         require_list = test_files.map { |filename| %{"#{File.expand_path filename}"} }.join(",")
         cmd = "ruby -Itest -e '[#{require_list}].each {|f| require f }' -- #{options[:test_options]}"
-        execute_command(cmd, process_number, num_processes)
+        execute_command(cmd, process_number, num_processes, !options[:serialize_stdout])
       end
 
       def self.line_is_result?(line)
@@ -45,11 +45,11 @@ module ParallelTests
         Grouper.in_even_groups_by_size(tests, num_groups, options)
       end
 
-      def self.execute_command(cmd, process_number,  num_processes)
+      def self.execute_command(cmd, process_number,  num_processes, echo_to_stdout)
         prefix = "PARALLEL_TEST_GROUPS=#{ num_processes } ; export PARALLEL_TEST_GROUPS;"
         cmd = "#{prefix} TEST_ENV_NUMBER=#{test_env_number(process_number)} ; export TEST_ENV_NUMBER; #{cmd}"
         f = open("|#{cmd}", 'r')
-        output = fetch_output(f)
+        output = fetch_output(f, echo_to_stdout)
         f.close
         {:stdout => output, :exit_status => $?.exitstatus}
       end
@@ -85,12 +85,14 @@ module ParallelTests
       end
 
       # read output of the process and print it in chunks
-      def self.fetch_output(process)
+      def self.fetch_output(process, echo_to_stdout)
         all = ''
         while buffer = process.readpartial(1000000)
           all << buffer
-          $stdout.print buffer
-          $stdout.flush
+          if echo_to_stdout
+            $stdout.print buffer
+            $stdout.flush
+          end
         end rescue EOFError
 
         all
