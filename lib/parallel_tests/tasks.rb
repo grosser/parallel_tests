@@ -130,7 +130,8 @@ namespace :parallel do
       command = "#{executable} #{type} --type #{test_framework} " \
         "-n #{count} "                     \
         "--pattern '#{pattern}' "          \
-        "--test-options '#{options}'"
+        "#{ENV["PARALLEL_TEST_ARGS"]} "     \
+        "--test-options '#{options}'"      \
 
       abort unless system(command) # allow to chain tasks e.g. rake parallel:spec parallel:features
     end
