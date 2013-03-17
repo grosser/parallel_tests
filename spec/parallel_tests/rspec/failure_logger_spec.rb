@@ -39,7 +39,7 @@ describe ParallelTests::RSpec::FailuresLogger do
   it "should invoke spec for rspec 1" do
     silence_warnings{ ParallelTests::RSpec::LoggerBase::RSPEC_1 = true }
     ParallelTests.stub!(:bundler_enabled?).and_return true
-    ParallelTests::RSpec::Runner.stub!(:run).with("bundle show rspec").and_return "/foo/bar/rspec-1.0.2"
+    ParallelTests::RSpec::Runner.stub!(:run).with("bundle show rspec-core").and_return "Could not find gem 'rspec-core'."
     @logger.example_failed @example1
 
     @logger.dump_failures
@@ -50,7 +50,7 @@ describe ParallelTests::RSpec::FailuresLogger do
 
   it "should invoke rspec for rspec 2" do
     ParallelTests.stub!(:bundler_enabled?).and_return true
-    ParallelTests::RSpec::Runner.stub!(:run).with("bundle show rspec").and_return "/foo/bar/rspec-2.0.2"
+    ParallelTests::RSpec::Runner.stub!(:run).with("bundle show rspec").and_return "/foo/bar/rspec-core-2.0.2"
     @logger.example_failed @example1
 
     @logger.dump_failures
