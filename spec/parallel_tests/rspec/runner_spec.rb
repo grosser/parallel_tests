@@ -61,7 +61,7 @@ describe ParallelTests::RSpec::Runner do
     it "run bundle exec spec when on bundler rspec 1" do
       File.stub!(:file?).with('script/spec').and_return false
       ParallelTests.stub!(:bundler_enabled?).and_return true
-      ParallelTests::RSpec::Runner.stub!(:run).with("bundle show rspec").and_return "/foo/bar/rspec-1.0.2"
+      ParallelTests::RSpec::Runner.stub!(:run).with("bundle show rspec-core").and_return "Could not find gem 'rspec-core' in bundler."
       ParallelTests::RSpec::Runner.should_receive(:open).with{|x,y| x =~ %r{bundle exec spec}}.and_return mocked_process
       call(['xxx'],1,22,{})
     end
@@ -69,7 +69,7 @@ describe ParallelTests::RSpec::Runner do
     it "run bundle exec rspec when on bundler rspec 2" do
       File.stub!(:file?).with('script/spec').and_return false
       ParallelTests.stub!(:bundler_enabled?).and_return true
-      ParallelTests::RSpec::Runner.stub!(:run).with("bundle show rspec").and_return "/foo/bar/rspec-2.0.2"
+      ParallelTests::RSpec::Runner.stub!(:run).with("bundle show rspec-core").and_return "/foo/bar/rspec-core-2.0.2"
       ParallelTests::RSpec::Runner.should_receive(:open).with{|x,y| x =~ %r{bundle exec rspec}}.and_return mocked_process
       call(['xxx'],1,22,{})
     end
@@ -117,7 +117,7 @@ describe ParallelTests::RSpec::Runner do
       File.should_receive(:file?).with('spec/parallel_spec.opts').and_return true
 
       ParallelTests.stub!(:bundler_enabled?).and_return true
-      ParallelTests::RSpec::Runner.stub!(:run).with("bundle show rspec").and_return "/foo/bar/rspec-1.0.2"
+      ParallelTests::RSpec::Runner.stub!(:run).with("bundle show rspec-core").and_return "Could not find gem 'rspec-core'."
 
       ParallelTests::RSpec::Runner.should_receive(:open).with{|x,y| x =~ %r{spec\s+ -O spec/parallel_spec.opts}}.and_return mocked_process
       call(['xxx'],1,22,{})
@@ -127,7 +127,7 @@ describe ParallelTests::RSpec::Runner do
       File.should_receive(:file?).with('spec/parallel_spec.opts').and_return true
 
       ParallelTests.stub!(:bundler_enabled?).and_return true
-      ParallelTests::RSpec::Runner.stub!(:run).with("bundle show rspec").and_return "/foo/bar/rspec-2.4.2"
+      ParallelTests::RSpec::Runner.stub!(:run).with("bundle show rspec-core").and_return "/foo/bar/rspec-core-2.4.2"
 
       ParallelTests::RSpec::Runner.should_receive(:open).with{|x,y| x =~ %r{rspec\s+ --color --tty -O spec/parallel_spec.opts}}.and_return mocked_process
       call(['xxx'],1,22,{})
