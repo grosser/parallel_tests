@@ -16,7 +16,7 @@ module ParallelTests
         cmd = if File.file?("script/spec")
           "script/spec"
         elsif ParallelTests.bundler_enabled?
-          cmd = (run("bundle show rspec") =~ %r{/rspec-1[^/]+$} ? "spec" : "rspec")
+          cmd = (run("bundle show rspec-core") =~ %r{Could not find gem.*} ? "spec" : "rspec")
           "bundle exec #{cmd}"
         else
           %w[spec rspec].detect{|cmd| system "#{cmd} --version > /dev/null 2>&1" }
