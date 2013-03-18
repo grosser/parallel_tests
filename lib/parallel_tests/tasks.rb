@@ -30,7 +30,7 @@ module ParallelTests
         activate_pipefail = "set -o pipefail"
         remove_ignored_lines = %Q{(grep -v "#{ignore_regex}" || test 1)}
 
-        if system("#{activate_pipefail} && test 1")
+        if system("#{activate_pipefail} 2>/dev/null && test 1")
           "#{activate_pipefail} && (#{command}) | #{remove_ignored_lines}"
         else
           command
