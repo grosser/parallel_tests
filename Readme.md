@@ -258,6 +258,7 @@ inspired by [pivotal labs](http://pivotallabs.com/users/miked/blog/articles/849-
  - [Zeke Fast](https://github.com/zekefast)
  - [Joseph Shraibman](https://github.com/jshraibman-mdsol)
  - [David Davis](https://github.com/daviddavis)
+ - [Ari Pollak](https://github.com/aripollak)
 
 [Michael Grosser](http://grosser.it)<br/>
 michael@grosser.it<br/>
