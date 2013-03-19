@@ -83,7 +83,7 @@ describe ParallelTests::Tasks do
 
     context "with pipefail supported" do
       before :all do
-        if not system("set -o pipefail && test 1")
+        if not system("set -o pipefail 2>/dev/null && test 1")
           pending "pipefail is not supported on your system"
         end
       end
@@ -107,7 +107,7 @@ describe ParallelTests::Tasks do
 
     context "without pipefail supported" do
       before do
-        ParallelTests::Tasks.should_receive(:system).with("set -o pipefail && test 1").and_return false
+        ParallelTests::Tasks.should_receive(:system).with("set -o pipefail 2>/dev/null && test 1").and_return false
       end
 
       it "should not filter and succeed" do
