@@ -20,7 +20,7 @@ module ParallelTests
 
     def execute_in_parallel(items, num_processes, options)
       Tempfile.open 'parallel_tests-lock' do |lock|
-        Parallel.map(items, :in_processes => num_processes) do |item|
+        return Parallel.map(items, :in_processes => num_processes) do |item|
           result = yield(item)
           report_output(result, lock) if options[:serialize_stdout]
           result
