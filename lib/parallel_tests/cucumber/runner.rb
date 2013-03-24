@@ -19,7 +19,9 @@ module ParallelTests
       end
 
       def self.executable
-        if ParallelTests.bundler_enabled?
+        if File.file?("script/zeus_cucumber")
+          "script/zeus_cucumber"
+        elsif ParallelTests.bundler_enabled?
           "bundle exec cucumber"
         elsif File.file?("script/cucumber")
           "script/cucumber"
