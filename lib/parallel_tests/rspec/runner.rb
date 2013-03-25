@@ -13,6 +13,7 @@ module ParallelTests
       end
 
       def self.executable
+        return overriden_executable if overriden_executable
         cmd = if File.file?("script/spec")
           "script/spec"
         elsif ParallelTests.bundler_enabled?
