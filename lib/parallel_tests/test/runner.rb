@@ -23,7 +23,6 @@ module ParallelTests
 
       def self.run_tests(test_files, process_number, num_processes, options)
         require_list = test_files.map { |filename| %{"#{File.expand_path filename}"} }.join(",")
-        executable = overriden_executable || "ruby"
         cmd = "#{executable} -Itest -e '[#{require_list}].each {|f| require f }' -- #{options[:test_options]}"
         execute_command(cmd, process_number, num_processes, options)
       end
@@ -74,8 +73,12 @@ module ParallelTests
 
       protected
 
-      def self.overriden_executable
-        ENV['PARALLEL_TESTS_EXECUTABLE']
+      def self.executable
+        ENV['PARALLEL_TESTS_EXECUTABLE'] || determine_executable
+      end
+
+      def self.determine_executable
+        "ruby"
       end
 
       def self.sum_up_results(results)

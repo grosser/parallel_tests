@@ -18,8 +18,7 @@ module ParallelTests
         execute_command(cmd, process_number, num_processes, options)
       end
 
-      def self.executable
-        return overriden_executable if overriden_executable
+      def self.determine_executable
         if ParallelTests.bundler_enabled?
           "bundle exec cucumber"
         elsif File.file?("script/cucumber")
