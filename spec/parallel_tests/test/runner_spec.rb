@@ -26,6 +26,13 @@ describe ParallelTests::Test::Runner do
       ENV.delete('PARALLEL_TEST_PROCESSORS')
     end
 
+    it "allows to override runner executable via PARALLEL_TESTS_EXECUTABLE" do
+      ENV['PARALLEL_TESTS_EXECUTABLE'] = 'script/custom_rspec'
+      ParallelTests::Test::Runner.should_receive(:open).with{|x,y| x=~/script\/custom_rspec/}.and_return mocked_process
+      call(['xxx'],1,22,{})
+      ENV.delete('PARALLEL_TESTS_EXECUTABLE')
+    end
+
     it "uses options" do
       ParallelTests::Test::Runner.should_receive(:open).with{|x,y| x=~ %r{ruby -Itest .* -- -v}}.and_return mocked_process
       call(['xxx'],1,22,:test_options => '-v')

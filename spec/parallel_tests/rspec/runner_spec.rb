@@ -32,6 +32,13 @@ describe ParallelTests::RSpec::Runner do
       call(['xxx'],1,22,{})
     end
 
+    it "allows to override runner executable via PARALLEL_TESTS_EXECUTABLE" do
+      ENV['PARALLEL_TESTS_EXECUTABLE'] = 'script/custom_rspec'
+      ParallelTests::RSpec::Runner.should_receive(:open).with{|x,y| x=~/script\/custom_rspec/}.and_return mocked_process
+      call(['xxx'],1,22,{})
+      ENV.delete('PARALLEL_TESTS_EXECUTABLE')
+    end
+
     it "runs with color when called from cmdline" do
       ParallelTests::RSpec::Runner.should_receive(:open).with{|x,y| x=~/ --tty /}.and_return mocked_process
       $stdout.should_receive(:tty?).and_return true
