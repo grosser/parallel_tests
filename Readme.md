@@ -261,6 +261,7 @@ inspired by [pivotal labs](http://pivotallabs.com/users/miked/blog/articles/849-
  - [David Davis](https://github.com/daviddavis)
  - [Ari Pollak](https://github.com/aripollak)
  - [Aaron Jensen](https://github.com/aaronjensen)
+ - [Artur Roszczyk](https://github.com/sevos)
 
 [Michael Grosser](http://grosser.it)<br/>
 michael@grosser.it<br/>
