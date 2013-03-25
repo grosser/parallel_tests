@@ -19,6 +19,7 @@ module ParallelTests
       end
 
       def self.executable
+        return overriden_executable if overriden_executable
         if ParallelTests.bundler_enabled?
           "bundle exec cucumber"
         elsif File.file?("script/cucumber")
