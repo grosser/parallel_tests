@@ -169,6 +169,7 @@ Options are:
         --non-parallel               execute same commands but do not in parallel, needs --exec
         --no-symlinks                Do not traverse symbolic links to find test files
         --ignore-tags [PATTERN]      When counting steps ignore scenarios with tags that match this pattern
+    -n, --nice                       execute test commands with low priority.
     -v, --version                    Show Version
     -h, --help                       Show this.
 
