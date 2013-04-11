@@ -74,17 +74,17 @@ describe ParallelTests::Cucumber do
       end
 
       it "uses parallel profile" do
-        ParallelTests::Cucumber::Runner.should_receive(:open).with{|x,y| x =~ %r{script/cucumber .* foo bar --profile parallel xxx}}.and_return mocked_process
+        ParallelTests::Cucumber::Runner.should_receive(:open).with{|x,y| x =~ %r{script/cucumber .* foo bar --profile parallel "xxx"}}.and_return mocked_process
         call(['xxx'],1,22, :test_options => 'foo bar')
       end
 
       it "uses given profile via --profile" do
-        ParallelTests::Cucumber::Runner.should_receive(:open).with{|x,y| x =~ %r{script/cucumber .* --profile foo xxx$}}.and_return mocked_process
+        ParallelTests::Cucumber::Runner.should_receive(:open).with{|x,y| x =~ %r{script/cucumber .* --profile foo "xxx"$}}.and_return mocked_process
         call(['xxx'],1,22, :test_options => '--profile foo')
       end
 
       it "uses given profile via -p" do
-        ParallelTests::Cucumber::Runner.should_receive(:open).with{|x,y| x =~ %r{script/cucumber .* -p foo xxx$}}.and_return mocked_process
+        ParallelTests::Cucumber::Runner.should_receive(:open).with{|x,y| x =~ %r{script/cucumber .* -p foo "xxx"$}}.and_return mocked_process
         call(['xxx'],1,22, :test_options => '-p foo')
       end
     end

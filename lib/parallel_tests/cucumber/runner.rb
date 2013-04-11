@@ -12,8 +12,7 @@ module ParallelTests
           color,
           executable,
           (runtime_logging if File.directory?(File.dirname(runtime_log))),
-          cucumber_opts(options[:test_options]),
-          *test_files
+           "\"#{test_files.join('" "')}\""
         ].compact.join(" ")
         execute_command(cmd, process_number, num_processes, options)
       end
