@@ -1,3 +1,5 @@
+require 'open3'
+
 module ParallelTests
   module Test
     class Runner
@@ -53,15 +55,28 @@ module ParallelTests
         execute_command_and_capture_output(env, cmd, options[:serialize_stdout])
       end
 
-      def self.execute_command_and_capture_output(env, cmd, silent)
+      def self.execute_command_and_capture_output(env, cmd, silence)
         # make processes descriptive / visible in ps -ef
         exports = env.map do |k,v|
           "#{k}=#{v};export #{k}"
         end.join(";")
         cmd = "#{exports};#{cmd}"
 
-        output = open("| #{cmd}", "r") { |output| capture_output(output, silent) }
-        {:stdout => output, :exit_status => $?.exitstatus}
+        output, errput, exitstatus = nil
+        if RUBY_VERSION =~ /^1\.8/
+          open("|#{cmd}", "r") do |output|
+            output, errput = capture_output(output, nil, silence)
+          end
+          exitstatus = $?.exitstatus
+        else
+          Open3.popen3(cmd) do |stdin, stdout, stderr, thread|
+            stdin.close
+            output, errput = capture_output(stdout, stderr, silence)
+            exitstatus = thread.value.exitstatus
+          end
+        end
+
+        {:stdout => output, :stderr => errput, :exit_status => exitstatus}
       end
 
       def self.find_results(test_output)
@@ -101,14 +116,22 @@ module ParallelTests
       end
 
       # read output of the process and print it in chunks
-      def self.capture_output(out, silent)
-        result = ""
+      def self.capture_output(out, err, silence)
+        results = ["", ""]
         loop do
-          read = out.readpartial(1000000) # read whatever chunk we can get
-          result << read
-          $stdout.print read unless silent
+          [[out, $stdout, 0], [err, $stderr, 1]].each do |input, output, index|
+            next unless input
+            begin
+              read = input.readpartial(1000000) # read whatever chunk we can get
+              results[index] << read
+              output.print read if index == 1 || !silence
+
+            rescue EOFError
+              raise if index == 0 # we only care about the end of stdout
+            end
+          end
         end rescue EOFError
-        result
+        results
       end
 
       def self.with_runtime_info(tests)

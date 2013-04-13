@@ -298,6 +298,7 @@ EOF
         result = call("ruby #{path}", 1, 4, {})
         result.should == {
           :stdout => "2\n",
+          :stderr => "",
           :exit_status => 0
         }
       end
@@ -308,6 +309,7 @@ EOF
         result = call("ruby #{path}", 0, 4, {})
         result.should == {
           :stdout => "\"\"\n",
+          :stderr => "",
           :exit_status => 0
         }
       end
@@ -318,19 +320,24 @@ EOF
         result = call("ruby #{path}", 1, 4, {})
         result.should == {
           :stdout => "4\n",
+          :stderr => "",
           :exit_status => 0
         }
       end
     end
 
-    # TODO hangs forever
-    xit "skips reads from stdin" do
-      run_with_file("$stdin.read; puts 123") do |path|
-        result = call("ruby #{path}", 1, 2, {})
-        result.should == {
-          :stdout => "123\n",
-          :exit_status => 0
-        }
+    it "skips reads from stdin" do
+      if RUBY_VERSION =~ /^1\.8/
+        pending
+      else
+        run_with_file("$stdin.read; puts 123") do |path|
+          result = call("ruby #{path}", 1, 2, {})
+          result.should == {
+            :stdout => "123\n",
+            :stderr => "",
+            :exit_status => 0
+          }
+        end
       end
     end
 
@@ -339,6 +346,7 @@ EOF
         result = call("ruby #{path}", 1, 4, {})
         result.should == {
           :stdout => "123\n345\n",
+          :stderr => "",
           :exit_status => 0
         }
       end
@@ -347,11 +355,16 @@ EOF
     it "prints output while running" do
       run_with_file("$stdout.sync = true; puts 123; sleep 0.1; print 345; sleep 0.1; puts 567") do |path|
         $stdout.should_receive(:print).with("123\n")
-        $stdout.should_receive(:print).with("345")
-        $stdout.should_receive(:print).with("567\n")
+        if RUBY_VERSION =~ /^1\.8/
+          $stdout.should_receive(:print).with("345")
+          $stdout.should_receive(:print).with("567\n")
+        else
+          $stdout.should_receive(:print).with("345567\n")
+        end
         result = call("ruby #{path}", 1, 4, {})
         result.should == {
           :stdout => "123\n345567\n",
+          :stderr => "",
           :exit_status => 0
         }
       end
@@ -362,6 +375,7 @@ EOF
         result = call("ruby #{path}", 1, 4, {})
         result.should == {
           :stdout => "123\n345\n",
+          :stderr => "",
           :exit_status => 0
         }
       end
@@ -373,6 +387,7 @@ EOF
         result = call("ruby #{path}", 1, 4, :serialize_stdout => true)
         result.should == {
           :stdout => "123\n",
+          :stderr => "",
           :exit_status => 0
         }
       end
@@ -383,21 +398,26 @@ EOF
         result = call("ruby #{path}", 1, 4, {})
         result.should == {
           :stdout => "123\n",
+          :stderr => "",
           :exit_status => 5
         }
       end
     end
 
-    xit "prints each stream to the correct stream" do
-      # when adding ; $stderr.puts 345 it print directly to stderr...
-      out, err = run_with_file("puts 123; exit 5") do |path|
-        result = call("ruby #{path}", 1, 4, {})
-        result.should == {
-          :stdout => "123\n",
-          :exit_status => 5
-        }
+    it "prints each stream to the correct stream" do
+      if RUBY_VERSION =~ /^1\.8/
+        pending
+      else
+        out, err = run_with_file("puts 123 ; $stderr.puts 345 ; exit 5") do |path|
+          result = call("ruby #{path}", 1, 4, {})
+          result.should == {
+            :stdout => "123\n",
+            :stderr => "345\n",
+            :exit_status => 5
+          }
+        end
+        err.should == "345\n"
       end
-      err.should == "345\n"
     end
   end
 end
