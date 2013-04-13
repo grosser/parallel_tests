@@ -27,7 +27,7 @@ RSpec.configure do |config|
 end
 
 def mocked_process
-  open('|cat /dev/null')
+  StringIO.new
 end
 
 def size_of(group)

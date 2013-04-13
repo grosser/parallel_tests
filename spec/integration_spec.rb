@@ -188,7 +188,7 @@ describe 'CLI' do
   end
 
   it "can wait_for_other_processes_to_finish" do
-    write "test/a_test.rb", "require 'parallel_tests'; ParallelTests.wait_for_other_processes_to_finish; puts 'a'"
+    write "test/a_test.rb", "require 'parallel_tests'; sleep 0.5 ; ParallelTests.wait_for_other_processes_to_finish; puts 'a'"
     write "test/b_test.rb", "sleep 1; puts 'b'"
     write "test/c_test.rb", "sleep 1.5; puts 'c'"
     write "test/d_test.rb", "sleep 2; puts 'd'"

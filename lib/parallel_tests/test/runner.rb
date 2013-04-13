@@ -46,11 +46,21 @@ module ParallelTests
       end
 
       def self.execute_command(cmd, process_number,  num_processes, options)
-        prefix = "PARALLEL_TEST_GROUPS=#{ num_processes } ; export PARALLEL_TEST_GROUPS;"
-        cmd = "#{prefix} TEST_ENV_NUMBER=#{test_env_number(process_number)} ; export TEST_ENV_NUMBER; #{cmd}"
-        f = open("|#{cmd}", 'r')
-        output = fetch_output(f, options)
-        f.close
+        env = (options[:env] || {}).merge(
+          "TEST_ENV_NUMBER" => test_env_number(process_number),
+          "PARALLEL_TEST_GROUPS" => num_processes
+        )
+        execute_command_and_capture_output(env, cmd, options[:serialize_stdout])
+      end
+
+      def self.execute_command_and_capture_output(env, cmd, silent)
+        # make processes descriptive / visible in ps -ef
+        exports = env.map do |k,v|
+          "#{k}=#{v};export #{k}"
+        end.join(";")
+        cmd = "#{exports};#{cmd}"
+
+        output = open("| #{cmd}", "r") { |output| capture_output(output, silent) }
         {:stdout => output, :exit_status => $?.exitstatus}
       end
 
@@ -84,26 +94,21 @@ module ParallelTests
       def self.sum_up_results(results)
         results = results.join(' ').gsub(/s\b/,'') # combine and singularize results
         counts = results.scan(/(\d+) (\w+)/)
-        sums = counts.inject(Hash.new(0)) do |sum, (number, word)|
+        counts.inject(Hash.new(0)) do |sum, (number, word)|
           sum[word] += number.to_i
           sum
         end
-
-        sums
       end
 
       # read output of the process and print it in chunks
-      def self.fetch_output(process, options)
-        all = ''
-        while buffer = process.readpartial(1000000)
-          all << buffer
-          unless options[:serialize_stdout]
-            $stdout.print buffer
-            $stdout.flush
-          end
+      def self.capture_output(out, silent)
+        result = ""
+        loop do
+          read = out.readpartial(1000000) # read whatever chunk we can get
+          result << read
+          $stdout.print read unless silent
         end rescue EOFError
-
-        all
+        result
       end
 
       def self.with_runtime_info(tests)

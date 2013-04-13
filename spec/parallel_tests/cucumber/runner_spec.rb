@@ -15,54 +15,36 @@ describe ParallelTests::Cucumber do
       ParallelTests::Cucumber::Runner.run_tests(*args)
     end
 
-    it "uses TEST_ENV_NUMBER=blank when called for process 0" do
-      ParallelTests::Cucumber::Runner.should_receive(:open).with{|x,y| x=~/TEST_ENV_NUMBER= /}.and_return mocked_process
-      call(['xxx'],0,22,{})
-    end
-
-    it "uses TEST_ENV_NUMBER=2 when called for process 1" do
-      ParallelTests::Cucumber::Runner.should_receive(:open).with{|x,y| x=~/TEST_ENV_NUMBER=2/}.and_return mocked_process
-      call(['xxx'],1,22,{})
-    end
-
-    it 'sets PARALLEL_TEST_GROUPS so child processes know that they are being run under parallel_tests' do
-      ParallelTests::Cucumber::Runner.should_receive(:open).with{|x,y| x=~/PARALLEL_TEST_GROUPS=22/}.and_return mocked_process
-      call(['xxx'],1,22,{})
+    def should_run_with(regex)
+      ParallelTests::Test::Runner.should_receive(:execute_command).with{|a,b,c,d| a =~ regex}
     end
 
     it "allows to override runner executable via PARALLEL_TESTS_EXECUTABLE" do
       ENV['PARALLEL_TESTS_EXECUTABLE'] = 'script/custom_rspec'
-      ParallelTests::Cucumber::Runner.should_receive(:open).with{|x,y| x=~/script\/custom_rspec/}.and_return mocked_process
+      should_run_with /script\/custom_rspec/
       call(['xxx'],1,22,{})
       ENV.delete('PARALLEL_TESTS_EXECUTABLE')
     end
 
-    it "returns the output" do
-      io = open('spec/spec_helper.rb')
-      $stdout.stub!(:print)
-      ParallelTests::Cucumber::Runner.should_receive(:open).and_return io
-      call(['xxx'],1,22,{})[:stdout].should =~ /\$LOAD_PATH << File/
-    end
-
     it "runs bundle exec cucumber when on bundler 0.9" do
       ParallelTests.stub!(:bundler_enabled?).and_return true
-      ParallelTests::Cucumber::Runner.should_receive(:open).with{|x,y| x =~ %r{bundle exec cucumber}}.and_return mocked_process
+      should_run_with %r{bundle exec cucumber}
       call(['xxx'],1,22,{})
     end
 
     it "runs script/cucumber when script/cucumber is found" do
-      ParallelTests::Cucumber::Runner.should_receive(:open).with{|x,y| x =~ %r{script/cucumber}}.and_return mocked_process
+      should_run_with %r{script/cucumber}
       call(['xxx'],1,22,{})
     end
 
     it "runs cucumber by default" do
       File.stub!(:file?).with('script/cucumber').and_return false
-      ParallelTests::Cucumber::Runner.should_receive(:open).with{|x,y| x !~ %r{(script/cucumber)|(bundle exec cucumber)}}.and_return mocked_process
+      should_run_with %r{^cucumber}
       call(['xxx'],1,22,{})
     end
 
     it "uses options passed in" do
-      ParallelTests::Cucumber::Runner.should_receive(:open).with{|x,y| x =~ %r{script/cucumber .* -p default}}.and_return mocked_process
+      should_run_with %r{script/cucumber .* -p default}
       call(['xxx'],1,22,:test_options => '-p default')
     end
 
@@ -74,31 +56,31 @@ describe ParallelTests::Cucumber do
       end
 
       it "uses parallel profile" do
-        ParallelTests::Cucumber::Runner.should_receive(:open).with{|x,y| x =~ %r{script/cucumber .* foo bar --profile parallel xxx}}.and_return mocked_process
+        should_run_with %r{script/cucumber .* foo bar --profile parallel xxx}
         call(['xxx'],1,22, :test_options => 'foo bar')
       end
 
       it "uses given profile via --profile" do
-        ParallelTests::Cucumber::Runner.should_receive(:open).with{|x,y| x =~ %r{script/cucumber .* --profile foo xxx$}}.and_return mocked_process
+        should_run_with %r{script/cucumber .* --profile foo xxx$}
         call(['xxx'],1,22, :test_options => '--profile foo')
       end
 
       it "uses given profile via -p" do
-        ParallelTests::Cucumber::Runner.should_receive(:open).with{|x,y| x =~ %r{script/cucumber .* -p foo xxx$}}.and_return mocked_process
+        should_run_with  %r{script/cucumber .* -p foo xxx$}
         call(['xxx'],1,22, :test_options => '-p foo')
       end
     end
 
     it "does not use parallel profile if config/cucumber.yml does not contain it" do
       file_contents = 'blob: -f progress'
-      ParallelTests::Cucumber::Runner.should_receive(:open).with{|x,y| x =~ %r{script/cucumber .* foo bar}}.and_return mocked_process
+      should_run_with  %r{script/cucumber .* foo bar}
       Dir.should_receive(:glob).and_return ['config/cucumber.yml']
       File.should_receive(:read).with('config/cucumber.yml').and_return file_contents
       call(['xxx'],1,22,:test_options => 'foo bar')
     end
 
     it "does not use the parallel profile if config/cucumber.yml does not exist" do
-      ParallelTests::Cucumber::Runner.should_receive(:open).with{|x,y| x =~ %r{script/cucumber .*}}.and_return mocked_process
+      should_run_with %r{script/cucumber} # TODO this test looks useless...
       Dir.should_receive(:glob).and_return []
       call(['xxx'],1,22,{})
     end

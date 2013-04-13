@@ -4,57 +4,33 @@ require "parallel_tests/test/runner"
 describe ParallelTests::Test::Runner do
   test_tests_in_groups(ParallelTests::Test::Runner, 'test', '_test.rb')
 
-  describe :run_tests do
+  describe ".run_tests" do
     def call(*args)
       ParallelTests::Test::Runner.run_tests(*args)
     end
 
-    it "uses TEST_ENV_NUMBER=blank when called for process 0" do
-      ParallelTests::Test::Runner.should_receive(:open).with{|x,y|x=~/TEST_ENV_NUMBER= /}.and_return mocked_process
-      call(['xxx'],0,22,{})
-    end
-
-    it "uses TEST_ENV_NUMBER=2 when called for process 1" do
-      ParallelTests::Test::Runner.should_receive(:open).with{|x,y| x=~/TEST_ENV_NUMBER=2/}.and_return mocked_process
-      call(['xxx'],1,22,{})
-    end
-
-    it 'sets PARALLEL_TEST_GROUPS so child processes know that they are being run under parallel_tests' do
-      ENV['PARALLEL_TEST_PROCESSORS'] = '22'
-      ParallelTests::Test::Runner.should_receive(:open).with{|x,y| x=~/PARALLEL_TEST_GROUPS=22/}.and_return mocked_process
-      call(['xxx'],1,22,{})
-      ENV.delete('PARALLEL_TEST_PROCESSORS')
-    end
-
     it "allows to override runner executable via PARALLEL_TESTS_EXECUTABLE" do
-      ENV['PARALLEL_TESTS_EXECUTABLE'] = 'script/custom_rspec'
-      ParallelTests::Test::Runner.should_receive(:open).with{|x,y| x=~/script\/custom_rspec/}.and_return mocked_process
-      call(['xxx'],1,22,{})
-      ENV.delete('PARALLEL_TESTS_EXECUTABLE')
+      begin
+        ENV['PARALLEL_TESTS_EXECUTABLE'] = 'script/custom_rspec'
+        ParallelTests::Test::Runner.should_receive(:execute_command).with{|a,b,c,d| a.include?("script/custom_rspec") }
+        call(['xxx'], 1, 22, {})
+      ensure
+        ENV.delete('PARALLEL_TESTS_EXECUTABLE')
+      end
     end
 
     it "uses options" do
-      ParallelTests::Test::Runner.should_receive(:open).with{|x,y| x=~ %r{ruby -Itest .* -- -v}}.and_return mocked_process
-      call(['xxx'],1,22,:test_options => '-v')
+      ParallelTests::Test::Runner.should_receive(:execute_command).with{|a,b,c,d| a =~ %r{ruby -Itest .* -- -v}}
+      call(['xxx'], 1, 22, :test_options => '-v')
     end
 
     it "returns the output" do
-      io = open('spec/spec_helper.rb')
-      $stdout.stub!(:print)
-      ParallelTests::Test::Runner.should_receive(:open).and_return io
-      call(['xxx'],1,22,{})[:stdout].should =~ /\$LOAD_PATH << File/
-    end
-
-    it "does not output to stdout when serializing output" do
-      io = open('spec/spec_helper.rb')
-      $stdout.should_not_receive(:print)
-      $stdout.should_not_receive(:flush)
-      ParallelTests::Test::Runner.should_receive(:open).and_return io
-      call(['xxx'],1,22,{:serialize_stdout => true})[:stdout]
+      ParallelTests::Test::Runner.should_receive(:execute_command).and_return({:x => 1})
+      call(['xxx'], 1, 22, {}).should == {:x => 1}
     end
   end
 
-  describe :test_in_groups do
+  describe ".test_in_groups" do
     def call(*args)
       ParallelTests::Test::Runner.tests_in_groups(*args)
     end
@@ -98,7 +74,7 @@ describe ParallelTests::Test::Runner do
     end
   end
 
-  describe :find_results do
+  describe ".find_results" do
     def call(*args)
       ParallelTests::Test::Runner.find_results(*args)
     end
@@ -150,7 +126,7 @@ EOF
     end
   end
 
-  describe :find_tests do
+  describe ".find_tests" do
     def call(*args)
       ParallelTests::Test::Runner.send(:find_tests, *args)
     end
@@ -268,7 +244,7 @@ EOF
     end
   end
 
-  describe :summarize_results do
+  describe ".summarize_results" do
     def call(*args)
       ParallelTests::Test::Runner.summarize_results(*args)
     end
@@ -291,6 +267,137 @@ EOF
 
     it "does not pluralize 1" do
       call(['1 xxx 2 yyy']).should == '1 xxx, 2 yyys'
+    end
+  end
+
+  describe ".execute_command" do
+    def call(*args)
+      ParallelTests::Test::Runner.execute_command(*args)
+    end
+
+    def capture_output
+      $stdout, $stderr = StringIO.new, StringIO.new
+      yield
+      [$stdout.string, $stderr.string]
+    ensure
+      $stdout, $stderr = STDOUT, STDERR
+    end
+
+    def run_with_file(content)
+      capture_output do
+        Tempfile.open("xxx") do |f|
+          f.write(content)
+          f.flush
+          yield f.path
+        end
+      end
+    end
+
+    it "sets process number to 2 for 1" do
+      run_with_file("puts ENV['TEST_ENV_NUMBER']") do |path|
+        result = call("ruby #{path}", 1, 4, {})
+        result.should == {
+          :stdout => "2\n",
+          :exit_status => 0
+        }
+      end
+    end
+
+    it "sets process number to '' for 0" do
+      run_with_file("puts ENV['TEST_ENV_NUMBER'].inspect") do |path|
+        result = call("ruby #{path}", 0, 4, {})
+        result.should == {
+          :stdout => "\"\"\n",
+          :exit_status => 0
+        }
+      end
+    end
+
+    it 'sets PARALLEL_TEST_GROUPS so child processes know that they are being run under parallel_tests' do
+      run_with_file("puts ENV['PARALLEL_TEST_GROUPS']") do |path|
+        result = call("ruby #{path}", 1, 4, {})
+        result.should == {
+          :stdout => "4\n",
+          :exit_status => 0
+        }
+      end
+    end
+
+    # TODO hangs forever
+    xit "skips reads from stdin" do
+      run_with_file("$stdin.read; puts 123") do |path|
+        result = call("ruby #{path}", 1, 2, {})
+        result.should == {
+          :stdout => "123\n",
+          :exit_status => 0
+        }
+      end
+    end
+
+    it "waits for process to finish" do
+      run_with_file("sleep 0.5; puts 123; sleep 0.5; puts 345") do |path|
+        result = call("ruby #{path}", 1, 4, {})
+        result.should == {
+          :stdout => "123\n345\n",
+          :exit_status => 0
+        }
+      end
+    end
+
+    it "prints output while running" do
+      run_with_file("$stdout.sync = true; puts 123; sleep 0.1; print 345; sleep 0.1; puts 567") do |path|
+        $stdout.should_receive(:print).with("123\n")
+        $stdout.should_receive(:print).with("345")
+        $stdout.should_receive(:print).with("567\n")
+        result = call("ruby #{path}", 1, 4, {})
+        result.should == {
+          :stdout => "123\n345567\n",
+          :exit_status => 0
+        }
+      end
+    end
+
+    it "works with synced stdout" do
+      run_with_file("$stdout.sync = true; puts 123; sleep 0.1; puts 345") do |path|
+        result = call("ruby #{path}", 1, 4, {})
+        result.should == {
+          :stdout => "123\n345\n",
+          :exit_status => 0
+        }
+      end
+    end
+
+    it "does not print to stdout with :serialize_stdout" do
+      run_with_file("puts 123") do |path|
+        $stdout.should_not_receive(:print)
+        result = call("ruby #{path}", 1, 4, :serialize_stdout => true)
+        result.should == {
+          :stdout => "123\n",
+          :exit_status => 0
+        }
+      end
+    end
+
+    it "returns correct exit status" do
+      run_with_file("puts 123; exit 5") do |path|
+        result = call("ruby #{path}", 1, 4, {})
+        result.should == {
+          :stdout => "123\n",
+          :exit_status => 5
+        }
+      end
+    end
+
+    xit "prints each stream to the correct stream" do
+      # when adding ; $stderr.puts 345 it print directly to stderr...
+      out, err = run_with_file("puts 123; exit 5") do |path|
+        result = call("ruby #{path}", 1, 4, {})
+        result.should == {
+          :stdout => "123\n",
+          :exit_status => 5
+        }
+      end
+      err.should == "345\n"
     end
   end
 end
