@@ -5,6 +5,7 @@ ParallelTests splits tests into even groups(by number of tests or runtime) and r
 
 Setup for Rails
 ===============
+[RailsCasts episode #413 Fast Tests](http://railscasts.com/episodes/413-fast-tests)  
 [still using Rails 2?](https://github.com/grosser/parallel_tests/blob/master/ReadmeRails2.md)
 
 ### Install
