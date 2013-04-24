@@ -1,4 +1,5 @@
 require "parallel_tests/test/runner"
+require 'shellwords'
 
 module ParallelTests
   module Cucumber
@@ -6,13 +7,14 @@ module ParallelTests
       NAME = 'Cucumber'
 
       def self.run_tests(test_files, process_number, num_processes, options)
+        sanitized_test_files = test_files.map { |val| Shellwords.escape(val) }
         options = options.merge(:env => {"AUTOTEST" => "1"}) if $stdout.tty? # display color when we are in a terminal
         runtime_logging = " --format ParallelTests::Cucumber::RuntimeLogger --out #{runtime_log}"
         cmd = [
           executable,
           (runtime_logging if File.directory?(File.dirname(runtime_log))),
           cucumber_opts(options[:test_options]),
-          *test_files
+          *sanitized_test_files
         ].compact.join(" ")
         execute_command(cmd, process_number, num_processes, options)
       end
