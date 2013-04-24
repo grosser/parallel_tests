@@ -47,6 +47,11 @@ describe ParallelTests::Cucumber do
       should_run_with %r{script/cucumber .* -p default}
       call(['xxx'],1,22,:test_options => '-p default')
     end
+    
+    it "sanitizes dangerous file names" do
+      should_run_with %r{xx\\ x}
+      call(['xx x'],1,22,{})
+    end
 
     context "with parallel profile in config/cucumber.yml" do
       before do
