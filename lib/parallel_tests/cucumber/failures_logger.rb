@@ -9,10 +9,12 @@ module ParallelTests
         @io = prepare_io(path_or_io)
       end
 
-      def after_feature(*)
+      def after_feature(feature)
         unless @lines.empty?
           lock_output do
-            @io.puts "#{@file}:#{@lines.join(':')}"
+            @lines.each do |line|
+              @io.puts "#{feature.file}:#{line}"
+            end
           end
         end
       end
