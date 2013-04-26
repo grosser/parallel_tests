@@ -1,3 +1,5 @@
+#encoding: utf-8
+
 require 'spec_helper'
 
 describe 'CLI' do
@@ -59,6 +61,13 @@ describe 'CLI' do
     result.scan('2 examples, 0 failures').size.should == 1 # 1 summary
     result.scan(/Finished in \d+\.\d+ seconds/).size.should == 2
     result.scan(/Took \d+\.\d+ seconds/).size.should == 1 # parallel summary
+  end
+
+  it "runs tests which outputs accented characters" do
+    write 'spec/xxx_spec.rb', 'describe("it"){it("should"){puts "Byłem tu"}}'
+    result = run_tests "spec", :type => 'rspec'
+    # test ran and gave their puts
+    result.should include('Byłem tu')
   end
 
   it "does not run any tests if there are none" do
@@ -221,6 +230,13 @@ describe 'CLI' do
         Given('I print TEST_ENV_NUMBER'){ puts \"YOUR TEST ENV IS \#{ENV['TEST_ENV_NUMBER']}!\" }
         And('I sleep a bit'){ sleep 0.2 }
       "
+    end
+
+    it "runs tests which outputs accented characters" do
+      write "features/good1.feature", "Feature: xxx\n  Scenario: xxx\n    Given I print accented characters"
+      write "features/steps/a.rb", "Given('I print accented characters'){ puts \"I tu też\" }"
+      result = run_tests "features", :type => "cucumber", :add => '--pattern good'
+      result.should include('I tu też')
     end
 
     it "passes TEST_ENV_NUMBER when running with pattern (issue #86)" do
