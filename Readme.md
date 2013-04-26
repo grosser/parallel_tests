@@ -139,6 +139,24 @@ Add the following to your `.rspec_parallel` (or `.rspec`) :
     --format progress
     --format ParallelTests::RSpec::FailuresLogger --out tmp/failing_specs.log
 
+Cucumber: FailuresLogger
+-----------------------
+
+This logger logs failed cucumber scenarios to the specified file. The filename can be passed to cucumber, prefixed with '@' to rerun failures.
+
+Usage:
+
+    cucumber --format ParallelTests::Cucumber::FailuresLogger --out tmp/cucumber_failures.log
+
+Or add the formatter to the `parallel:` profile of your `cucumber.yml`:
+
+    parallel: --format progress --format ParallelTests::Cucumber::FailuresLogger --out tmp/cucumber_failures.log
+
+
+To rerun failures:
+
+	cucumber @tmp/cucumber_failures.log
+
 Setup for non-rails
 ===================
     gem install parallel_tests
