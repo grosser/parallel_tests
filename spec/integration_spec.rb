@@ -64,7 +64,7 @@ describe 'CLI' do
   end
 
   it "runs tests which outputs accented characters" do
-    write 'spec/xxx_spec.rb', 'describe("it"){it("should"){puts "Byłem tu"}}'
+    write "spec/xxx_spec.rb", "#encoding: utf-8\ndescribe('it'){it('should'){puts 'Byłem tu'}}"
     result = run_tests "spec", :type => 'rspec'
     # test ran and gave their puts
     result.should include('Byłem tu')
@@ -234,7 +234,7 @@ describe 'CLI' do
 
     it "runs tests which outputs accented characters" do
       write "features/good1.feature", "Feature: xxx\n  Scenario: xxx\n    Given I print accented characters"
-      write "features/steps/a.rb", "Given('I print accented characters'){ puts \"I tu też\" }"
+      write "features/steps/a.rb", "#encoding: utf-8\nGiven('I print accented characters'){ puts \"I tu też\" }"
       result = run_tests "features", :type => "cucumber", :add => '--pattern good'
       result.should include('I tu też')
     end
