@@ -284,6 +284,7 @@ inspired by [pivotal labs](http://pivotallabs.com/users/miked/blog/articles/849-
  - [Artur Roszczyk](https://github.com/sevos)
  - [Caleb Tomlinson](https://github.com/calebTomlinson)
  - [Jawwad Ahmad](https://github.com/jawwad)
+ - [Iain Beeston](https://github.com/iainbeeston)
 
 [Michael Grosser](http://grosser.it)<br/>
 michael@grosser.it<br/>
