@@ -25,6 +25,11 @@ describe ParallelTests::RSpec::Runner do
       ParallelTests::Test::Runner.should_receive(:execute_command).with{|a,b,c,d| a !~ regex}
     end
 
+    it "runs command using nice when specifed" do
+      ParallelTests::Test::Runner.should_receive(:execute_command_and_capture_output).with{|a,b,c| b =~ %r{^nice rspec}}
+      call('xxx', 1, 22, :nice => true)
+    end
+
     it "runs with color when called from cmdline" do
       should_run_with %r{ --tty}
       $stdout.should_receive(:tty?).and_return true

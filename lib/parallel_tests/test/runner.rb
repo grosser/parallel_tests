@@ -52,6 +52,7 @@ module ParallelTests
           "TEST_ENV_NUMBER" => test_env_number(process_number),
           "PARALLEL_TEST_GROUPS" => num_processes
         )
+        cmd = "nice #{cmd}" if options[:nice]
         execute_command_and_capture_output(env, cmd, options[:serialize_stdout])
       end
 

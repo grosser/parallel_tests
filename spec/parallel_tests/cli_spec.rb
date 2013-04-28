@@ -29,6 +29,10 @@ describe ParallelTests::CLI do
       call(["--type", "test", "-t", "rspec"])
       subject.instance_variable_get(:@runner).should == ParallelTests::RSpec::Runner
     end
+
+    it "parses nice as nice" do
+      call(["--nice"]).should == defaults.merge(:nice => true)
+    end
   end
 
   describe "#load_runner" do
