@@ -419,5 +419,12 @@ EOF
         err.should == "345\n"
       end
     end
+
+    it "uses a lower priority process when the nice option is used" do
+      priority_cmd = "puts Process.getpriority(Process::PRIO_PROCESS, 0)"
+      priority_without_nice = run_with_file(priority_cmd){ |cmd| call("ruby #{cmd}", 1, 4, {}) }.first.to_i
+      priority_with_nice = run_with_file(priority_cmd){ |cmd| call("ruby #{cmd}", 1, 4, :nice => true) }.first.to_i
+      priority_without_nice.should < priority_with_nice
+    end
   end
 end
