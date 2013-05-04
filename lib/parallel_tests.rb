@@ -44,7 +44,7 @@ module ParallelTests
   # Fun fact: this includes the current process if it's run via parallel_tests
   def self.number_of_running_processes
     if RUBY_ENGINE == "jruby"
-      Thread.list.count { |t| t[:running_parallel_test] }
+      Thread.list.count { |t| t[:running_parallel_test] } - 1
     else
       result = `#{GREP_PROCESSES_COMMAND}`
       raise "Could not grep for processes -> #{result}" if result.strip != "" && !$?.success?
