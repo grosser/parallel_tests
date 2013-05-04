@@ -354,7 +354,8 @@ EOF
 
     it "prints output while running" do
       run_with_file("$stdout.sync = true; puts 123; sleep 0.1; print 345; sleep 0.1; puts 567") do |path|
-        $stdout.should_receive(:print).with("123\n")
+        output = (RUBY_ENGINE == "jruby" ? "123\n" : "123")
+        $stdout.should_receive(:print).with(output)
         if RUBY_VERSION =~ /^1\.8/
           $stdout.should_receive(:print).with("345")
           $stdout.should_receive(:print).with("567\n")

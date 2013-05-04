@@ -68,6 +68,7 @@ module ParallelTests
 
         output, errput, exitstatus = nil
         if RUBY_ENGINE == "jruby"
+          Thread.current[:running_parallel_test] = true
           # JRuby's popen3 doesn't pass arguments correctly to the shell, so we use stdin
           Open3.popen3("sh -") do |stdin, stdout, stderr, thread|
              stdin.puts cmd
