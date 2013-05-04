@@ -64,7 +64,13 @@ module ParallelTests
         cmd = "#{exports};#{cmd}"
 
         output, errput, exitstatus = nil
-        if RUBY_VERSION =~ /^1\.8/
+        if RUBY_ENGINE == "jruby"
+          IO.popen4("sh -c \"#{cmd}\"") do |pid, stdin, stdout, stderr|
+            stdin.close
+            output, errput = capture_output(stdout, stderr, silence)
+          end
+          exitstatus = $?.exitstatus
+        elsif RUBY_VERSION =~ /^1\.8/
           open("|#{cmd}", "r") do |output|
             output, errput = capture_output(output, nil, silence)
           end
