@@ -144,8 +144,7 @@ describe 'CLI' do
     }
     t = Time.now
     run_tests("spec", :processes => 2, :type => 'rspec')
-    # Java takes longer to initialize a new VM
-    expected = RUBY_ENGINE == "jruby" ? 50 : 10
+    expected = 10
     (Time.now - t).should <= expected
   end
 

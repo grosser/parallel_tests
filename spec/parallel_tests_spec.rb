@@ -106,10 +106,9 @@ describe ParallelTests do
     end
 
     it "is 2 when 2 are running" do
-      delay_mult = RUBY_ENGINE == "jruby" ? 20 : 1
-      wait = delay_mult * 0.2
+      wait = 0.2
       2.times { Thread.new{ `TEST_ENV_NUMBER=1; sleep #{wait}` } }
-      sleep (delay_mult * 0.1)
+      sleep 0.1
       ParallelTests.number_of_running_processes.should == 2
       sleep wait
     end
