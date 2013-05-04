@@ -64,7 +64,8 @@ module ParallelTests
         cmd = "#{exports};#{cmd}"
 
         output, errput, exitstatus = nil
-        if RUBY_VERSION =~ /^1\.8/
+
+        if RUBY_VERSION =~ /^1\.8/ or ENV["TEAMCITY_RAKE_RUNNER_MODE"] # fix #207
           open("|#{cmd}", "r") do |output|
             output, errput = capture_output(output, nil, silence)
           end
@@ -125,10 +126,7 @@ module ParallelTests
             begin
               read = input.readpartial(1000000) # read whatever chunk we can get
               results[index] << read
-              if index == 1 || !silence
-                output.print read
-                output.flush
-              end
+              output.print read if index == 1 || !silence
             rescue EOFError
               raise if index == 0 # we only care about the end of stdout
             end
