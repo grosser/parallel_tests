@@ -67,6 +67,8 @@ module ParallelTests
         cmd = "#{exports};#{cmd}"
 
         output, errput, exitstatus = nil
+        system("mkdir -p tmp")
+        system("touch tmp/.process.#{env['TEST_ENV_NUMBER']}")
         if RUBY_ENGINE == "jruby"
           # JRuby's popen3 doesn't pass arguments correctly to the shell, so we use stdin
           Open3.popen3("sh -") do |stdin, stdout, stderr, thread|
@@ -87,6 +89,8 @@ module ParallelTests
             exitstatus = thread.value.exitstatus
           end
         end
+        File.delete("tmp/.process.#{env['TEST_ENV_NUMBER']}")
+        system("rmdir tmp 2>/dev/null")
 
         {:stdout => output, :stderr => errput, :exit_status => exitstatus}
       end

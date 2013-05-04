@@ -354,13 +354,19 @@ EOF
 
     it "prints output while running" do
       run_with_file("$stdout.sync = true; puts 123; sleep 0.1; print 345; sleep 0.1; puts 567") do |path|
-        $stdout.should_receive(:print).with("123\n")
+        if RUBY_ENGINE == "jruby"
+          $stdout.should_receive(:print).with("123\n")
+        else
+          $stdout.should_receive(:print).with("123")
+        end
+
         if RUBY_VERSION =~ /^1\.8/
           $stdout.should_receive(:print).with("345")
           $stdout.should_receive(:print).with("567\n")
         else
           $stdout.should_receive(:print).with("345567\n")
         end
+        
         result = call("ruby #{path}", 1, 4, {})
         result.should == {
           :stdout => "123\n345567\n",
