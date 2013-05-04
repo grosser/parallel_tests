@@ -125,8 +125,10 @@ module ParallelTests
             begin
               read = input.readpartial(1000000) # read whatever chunk we can get
               results[index] << read
-              output.print read if index == 1 || !silence
-
+              if index == 1 || !silence
+                output.print read
+                output.flush
+              end
             rescue EOFError
               raise if index == 0 # we only care about the end of stdout
             end
