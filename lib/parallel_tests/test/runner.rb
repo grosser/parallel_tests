@@ -1,4 +1,7 @@
 require 'open3'
+if RUBY_ENGINE == "jruby"
+  require 'shellwords'
+end
 
 module ParallelTests
   module Test
@@ -65,9 +68,11 @@ module ParallelTests
 
         output, errput, exitstatus = nil
         if RUBY_ENGINE == "jruby"
-          IO.popen4("sh -c \"#{cmd}\"") do |pid, stdin, stdout, stderr|
-            stdin.close
-            output, errput = capture_output(stdout, stderr, silence)
+          # JRuby's popen3 doesn't pass arguments correctly to the shell, so we use stdin
+          Open3.popen3("sh -") do |stdin, stdout, stderr, thread|
+             stdin.puts cmd
+             stdin.close
+             output, errput = capture_output(stdout, stderr, silence)
           end
           exitstatus = $?.exitstatus
         elsif RUBY_VERSION =~ /^1\.8/
