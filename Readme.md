@@ -231,7 +231,6 @@ TODO
  - fix tests vs cucumber >= 1.2 `unknown option --format`
  - add integration tests for the rake tasks, maybe generate a rails project ...
  - add unit tests for cucumber runtime formatter
- - make jRuby compatible [basics](http://yehudakatz.com/2009/07/01/new-rails-isolation-testing/)
  - make windows compatible
 
 Authors
