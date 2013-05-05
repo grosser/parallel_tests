@@ -1,4 +1,7 @@
 require 'open3'
+if RUBY_ENGINE == "jruby"
+  require 'shellwords'
+end
 
 module ParallelTests
   module Test
@@ -64,8 +67,16 @@ module ParallelTests
         cmd = "#{exports};#{cmd}"
 
         output, errput, exitstatus = nil
-
-        if RUBY_VERSION =~ /^1\.8/ or ENV["TEAMCITY_RAKE_RUNNER_MODE"] # fix #207
+        if RUBY_ENGINE == "jruby"
+          Thread.current[:running_parallel_test] = true
+          # JRuby's popen3 doesn't pass arguments correctly to the shell, so we use stdin
+          Open3.popen3("sh -") do |stdin, stdout, stderr, thread|
+             stdin.puts cmd
+             stdin.close
+             output, errput = capture_output(stdout, stderr, silence)
+          end
+          exitstatus = $?.exitstatus
+        elsif RUBY_VERSION =~ /^1\.8/ or ENV["TEAMCITY_RAKE_RUNNER_MODE"] # fix #207
           open("|#{cmd}", "r") do |output|
             output, errput = capture_output(output, nil, silence)
           end

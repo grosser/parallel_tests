@@ -60,6 +60,7 @@ describe ParallelTests::Test::Runner do
     end
 
     it "groups by size and adds isolated separately" do
+      pending if RUBY_ENGINE == "jruby"
       ParallelTests::Test::Runner.should_receive(:with_runtime_info).
         and_return([
           ['aaa', 0],
@@ -173,6 +174,7 @@ EOF
     end
 
     it "finds test files but ignores those in symlinked folders" do
+      pending if RUBY_ENGINE == "jruby"
       with_files(['a/a_test.rb','b/b_test.rb']) do |root|
         `ln -s #{root}/a #{root}/b/link`
         call(["#{root}/b"], :symlinks => false).sort.should == [
@@ -353,6 +355,7 @@ EOF
     end
 
     it "prints output while running" do
+      pending if RUBY_ENGINE == "jruby"
       run_with_file("$stdout.sync = true; puts 123; sleep 0.1; print 345; sleep 0.1; puts 567") do |path|
         $stdout.should_receive(:print).with("123\n")
         if RUBY_VERSION =~ /^1\.8/
