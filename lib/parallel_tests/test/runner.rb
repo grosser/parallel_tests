@@ -1,7 +1,4 @@
 require 'open3'
-if RUBY_ENGINE == "jruby"
-  require 'shellwords'
-end
 
 module ParallelTests
   module Test

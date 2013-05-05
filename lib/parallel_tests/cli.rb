@@ -20,7 +20,7 @@ module ParallelTests
 
     def execute_in_parallel(items, num_processes, options)
       Tempfile.open 'parallel_tests-lock' do |lock|
-        mode = RUBY_ENGINE == "jruby" ? :in_threads : :in_processes
+        mode = (RUBY_ENGINE == "jruby" ? :in_threads : :in_processes)
         return Parallel.map(items, mode => num_processes) do |item|
           result = yield(item)
           report_output(result, lock) if options[:serialize_stdout]
