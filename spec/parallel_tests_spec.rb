@@ -102,10 +102,6 @@ describe ParallelTests do
   end
 
   describe ".number_of_running_processes" do
-    before do
-      pending if RUBY_ENGINE == "jruby"
-    end
-
     it "is 0 for nothing" do
       ParallelTests.number_of_running_processes.should == 0
     end

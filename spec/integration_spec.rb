@@ -139,7 +139,7 @@ describe 'CLI' do
   end
 
   it "runs faster with more processes" do
-    pending if RUBY_ENGINE == "jruby"
+    pending if RUBY_ENGINE == "jruby"  # just too slow ...
     2.times{|i|
       write "spec/xxx#{i}_spec.rb",  'describe("it"){it("should"){sleep 5}}; $stderr.puts ENV["TEST_ENV_NUMBER"]'
     }
@@ -198,7 +198,7 @@ describe 'CLI' do
   end
 
   it "can wait_for_other_processes_to_finish" do
-    pending if RUBY_ENGINE == "jruby"
+    pending if RUBY_ENGINE == "jruby" # just too slow ...
     write "test/a_test.rb", "require 'parallel_tests'; sleep 0.5 ; ParallelTests.wait_for_other_processes_to_finish; puts 'a'"
     write "test/b_test.rb", "sleep 1; puts 'b'"
     write "test/c_test.rb", "sleep 1.5; puts 'c'"

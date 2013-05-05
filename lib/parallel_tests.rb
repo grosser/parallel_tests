@@ -37,14 +37,12 @@ module ParallelTests
   end
 
   def self.wait_for_other_processes_to_finish
-    raise "Not supported" if RUBY_ENGINE == "jruby"
     return unless ENV["TEST_ENV_NUMBER"]
     sleep 1 until number_of_running_processes <= 1
   end
 
   # Fun fact: this includes the current process if it's run via parallel_tests
   def self.number_of_running_processes
-    raise "Not supported" if RUBY_ENGINE == "jruby"
     result = `#{GREP_PROCESSES_COMMAND}`
     raise "Could not grep for processes -> #{result}" if result.strip != "" && !$?.success?
     result.split("\n").size
