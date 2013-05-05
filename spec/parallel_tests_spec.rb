@@ -107,10 +107,18 @@ describe ParallelTests do
     end
 
     it "is 2 when 2 are running" do
-      pending if RUBY_ENGINE == "jruby"
       wait = 0.2
-      2.times { Thread.new{ `TEST_ENV_NUMBER=1; sleep #{wait}` } }
-      sleep 0.1
+      2.times do
+        Thread.new do
+          if RUBY_ENGINE == "jruby"
+            Thread.current[:running_parallel_test] = true
+            sleep wait
+          else
+            `TEST_ENV_NUMBER=1; sleep #{wait}`
+          end
+        end
+      end
+      sleep wait / 2
       ParallelTests.number_of_running_processes.should == 2
       sleep wait
     end
