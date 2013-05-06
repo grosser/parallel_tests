@@ -1,4 +1,5 @@
 require 'cucumber/formatter/rerun'
+require 'parallel_tests/cucumber/io'
 
 module ParallelTests
   module Cucumber
