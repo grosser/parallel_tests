@@ -11,11 +11,11 @@ module ParallelTests
       end
 
       def before_feature(_)
-        @start_at = Time.now.to_f
+        @start_at = ParallelTests.now.to_f
       end
 
       def after_feature(feature)
-        @example_times[feature.file] += Time.now.to_f - @start_at
+        @example_times[feature.file] += ParallelTests.now.to_f - @start_at
       end
 
       def after_features(*args)

@@ -1,3 +1,4 @@
+require 'parallel_tests'
 require 'parallel_tests/rspec/logger_base'
 
 class ParallelTests::RSpec::RuntimeLogger < ParallelTests::RSpec::LoggerBase
@@ -7,12 +8,12 @@ class ParallelTests::RSpec::RuntimeLogger < ParallelTests::RSpec::LoggerBase
   end
 
   def example_started(*args)
-    @time = Time.now
+    @time = ParallelTests.now
   end
 
   def example_passed(example)
     file = example.location.split(':').first
-    @example_times[file] += Time.now - @time
+    @example_times[file] += ParallelTests.now - @time
   end
 
   def dump_summary(*args);end

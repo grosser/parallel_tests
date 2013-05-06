@@ -1,3 +1,4 @@
+require 'parallel_tests'
 require 'parallel_tests/test/runner'
 
 module ParallelTests
@@ -82,9 +83,9 @@ class ::Test::Unit::TestSuite
   alias :run_without_timing :run unless defined? @@timing_installed
 
   def run(result, &progress_block)
-    start_time=Time.now
+    start_time = ParallelTests.now
     run_without_timing(result, &progress_block)
-    end_time=Time.now
+    end_time = ParallelTests.now
     ParallelTests::Test::RuntimeLogger.log(self.tests.first, start_time, end_time)
   end
 

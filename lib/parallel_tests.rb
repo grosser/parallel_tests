@@ -47,4 +47,13 @@ module ParallelTests
     raise "Could not grep for processes -> #{result}" if result.strip != "" && !$?.success?
     result.split("\n").size
   end
+
+  # real time even if someone messed with timecop in tests
+  def self.now
+    if Time.respond_to?(:now_without_mock_time) # Timecop
+      Time.now_without_mock_time
+    else
+      Time.now
+    end
+  end
 end

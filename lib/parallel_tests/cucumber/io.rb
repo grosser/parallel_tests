@@ -1,3 +1,5 @@
+require 'parallel_tests'
+
 module ParallelTests
   module Cucumber
     module Io

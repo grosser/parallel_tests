@@ -1,5 +1,6 @@
 require 'optparse'
 require 'tempfile'
+require 'parallel_tests'
 
 module ParallelTests
   class CLI
