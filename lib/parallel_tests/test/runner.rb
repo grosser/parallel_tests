@@ -64,7 +64,7 @@ module ParallelTests
         cmd = "#{exports};#{cmd}"
 
         output, errput, exitstatus = nil
-        if RUBY_ENGINE == "jruby"
+        if RUBY_PLATFORM == "java"
           # - JRuby's popen3 doesn't pass arguments correctly to the shell, so we use stdin
           # - JRuby's open cannot handle local variables properly so we would have to use instance variables
           Open3.popen3("sh -") do |stdin, stdout, stderr, thread|

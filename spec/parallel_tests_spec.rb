@@ -90,7 +90,7 @@ describe ParallelTests do
     end
 
     it "waits for other processes to finish" do
-      pending if RUBY_ENGINE == "jruby"
+      pending if RUBY_PLATFORM == "java"
       ENV["TEST_ENV_NUMBER"] = "2"
       counter = 0
       ParallelTests.stub(:sleep).with{ sleep 0.1; counter += 1 }
