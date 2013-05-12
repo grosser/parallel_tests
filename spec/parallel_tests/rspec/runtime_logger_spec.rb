@@ -73,4 +73,45 @@ describe ParallelTests::RSpec::RuntimeLogger do
     result.should_not include('FooBar')
     result.should include('foo.rb')
   end
+
+  context "integration" do
+    around do |example|
+      Dir.mktmpdir do |dir|
+        Dir.chdir(dir, &example)
+      end
+    end
+
+    def write(file, content)
+      FileUtils.mkdir_p(File.dirname(file))
+      File.open(file, 'w') { |f| f.write content }
+    end
+
+    it "logs shared examples into the running files" do
+      pending "no support in rspec for this :/"
+
+      write "spec/spec_helper.rb", <<-RUBY
+        shared_examples "foo" do
+          it "is slow" do
+            sleep 0.5
+          end
+        end
+      RUBY
+
+      ["a", "b"].each do |letter|
+        write "spec/#{letter}_spec.rb", <<-RUBY
+          require 'spec_helper'
+          describe 'xxx' do
+            it_behaves_like "foo"
+          end
+        RUBY
+      end
+
+      system("TEST_ENV_NUMBER=1 rspec spec -I #{Bundler.root.join("lib")} --format ParallelTests::RSpec::RuntimeLogger --out runtime.log 2>&1") || raise("nope")
+
+      result = File.read("runtime.log")
+      result.should include "a_spec:0.5"
+      result.should include "b_spec:0.5"
+      result.should_not include "spec_helper"
+    end
+  end
 end
