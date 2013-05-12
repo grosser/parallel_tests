@@ -12,7 +12,7 @@ module ParallelTests
       end
 
       def self.runtime_log
-        'tmp/parallel_runtime_test.log'
+        ENV['PARALLEL_TEST_RUNTIME_LOG'] || 'tmp/parallel_runtime_test.log'
       end
 
       def self.test_suffix
