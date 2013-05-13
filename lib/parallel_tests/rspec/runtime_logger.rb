@@ -5,15 +5,21 @@ class ParallelTests::RSpec::RuntimeLogger < ParallelTests::RSpec::LoggerBase
   def initialize(*args)
     super
     @example_times = Hash.new(0)
+    @current_group = nil
   end
 
-  def example_started(*args)
-    @time = ParallelTests.now
+  def example_group_started(example_group)
+    if @current_group == nil
+      @current_group = example_group
+      @time = ParallelTests.now
+    end
   end
-
-  def example_passed(example)
-    file = example.location.split(':').first
-    @example_times[file] += ParallelTests.now - @time
+  
+  def example_group_finished(example_group)
+    if @current_group == example_group
+      @example_times[example_group.file_path] += ParallelTests.now - @time
+      @current_group = nil
+    end
   end
 
   def dump_summary(*args);end
