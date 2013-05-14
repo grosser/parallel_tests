@@ -5,7 +5,6 @@ class ParallelTests::RSpec::RuntimeLogger < ParallelTests::RSpec::LoggerBase
   def initialize(*args)
     super
     @example_times = Hash.new(0)
-    @current_group = nil
   end
 
   def example_group_started(example_group)

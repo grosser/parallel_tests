@@ -87,8 +87,6 @@ describe ParallelTests::RSpec::RuntimeLogger do
     end
 
     it "logs shared examples into the running files" do
-      pending "no support in rspec for this :/"
-
       write "spec/spec_helper.rb", <<-RUBY
         shared_examples "foo" do
           it "is slow" do
