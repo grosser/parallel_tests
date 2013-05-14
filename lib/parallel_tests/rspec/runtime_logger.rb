@@ -9,17 +9,17 @@ class ParallelTests::RSpec::RuntimeLogger < ParallelTests::RSpec::LoggerBase
   end
 
   def example_group_started(example_group)
-    if @current_group == nil
-      @current_group = example_group
-      @time = ParallelTests.now
-    end
+    return if @current_group == nil
+    @current_group = example_group
+    @time = ParallelTests.now
   end
   
   def example_group_finished(example_group)
-    if @current_group == example_group
+    return if @current_group != example_group
+    if example_group.execution_result[:status] == 'passed'
       @example_times[example_group.file_path] += ParallelTests.now - @time
-      @current_group = nil
     end
+    @current_group = nil
   end
 
   def dump_summary(*args);end
