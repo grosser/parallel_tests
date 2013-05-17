@@ -21,17 +21,9 @@ describe ParallelTests::RSpec::RuntimeLogger do
         ParallelTests::RSpec::RuntimeLogger.new(f)
       end
 
-      example = (mock(:location => "#{Dir.pwd}/spec/foo.rb:123"))
-      logger.example_started example
-      logger.example_passed example
-      if options[:pending]
-        logger.example_pending example
-        logger.dump_pending
-      end
-      if options[:failed]
-        logger.example_failed example
-        logger.dump_failures
-      end
+      example = (mock(:file_path => "#{Dir.pwd}/spec/foo.rb"))
+      logger.example_group_started example
+      logger.example_group_finished example
       logger.start_dump
 
       #f.close
@@ -41,14 +33,6 @@ describe ParallelTests::RSpec::RuntimeLogger do
 
   it "logs runtime with relative paths" do
     log_for_a_file.should =~ @clean_output
-  end
-
-  it "does not log pending" do
-    log_for_a_file(:pending => true).should =~ @clean_output
-  end
-
-  it "does not log failures" do
-    log_for_a_file(:failed => true).should =~ @clean_output
   end
 
   it "does not log if we do not run in parallel" do
@@ -87,8 +71,6 @@ describe ParallelTests::RSpec::RuntimeLogger do
     end
 
     it "logs shared examples into the running files" do
-      pending "no support in rspec for this :/"
-
       write "spec/spec_helper.rb", <<-RUBY
         shared_examples "foo" do
           it "is slow" do
@@ -109,9 +91,36 @@ describe ParallelTests::RSpec::RuntimeLogger do
       system("TEST_ENV_NUMBER=1 rspec spec -I #{Bundler.root.join("lib")} --format ParallelTests::RSpec::RuntimeLogger --out runtime.log 2>&1") || raise("nope")
 
       result = File.read("runtime.log")
-      result.should include "a_spec:0.5"
-      result.should include "b_spec:0.5"
+      result.should include "a_spec.rb:0.5"
+      result.should include "b_spec.rb:0.5"
       result.should_not include "spec_helper"
+    end
+
+    it "logs multiple describe blocks" do
+      write "spec/a_spec.rb", <<-RUBY
+        describe "xxx" do
+          it "is slow" do
+            sleep 0.5
+          end
+        end
+
+        describe "yyy" do
+          it "is slow" do
+            sleep 0.5
+          end
+
+          describe "yep" do
+            it "is slow" do
+              sleep 0.5
+            end
+          end
+        end
+      RUBY
+
+      system("TEST_ENV_NUMBER=1 rspec spec -I #{Bundler.root.join("lib")} --format ParallelTests::RSpec::RuntimeLogger --out runtime.log 2>&1") || raise("nope")
+
+      result = File.read("runtime.log")
+      result.should include "a_spec.rb:1.5"
     end
   end
 end
