@@ -300,7 +300,6 @@ EOF
         result = call("ruby #{path}", 1, 4, {})
         result.should == {
           :stdout => "2\n",
-          :stderr => "",
           :exit_status => 0
         }
       end
@@ -311,7 +310,6 @@ EOF
         result = call("ruby #{path}", 0, 4, {})
         result.should == {
           :stdout => "\"\"\n",
-          :stderr => "",
           :exit_status => 0
         }
       end
@@ -322,24 +320,19 @@ EOF
         result = call("ruby #{path}", 1, 4, {})
         result.should == {
           :stdout => "4\n",
-          :stderr => "",
           :exit_status => 0
         }
       end
     end
 
     it "skips reads from stdin" do
-      if RUBY_VERSION =~ /^1\.8/
-        pending
-      else
-        run_with_file("$stdin.read; puts 123") do |path|
-          result = call("ruby #{path}", 1, 2, {})
-          result.should == {
-            :stdout => "123\n",
-            :stderr => "",
-            :exit_status => 0
-          }
-        end
+      pending "hangs on normal ruby, works on jruby" unless RUBY_PLATFORM == "java"
+      run_with_file("$stdin.read; puts 123") do |path|
+        result = call("ruby #{path}", 1, 2, {})
+        result.should == {
+          :stdout => "123\n",
+          :exit_status => 0
+        }
       end
     end
 
@@ -348,14 +341,13 @@ EOF
         result = call("ruby #{path}", 1, 4, {})
         result.should == {
           :stdout => "123\n345\n",
-          :stderr => "",
           :exit_status => 0
         }
       end
     end
 
     it "prints output while running" do
-      pending if RUBY_PLATFORM == "java"
+      pending "too slow" if RUBY_PLATFORM == " java"
       run_with_file("$stdout.sync = true; puts 123; sleep 0.1; print 345; sleep 0.1; puts 567") do |path|
         received = ""
         $stdout.stub(:print).with{|x| received << x.strip }
@@ -363,7 +355,6 @@ EOF
         received.should == "123345567"
         result.should == {
           :stdout => "123\n345567\n",
-          :stderr => "",
           :exit_status => 0
         }
       end
@@ -374,7 +365,6 @@ EOF
         result = call("ruby #{path}", 1, 4, {})
         result.should == {
           :stdout => "123\n345\n",
-          :stderr => "",
           :exit_status => 0
         }
       end
@@ -386,7 +376,6 @@ EOF
         result = call("ruby #{path}", 1, 4, :serialize_stdout => true)
         result.should == {
           :stdout => "123\n",
-          :stderr => "",
           :exit_status => 0
         }
       end
@@ -397,26 +386,21 @@ EOF
         result = call("ruby #{path}", 1, 4, {})
         result.should == {
           :stdout => "123\n",
-          :stderr => "",
           :exit_status => 5
         }
       end
     end
 
     it "prints each stream to the correct stream" do
-      if RUBY_VERSION =~ /^1\.8/
-        pending
-      else
-        out, err = run_with_file("puts 123 ; $stderr.puts 345 ; exit 5") do |path|
-          result = call("ruby #{path}", 1, 4, {})
-          result.should == {
-            :stdout => "123\n",
-            :stderr => "345\n",
-            :exit_status => 5
-          }
-        end
-        err.should == "345\n"
+      pending "open3"
+      out, err = run_with_file("puts 123 ; $stderr.puts 345 ; exit 5") do |path|
+        result = call("ruby #{path}", 1, 4, {})
+        result.should == {
+          :stdout => "123\n",
+          :exit_status => 5
+        }
       end
+      err.should == "345\n"
     end
 
     it "uses a lower priority process when the nice option is used" do

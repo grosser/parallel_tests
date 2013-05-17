@@ -63,30 +63,10 @@ module ParallelTests
         end.join(";")
         cmd = "#{exports};#{cmd}"
 
-        output, errput, exitstatus = nil
-        if RUBY_PLATFORM == "java"
-          # - JRuby's popen3 doesn't pass arguments correctly to the shell, so we use stdin
-          # - JRuby's open cannot handle local variables properly so we would have to use instance variables
-          Open3.popen3("sh -") do |stdin, stdout, stderr, thread|
-             stdin.puts cmd
-             stdin.close
-             output, errput = capture_output(stdout, stderr, silence)
-          end
-          exitstatus = $?.exitstatus
-        elsif RUBY_VERSION =~ /^1\.8/ or ENV["TEAMCITY_RAKE_RUNNER_MODE"] # fix #207
-          open("|#{cmd}", "r") do |output|
-            output, errput = capture_output(output, nil, silence)
-          end
-          exitstatus = $?.exitstatus
-        else
-          Open3.popen3(cmd) do |stdin, stdout, stderr, thread|
-            stdin.close
-            output, errput = capture_output(stdout, stderr, silence)
-            exitstatus = thread.value.exitstatus
-          end
-        end
+        output = open("|#{cmd}", "r") { |output| capture_output(output, silence) }
+        exitstatus = $?.exitstatus
 
-        {:stdout => output, :stderr => errput, :exit_status => exitstatus}
+        {:stdout => output, :exit_status => exitstatus}
       end
 
       def self.find_results(test_output)
@@ -126,24 +106,16 @@ module ParallelTests
       end
 
       # read output of the process and print it in chunks
-      def self.capture_output(out, err, silence)
-        results = ["", ""]
+      def self.capture_output(out, silence)
+        result = ""
         loop do
-          [[out, $stdout, 0], [err, $stderr, 1]].each do |input, output, index|
-            next unless input
-            begin
-              read = input.readpartial(1000000) # read whatever chunk we can get
-              results[index] << read
-              if index == 1 || !silence
-                output.print read
-                output.flush
-              end
-            rescue EOFError
-              raise if index == 0 # we only care about the end of stdout
-            end
+          begin
+            read = out.readpartial(1000000) # read whatever chunk we can get
+            result << read
+            $stdout.print read if !silence
           end
         end rescue EOFError
-        results
+        result
       end
 
       def self.with_runtime_info(tests)
