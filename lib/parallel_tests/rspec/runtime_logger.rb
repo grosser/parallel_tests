@@ -21,8 +21,10 @@ class ParallelTests::RSpec::RuntimeLogger < ParallelTests::RSpec::LoggerBase
     end
   else
     def example_group_started(example_group)
+      if @group_nesting == 0
+        @time = ParallelTests.now
+      end
       @group_nesting += 1
-      @time = ParallelTests.now
       super
     end
 
