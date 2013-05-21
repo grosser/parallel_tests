@@ -112,7 +112,10 @@ module ParallelTests
           begin
             read = out.readpartial(1000000) # read whatever chunk we can get
             result << read
-            $stdout.print read if !silence
+            unless silence
+              $stdout.print read
+              $stdout.flush
+            end
           end
         end rescue EOFError
         result
