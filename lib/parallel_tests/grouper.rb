@@ -40,8 +40,6 @@ module ParallelTests
       in_even_groups_by_size(features_with_steps, num_groups)
     end
 
-    private
-
     def self.build_features_with_steps(tests, options)
       require 'parallel_tests/cucumber/gherkin_listener'
       listener = Cucumber::GherkinListener.new
