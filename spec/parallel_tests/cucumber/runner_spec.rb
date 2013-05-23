@@ -43,11 +43,17 @@ describe ParallelTests::Cucumber do
       call(['xxx'],1,22,{})
     end
 
+    it "uses bin/cucumber when present" do
+      File.stub(:exists?).with("bin/cucumber").and_return true
+      should_run_with %r{bin/cucumber}
+      call(['xxx'],1,22,{})
+    end
+
     it "uses options passed in" do
       should_run_with %r{script/cucumber .* -p default}
       call(['xxx'],1,22,:test_options => '-p default')
     end
-    
+
     it "sanitizes dangerous file names" do
       should_run_with %r{xx\\ x}
       call(['xx x'],1,22,{})
