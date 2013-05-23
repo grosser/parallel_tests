@@ -20,9 +20,12 @@ module ParallelTests
       end
 
       def self.determine_executable
-        if ParallelTests.bundler_enabled?
+        case
+        when File.exists?("bin/cucumber")
+          "bin/cucumber"
+        when ParallelTests.bundler_enabled?
           "bundle exec cucumber"
-        elsif File.file?("script/cucumber")
+        when File.file?("script/cucumber")
           "script/cucumber"
         else
           "cucumber"
