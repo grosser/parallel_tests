@@ -1,3 +1,5 @@
+require 'parallel_tests/cucumber/scenarios'
+
 module ParallelTests
   class Grouper
     class << self
@@ -6,24 +8,24 @@ module ParallelTests
         in_even_groups_by_size(features_with_steps, num_groups)
       end
 
-      def in_even_groups_by_size(items_with_sizes, num_groups, options = {})
+      def by_scenario(tests, num_groups, options={})
+        scenarios = group_by_scenario(tests, options)
+        in_even_groups_by_size(scenarios, num_groups)
+      end
+
+      def in_even_groups_by_size(items, num_groups, options= {})
         groups = Array.new(num_groups) { {:items => [], :size => 0} }
 
         # add all files that should run in a single process to one group
         (options[:single_process] || []).each do |pattern|
-          matched, items_with_sizes = items_with_sizes.partition { |item, size| item =~ pattern }
+          matched, items = items.partition { |item, size| item =~ pattern }
           matched.each { |item, size| add_to_group(groups.first, item, size) }
         end
 
         groups_to_fill = (options[:isolate] ? groups[1..-1] : groups)
+        group_features_by_size(items_to_group(items), groups_to_fill)
 
-        # add all other files
-        largest_first(items_with_sizes).each do |item, size|
-          smallest = smallest_group(groups_to_fill)
-          add_to_group(smallest, item, size)
-        end
-
-        groups.map!{|g| g[:items].sort }
+        groups.map {|g| g[:items].sort }
       end
 
       private
@@ -45,11 +47,25 @@ module ParallelTests
         require 'parallel_tests/gherkin/listener'
         listener = ParallelTests::Gherkin::Listener.new
         listener.ignore_tag_pattern = Regexp.compile(options[:ignore_tag_pattern]) if options[:ignore_tag_pattern]
-        parser = ::Gherkin::Parser::Parser.new(listener, true, 'root')
-        tests.each{|file|
-          parser.parse(File.read(file), file, 0)
-        }
+        parser = Gherkin::Parser::Parser.new(listener, true, 'root')
+        tests.each{|file| parser.parse(File.read(file), file, 0) }
         listener.collect.sort_by{|_,value| -value }
+      end
+
+      def group_by_scenario(tests, options={})
+        ParallelTests::Cucumber::Scenarios.all(tests, options)
+      end
+
+      def group_features_by_size(items, groups_to_fill)
+        items.each do |item, size|
+          size ||= 1
+          smallest = smallest_group(groups_to_fill)
+          add_to_group(smallest, item, size)
+        end
+      end
+
+      def items_to_group(items)
+        items.first && items.first.size == 2 ? largest_first(items) : items
       end
     end
   end
