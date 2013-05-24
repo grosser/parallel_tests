@@ -49,4 +49,26 @@ describe ParallelTests::Grouper do
       call(6).should == [["5"], ["4"], ["3"], ["2"], ["1"], []]
     end
   end
+
+  describe :by_scenario do
+    let(:feature_file) do
+      Tempfile.new('grouper.feature').tap do |feature|
+        feature.write <<-EOS
+          Feature: Grouping by scenario
+
+            Scenario: First
+              Given I do nothing
+
+            Scenario: Second
+              Given I don't do anything
+        EOS
+        feature.rewind
+      end
+    end
+
+    it 'splits a feature into individual scenarios' do
+      groups = ParallelTests::Grouper.by_scenario([feature_file.path])
+      groups.should eq %W(#{feature_file.path}:3 #{feature_file.path}:6)
+    end
+  end
 end
