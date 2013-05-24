@@ -285,6 +285,7 @@ inspired by [pivotal labs](http://pivotallabs.com/users/miked/blog/articles/849-
  - [Jawwad Ahmad](https://github.com/jawwad)
  - [Iain Beeston](https://github.com/iainbeeston)
  - [Alejandro Pulver](https://github.com/alepulver)
+ - [Felix Clack](https://github.com/felixclack)
 
 [Michael Grosser](http://grosser.it)<br/>
 michael@grosser.it<br/>
