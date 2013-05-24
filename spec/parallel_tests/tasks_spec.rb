@@ -5,22 +5,32 @@ describe ParallelTests::Tasks do
   describe ".parse_args" do
     it "should return the count" do
       args = {:count => 2}
-      ParallelTests::Tasks.parse_args(args).should == [2, "", ""]
+      ParallelTests::Tasks.parse_args(args).should == [2, "", "", nil]
     end
 
     it "should default to the prefix" do
       args = {:count => "models"}
-      ParallelTests::Tasks.parse_args(args).should == [nil, "models", ""]
+      ParallelTests::Tasks.parse_args(args).should == [nil, "models", "", nil]
     end
 
     it "should return the count and pattern" do
       args = {:count => 2, :pattern => "models"}
-      ParallelTests::Tasks.parse_args(args).should == [2, "models", ""]
+      ParallelTests::Tasks.parse_args(args).should == [2, "models", "", nil]
     end
 
     it "should return the count, pattern, and options" do
       args = {:count => 2, :pattern => "plain", :options => "-p default"}
-      ParallelTests::Tasks.parse_args(args).should == [2, "plain", "-p default"]
+      ParallelTests::Tasks.parse_args(args).should == [2, "plain", "-p default", nil]
+    end
+
+    it "should return the count, pattern, options and parallel_options" do
+      args = {
+        :count => 2,
+        :pattern => "plain",
+        :options => "-p default",
+        :parallel_options => "--group-by steps"
+      }
+      ParallelTests::Tasks.parse_args(args).should == [2, "plain", "-p default", "--group-by steps"]
     end
   end
 

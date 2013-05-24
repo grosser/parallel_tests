@@ -38,7 +38,7 @@ module ParallelTests
         end
 
         def test_file_name
-          "feature"
+          @test_file_name || "feature"
         end
 
         def test_suffix
@@ -56,7 +56,7 @@ module ParallelTests
           sort_order = %w[scenario step failed undefined skipped pending passed]
 
           %w[scenario step].map do |group|
-            group_results = results.grep /^\d+ #{group}/
+            group_results = results.grep(/^\d+ #{group}/)
             next if group_results.empty?
 
             sums = sum_up_results(group_results)
@@ -86,8 +86,9 @@ module ParallelTests
         end
 
         def tests_in_groups(tests, num_groups, options={})
-          if options[:group_by] == :steps
-            Grouper.by_steps(find_tests(tests, options), num_groups, options)
+          @test_file_name = options[:group_by] == :scenario ? "scenario" : "feature"
+          if Grouper.respond_to?("by_#{options[:group_by]}".to_sym)
+            Grouper.send("by_#{options[:group_by]}".to_sym, find_tests(tests, options), num_groups, options)
           else
             super
           end
