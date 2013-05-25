@@ -52,7 +52,7 @@ describe ParallelTests::Test::RuntimeLogger do
     end
 
     def call(*args)
-      ParallelTests::Test::RuntimeLogger.message(*args)
+      ParallelTests::Test::RuntimeLogger.send(:message, *args)
     end
 
     it "formats results for simple test names" do
