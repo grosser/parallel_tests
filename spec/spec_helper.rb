@@ -90,7 +90,7 @@ def test_tests_in_groups(klass, folder, suffix)
 
     it "groups when given an array of files" do
       list_of_files = Dir["#{test_root}/**/*#{suffix}"]
-      found = klass.with_runtime_info(list_of_files)
+      found = klass.send(:with_runtime_info, list_of_files)
       found.should =~ list_of_files.map{ |file| [file, File.stat(file).size]}
     end
 

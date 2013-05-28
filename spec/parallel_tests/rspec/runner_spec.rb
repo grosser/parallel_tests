@@ -84,6 +84,12 @@ describe ParallelTests::RSpec::Runner do
       call('xxx', 1, 22, {})
     end
 
+    it "uses bin/rspec when present" do
+      File.stub(:exists?).with('bin/rspec').and_return true
+      should_run_with %r{bin/rspec}
+      call('xxx', 1, 22, {})
+    end
+
     it "uses no -O when no opts where found" do
       File.stub!(:file?).with('spec/spec.opts').and_return false
       should_not_run_with %r{spec/spec.opts}
