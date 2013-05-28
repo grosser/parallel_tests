@@ -1,9 +1,15 @@
+require 'parallel_tests/cucumber/scenarios'
+
 module ParallelTests
   class Grouper
     class << self
       def by_steps(tests, num_groups, options)
         features_with_steps = build_features_with_steps(tests, options)
         in_even_groups_by_size(features_with_steps, num_groups)
+      end
+
+      def by_scenario(tests)
+        group_by_scenario(tests)
       end
 
       def in_even_groups_by_size(items_with_sizes, num_groups, options = {})
@@ -23,7 +29,7 @@ module ParallelTests
           add_to_group(smallest, item, size)
         end
 
-        groups.map!{|g| g[:items].sort }
+        groups.map {|g| g[:items].sort }
       end
 
       private
@@ -50,6 +56,10 @@ module ParallelTests
           parser.parse(File.read(file), file, 0)
         }
         listener.collect.sort_by{|_,value| -value }
+      end
+
+      def group_by_scenario(tests)
+        ParallelTests::Cucumber::Scenarios.all(tests)
       end
     end
   end

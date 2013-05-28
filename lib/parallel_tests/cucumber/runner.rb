@@ -86,8 +86,11 @@ module ParallelTests
         end
 
         def tests_in_groups(tests, num_groups, options={})
-          if options[:group_by] == :steps
+          case options[:group_by]
+          when :steps
             Grouper.by_steps(find_tests(tests, options), num_groups, options)
+          when :scenarios
+            Grouper.by_scenario(find_tests(tests, options))
           else
             super
           end
