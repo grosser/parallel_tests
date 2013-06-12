@@ -9,7 +9,7 @@ Setup for Rails
 [still using Rails 2?](https://github.com/grosser/parallel_tests/blob/master/ReadmeRails2.md)
 
 ### Install
-If you use RSpec: ensure you got >= 2.4
+If you use RSpec: ensure you have >= 2.4
 
 As gem
 
