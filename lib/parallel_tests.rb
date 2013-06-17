@@ -1,5 +1,6 @@
 require "parallel"
 require "parallel_tests/railtie" if defined? Rails::Railtie
+require "rbconfig"
 
 module ParallelTests
   GREP_PROCESSES_COMMAND = \
