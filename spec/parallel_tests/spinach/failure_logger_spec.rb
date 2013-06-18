@@ -1,16 +1,16 @@
 require 'spec_helper'
 require 'parallel_tests/gherkin_bdd/io'
-require 'parallel_tests/cucumber/failures_logger'
+require 'parallel_tests/spinach/failures_logger'
 
-describe ParallelTests::Cucumber::FailuresLogger do
-
+describe ParallelTests::Spinach::FailuresLogger do
+=begin
   before do
     @output = OutputLogger.new([])
     @output.stub(:write)
 
-    @logger1 = ParallelTests::Cucumber::FailuresLogger.new(nil, @output, nil)
-    @logger2 = ParallelTests::Cucumber::FailuresLogger.new(nil, @output, nil)
-    @logger3 = ParallelTests::Cucumber::FailuresLogger.new(nil, @output, nil)
+    @logger1 = ParallelTests::Spinach::FailuresLogger.new(nil, @output, nil)
+    @logger2 = ParallelTests::Spinach::FailuresLogger.new(nil, @output, nil)
+    @logger3 = ParallelTests::Spinach::FailuresLogger.new(nil, @output, nil)
 
     @feature1 = mock('feature', :file => "feature/path/to/feature1.feature")
     @feature2 = mock('feature', :file => "feature/path/to/feature2.feature")
@@ -40,4 +40,6 @@ feature/path/to/feature3.feature:6
 feature/path/to/feature3.feature:9
 END
   end
+
+=end
 end

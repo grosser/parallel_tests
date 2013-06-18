@@ -47,7 +47,8 @@ test:
 ### Run!
     rake parallel:test          # Test::Unit
     rake parallel:spec          # RSpec
-    rake parallel:features      # Cucumber
+    rake parallel:cucumber      # Cucumber
+    rake parallel:spinach       # Spinach
 
     rake parallel:test[1] --> force 1 CPU --> 86 seconds
     rake parallel:test    --> got 2 CPUs? --> 47 seconds
@@ -183,7 +184,7 @@ Options are:
     -i, --isolate                    Do not run any other tests in the group used by --single(-s)
     -e, --exec [COMMAND]             execute this code parallel and with ENV['TEST_ENV_NUM']
     -o, --test-options '[OPTIONS]'   execute test commands with those options
-    -t, --type [TYPE]                test(default) / rspec / cucumber
+    -t, --type [TYPE]                test(default) / rspec / cucumber / spinach
         --serialize-stdout           Serialize stdout output, nothing will be written until everything is done
         --non-parallel               execute same commands but do not in parallel, needs --exec
         --no-symlinks                Do not traverse symbolic links to find test files

@@ -42,8 +42,8 @@ module ParallelTests
       end
 
       def build_features_with_steps(tests, options)
-        require 'parallel_tests/cucumber/gherkin_listener'
-        listener = Cucumber::GherkinListener.new
+        require 'parallel_tests/gherkin_bdd/gherkin_listener'
+        listener = GherkinBDD::GherkinListener.new
         listener.ignore_tag_pattern = Regexp.compile(options[:ignore_tag_pattern]) if options[:ignore_tag_pattern]
         parser = Gherkin::Parser::Parser.new(listener, true, 'root')
         tests.each{|file|

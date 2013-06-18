@@ -111,7 +111,7 @@ namespace :parallel do
     ParallelTests::Tasks.run_in_parallel("RAILS_ENV=#{ParallelTests::Tasks.rails_env} rake #{args.command}")
   end
 
-  ['test', 'spec', 'features'].each do |type|
+  ['test', 'spec', 'cucumber', 'spinach'].each do |type|
     desc "run #{type} in parallel with parallel:#{type}[num_cpus]"
     task type, [:count, :pattern, :options] do |t, args|
       ParallelTests::Tasks.check_for_pending_migrations
@@ -123,15 +123,19 @@ namespace :parallel do
       test_framework = {
         'spec' => 'rspec',
         'test' => 'test',
-        'features' => 'cucumber'
+        'cucumber' => 'cucumber',
+        'spinach' => 'spinach',
       }[type]
 
+      if test_framework == 'cucumber' || test_framework == 'spinach'
+        type = 'features'
+      end
       executable = File.join(File.dirname(__FILE__), '..', '..', 'bin', 'parallel_test')
+
       command = "#{executable} #{type} --type #{test_framework} " \
         "-n #{count} "                     \
         "--pattern '#{pattern}' "          \
         "--test-options '#{options}'"
-
       abort unless system(command) # allow to chain tasks e.g. rake parallel:spec parallel:features
     end
   end

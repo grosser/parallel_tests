@@ -1,14 +1,16 @@
 require "parallel_tests/gherkin_bdd/runner"
 
 module ParallelTests
-  module Cucumber
+  module Spinach
     class Runner < ParallelTests::GherkinBDD::Runner
-      NAME = 'Cucumber'
-      NAME_LOWER_CASE = 'cucumber'
+      NAME = 'Spinach'
+      NAME_LOWER_CASE = 'spinach'
       class << self
+
         def runtime_logging
+          #not yet supportd
           #" --format ParallelTests::#{NAME}::RuntimeLogger --out #{runtime_log}"
-          " --format ParallelTests::GherkinBDD::RuntimeLogger --out #{runtime_log}"
+          ""
         end
 
         def runtime_log
@@ -30,6 +32,7 @@ module ParallelTests
         end
 
       end
+
     end
   end
 end

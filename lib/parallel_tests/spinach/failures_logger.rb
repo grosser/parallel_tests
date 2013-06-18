@@ -1,9 +1,9 @@
-require 'cucumber/formatter/rerun'
+#require 'spinach/formatter/rerun'
 require 'parallel_tests/gherkin_bdd/io'
 
 module ParallelTests
-  module Cucumber
-    class FailuresLogger < ::Cucumber::Formatter::Rerun
+  module Spinach
+    class FailuresLogger #< ::Spinach::Formatter::Rerun
       include ParallelTests::GherkinBDD::Io
 
       def initialize(runtime, path_or_io, options)
