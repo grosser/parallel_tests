@@ -288,8 +288,6 @@ describe 'CLI' do
     end
   end
 
-
-
   context "Spinach" do
     before do
       write "features/steps/a.rb", "class A < Spinach::FeatureSteps\n  Given 'I print TEST_ENV_NUMBER' do\n    puts \"YOUR TEST ENV IS \#{ENV['TEST_ENV_NUMBER']}!\"\n  end\n  And 'I sleep a bit' do\n    sleep 0.2\n  end\nend"
@@ -345,7 +343,4 @@ describe 'CLI' do
       results.should include("Took")
     end
   end
-
-
-
 end
