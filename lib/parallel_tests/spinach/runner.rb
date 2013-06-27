@@ -8,8 +8,7 @@ module ParallelTests
       class << self
 
         def runtime_logging
-          #not yet supportd
-          #" --format ParallelTests::#{NAME}::RuntimeLogger --out #{runtime_log}"
+          #Not Yet Supported
           ""
         end
 

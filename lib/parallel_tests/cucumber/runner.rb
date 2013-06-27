@@ -7,7 +7,6 @@ module ParallelTests
       NAME_LOWER_CASE = 'cucumber'
       class << self
         def runtime_logging
-          #" --format ParallelTests::#{NAME}::RuntimeLogger --out #{runtime_log}"
           " --format ParallelTests::GherkinBDD::RuntimeLogger --out #{runtime_log}"
         end
 

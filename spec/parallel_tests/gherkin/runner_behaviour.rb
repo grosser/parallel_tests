@@ -2,17 +2,15 @@ require "spec_helper"
 require "parallel_tests/gherkin_bdd/runner"
 
 shared_examples_for 'gherkin runners' do
-  test_tests_in_groups(RUNNER_CLASS, 'features', ".feature")
-
   describe :run_tests do
     before do
       ParallelTests.stub!(:bundler_enabled?).and_return false
       File.stub!(:file?).with('.bundle/environment.rb').and_return false
-      File.stub!(:file?).with("script/#{NAME}").and_return true
+      File.stub!(:file?).with("script/#{runner_name}").and_return true
     end
 
     def call(*args)
-      RUNNER_CLASS.run_tests(*args)
+      runner_class().run_tests(*args)
     end
 
     def should_run_with(regex)
@@ -26,72 +24,72 @@ shared_examples_for 'gherkin runners' do
       ENV.delete('PARALLEL_TESTS_EXECUTABLE')
     end
 
-    it "runs bundle exec #{NAME} when on bundler 0.9" do
+    it "runs bundle exec {runner_name} when on bundler 0.9" do
       ParallelTests.stub!(:bundler_enabled?).and_return true
-      should_run_with %r{bundle exec #{NAME}}
+      should_run_with %r{bundle exec #{runner_name}}
       call(['xxx'], 1, 22, {})
     end
 
-    it "runs script/#{NAME} when script/#{NAME} is found" do
-      should_run_with %r{script/#{NAME}}
+    it "runs script/{runner_name} when script/{runner_name} is found" do
+      should_run_with %r{script/#{runner_name}}
       call(['xxx'], 1, 22, {})
     end
 
-    it "runs #{NAME} by default" do
-      File.stub!(:file?).with("script/#{NAME}").and_return false
-      should_run_with %r{^#{NAME}}
+    it "runs {runner_name} by default" do
+      File.stub!(:file?).with("script/#{runner_name}").and_return false
+      should_run_with %r{^#{runner_name}}
       call(['xxx'], 1, 22, {})
     end
 
-    it "uses bin/#{NAME} when present" do
-      File.stub(:exists?).with("bin/#{NAME}").and_return true
-      should_run_with %r{bin/#{NAME}}
+    it "uses bin/{runner_name} when present" do
+      File.stub(:exists?).with("bin/#{runner_name}").and_return true
+      should_run_with %r{bin/#{runner_name}}
       call(['xxx'], 1, 22, {})
     end
 
     it "uses options passed in" do
-      should_run_with %r{script/#{NAME} .* -p default}
+      should_run_with %r{script/#{runner_name} .* -p default}
       call(['xxx'], 1, 22, :test_options => '-p default')
     end
 
-    it "sanitizes dangerous file names" do
+    it "sanitizes dangerous file runner_names" do
       should_run_with %r{xx\\ x}
       call(['xx x'], 1, 22, {})
     end
 
-    context "with parallel profile in config/#{NAME}.yml" do
+    context "with parallel profile in config/{runner_name}.yml" do
       before do
         file_contents = 'parallel: -f progress'
-        Dir.stub(:glob).and_return ["config/#{NAME}.yml"]
-        File.stub(:read).with("config/#{NAME}.yml").and_return file_contents
+        Dir.stub(:glob).and_return ["config/#{runner_name}.yml"]
+        File.stub(:read).with("config/#{runner_name}.yml").and_return file_contents
       end
 
       it "uses parallel profile" do
-        should_run_with %r{script/#{NAME} .* foo bar --profile parallel xxx}
+        should_run_with %r{script/#{runner_name} .* foo bar --profile parallel xxx}
         call(['xxx'], 1, 22, :test_options => 'foo bar')
       end
 
       it "uses given profile via --profile" do
-        should_run_with %r{script/#{NAME} .* --profile foo xxx$}
+        should_run_with %r{script/#{runner_name} .* --profile foo xxx$}
         call(['xxx'], 1, 22, :test_options => '--profile foo')
       end
 
       it "uses given profile via -p" do
-        should_run_with %r{script/#{NAME} .* -p foo xxx$}
+        should_run_with %r{script/#{runner_name} .* -p foo xxx$}
         call(['xxx'], 1, 22, :test_options => '-p foo')
       end
     end
 
-    it "does not use parallel profile if config/#{NAME}.yml does not contain it" do
+    it "does not use parallel profile if config/{runner_name}.yml does not contain it" do
       file_contents = 'blob: -f progress'
-      should_run_with %r{script/#{NAME} .* foo bar}
-      Dir.should_receive(:glob).and_return ["config/#{NAME}.yml"]
-      File.should_receive(:read).with("config/#{NAME}.yml").and_return file_contents
+      should_run_with %r{script/#{runner_name} .* foo bar}
+      Dir.should_receive(:glob).and_return ["config/#{runner_name}.yml"]
+      File.should_receive(:read).with("config/#{runner_name}.yml").and_return file_contents
       call(['xxx'], 1, 22, :test_options => 'foo bar')
     end
 
-    it "does not use the parallel profile if config/#{NAME}.yml does not exist" do
-      should_run_with %r{script/#{NAME}} # TODO this test looks useless...
+    it "does not use the parallel profile if config/{runner_name}.yml does not exist" do
+      should_run_with %r{script/#{runner_name}} # TODO this test looks useless...
       Dir.should_receive(:glob).and_return []
       call(['xxx'], 1, 22, {})
     end
@@ -100,27 +98,27 @@ shared_examples_for 'gherkin runners' do
   describe :line_is_result? do
     it "should match lines with only one scenario" do
       line = "1 scenario (1 failed)"
-      RUNNER_CLASS.line_is_result?(line).should be_true
+      runner_class().line_is_result?(line).should be_true
     end
 
     it "should match lines with multiple scenarios" do
       line = "2 scenarios (1 failed, 1 passed)"
-      RUNNER_CLASS.line_is_result?(line).should be_true
+      runner_class().line_is_result?(line).should be_true
     end
 
     it "should match lines with only one step" do
       line = "1 step (1 failed)"
-      RUNNER_CLASS.line_is_result?(line).should be_true
+      runner_class().line_is_result?(line).should be_true
     end
 
     it "should match lines with multiple steps" do
       line = "5 steps (1 failed, 4 passed)"
-      RUNNER_CLASS.line_is_result?(line).should be_true
+      runner_class().line_is_result?(line).should be_true
     end
 
     it "should not match other lines" do
       line = '    And I should have "2" emails                                # features/step_definitions/user_steps.rb:25'
-      RUNNER_CLASS.line_is_result?(line).should be_false
+      runner_class().line_is_result?(line).should be_false
     end
   end
 
@@ -145,13 +143,13 @@ And I should not see "foo"                                       # features/step
 1 step (1 passed)
 
 EOF
-      RUNNER_CLASS.find_results(output).should == ["7 scenarios (3 failed, 4 passed)", "33 steps (3 failed, 2 skipped, 28 passed)", "4 scenarios (4 passed)", "40 steps (40 passed)", "1 scenario (1 passed)", "1 step (1 passed)"]
+      runner_class().find_results(output).should == ["7 scenarios (3 failed, 4 passed)", "33 steps (3 failed, 2 skipped, 28 passed)", "4 scenarios (4 passed)", "40 steps (40 passed)", "1 scenario (1 passed)", "1 step (1 passed)"]
     end
   end
 
   describe :summarize_results do
     def call(*args)
-      RUNNER_CLASS.summarize_results(*args)
+      runner_class().summarize_results(*args)
     end
 
     it "sums up results for scenarios and steps separately from each other" do
