@@ -127,7 +127,7 @@ namespace :parallel do
         'features-spinach' => 'spinach',
       }[type]
 
-      if test_framework == 'features-spinach'
+      if test_framework == 'spinach'
         type = 'features'
       end
       executable = File.join(File.dirname(__FILE__), '..', '..', 'bin', 'parallel_test')
