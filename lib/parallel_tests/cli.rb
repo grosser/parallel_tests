@@ -97,6 +97,7 @@ BANNER
 group tests by:
           found - order of finding files
           steps - number of cucumber steps
+          scenarios - individual cucumber scenarios
           default - runtime or filesize
 TEXT
 ) { |type| options[:group_by] = type.to_sym }
