@@ -7,15 +7,13 @@ module ParallelTests
         def name
           'spinach'
         end
+
         def runtime_logging
           #Not Yet Supported
           ""
         end
 
-
-
       end
-
     end
   end
 end
