@@ -1,7 +1,7 @@
-require 'parallel_tests/gherkin_bdd/io'
+require 'parallel_tests/gherkin/io'
 
 module ParallelTests
-  module GherkinBDD
+  module Gherkin
     class RuntimeLogger
       include Io
 

@@ -1,5 +1,5 @@
 require "spec_helper"
-require "parallel_tests/gherkin_bdd/runner"
+require "parallel_tests/gherkin/runner"
 
 shared_examples_for 'gherkin runners' do
   describe :run_tests do

@@ -2,7 +2,7 @@ require "parallel_tests/test/runner"
 require 'shellwords'
 
 module ParallelTests
-  module GherkinBDD
+  module Gherkin
     class Runner < ParallelTests::Test::Runner
 
       class << self
@@ -76,7 +76,7 @@ module ParallelTests
 
 
         def runtime_logging
-          " --format ParallelTests::GherkinBDD::RuntimeLogger --out #{runtime_log}"
+          " --format ParallelTests::Gherkin::RuntimeLogger --out #{runtime_log}"
         end
 
         def runtime_log

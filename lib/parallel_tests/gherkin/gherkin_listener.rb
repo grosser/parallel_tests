@@ -1,7 +1,7 @@
 require 'gherkin'
 
 module ParallelTests
-  module GherkinBDD
+  module Gherkin
     class GherkinListener
       attr_reader :collect
 

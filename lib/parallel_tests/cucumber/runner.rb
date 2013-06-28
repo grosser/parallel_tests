@@ -1,8 +1,8 @@
-require "parallel_tests/gherkin_bdd/runner"
+require "parallel_tests/gherkin/runner"
 
 module ParallelTests
   module Cucumber
-    class Runner < ParallelTests::GherkinBDD::Runner
+    class Runner < ParallelTests::Gherkin::Runner
       class << self
         def name
           'cucumber'
