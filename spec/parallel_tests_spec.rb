@@ -94,10 +94,10 @@ describe ParallelTests do
       ENV["TEST_ENV_NUMBER"] = "2"
       counter = 0
       ParallelTests.stub(:sleep).with{ sleep 0.1; counter += 1 }
-      with_running_processes(2, 0.4) do
+      with_running_processes(2, 0.6) do
         ParallelTests.wait_for_other_processes_to_finish
       end
-      counter.should == 3
+      counter.should >= 2
     end
   end
 
