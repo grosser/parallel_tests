@@ -111,7 +111,7 @@ namespace :parallel do
     ParallelTests::Tasks.run_in_parallel("RAILS_ENV=#{ParallelTests::Tasks.rails_env} rake #{args.command}")
   end
 
-  ['test', 'spec', 'cucumber', 'spinach'].each do |type|
+  ['test', 'spec', 'features', 'features-spinach'].each do |type|
     desc "run #{type} in parallel with parallel:#{type}[num_cpus]"
     task type, [:count, :pattern, :options] do |t, args|
       ParallelTests::Tasks.check_for_pending_migrations
