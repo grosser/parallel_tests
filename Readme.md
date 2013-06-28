@@ -47,8 +47,8 @@ test:
 ### Run!
     rake parallel:test          # Test::Unit
     rake parallel:spec          # RSpec
-    rake parallel:cucumber      # Cucumber
-    rake parallel:spinach       # Spinach
+    rake parallel:features      # Cucumber
+    rake parallel:features-spinach       # Spinach
 
     rake parallel:test[1] --> force 1 CPU --> 86 seconds
     rake parallel:test    --> got 2 CPUs? --> 47 seconds
@@ -165,6 +165,7 @@ Setup for non-rails
     parallel_test test/
     parallel_rspec spec/
     parallel_cucumber features/
+    parallel_spinach features/
 
  - use ENV['TEST_ENV_NUMBER'] inside your tests to select separate db/memcache/etc.
  - Only run selected files & folders:

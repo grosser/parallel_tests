@@ -5,13 +5,8 @@ require "parallel_tests/spinach/runner"
 describe ParallelTests::Spinach::Runner do
   test_tests_in_groups(ParallelTests::Spinach::Runner, 'features', ".feature")
 
-  def runner_name
-    'spinach'
+  it_should_behave_like 'gherkin runners' do
+    let(:runner_name) {'spinach'}
+    let(:runner_class){ParallelTests::Spinach::Runner}
   end
-
-  def runner_class
-    ParallelTests::Spinach::Runner
-  end
-
-  it_should_behave_like 'gherkin runners'
 end

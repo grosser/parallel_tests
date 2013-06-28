@@ -123,11 +123,11 @@ namespace :parallel do
       test_framework = {
         'spec' => 'rspec',
         'test' => 'test',
-        'cucumber' => 'cucumber',
-        'spinach' => 'spinach',
+        'features' => 'cucumber',
+        'features-spinach' => 'spinach',
       }[type]
 
-      if test_framework == 'cucumber' || test_framework == 'spinach'
+      if test_framework == 'features-spinach'
         type = 'features'
       end
       executable = File.join(File.dirname(__FILE__), '..', '..', 'bin', 'parallel_test')

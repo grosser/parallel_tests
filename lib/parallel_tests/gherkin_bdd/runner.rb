@@ -60,7 +60,7 @@ module ParallelTests
 
         def profile_from_config
           # copied from https://github.com/cucumber/cucumber/blob/master/lib/cucumber/cli/profile_loader.rb#L85
-          config = Dir.glob('{,.config/,config/}#{NAME_LOWER_CASE}{.yml,.yaml}').first
+          config = Dir.glob("{,.config/,config/}#{name}{.yml,.yaml}").first
           if config && File.read(config) =~ /^parallel:/
             "--profile parallel"
           end
@@ -73,6 +73,29 @@ module ParallelTests
             super
           end
         end
+
+
+        def runtime_logging
+          " --format ParallelTests::GherkinBDD::RuntimeLogger --out #{runtime_log}"
+        end
+
+        def runtime_log
+          "tmp/parallel_runtime_#{name}.log"
+        end
+
+        def determine_executable
+          case
+            when File.exists?("bin/#{name}")
+              "bin/#{name}"
+            when ParallelTests.bundler_enabled?
+              "bundle exec #{name}"
+            when File.file?("script/#{name}")
+              "script/#{name}"
+            else
+              "#{name}"
+          end
+        end
+
       end
     end
   end
