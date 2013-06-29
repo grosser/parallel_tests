@@ -1,7 +1,7 @@
-require 'parallel_tests/cucumber/io'
+require 'parallel_tests/gherkin/io'
 
 module ParallelTests
-  module Cucumber
+  module Gherkin
     class RuntimeLogger
       include Io
 

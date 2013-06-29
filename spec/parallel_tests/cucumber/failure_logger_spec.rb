@@ -1,5 +1,5 @@
 require 'spec_helper'
-require 'parallel_tests/cucumber/io'
+require 'parallel_tests/gherkin/io'
 require 'parallel_tests/cucumber/failures_logger'
 
 describe ParallelTests::Cucumber::FailuresLogger do

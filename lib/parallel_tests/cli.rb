@@ -96,7 +96,7 @@ BANNER
         opts.on("--group-by [TYPE]", <<-TEXT
 group tests by:
           found - order of finding files
-          steps - number of cucumber steps
+          steps - number of cucumber/spinach steps
           default - runtime or filesize
 TEXT
 ) { |type| options[:group_by] = type.to_sym }
@@ -117,7 +117,7 @@ TEXT
 
         opts.on("-e", "--exec [COMMAND]", "execute this code parallel and with ENV['TEST_ENV_NUM']") { |path| options[:execute] = path }
         opts.on("-o", "--test-options '[OPTIONS]'", "execute test commands with those options") { |arg| options[:test_options] = arg }
-        opts.on("-t", "--type [TYPE]", "test(default) / rspec / cucumber") do |type|
+        opts.on("-t", "--type [TYPE]", "test(default) / rspec / cucumber / spinach") do |type|
           begin
             @runner = load_runner(type)
           rescue NameError, LoadError => e
