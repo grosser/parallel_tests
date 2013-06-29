@@ -236,6 +236,8 @@ describe 'CLI' do
       write "features/steps/a.rb", "
         Given('I print TEST_ENV_NUMBER'){ puts \"YOUR TEST ENV IS \#{ENV['TEST_ENV_NUMBER']}!\" }
         And('I sleep a bit'){ sleep 0.2 }
+        And('I pass'){ true }
+        And('I fail'){ fail }
       "
     end
 
@@ -285,6 +287,22 @@ describe 'CLI' do
       results = run_tests("", :type => "cucumber")
       results.should include("2 processes for 0 features")
       results.should include("Took")
+    end
+
+    it "collates failing scenarios" do
+      write "features/pass.feature", "Feature: xxx\n  Scenario: xxx\n    Given I pass"
+      write "features/fail1.feature", "Feature: xxx\n  Scenario: xxx\n    Given I fail"
+      write "features/fail2.feature", "Feature: xxx\n  Scenario: xxx\n    Given I fail"
+      results = run_tests "features", :processes => 3, :type => "cucumber", :fail => true
+
+      results.should include """
+Failing Scenarios:
+cucumber features/fail2.feature:2 # Scenario: xxx
+cucumber features/fail1.feature:2 # Scenario: xxx
+
+3 scenarios (2 failed, 1 passed)
+3 steps (2 failed, 1 passed)
+"""
     end
   end
 
