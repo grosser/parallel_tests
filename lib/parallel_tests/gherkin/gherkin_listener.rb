@@ -1,7 +1,7 @@
 require 'gherkin'
 
 module ParallelTests
-  module Cucumber
+  module Gherkin
     class GherkinListener
       attr_reader :collect
 

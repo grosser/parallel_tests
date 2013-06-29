@@ -1,12 +1,18 @@
 require "parallel_tests/gherkin/runner"
 
 module ParallelTests
-  module Cucumber
+  module Spinach
     class Runner < ParallelTests::Gherkin::Runner
       class << self
         def name
-          'cucumber'
+          'spinach'
         end
+
+        def runtime_logging
+          #Not Yet Supported
+          ""
+        end
+
       end
     end
   end

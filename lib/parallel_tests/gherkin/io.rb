@@ -1,7 +1,7 @@
 require 'parallel_tests'
 
 module ParallelTests
-  module Cucumber
+  module Gherkin
     module Io
 
       def prepare_io(path_or_io)

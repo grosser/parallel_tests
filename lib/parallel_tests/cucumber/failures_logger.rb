@@ -1,10 +1,10 @@
 require 'cucumber/formatter/rerun'
-require 'parallel_tests/cucumber/io'
+require 'parallel_tests/gherkin/io'
 
 module ParallelTests
   module Cucumber
     class FailuresLogger < ::Cucumber::Formatter::Rerun
-      include Io
+      include ParallelTests::Gherkin::Io
 
       def initialize(runtime, path_or_io, options)
         @io = prepare_io(path_or_io)

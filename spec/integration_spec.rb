@@ -132,6 +132,11 @@ describe 'CLI' do
     `#{bin_folder}/parallel_cucumber -v`.should == version
   end
 
+  it "runs through parallel_spinach" do
+    version = `#{executable} -v`
+    `#{bin_folder}/parallel_spinach -v`.should == version
+  end
+
   it "runs with --group-by found" do
     # it only tests that it does not blow up, as it did before fixing...
     write "spec/x1_spec.rb", "puts '111'"
@@ -278,6 +283,62 @@ describe 'CLI' do
 
     it "runs successfully without any files" do
       results = run_tests("", :type => "cucumber")
+      results.should include("2 processes for 0 features")
+      results.should include("Took")
+    end
+  end
+
+  context "Spinach", :filter_for_ruby_187 => true do
+    before do
+      write "features/steps/a.rb", "class A < Spinach::FeatureSteps\n  Given 'I print TEST_ENV_NUMBER' do\n    puts \"YOUR TEST ENV IS \#{ENV['TEST_ENV_NUMBER']}!\"\n  end\n  And 'I sleep a bit' do\n    sleep 0.2\n  end\nend"
+    end
+
+    it "runs tests which outputs accented characters" do
+      write "features/good1.feature", "Feature: a\n  Scenario: xxx\n    Given I print accented characters"
+      write "features/steps/a.rb", "#encoding: utf-8\nclass A < Spinach::FeatureSteps\nGiven 'I print accented characters' do\n  puts \"I tu też\" \n  end\nend"
+      result = run_tests "features", :type => "spinach", :add => 'features/good1.feature'#, :add => '--pattern good'
+      result.should include('I tu też')
+    end
+
+    it "passes TEST_ENV_NUMBER when running with pattern (issue #86)" do
+      write "features/good1.feature", "Feature: a\n  Scenario: xxx\n    Given I print TEST_ENV_NUMBER"
+      write "features/good2.feature", "Feature: a\n  Scenario: xxx\n    Given I print TEST_ENV_NUMBER"
+      write "features/b.feature", "Feature: b\n  Scenario: xxx\n    Given I FAIL" #Expect this not to be run
+      write "features/steps/a.rb", "class A < Spinach::FeatureSteps\nGiven('I print TEST_ENV_NUMBER'){ puts \"YOUR TEST ENV IS \#{ENV['TEST_ENV_NUMBER']}!\" }\nend"
+
+      result = run_tests "features", :type => "spinach", :add => '--pattern good'
+
+      result.should include('YOUR TEST ENV IS 2!')
+      result.should include('YOUR TEST ENV IS !')
+      result.should_not include('I FAIL')
+    end
+
+    it "writes a runtime log" do
+      pending 'not yet implemented -- custom runtime logging'
+      log = "tmp/parallel_runtime_spinach.log"
+      write(log, "x")
+
+      2.times{|i|
+        # needs sleep so that runtime loggers dont overwrite each other initially
+        write "features/good#{i}.feature", "Feature: A\n  Scenario: xxx\n    Given I print TEST_ENV_NUMBER\n    And I sleep a bit"
+      }
+      result = run_tests "features", :type => "spinach"
+      read(log).gsub(/\.\d+/,'').split("\n").should =~ [
+        "features/good0.feature:0",
+        "features/good1.feature:0"
+      ]
+    end
+
+    it "runs each feature once when there are more processes then features (issue #89)" do
+      2.times{|i|
+        write "features/good#{i}.feature", "Feature: A\n  Scenario: xxx\n    Given I print TEST_ENV_NUMBER\n"
+      }
+      result = run_tests "features", :type => "spinach", :add => '-n 3'
+      result.scan(/YOUR TEST ENV IS \d?!/).sort.should == ["YOUR TEST ENV IS !", "YOUR TEST ENV IS 2!"]
+    end
+
+    it "runs successfully without any files" do
+      results = run_tests("", :type => "spinach")
       results.should include("2 processes for 0 features")
       results.should include("Took")
     end

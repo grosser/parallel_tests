@@ -1,9 +1,9 @@
-require 'parallel_tests/cucumber/gherkin_listener'
+require 'parallel_tests/gherkin/gherkin_listener'
 
-describe ParallelTests::Cucumber::GherkinListener do
+describe ParallelTests::Gherkin::GherkinListener do
   describe :collect do
     before(:each) do
-      @listener = ParallelTests::Cucumber::GherkinListener.new
+      @listener = ParallelTests::Gherkin::GherkinListener.new
       @listener.uri("feature_file")
     end
 
