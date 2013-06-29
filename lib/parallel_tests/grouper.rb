@@ -42,8 +42,8 @@ module ParallelTests
       end
 
       def build_features_with_steps(tests, options)
-        require 'parallel_tests/gherkin/gherkin_listener'
-        listener = ParallelTests::Gherkin::GherkinListener.new
+        require 'parallel_tests/gherkin/listener'
+        listener = ParallelTests::Gherkin::Listener.new
         listener.ignore_tag_pattern = Regexp.compile(options[:ignore_tag_pattern]) if options[:ignore_tag_pattern]
         parser = ::Gherkin::Parser::Parser.new(listener, true, 'root')
         tests.each{|file|

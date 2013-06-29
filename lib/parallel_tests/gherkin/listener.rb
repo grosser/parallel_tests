@@ -2,7 +2,7 @@ require 'gherkin'
 
 module ParallelTests
   module Gherkin
-    class GherkinListener
+    class Listener
       attr_reader :collect
 
       attr_writer :ignore_tag_pattern
