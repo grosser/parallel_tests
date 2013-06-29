@@ -288,6 +288,7 @@ inspired by [pivotal labs](http://pivotallabs.com/users/miked/blog/articles/849-
  - [Iain Beeston](https://github.com/iainbeeston)
  - [Alejandro Pulver](https://github.com/alepulver)
  - [Felix Clack](https://github.com/felixclack)
+ - [Izaak Alpert](https://github.com/karlhungus)
 
 [Michael Grosser](http://grosser.it)<br/>
 michael@grosser.it<br/>
