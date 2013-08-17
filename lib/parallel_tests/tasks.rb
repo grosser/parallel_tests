@@ -101,6 +101,12 @@ namespace :parallel do
     ParallelTests::Tasks.run_in_parallel(ParallelTests::Tasks.suppress_output(command, "^   ->\\|^-- "), args)
   end
 
+  # load the structure from the structure.sql file
+  desc "load structure for test databases via db:structure:load --> parallel:load_structure[num_cpus]"
+  task :load_structure, :count do |t,args|
+    ParallelTests::Tasks.run_in_parallel("rake db:structure:load RAILS_ENV=#{ParallelTests::Tasks.rails_env}", args)
+  end
+
   desc "load the seed data from db/seeds.rb via db:seed --> parallel:seed[num_cpus]"
   task :seed, :count do |t,args|
     ParallelTests::Tasks.run_in_parallel("rake db:seed RAILS_ENV=#{ParallelTests::Tasks.rails_env}", args)
