@@ -123,6 +123,7 @@ describe ParallelTests::Tasks do
   describe ".check_for_pending_migrations" do
     after do
       Rake.application.instance_variable_get('@tasks').delete("db:abort_if_pending_migrations")
+      Rake.application.instance_variable_get('@tasks').delete("app:db:abort_if_pending_migrations")
     end
 
     it "should do nothing if pending migrations is no defined" do
@@ -132,6 +133,15 @@ describe ParallelTests::Tasks do
     it "should run pending migrations is task is defined" do
       foo = 1
       Rake::Task.define_task("db:abort_if_pending_migrations") do
+        foo = 2
+      end
+      ParallelTests::Tasks.check_for_pending_migrations
+      foo.should == 2
+    end
+
+    it "should run pending migrations is app task is defined" do
+      foo = 1
+      Rake::Task.define_task("app:db:abort_if_pending_migrations") do
         foo = 2
       end
       ParallelTests::Tasks.check_for_pending_migrations
