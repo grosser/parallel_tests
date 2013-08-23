@@ -290,6 +290,7 @@ inspired by [pivotal labs](http://pivotallabs.com/users/miked/blog/articles/849-
  - [Felix Clack](https://github.com/felixclack)
  - [Izaak Alpert](https://github.com/karlhungus)
  - [Micah Geisel](https://github.com/botandrose)
+ - [Exoth](https://github.com/Exoth)
 
 [Michael Grosser](http://grosser.it)<br/>
 michael@grosser.it<br/>
