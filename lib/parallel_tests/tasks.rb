@@ -38,9 +38,11 @@ module ParallelTests
       end
 
       def check_for_pending_migrations
-        abort_migrations = "db:abort_if_pending_migrations"
-        if Rake::Task.task_defined?(abort_migrations)
-          Rake::Task[abort_migrations].invoke
+        ["db:abort_if_pending_migrations", "app:db:abort_if_pending_migrations"].each do |abort_migrations|
+          if Rake::Task.task_defined?(abort_migrations)
+            Rake::Task[abort_migrations].invoke
+            break
+          end
         end
       end
 
@@ -84,7 +86,8 @@ namespace :parallel do
     else
       # there is no separate dump / load for schema_format :sql -> do it safe and slow
       args = args.to_hash.merge(:non_parallel => true) # normal merge returns nil
-      ParallelTests::Tasks.run_in_parallel('rake db:test:prepare --trace', args)
+      taskname = Rake::Task.task_defined?('db:test:prepare') ? 'db:test:prepare' : 'app:db:test:prepare'
+      ParallelTests::Tasks.run_in_parallel("rake #{taskname} --trace", args)
     end
   end
 
