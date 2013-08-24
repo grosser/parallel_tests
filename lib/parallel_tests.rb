@@ -1,8 +1,14 @@
 require "parallel"
 require "parallel_tests/railtie" if defined? Rails::Railtie
+require "rbconfig"
 
 module ParallelTests
-  GREP_PROCESSES_COMMAND = "ps -ef | grep [T]EST_ENV_NUMBER= 2>&1"
+  GREP_PROCESSES_COMMAND = \
+  if RbConfig::CONFIG['host_os'] =~ /win32/
+    "wmic process get commandline | findstr TEST_ENV_NUMBER 2>&1"
+  else
+    "ps -ef | grep [T]EST_ENV_NUMBER= 2>&1"
+  end
 
   autoload :CLI, "parallel_tests/cli"
   autoload :VERSION, "parallel_tests/version"
