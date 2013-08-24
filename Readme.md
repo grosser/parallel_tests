@@ -291,6 +291,7 @@ inspired by [pivotal labs](http://pivotallabs.com/users/miked/blog/articles/849-
  - [Izaak Alpert](https://github.com/karlhungus)
  - [Micah Geisel](https://github.com/botandrose)
  - [Exoth](https://github.com/Exoth)
+ - [sidfarkus](https://github.com/sidfarkus)
 
 [Michael Grosser](http://grosser.it)<br/>
 michael@grosser.it<br/>
