@@ -153,6 +153,7 @@ Or add the formatter to the `parallel:` profile of your `cucumber.yml`:
 
     parallel: --format progress --format ParallelTests::Cucumber::FailuresLogger --out tmp/cucumber_failures.log
 
+Note if your `cucumber.yml` default profile uses `<%= std_opts %>` you may need to insert this as follows `parallel: <%= std_opts %> --format progress...`
 
 To rerun failures:
 
