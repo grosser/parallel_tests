@@ -227,7 +227,7 @@ TIPS
  - [ZSH] use quotes to use rake arguments `rake "parallel:prepare[3]"`
  - [email_spec and/or action_mailer_cache_delivery](https://github.com/grosser/parallel_tests/wiki)
  - [Memcached] use different namespaces e.g. `config.cache_store = ..., :namespace => "test_#{ENV['TEST_ENV_NUMBER']}"`
- - Use a key => value pair when setting environment variables
+ - Use a key => value pair when setting environment variables (make sure both key and values are in quotes)
 
 TODO
 ====
