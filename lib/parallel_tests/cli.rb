@@ -117,7 +117,7 @@ TEXT
 
         opts.on("-e", "--exec [COMMAND]", "execute this code parallel and with ENV['TEST_ENV_NUM']") { |path| options[:execute] = path }
         opts.on("-o", "--test-options '[OPTIONS]'", "execute test commands with those options") { |arg| options[:test_options] = arg }
-        opts.on("-en","--environment-options '[OPTIONS]'", "Add environment varaibles to tests") { |arg| options[:env] = arg }
+        opts.on("--environment-variables '[OPTION]'", "Add environment varaibles to tests") { |arg| options[:env] = {arg.split('=')[0] => arg.split('=')[1]}}
         opts.on("-t", "--type [TYPE]", "test(default) / rspec / cucumber / spinach") do |type|
           begin
             @runner = load_runner(type)
