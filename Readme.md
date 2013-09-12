@@ -175,25 +175,26 @@ Setup for non-rails
 
 Options are:
 
-    -n [PROCESSES]                   How many processes to use, default: available CPUs
-    -p, --pattern [PATTERN]          run tests matching this pattern
-        --group-by [TYPE]            group tests by:
+    -n [PROCESSES]                   	How many processes to use, default: available CPUs
+    -en,--environment-options [options] Inject environment variables into tasks
+    -p, --pattern [PATTERN]          	run tests matching this pattern
+        --group-by [TYPE]            	group tests by:
           found - order of finding files
           steps - number of cucumber steps
           default - runtime or filesize
-    -m, --multiply-processes [FLOAT] use given number as a multiplier of processes to run
-    -s, --single [PATTERN]           Run all matching files in the same process
-    -i, --isolate                    Do not run any other tests in the group used by --single(-s)
-    -e, --exec [COMMAND]             execute this code parallel and with ENV['TEST_ENV_NUM']
-    -o, --test-options '[OPTIONS]'   execute test commands with those options
-    -t, --type [TYPE]                test(default) / rspec / cucumber / spinach
-        --serialize-stdout           Serialize stdout output, nothing will be written until everything is done
-        --non-parallel               execute same commands but do not in parallel, needs --exec
-        --no-symlinks                Do not traverse symbolic links to find test files
-        --ignore-tags [PATTERN]      When counting steps ignore scenarios with tags that match this pattern
-        --nice                       execute test commands with low priority.
-    -v, --version                    Show Version
-    -h, --help                       Show this.
+    -m, --multiply-processes [FLOAT] 	use given number as a multiplier of processes to run
+    -s, --single [PATTERN]           	Run all matching files in the same process
+    -i, --isolate                    	Do not run any other tests in the group used by --single(-s)
+    -e, --exec [COMMAND]             	execute this code parallel and with ENV['TEST_ENV_NUM']
+    -o, --test-options '[OPTIONS]'   	execute test commands with those options
+    -t, --type [TYPE]                	test(default) / rspec / cucumber / spinach
+        --serialize-stdout           	Serialize stdout output, nothing will be written until everything is done
+        --non-parallel               	execute same commands but do not in parallel, needs --exec
+        --no-symlinks                	Do not traverse symbolic links to find test files
+        --ignore-tags [PATTERN]      	When counting steps ignore scenarios with tags that match this pattern
+        --nice                       	execute test commands with low priority.
+    -v, --version                    	Show Version
+    -h, --help                       	Show this.
 
 You can run any kind of code in parallel with -e / --execute
 
@@ -228,6 +229,7 @@ TIPS
  - [ZSH] use quotes to use rake arguments `rake "parallel:prepare[3]"`
  - [email_spec and/or action_mailer_cache_delivery](https://github.com/grosser/parallel_tests/wiki)
  - [Memcached] use different namespaces e.g. `config.cache_store = ..., :namespace => "test_#{ENV['TEST_ENV_NUMBER']}"`
+ - Use a key => value pair when setting environment variables (make sure both key and values are in quotes)
 
 TODO
 ====
