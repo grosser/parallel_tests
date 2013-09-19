@@ -2,10 +2,6 @@ require "spec_helper"
 require "parallel_tests/env/runner"
 
 describe ParallelTests::Env::Runner do
-  before :each do
-    ENV['PARALLEL_TEST_SUFFIX'] = "_spec.rb"
-  end
-
   test_tests_in_groups(ParallelTests::Env::Runner, 'test', '_spec.rb')
 
   describe ".find_tests" do

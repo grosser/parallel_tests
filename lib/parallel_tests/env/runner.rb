@@ -13,7 +13,7 @@ module ParallelTests
         end
 
         def test_suffix
-          ENV['PARALLEL_TEST_SUFFIX'] || "_test.rb"
+          "_{test,spec}.rb"
         end
 
         def run_tests(test_files, process_number, num_processes, options)
