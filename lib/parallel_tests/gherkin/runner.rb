@@ -23,7 +23,7 @@ module ParallelTests
         end
 
         def test_suffix
-          ".feature"
+          /\.feature/
         end
 
         def line_is_result?(line)

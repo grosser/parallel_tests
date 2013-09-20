@@ -17,7 +17,7 @@ module ParallelTests
         end
 
         def test_suffix
-          "_{test,spec}.rb"
+          /_(test|spec).rb/
         end
 
         def test_file_name
@@ -151,7 +151,7 @@ module ParallelTests
           (tests || []).map do |file_or_folder|
             if File.directory?(file_or_folder)
               files = files_in_folder(file_or_folder, options)
-              files.grep(options[:pattern]||//)
+              files.grep(test_suffix).grep(options[:pattern]||//)
             else
               file_or_folder
             end
@@ -166,7 +166,7 @@ module ParallelTests
             # http://stackoverflow.com/questions/357754/can-i-traverse-symlinked-directories-in-ruby-with-a-glob
             "**{,/*/**}/*"
           end
-          Dir[File.join(folder, pattern + test_suffix)].uniq
+          Dir[File.join(folder, pattern)].uniq
         end
       end
     end
