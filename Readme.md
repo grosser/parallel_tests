@@ -17,14 +17,6 @@ As gem
 # add to Gemfile
 gem "parallel_tests", :group => :development
 ```
-OR as plugin
-
-    rails plugin install git://github.com/grosser/parallel_tests.git
-
-```ruby
-# add to Gemfile
-gem "parallel", :group => :development
-```
 
 ### Add to `config/database.yml`
 ParallelTests uses 1 database per test-process.
@@ -294,6 +286,7 @@ inspired by [pivotal labs](http://pivotallabs.com/users/miked/blog/articles/849-
  - [Micah Geisel](https://github.com/botandrose)
  - [Exoth](https://github.com/Exoth)
  - [sidfarkus](https://github.com/sidfarkus)
+ - [Colin Harris](https://github.com/aberant)
 
 [Michael Grosser](http://grosser.it)<br/>
 michael@grosser.it<br/>
