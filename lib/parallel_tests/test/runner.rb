@@ -17,7 +17,7 @@ module ParallelTests
         end
 
         def test_suffix
-          /_(test|spec).rb/
+          /_(test|spec).rb$/
         end
 
         def test_file_name
