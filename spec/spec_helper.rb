@@ -156,15 +156,13 @@ def test_tests_in_groups(klass, folder, suffix)
   end
 end
 
-module FindTestsHelper
-  def with_files(files)
-    Dir.mktmpdir do |root|
-      files.each do |file|
-        parent = "#{root}/#{File.dirname(file)}"
-        `mkdir -p #{parent}` unless File.exist?(parent)
-        `touch #{root}/#{file}`
-      end
-      yield root
+def with_files(files)
+  Dir.mktmpdir do |root|
+    files.each do |file|
+      parent = "#{root}/#{File.dirname(file)}"
+      `mkdir -p #{parent}` unless File.exist?(parent)
+      `touch #{root}/#{file}`
     end
+    yield root
   end
 end

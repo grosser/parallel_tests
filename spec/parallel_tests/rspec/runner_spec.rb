@@ -186,8 +186,6 @@ ff.**..
   end
 
   describe ".find_tests" do
-    include FindTestsHelper
-
     def call(*args)
       ParallelTests::RSpec::Runner.send(:find_tests, *args)
     end

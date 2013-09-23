@@ -176,8 +176,6 @@ EOF
   end
 
   describe ".find_tests" do
-    include FindTestsHelper
-
     def call(*args)
       ParallelTests::Gherkin::Runner.send(:find_tests, *args)
     end
