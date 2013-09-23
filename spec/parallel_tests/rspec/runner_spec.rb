@@ -184,4 +184,20 @@ ff.**..
       call(output).should == ['0 examples, 0 failures, 0 pending','1 examples, 1 failures, 1 pending']
     end
   end
+
+  describe ".find_tests" do
+    include FindTestsHelper
+
+    def call(*args)
+      ParallelTests::RSpec::Runner.send(:find_tests, *args)
+    end
+
+    it "doesn't find bakup files with the same name as test files" do
+      with_files(['a/x_spec.rb','a/x_spec.rb.bak']) do |root|
+        call(["#{root}/"]).should == [
+          "#{root}/a/x_spec.rb",
+        ]
+      end
+    end
+  end
 end

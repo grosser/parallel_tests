@@ -3,6 +3,7 @@ require "parallel_tests/test/runner"
 
 describe ParallelTests::Test::Runner do
   test_tests_in_groups(ParallelTests::Test::Runner, 'test', '_test.rb')
+  test_tests_in_groups(ParallelTests::Test::Runner, 'test', '_spec.rb')
 
   describe ".run_tests" do
     def call(*args)
@@ -128,31 +129,10 @@ EOF
   end
 
   describe ".find_tests" do
+    include FindTestsHelper
+
     def call(*args)
       ParallelTests::Test::Runner.send(:find_tests, *args)
-    end
-
-    def with_files(files)
-      begin
-        root = "/tmp/test-find_tests-#{rand(999)}"
-        `mkdir #{root}`
-        files.each do |file|
-          parent = "#{root}/#{File.dirname(file)}"
-          `mkdir -p #{parent}` unless File.exist?(parent)
-          `touch #{root}/#{file}`
-        end
-        yield root
-      ensure
-        `rm -rf #{root}`
-      end
-    end
-
-    def inside_dir(dir)
-      old = Dir.pwd
-      Dir.chdir dir
-      yield
-    ensure
-      Dir.chdir old
     end
 
     it "finds test in folders with appended /" do
@@ -226,6 +206,22 @@ EOF
             "a/z_test.rb",
           ]
         end
+      end
+    end
+
+    it "doesn't find bakup files with the same name as test files" do
+      with_files(['a/x_test.rb','a/x_test.rb.bak']) do |root|
+        call(["#{root}/"]).should == [
+          "#{root}/a/x_test.rb",
+        ]
+      end
+    end
+
+    it "finds minispec files" do
+      with_files(['a/x_spec.rb']) do |root|
+        call(["#{root}/"]).should == [
+          "#{root}/a/x_spec.rb",
+        ]
       end
     end
 

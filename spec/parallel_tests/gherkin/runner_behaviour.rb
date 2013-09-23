@@ -174,4 +174,20 @@ EOF
       call(["1 scenario (1 passed)", "1 step (1 passed)"]).should == "1 scenario (1 passed)\n1 step (1 passed)"
     end
   end
+
+  describe ".find_tests" do
+    include FindTestsHelper
+
+    def call(*args)
+      ParallelTests::Gherkin::Runner.send(:find_tests, *args)
+    end
+
+    it "doesn't find bakup files with the same name as test files" do
+      with_files(['a/x.feature','a/x.feature.bak']) do |root|
+        call(["#{root}/"]).should == [
+          "#{root}/a/x.feature",
+        ]
+      end
+    end
+  end
 end
