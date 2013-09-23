@@ -190,7 +190,7 @@ EOF
 
     it "does not expand paths" do
       with_files(['a/x_test.rb']) do |root|
-        inside_dir root do
+        Dir.chdir root do
           call(['a']).sort.should == [
             "a/x_test.rb"
           ]
@@ -200,7 +200,7 @@ EOF
 
     it "finds test files in folders by pattern" do
       with_files(['a/x_test.rb','a/y_test.rb','a/z_test.rb']) do |root|
-        inside_dir root do
+        Dir.chdir root do
           call(["a"], :pattern => /^a\/(y|z)_test/).sort.should == [
             "a/y_test.rb",
             "a/z_test.rb",

@@ -158,25 +158,13 @@ end
 
 module FindTestsHelper
   def with_files(files)
-    begin
-      root = "/tmp/test-find_tests-#{rand(999)}"
-      `mkdir #{root}`
+    Dir.mktmpdir do |root|
       files.each do |file|
         parent = "#{root}/#{File.dirname(file)}"
         `mkdir -p #{parent}` unless File.exist?(parent)
         `touch #{root}/#{file}`
       end
       yield root
-    ensure
-      `rm -rf #{root}`
     end
-  end
-
-  def inside_dir(dir)
-    old = Dir.pwd
-    Dir.chdir dir
-    yield
-  ensure
-    Dir.chdir old
   end
 end
