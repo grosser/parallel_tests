@@ -220,6 +220,7 @@ TIPS
  - [ZSH] use quotes to use rake arguments `rake "parallel:prepare[3]"`
  - [email_spec and/or action_mailer_cache_delivery](https://github.com/grosser/parallel_tests/wiki)
  - [Memcached] use different namespaces e.g. `config.cache_store = ..., :namespace => "test_#{ENV['TEST_ENV_NUMBER']}"`
+ - [zeus-parallel_tests](https://github.com/sevos/zeus-parallel_tests)
 
 TODO
 ====
