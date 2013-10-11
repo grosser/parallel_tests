@@ -1,3 +1,3 @@
 module ParallelTests
-  VERSION = Version = '0.16.0'
+  VERSION = Version = '0.16.1'
 end
