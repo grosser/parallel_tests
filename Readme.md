@@ -90,10 +90,12 @@ end
 Loggers
 ===================
 
-Even process runtimes
------------------
+Even test group run-times
+-------------------------
 
-Log test runtime to give each process the same runtime.
+Add the `RuntimeLogger` to log how long each test takes to run.
+This log file will be loaded on the next test run, and the tests will be grouped
+so that each process should finish around the same time.
 
 Rspec: Add to your `.rspec_parallel` (or `.rspec`) :
 
