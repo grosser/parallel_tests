@@ -31,16 +31,16 @@ describe ParallelTests::Gherkin::Listener do
     it "counts scenario outlines steps separately" do
       @listener.scenario_outline("outline")
       5.times {@listener.step(nil)}
-      @listener.collect.should == {"feature_file" => 0}
+      @listener.examples(stub('examples', :rows => Array.new(3)))
+      @listener.collect.should == {"feature_file" => 15}
 
       @listener.scenario("scenario")
       2.times {@listener.step(nil)}
-      @listener.collect.should == {"feature_file" => 2}
+      @listener.collect.should == {"feature_file" => 17}
 
       @listener.scenario("scenario")
-      @listener.collect.should == {"feature_file" => 2}
+      @listener.collect.should == {"feature_file" => 17}
 
-      3.times {@listener.examples}
       @listener.eof
       @listener.collect.should == {"feature_file" => 17}
     end
@@ -71,15 +71,14 @@ describe ParallelTests::Gherkin::Listener do
       @listener.ignore_tag_pattern = nil
       @listener.scenario_outline( stub('scenario', :tags =>[ stub('tag', :name => '@WIP' )]) )
       @listener.step(nil)
-      3.times {@listener.examples}
+      @listener.examples(stub('examples', :rows => Array.new(3)))
       @listener.eof
       @listener.collect.should == {"feature_file" => 3}
-
 
       @listener.ignore_tag_pattern = /@something_other_than_WIP/
       @listener.scenario_outline( stub('scenario', :tags =>[ stub('tag', :name => '@WIP' )]) )
       @listener.step(nil)
-      3.times {@listener.examples}
+      @listener.examples(stub('examples', :rows => Array.new(3)))
       @listener.eof
       @listener.collect.should == {"feature_file" => 6}
     end
@@ -88,7 +87,7 @@ describe ParallelTests::Gherkin::Listener do
       @listener.ignore_tag_pattern = /@WIP/
       @listener.scenario_outline( stub('scenario', :tags =>[ stub('tag', :name => '@WIP' )]) )
       @listener.step(nil)
-      3.times {@listener.examples}
+      @listener.examples(stub('examples', :rows => Array.new(3)))
       @listener.eof
       @listener.collect.should == {"feature_file" => 0}
     end

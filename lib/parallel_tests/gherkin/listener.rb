@@ -48,17 +48,22 @@ module ParallelTests
         @collect[@uri] = 0
       end
 
-      def examples(*args)
-        @examples += 1
+      #
+      # @param  [Gherkin::Formatter::Model::Examples]  examples
+      #
+      def examples(examples)
+        if examples.rows.size > 0
+          @collect[@uri] += (@outline_steps * examples.rows.size)
+        end
       end
 
       def eof(*args)
-        @collect[@uri] += (@background_steps * @scenarios) + (@outline_steps * @examples)
+        @collect[@uri] += (@background_steps * @scenarios)
         reset_counters!
       end
 
       def reset_counters!
-        @examples = @outline = @outline_steps = @background = @background_steps = @scenarios = 0
+        @outline = @outline_steps = @background = @background_steps = @scenarios = 0
         @ignoring = nil
       end
 
