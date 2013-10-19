@@ -290,6 +290,7 @@ inspired by [pivotal labs](http://pivotallabs.com/users/miked/blog/articles/849-
  - [Exoth](https://github.com/Exoth)
  - [sidfarkus](https://github.com/sidfarkus)
  - [Colin Harris](https://github.com/aberant)
+ - [Wataru MIYAGUNI](https://github.com/gongo)
 
 [Michael Grosser](http://grosser.it)<br/>
 michael@grosser.it<br/>
