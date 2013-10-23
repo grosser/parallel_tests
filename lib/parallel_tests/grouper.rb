@@ -47,7 +47,7 @@ module ParallelTests
         require 'parallel_tests/gherkin/listener'
         listener = ParallelTests::Gherkin::Listener.new
         listener.ignore_tag_pattern = Regexp.compile(options[:ignore_tag_pattern]) if options[:ignore_tag_pattern]
-        parser = Gherkin::Parser::Parser.new(listener, true, 'root')
+        parser = ::Gherkin::Parser::Parser.new(listener, true, 'root')
         tests.each{|file| parser.parse(File.read(file), file, 0) }
         listener.collect.sort_by{|_,value| -value }
       end

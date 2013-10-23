@@ -51,18 +51,18 @@ module ParallelTests
           output.join("\n\n")
         end
 
-        private
-
-        def failing_scenario_regex
-          /^cucumber features\/.+:\d+/
-        end
-
         def tests_in_groups(tests, num_groups, options={})
           if options[:group_by] == :steps
             Grouper.by_steps(find_tests(tests, options), num_groups, options)
           else
             super
           end
+        end
+
+        private
+
+        def failing_scenario_regex
+          /^cucumber features\/.+:\d+/
         end
       end
     end
