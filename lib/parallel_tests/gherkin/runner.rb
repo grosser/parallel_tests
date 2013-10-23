@@ -74,7 +74,6 @@ module ParallelTests
           end
         end
 
-
         def runtime_logging
           " --format ParallelTests::Gherkin::RuntimeLogger --out #{runtime_log}"
         end
@@ -95,7 +94,6 @@ module ParallelTests
               "#{name}"
           end
         end
-
       end
     end
   end

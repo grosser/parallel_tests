@@ -2,7 +2,7 @@ require 'gherkin/tag_expression'
 require 'cucumber/runtime'
 require 'cucumber'
 require 'parallel_tests/cucumber/scenario_line_logger'
-require 'parallel_tests/cucumber/gherkin_listener'
+require 'parallel_tests/gherkin/listener'
 
 module ParallelTests
   module Cucumber
@@ -20,7 +20,7 @@ module ParallelTests
         private
 
         def split_into_scenarios(files, tags=[])
-          tag_expression = Gherkin::TagExpression.new(tags)
+          tag_expression = ::Gherkin::TagExpression.new(tags)
           scenario_line_logger = ParallelTests::Cucumber::Formatters::ScenarioLineLogger.new(tag_expression)
           loader = ::Cucumber::Runtime::FeaturesLoader.new(files, [], tag_expression)
 
