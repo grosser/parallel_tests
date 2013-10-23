@@ -360,5 +360,27 @@ cucumber features/fail1.feature:2 # Scenario: xxx
       results.should include("2 processes for 0 features")
       results.should include("Took")
     end
+
+    it "groups by scenario" do
+      write "features/long.feature", <<-EOS
+      Feature: xxx
+        Scenario: xxx
+          Given I print TEST_ENV_NUMBER
+
+        Scenario: xxx
+          Given I print TEST_ENV_NUMBER
+      EOS
+      result = run_tests "features", :type => "cucumber", :add => "--group-by scenario"
+      result.should include("2 processes for 2 scenarios")
+    end
+
+    it "groups by step" do
+      write "features/good1.feature", "Feature: xxx\n  Scenario: xxx\n    Given I print TEST_ENV_NUMBER"
+      write "features/good2.feature", "Feature: xxx\n  Scenario: xxx\n    Given I print TEST_ENV_NUMBER"
+
+      result = run_tests "features", :type => "cucumber", :add => '--group-by steps'
+
+      result.should include("2 processes for 2 features")
+    end
   end
 end
