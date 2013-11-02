@@ -403,5 +403,15 @@ EOF
       priority_with_nice = run_with_file(priority_cmd){ |cmd| call("ruby #{cmd}", 1, 4, :nice => true) }.first.to_i
       priority_without_nice.should < priority_with_nice
     end
+
+    it "replaces REPLACE_TEST_ENV_NUMBER" do
+      run_with_file("puts ARGV.first") do |path|
+        result = call("ruby #{path} REPLACE_TEST_ENV_NUMBER", 1, 4, {})
+        result.should == {
+          :stdout => "2\n",
+          :exit_status => 0
+        }
+      end
+    end
   end
 end

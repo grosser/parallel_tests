@@ -50,17 +50,19 @@ module ParallelTests
         end
 
         def execute_command(cmd, process_number,  num_processes, options)
+          number = test_env_number(process_number)
           env = (options[:env] || {}).merge(
-            "TEST_ENV_NUMBER" => test_env_number(process_number),
+            "TEST_ENV_NUMBER" => number,
             "PARALLEL_TEST_GROUPS" => num_processes
           )
+          cmd.gsub!("REPLACE_TEST_ENV_NUMBER", number.to_s)
           cmd = "nice #{cmd}" if options[:nice]
           execute_command_and_capture_output(env, cmd, options[:serialize_stdout])
         end
 
         def execute_command_and_capture_output(env, cmd, silence)
           # make processes descriptive / visible in ps -ef
-          windows = RbConfig::CONFIG['host_os'] =~ /cygwin|mswin|mingw|bccwin|wince|emx/ 
+          windows = RbConfig::CONFIG['host_os'] =~ /cygwin|mswin|mingw|bccwin|wince|emx/
           separator = windows ? ' & ' : ';'
           exports = env.map do |k,v|
             if windows
