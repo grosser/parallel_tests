@@ -8,7 +8,7 @@ module ParallelTests
       end
 
       def run_in_parallel(cmd, options={})
-        count = " -n #{options[:count]}" if options[:count]
+        count = " -n #{options[:count]}" unless options[:count].to_s.empty?
         executable = File.expand_path("../../../bin/parallel_test", __FILE__)
         command = "#{executable} --exec '#{cmd}'#{count}#{' --non-parallel' if options[:non_parallel]}"
         abort unless system(command)

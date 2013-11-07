@@ -48,7 +48,7 @@ describe ParallelTests::Tasks do
   describe ".run_in_parallel" do
     let(:full_path){ File.expand_path("../../../bin/parallel_test", __FILE__) }
 
-    it "should have the executable" do
+    it "has the executable" do
       File.file?(full_path).should == true
       File.executable?(full_path).should == true
     end
@@ -61,6 +61,11 @@ describe ParallelTests::Tasks do
     it "runs command with :count option" do
       ParallelTests::Tasks.should_receive(:system).with("#{full_path} --exec 'echo' -n 123").and_return true
       ParallelTests::Tasks.run_in_parallel("echo", :count => 123)
+    end
+
+    it "runs without -n with blank :count option" do
+      ParallelTests::Tasks.should_receive(:system).with("#{full_path} --exec 'echo'").and_return true
+      ParallelTests::Tasks.run_in_parallel("echo", :count => "")
     end
 
     it "runs command with :non_parallel option" do
