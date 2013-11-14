@@ -39,7 +39,7 @@ module ParallelTests
         end
 
         def test_suffix
-          /_spec\.rb$/
+          /^spec\/(features\/.*\.feature|.*_spec\.rb)$/
         end
 
         private
