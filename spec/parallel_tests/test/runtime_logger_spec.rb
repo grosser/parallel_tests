@@ -20,8 +20,8 @@ describe ParallelTests::Test::RuntimeLogger do
       ParallelTests::Test::RuntimeLogger.send(:class_variable_set,:@@has_started, false)
       ParallelTests::Test::RuntimeLogger.log(test, time, Time.at(time.to_f+2.00))
       result = File.read(log)
-      result.should_not include('FooBar')
-      result.should include('test/fake_test.rb:2.00')
+      expect(result).to_not include('FooBar')
+      expect(result).to include('test/fake_test.rb:2.00')
     end
 
     it "appends to the runtime_log file after first log invocation" do
@@ -38,9 +38,9 @@ describe ParallelTests::Test::RuntimeLogger do
       ParallelTests::Test::RuntimeLogger.log(test, time, Time.at(time.to_f+2.00))
       ParallelTests::Test::RuntimeLogger.log(other_test, time, Time.at(time.to_f+2.00))
       result = File.read(log)
-      result.should_not include('FooBar')
-      result.should include('test/fake_test.rb:2.00')
-      result.should include('test/other_fake_test.rb:2.00')
+      expect(result).to_not include('FooBar')
+      expect(result).to include('test/fake_test.rb:2.00')
+      expect(result).to include('test/other_fake_test.rb:2.00')
     end
   end
 
@@ -60,7 +60,7 @@ describe ParallelTests::Test::RuntimeLogger do
       end
       test = FakeTest.new
       time = Time.now
-      call(test, time, Time.at(time.to_f+2.00)).should == 'test/fake_test.rb:2.00'
+      expect(call(test, time, Time.at(time.to_f+2.00))).to eq 'test/fake_test.rb:2.00'
     end
 
     it "formats results for complex test names" do
@@ -70,7 +70,7 @@ describe ParallelTests::Test::RuntimeLogger do
       end
       test = AVeryComplex::FakeTest.new
       time = Time.now
-      call(test, time, Time.at(time.to_f+2.00)).should == 'test/a_very_complex/fake_test.rb:2.00'
+      expect(call(test, time, Time.at(time.to_f+2.00))).to eq 'test/a_very_complex/fake_test.rb:2.00'
     end
 
     it "guesses subdirectory structure for rails test classes" do
@@ -83,7 +83,7 @@ describe ParallelTests::Test::RuntimeLogger do
         end
         test = FakeControllerTest.new
         time = Time.now
-        call(test, time, Time.at(time.to_f+2.00)).should == 'test/functional/fake_controller_test.rb:2.00'
+        expect(call(test, time, Time.at(time.to_f+2.00))).to eq 'test/functional/fake_controller_test.rb:2.00'
       end
     end
   end

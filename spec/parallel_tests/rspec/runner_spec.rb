@@ -18,41 +18,41 @@ describe ParallelTests::RSpec::Runner do
     end
 
     def should_run_with(regex)
-      ParallelTests::Test::Runner.should_receive(:execute_command).with{|a,b,c,d| a =~ regex}
+      expect(ParallelTests::Test::Runner).to receive(:execute_command).with{|a,b,c,d| a.match(regex)}
     end
 
     def should_not_run_with(regex)
-      ParallelTests::Test::Runner.should_receive(:execute_command).with{|a,b,c,d| a !~ regex}
+      expect(ParallelTests::Test::Runner).to receive(:execute_command).with{|a,b,c,d| a !~ regex}
     end
 
     it "runs command using nice when specifed" do
-      ParallelTests::Test::Runner.should_receive(:execute_command_and_capture_output).with{|a,b,c| b =~ %r{^nice rspec}}
+      expect{(ParallelTests::Test::Runner).to receive(:execute_command_and_capture_output).with{|a,b,c| b match( %r{^nice rspec})}}.to be_true
       call('xxx', 1, 22, :nice => true)
     end
 
     it "runs with color when called from cmdline" do
       should_run_with %r{ --tty}
-      $stdout.should_receive(:tty?).and_return true
+      expect($stdout).to receive(:tty?).and_return true
       call('xxx', 1, 22, {})
     end
 
     it "runs without color when not called from cmdline" do
       should_not_run_with %r{ --tty}
-      $stdout.should_receive(:tty?).and_return false
+      expect($stdout).to receive(:tty?).and_return false
       call('xxx', 1, 22, {})
     end
 
     it "runs with color for rspec 1 when called for the cmdline" do
-      File.should_receive(:file?).with('script/spec').and_return true
-      ParallelTests::Test::Runner.should_receive(:execute_command).with { |a, b, c, d| d[:env] == {"RSPEC_COLOR" => "1"} }
-      $stdout.should_receive(:tty?).and_return true
+      expect(File).to receive(:file?).with('script/spec').and_return true
+      expect(ParallelTests::Test::Runner).to receive(:execute_command).with { |a, b, c, d| d[:env] == {"RSPEC_COLOR" => "1"} }
+      expect($stdout).to receive(:tty?).and_return true
       call('xxx', 1, 22, {})
     end
 
     it "runs without color for rspec 1 when not called for the cmdline" do
-      File.should_receive(:file?).with('script/spec').and_return true
-      ParallelTests::Test::Runner.should_receive(:execute_command).with { |a, b, c, d| d[:env] == {} }
-      $stdout.should_receive(:tty?).and_return false
+      expect(File).to receive(:file?).with('script/spec').and_return true
+      expect(ParallelTests::Test::Runner).to receive(:execute_command).with { |a, b, c, d| d[:env] == {} }
+      expect($stdout).to receive(:tty?).and_return false
       call('xxx', 1, 22, {})
     end
 
@@ -73,7 +73,7 @@ describe ParallelTests::RSpec::Runner do
     end
 
     it "runs script/spec when script/spec can be found" do
-      File.should_receive(:file?).with('script/spec').and_return true
+      expect(File).to receive(:file?).with('script/spec').and_return true
       should_run_with %r{script/spec}
       call('xxx' ,1, 22, {})
     end
@@ -105,20 +105,20 @@ describe ParallelTests::RSpec::Runner do
 
     it "uses -O spec/parallel_spec.opts when found (with script/spec)" do
       File.stub!(:file?).with('script/spec').and_return true
-      File.should_receive(:file?).with('spec/parallel_spec.opts').and_return true
+      expect(File).to receive(:file?).with('spec/parallel_spec.opts').and_return true
       should_run_with %r{script/spec\s+-O spec/parallel_spec.opts}
       call('xxx', 1, 22, {})
     end
 
     it "uses -O .rspec_parallel when found (with script/spec)" do
       File.stub!(:file?).with('script/spec').and_return true
-      File.should_receive(:file?).with('.rspec_parallel').and_return true
+      expect(File).to receive(:file?).with('.rspec_parallel').and_return true
       should_run_with %r{script/spec\s+-O .rspec_parallel}
       call('xxx', 1, 22, {})
     end
 
     it "uses -O spec/parallel_spec.opts with rspec1" do
-      File.should_receive(:file?).with('spec/parallel_spec.opts').and_return true
+      expect(File).to receive(:file?).with('spec/parallel_spec.opts').and_return true
 
       ParallelTests.stub!(:bundler_enabled?).and_return true
       ParallelTests::RSpec::Runner.stub!(:run).with("bundle show rspec-core").and_return "Could not find gem 'rspec-core'."
@@ -129,7 +129,7 @@ describe ParallelTests::RSpec::Runner do
 
     it "uses -O spec/parallel_spec.opts with rspec2" do
       pending if RUBY_PLATFORM == "java" # FIXME not sure why, but fails on travis
-      File.should_receive(:file?).with('spec/parallel_spec.opts').and_return true
+      expect(File).to receive(:file?).with('spec/parallel_spec.opts').and_return true
 
       ParallelTests.stub!(:bundler_enabled?).and_return true
       ParallelTests::RSpec::Runner.stub!(:run).with("bundle show rspec-core").and_return "/foo/bar/rspec-core-2.4.2"
@@ -144,8 +144,8 @@ describe ParallelTests::RSpec::Runner do
     end
 
     it "returns the output" do
-      ParallelTests::RSpec::Runner.should_receive(:execute_command).and_return :x => 1
-      call('xxx', 1, 22, {}).should == {:x => 1}
+      expect(ParallelTests::RSpec::Runner).to receive(:execute_command).and_return :x => 1
+      expect(call('xxx', 1, 22, {})).to eq ({ :x => 1} )
     end
   end
 
@@ -166,7 +166,7 @@ ff.**..
 1 example, 1 failure, 1 pending
 "
 
-      call(output).should == ['0 examples, 0 failures, 0 pending','1 example, 1 failure, 1 pending']
+      expect(call(output)).to eq ['0 examples, 0 failures, 0 pending','1 example, 1 failure, 1 pending']
     end
 
     it "is robust against scrambeled output" do
@@ -181,7 +181,7 @@ ff.**..
 1 exampF.les, 1 failures, 1 pend.ing
 "
 
-      call(output).should == ['0 examples, 0 failures, 0 pending','1 examples, 1 failures, 1 pending']
+      expect(call(output)).to eq ['0 examples, 0 failures, 0 pending','1 examples, 1 failures, 1 pending']
     end
   end
 

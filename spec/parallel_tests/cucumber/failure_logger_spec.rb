@@ -28,7 +28,7 @@ describe ParallelTests::Cucumber::FailuresLogger do
 
     output_file_contents = @output.output.join("\n").concat("\n")
 
-    output_file_contents.should == <<END
+    expect(output_file_contents).to eq <<END
 feature/path/to/feature1.feature:1
 feature/path/to/feature1.feature:2
 feature/path/to/feature1.feature:3

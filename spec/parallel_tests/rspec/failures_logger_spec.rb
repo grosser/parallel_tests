@@ -32,8 +32,8 @@ describe ParallelTests::RSpec::FailuresLogger do
     @logger.dump_failures
     @logger.dump_summary(1,2,3,4)
 
-    clean_output.should =~ /^rspec .*? should do stuff/
-    clean_output.should =~ /^rspec .*? should do other stuff/
+    expect(clean_output).to match( /^rspec .*? should do stuff/ )
+    expect(clean_output).to match( /^rspec .*? should do other stuff/ )
   end
 
   it "should invoke spec for rspec 1" do
@@ -45,7 +45,7 @@ describe ParallelTests::RSpec::FailuresLogger do
     @logger.dump_failures
     @logger.dump_summary(1,2,3,4)
 
-    clean_output.should =~ /^bundle exec spec/
+    expect(clean_output).to match( /^bundle exec spec/ )
   end
 
   it "should invoke rspec for rspec 2" do
@@ -56,7 +56,7 @@ describe ParallelTests::RSpec::FailuresLogger do
     @logger.dump_failures
     @logger.dump_summary(1,2,3,4)
 
-    clean_output.should =~ /^rspec/
+    expect(clean_output).to match( /^rspec/ )
   end
 
   it "should return relative paths" do
@@ -66,8 +66,8 @@ describe ParallelTests::RSpec::FailuresLogger do
     @logger.dump_failures
     @logger.dump_summary(1,2,3,4)
 
-    clean_output.should =~ %r(\./spec/path/to/example:123)
-    clean_output.should =~ %r(\./spec/path/to/example2:456)
+    expect(clean_output).to match( %r(\./spec/path/to/example:123) )
+    expect(clean_output).to match( %r(\./spec/path/to/example2:456) )
   end
 
 
@@ -77,6 +77,6 @@ describe ParallelTests::RSpec::FailuresLogger do
     @logger.example_failed example
     @logger.dump_failures
     @logger.dump_summary(1,2,3,4)
-    clean_output.should == ''
+    expect(clean_output).to eq ''
   end
 end
