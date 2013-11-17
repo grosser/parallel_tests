@@ -12,25 +12,25 @@ describe ParallelTests do
     end
 
     it "uses the given count if set" do
-      call('5').should == 5
+      expect(call('5')).to eq 5
     end
 
     it "uses the processor count from Parallel" do
-      call(nil).should == 20
+      expect(call(nil)).to eq 20
     end
 
     it "uses the processor count from ENV before Parallel" do
       ENV['PARALLEL_TEST_PROCESSORS'] = '22'
-      call(nil).should == 22
+      expect(call(nil)).to eq 22
     end
 
     it "does not use blank count" do
-      call('   ').should == 20
+      expect(call('   ')).to eq 20
     end
 
     it "does not use blank env" do
       ENV['PARALLEL_TEST_PROCESSORS'] = '   '
-      call(nil).should == 20
+      expect(call(nil)).to eq 20
     end
   end
 
@@ -41,28 +41,28 @@ describe ParallelTests do
 
     it "should return false" do
       use_temporary_directory_for do
-        ParallelTests.send(:bundler_enabled?).should == false
+        expect(ParallelTests.send(:bundler_enabled?)).to eq false
       end
     end
 
     it "should return true when there is a constant called Bundler" do
       use_temporary_directory_for do
         Object.stub!(:const_defined?).with(:Bundler).and_return true
-        ParallelTests.send(:bundler_enabled?).should == true
+        expect(ParallelTests.send(:bundler_enabled?)).to eq true
       end
     end
 
     it "should be true when there is a Gemfile" do
       use_temporary_directory_for do
         FileUtils.touch("Gemfile")
-        ParallelTests.send(:bundler_enabled?).should == true
+        expect(ParallelTests.send(:bundler_enabled?)).to eq true
       end
     end
 
     it "should be true when there is a Gemfile in the parent directory" do
       use_temporary_directory_for do
         FileUtils.touch(File.join("..", "Gemfile"))
-        ParallelTests.send(:bundler_enabled?).should == true
+        expect(ParallelTests.send(:bundler_enabled?)).to eq true
       end
     end
   end
@@ -77,13 +77,13 @@ describe ParallelTests do
     end
 
     it "does not wait if not run in parallel" do
-      ParallelTests.should_not_receive(:sleep)
+      expect(ParallelTests).to_not receive(:sleep)
       ParallelTests.wait_for_other_processes_to_finish
     end
 
     it "stops if only itself is running" do
       ENV["TEST_ENV_NUMBER"] = "2"
-      ParallelTests.should_not_receive(:sleep)
+      expect(ParallelTests).to_not receive(:sleep)
       with_running_processes(1) do
           ParallelTests.wait_for_other_processes_to_finish
         end
@@ -97,41 +97,41 @@ describe ParallelTests do
       with_running_processes(2, 0.6) do
         ParallelTests.wait_for_other_processes_to_finish
       end
-      counter.should >= 2
+      expect(counter).to be >= 2
     end
   end
 
   describe ".number_of_running_processes" do
     it "is 0 for nothing" do
-      ParallelTests.number_of_running_processes.should == 0
+      expect(ParallelTests.number_of_running_processes).to eq 0
     end
 
     it "is 2 when 2 are running" do
       wait = 0.2
       2.times { Thread.new { `TEST_ENV_NUMBER=1; sleep #{wait}` } }
       sleep wait / 2
-      ParallelTests.number_of_running_processes.should == 2
+      expect(ParallelTests.number_of_running_processes).to eq 2
       sleep wait
     end
   end
 
   describe ".first_process?" do
     it "is first if no env is set" do
-      ParallelTests.first_process?.should == true
+      expect(ParallelTests.first_process?).to eq true
     end
 
     it "is first if env is set to blank" do
       ENV["TEST_ENV_NUMBER"] = ""
-      ParallelTests.first_process?.should == true
+      expect(ParallelTests.first_process?).to eq true
     end
 
     it "is not first if env is set to something" do
       ENV["TEST_ENV_NUMBER"] = "2"
-      ParallelTests.first_process?.should == false
+      expect(ParallelTests.first_process?).to eq false
     end
   end
 
   it "has a version" do
-    ParallelTests::VERSION.should =~ /^\d+\.\d+\.\d+/
+    expect(ParallelTests::VERSION).to match( /^\d+\.\d+\.\d+/ )
   end
 end
