@@ -313,9 +313,17 @@ cucumber features/fail1.feature:2 # Scenario: xxx
 
         Scenario: xxx
           Given I print TEST_ENV_NUMBER
+
+        Scenario Outline: xxx
+          Given I print TEST_ENV_NUMBER
+
+        Examples:
+          | num |
+          | one |
+          | two |
       EOS
       result = run_tests "features", :type => "cucumber", :add => "--group-by scenarios"
-      result.should include("2 processes for 2 scenarios")
+      result.should include("2 processes for 4 scenarios")
     end
 
     it "groups by step" do
