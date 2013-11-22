@@ -314,7 +314,7 @@ cucumber features/fail1.feature:2 # Scenario: xxx
         Scenario: xxx
           Given I print TEST_ENV_NUMBER
       EOS
-      result = run_tests "features", :type => "cucumber", :add => "--group-by scenario"
+      result = run_tests "features", :type => "cucumber", :add => "--group-by scenarios"
       result.should include("2 processes for 2 scenarios")
     end
 

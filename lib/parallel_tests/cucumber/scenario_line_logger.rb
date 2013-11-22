@@ -13,7 +13,7 @@ module ParallelTests
 
         def visit_feature_element(feature_element)
           
-          if @tag_expression.eval(feature_element.source_tag_names)
+          if @tag_expression.evaluate(feature_element.source_tags)
             line = if feature_element.respond_to?(:line)
               feature_element.line
             else
