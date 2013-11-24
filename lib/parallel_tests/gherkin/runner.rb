@@ -68,7 +68,7 @@ module ParallelTests
 
         def tests_in_groups(tests, num_groups, options={})
           if options[:group_by] == :scenarios
-            @test_file_name = "scenarios"
+            @test_file_name = "scenario"
           end
           if Grouper.respond_to?("by_#{options[:group_by]}".to_sym)
             Grouper.send("by_#{options[:group_by]}".to_sym, find_tests(tests, options), num_groups, options)
