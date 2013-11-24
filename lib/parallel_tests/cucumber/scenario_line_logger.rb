@@ -25,10 +25,18 @@ module ParallelTests
           when ::Cucumber::Ast::ScenarioOutline
             sections = feature_element.instance_variable_get(:@example_sections)
             sections.each { |section|
-              # get rows from example minus headers
-              rows = section[1].instance_variable_get(:@rows)[1..-1]
-              rows.each { |row|
-                line = row.instance_variable_get(:@line)
+              rows = if section[1].respond_to?(:rows)
+                section[1].rows
+              else
+                section[1].instance_variable_get(:@rows)
+              end
+              rows.each_with_index { |row, index|
+                next if index == 0  # slices didn't work with jruby data structure
+                line = if row.respond_to?(:line)
+                  row.line
+                else
+                  row.instance_variable_get(:@line)
+                end
                 @scenarios << [feature_element.feature.file, line].join(":")
               }
             }
