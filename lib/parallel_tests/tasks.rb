@@ -46,21 +46,20 @@ module ParallelTests
         end
       end
 
-      # parallel:spec[:count, :pattern, :options, :parallel_options]
+      # parallel:spec[:count, :pattern, :options]
       def parse_args(args)
         # order as given by user
-        args = [args[:count], args[:pattern], args[:options], args[:parallel_options]]
+        args = [args[:count], args[:pattern], args[:options]]
 
         # count given or empty ?
-        # parallel:spec[2,models,options,parallel_options]
+        # parallel:spec[2,models,options]
         # parallel:spec[,models,options]
         count = args.shift if args.first.to_s =~ /^\d*$/
         num_processes = count.to_i unless count.to_s.empty?
         pattern = args.shift
         options = args.shift
-        parallel_options = args.shift
 
-        [num_processes, pattern.to_s, options.to_s, parallel_options]
+        [num_processes, pattern.to_s, options.to_s]
       end
     end
   end
@@ -129,7 +128,7 @@ namespace :parallel do
       $LOAD_PATH << File.expand_path(File.join(File.dirname(__FILE__), '..'))
       require "parallel_tests"
 
-      count, pattern, options, parallel_options = ParallelTests::Tasks.parse_args(args)
+      count, pattern, options = ParallelTests::Tasks.parse_args(args)
       test_framework = {
         'spec' => 'rspec',
         'test' => 'test',
@@ -145,8 +144,7 @@ namespace :parallel do
       command = "#{executable} #{type} --type #{test_framework} " \
         "-n #{count} "                     \
         "--pattern '#{pattern}' "          \
-        "--test-options '#{options}'"      \
-        "#{parallel_options}"
+        "--test-options '#{options}'"
       abort unless system(command) # allow to chain tasks e.g. rake parallel:spec parallel:features
     end
   end
