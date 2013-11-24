@@ -50,12 +50,12 @@ describe ParallelTests::Grouper do
     end
   end
 
-  describe :by_scenario do
+  describe :by_scenarios do
     let(:feature_file) { double 'file' }
 
     it 'splits a feature into individual scenarios' do
       ParallelTests::Cucumber::Scenarios.should_receive(:all).and_return({ 'feature_file:3' => 1 })
-      ParallelTests::Grouper.by_scenario([feature_file], 1)
+      ParallelTests::Grouper.by_scenarios([feature_file], 1)
     end
   end
 end

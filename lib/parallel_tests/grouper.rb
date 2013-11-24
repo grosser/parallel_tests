@@ -8,8 +8,8 @@ module ParallelTests
         in_even_groups_by_size(features_with_steps, num_groups)
       end
 
-      def by_scenario(tests, num_groups, options={})
-        scenarios = group_by_scenario(tests, options)
+      def by_scenarios(tests, num_groups, options={})
+        scenarios = group_by_scenarios(tests, options)
         in_even_groups_by_size(scenarios, num_groups)
       end
 
@@ -54,7 +54,7 @@ module ParallelTests
         listener.collect.sort_by{|_,value| -value }
       end
 
-      def group_by_scenario(tests, options={})
+      def group_by_scenarios(tests, options={})
         ParallelTests::Cucumber::Scenarios.all(tests, options)
       end
 
