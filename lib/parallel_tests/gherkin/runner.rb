@@ -70,8 +70,9 @@ module ParallelTests
           if options[:group_by] == :scenarios
             @test_file_name = "scenario"
           end
-          if Grouper.respond_to?("by_#{options[:group_by]}".to_sym)
-            Grouper.send("by_#{options[:group_by]}".to_sym, find_tests(tests, options), num_groups, options)
+          method = "by_#{options[:group_by]}"
+          if Grouper.respond_to?(method)
+            Grouper.send(method, find_tests(tests, options), num_groups, options)
           else
             super
           end
@@ -88,14 +89,14 @@ module ParallelTests
 
         def determine_executable
           case
-            when File.exists?("bin/#{name}")
-              "bin/#{name}"
-            when ParallelTests.bundler_enabled?
-              "bundle exec #{name}"
-            when File.file?("script/#{name}")
-              "script/#{name}"
-            else
-              "#{name}"
+          when File.exists?("bin/#{name}")
+            "bin/#{name}"
+          when ParallelTests.bundler_enabled?
+            "bundle exec #{name}"
+          when File.file?("script/#{name}")
+            "script/#{name}"
+          else
+            "#{name}"
           end
         end
 
