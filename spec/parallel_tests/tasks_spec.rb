@@ -22,6 +22,15 @@ describe ParallelTests::Tasks do
       args = {:count => 2, :pattern => "plain", :options => "-p default"}
       ParallelTests::Tasks.parse_args(args).should == [2, "plain", "-p default"]
     end
+
+    it "should return the count, pattern, and options" do
+      args = {
+        :count => 2,
+        :pattern => "plain",
+        :options => "-p default --group-by steps",
+      }
+      ParallelTests::Tasks.parse_args(args).should == [2, "plain", "-p default --group-by steps"]
+    end
   end
 
   describe ".rails_env" do

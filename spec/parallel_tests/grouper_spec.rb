@@ -49,4 +49,13 @@ describe ParallelTests::Grouper do
       call(6).should == [["5"], ["4"], ["3"], ["2"], ["1"], []]
     end
   end
+
+  describe :by_scenarios do
+    let(:feature_file) { double 'file' }
+
+    it 'splits a feature into individual scenarios' do
+      ParallelTests::Cucumber::Scenarios.should_receive(:all).and_return({ 'feature_file:3' => 1 })
+      ParallelTests::Grouper.by_scenarios([feature_file], 1)
+    end
+  end
 end
