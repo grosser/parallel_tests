@@ -1,5 +1,3 @@
-require 'parallel_tests/cucumber/scenarios'
-
 module ParallelTests
   class Grouper
     class << self
@@ -55,6 +53,7 @@ module ParallelTests
       end
 
       def group_by_scenarios(tests, options={})
+        require 'parallel_tests/cucumber/scenarios'
         ParallelTests::Cucumber::Scenarios.all(tests, options)
       end
 
