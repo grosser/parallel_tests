@@ -87,7 +87,7 @@ namespace :parallel do
       # there is no separate dump / load for schema_format :sql -> do it safe and slow
       args = args.to_hash.merge(:non_parallel => true) # normal merge returns nil
       taskname = Rake::Task.task_defined?('db:test:prepare') ? 'db:test:prepare' : 'app:db:test:prepare'
-      ParallelTests::Tasks.run_in_parallel("rake #{taskname} --trace", args)
+      ParallelTests::Tasks.run_in_parallel("rake #{taskname}", args)
     end
   end
 
