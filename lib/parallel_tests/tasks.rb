@@ -30,8 +30,10 @@ module ParallelTests
         activate_pipefail = "set -o pipefail"
         remove_ignored_lines = %Q{(grep -v "#{ignore_regex}" || test 1)}
 
-        if system("#{activate_pipefail} 2>/dev/null && test 1")
-          "#{activate_pipefail} && (#{command}) | #{remove_ignored_lines}"
+        if File.executable?('/bin/bash') && system('/bin/bash', '-c', "#{activate_pipefail} 2>/dev/null && test 1")
+          # We need to shell escape single quotes (' becomes '"'"') because
+          # run_in_parallel wraps command in single quotes
+          %Q{/bin/bash -c '"'"'#{activate_pipefail} && (#{command}) | #{remove_ignored_lines}'"'"'}
         else
           command
         end
