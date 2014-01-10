@@ -35,6 +35,8 @@ module ParallelTests
       report_time_taken do
         groups = @runner.tests_in_groups(options[:files], num_processes, options)
 
+        puts groups.inspect
+
         if options[:only_group]
           group_to_run = groups[options[:only_group] - 1]
 
@@ -105,6 +107,7 @@ group tests by:
           found - order of finding files
           steps - number of cucumber/spinach steps
           scenarios - individual cucumber scenarios
+          filesize - by size of the file
           default - runtime or filesize
 TEXT
 ) { |type| options[:group_by] = type.to_sym }
@@ -145,7 +148,7 @@ TEXT
       end.parse!(argv)
 
       raise "--group-by found and --single-process are not supported" if options[:group_by] == :found and options[:single_process]
-      raise "--group-by found is required for --only-group" if options[:group_by] != :found and options[:only_group]
+      raise "--group-by filesize is required for --only-group" if options[:group_by] != :filesize and options[:only_group]
 
       if options[:count] == 0
         options.delete(:count)
