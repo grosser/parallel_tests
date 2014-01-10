@@ -35,8 +35,6 @@ module ParallelTests
       report_time_taken do
         groups = @runner.tests_in_groups(options[:files], num_processes, options)
 
-        puts groups.inspect
-
         if options[:only_group]
           group_to_run = groups[options[:only_group] - 1]
 
