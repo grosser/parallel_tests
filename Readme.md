@@ -295,6 +295,7 @@ inspired by [pivotal labs](http://pivotallabs.com/users/miked/blog/articles/849-
  - [Colin Harris](https://github.com/aberant)
  - [Wataru MIYAGUNI](https://github.com/gongo)
  - [Brandon Turner](https://github.com/blt04)
+ - [Matt Hodgson](https://github.com/mhodgson)
 
 [Michael Grosser](http://grosser.it)<br/>
 michael@grosser.it<br/>
