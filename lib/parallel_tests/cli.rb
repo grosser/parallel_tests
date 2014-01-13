@@ -45,9 +45,9 @@ module ParallelTests
           test_results = execute_in_parallel(groups, groups.size, options) do |group|
             run_tests(group, groups.index(group), num_processes, options)
           end
-
-          report_results(test_results)
         end
+
+        report_results(test_results)
       end
 
       abort final_fail_message if any_test_failed?(test_results)
@@ -145,15 +145,16 @@ TEXT
         opts.on("-h", "--help", "Show this.") { puts opts; exit }
       end.parse!(argv)
 
-      raise "--group-by found and --single-process are not supported" if options[:group_by] == :found and options[:single_process]
-      raise "--group-by filesize is required for --only-group" if options[:group_by] != :filesize and options[:only_group]
-
       if options[:count] == 0
         options.delete(:count)
         options[:non_parallel] = true
       end
 
       options[:files] = argv
+
+      raise "--group-by found and --single-process are not supported" if options[:group_by] == :found and options[:single_process]
+      raise "--group-by filesize is required for --only-group" if options[:group_by] != :filesize and options[:only_group]
+
       options
     end
 

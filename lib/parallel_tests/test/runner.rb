@@ -145,7 +145,7 @@ module ParallelTests
             end
             tests.sort.map{|test| [test, times[File.expand_path(test)]] }
           else # use file sizes
-            tests.sort.map{|test| [test, File.stat(test).size] }
+            with_filesize_info(tests)
           end
         end
 
