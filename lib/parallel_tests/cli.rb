@@ -34,10 +34,17 @@ module ParallelTests
 
       report_time_taken do
         groups = @runner.tests_in_groups(options[:files], num_processes, options)
-        report_number_of_tests(groups)
 
-        test_results = execute_in_parallel(groups, groups.size, options) do |group|
-          run_tests(group, groups.index(group), num_processes, options)
+        test_results = if options[:only_group]
+          group_to_run = groups[options[:only_group] - 1]
+
+          [run_tests(group_to_run, 0, num_processes, options)]
+        else
+          report_number_of_tests(groups)
+
+          execute_in_parallel(groups, groups.size, options) do |group|
+            run_tests(group, groups.index(group), num_processes, options)
+          end
         end
 
         report_results(test_results)
@@ -98,6 +105,7 @@ group tests by:
           found - order of finding files
           steps - number of cucumber/spinach steps
           scenarios - individual cucumber scenarios
+          filesize - by size of the file
           default - runtime or filesize
 TEXT
 ) { |type| options[:group_by] = type.to_sym }
@@ -115,6 +123,8 @@ TEXT
 
           options[:isolate] = true
         end
+
+        opts.on("--only-group [INTEGER]", Integer) { |group| options[:only_group] = group }
 
         opts.on("-e", "--exec [COMMAND]", "execute this code parallel and with ENV['TEST_ENV_NUM']") { |path| options[:execute] = path }
         opts.on("-o", "--test-options '[OPTIONS]'", "execute test commands with those options") { |arg| options[:test_options] = arg }
@@ -135,14 +145,18 @@ TEXT
         opts.on("-h", "--help", "Show this.") { puts opts; exit }
       end.parse!(argv)
 
-      raise "--group-by found and --single-process are not supported" if options[:group_by] == :found and options[:single_process]
-
       if options[:count] == 0
         options.delete(:count)
         options[:non_parallel] = true
       end
 
       options[:files] = argv
+
+      options[:group_by] ||= :filesize if options[:only_group]
+
+      raise "--group-by found and --single-process are not supported" if options[:group_by] == :found and options[:single_process]
+      raise "--group-by filesize is required for --only-group" if options[:group_by] != :filesize and options[:only_group]
+
       options
     end
 

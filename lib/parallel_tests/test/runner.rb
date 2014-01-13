@@ -43,6 +43,8 @@ module ParallelTests
 
           tests = if options[:group_by] == :found
             tests.map { |t| [t, 1] }
+          elsif options[:group_by] == :filesize
+            with_filesize_info(tests)
           else
             with_runtime_info(tests)
           end
@@ -60,7 +62,7 @@ module ParallelTests
 
         def execute_command_and_capture_output(env, cmd, silence)
           # make processes descriptive / visible in ps -ef
-          windows = RbConfig::CONFIG['host_os'] =~ /cygwin|mswin|mingw|bccwin|wince|emx/ 
+          windows = RbConfig::CONFIG['host_os'] =~ /cygwin|mswin|mingw|bccwin|wince|emx/
           separator = windows ? ' & ' : ';'
           exports = env.map do |k,v|
             if windows
@@ -143,8 +145,13 @@ module ParallelTests
             end
             tests.sort.map{|test| [test, times[File.expand_path(test)]] }
           else # use file sizes
-            tests.sort.map{|test| [test, File.stat(test).size] }
+            with_filesize_info(tests)
           end
+        end
+
+        def with_filesize_info(tests)
+          # use filesize to group files
+          tests.sort.map { |test| [test, File.stat(test).size] }
         end
 
         def find_tests(tests, options = {})
