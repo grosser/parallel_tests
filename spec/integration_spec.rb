@@ -216,11 +216,11 @@ describe 'CLI' do
     write "test/long_test.rb", "puts 'this is a long test'"
     write "test/short_test.rb", "puts 'short test'"
 
-    group_1_result = run_tests("test", :processes => 2, :add => '--only-group 1 --group-by filesize')
+    group_1_result = run_tests("test", :processes => 2, :add => '--only-group 1')
     group_1_result.should include("this is a long test")
     group_1_result.should_not include("short test")
 
-    group_2_result = run_tests("test", :processes => 2, :add => '--only-group 2 --group-by filesize')
+    group_2_result = run_tests("test", :processes => 2, :add => '--only-group 2')
     group_2_result.should_not include("this is a long test")
     group_2_result.should include("short test")
   end

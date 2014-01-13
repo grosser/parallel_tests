@@ -152,7 +152,7 @@ TEXT
 
       options[:files] = argv
 
-      options[:group_by] ||= :filesize if options[:group_by]
+      options[:group_by] ||= :filesize if options[:only_group]
 
       raise "--group-by found and --single-process are not supported" if options[:group_by] == :found and options[:single_process]
       raise "--group-by filesize is required for --only-group" if options[:group_by] != :filesize and options[:only_group]
