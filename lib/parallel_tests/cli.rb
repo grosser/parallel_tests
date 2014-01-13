@@ -35,14 +35,14 @@ module ParallelTests
       report_time_taken do
         groups = @runner.tests_in_groups(options[:files], num_processes, options)
 
-        if options[:only_group]
+        test_results = if options[:only_group]
           group_to_run = groups[options[:only_group] - 1]
 
-          test_results = [run_tests(group_to_run, 0, num_processes, options)]
+          [run_tests(group_to_run, 0, num_processes, options)]
         else
           report_number_of_tests(groups)
 
-          test_results = execute_in_parallel(groups, groups.size, options) do |group|
+          execute_in_parallel(groups, groups.size, options) do |group|
             run_tests(group, groups.index(group), num_processes, options)
           end
         end
@@ -151,6 +151,8 @@ TEXT
       end
 
       options[:files] = argv
+
+      options[:group_by] ||= :filesize if options[:group_by]
 
       raise "--group-by found and --single-process are not supported" if options[:group_by] == :found and options[:single_process]
       raise "--group-by filesize is required for --only-group" if options[:group_by] != :filesize and options[:only_group]
