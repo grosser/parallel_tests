@@ -210,7 +210,7 @@ TIPS
 ====
  - [RSpec] add a `.rspec_parallel` to use different options, e.g. **no --drb**
  - [RSpec] delete `script/spec`
- - [[Spork](https://github.com/sporkrb/spork)] does not work with parallel_tests
+ - [[Spork](https://github.com/sporkrb/spork)] does not work with parallel_tests except when using [sqlite in memory](https://github.com/grosser/parallel_tests/wiki#wiki-with-spork)
  - [RSpec] remove --loadby from you spec/*.opts
  - [RSpec] Instantly see failures (instead of just a red F) with [rspec-instafail](https://github.com/grosser/rspec-instafail)
  - [Bundler] if you have a `Gemfile` then `bundle exec` will be used to run tests
