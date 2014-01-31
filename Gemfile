@@ -1,9 +1,9 @@
-source :rubygems
+source 'https://rubygems.org'
 gemspec
 
-group :development do
-  gem 'test-unit', :platform => :ruby_19
-  gem 'rspec', '>=2.4'
-  gem 'cucumber'
-  gem 'rake'
-end
+gem 'bump'
+gem 'test-unit'
+gem 'rspec', '>=2.4'
+gem 'cucumber'
+gem 'spinach'
+gem 'rake'

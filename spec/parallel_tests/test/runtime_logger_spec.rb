@@ -2,6 +2,13 @@ require 'spec_helper'
 
 describe ParallelTests::Test::RuntimeLogger do
   describe :writing do
+    around do |example|
+      use_temporary_directory_for do
+        FileUtils.mkdir_p(File.dirname(log))
+        example.call
+      end
+    end
+
     let(:log) { ParallelTests::Test::Runner.runtime_log }
 
     it "overwrites the runtime_log file on first log invocation" do
@@ -37,9 +44,15 @@ describe ParallelTests::Test::RuntimeLogger do
     end
   end
 
-  describe :formatting do
+  describe "formatting" do
+    def with_rails_defined
+      Object.const_set(:Rails, Module.new)
+      yield
+      Object.send(:remove_const, :Rails)
+    end
+
     def call(*args)
-      ParallelTests::Test::RuntimeLogger.message(*args)
+      ParallelTests::Test::RuntimeLogger.send(:message, *args)
     end
 
     it "formats results for simple test names" do
@@ -61,17 +74,17 @@ describe ParallelTests::Test::RuntimeLogger do
     end
 
     it "guesses subdirectory structure for rails test classes" do
-      module Rails
-      end
-      class ActionController
-        class TestCase
+      with_rails_defined do
+        class ActionController
+          class TestCase
+          end
         end
+        class FakeControllerTest < ActionController::TestCase
+        end
+        test = FakeControllerTest.new
+        time = Time.now
+        call(test, time, Time.at(time.to_f+2.00)).should == 'test/functional/fake_controller_test.rb:2.00'
       end
-      class FakeControllerTest < ActionController::TestCase
-      end
-      test = FakeControllerTest.new
-      time = Time.now
-      call(test, time, Time.at(time.to_f+2.00)).should == 'test/functional/fake_controller_test.rb:2.00'
     end
   end
 end

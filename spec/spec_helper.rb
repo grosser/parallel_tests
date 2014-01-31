@@ -1,17 +1,14 @@
 $LOAD_PATH << File.expand_path("../lib", File.dirname(__FILE__))
 
-FAKE_RAILS_ROOT = '/tmp/pspecs/fixtures'
+FAKE_RAILS_ROOT = './tmp/pspecs/fixtures'
 
 require 'tempfile'
-require 'parallel_tests'
-require 'parallel_tests/test/runner'
-require 'parallel_tests/test/runtime_logger'
 
-require 'parallel_tests/rspec/runner'
+require 'parallel_tests'
+require 'parallel_tests/test/runtime_logger'
 require 'parallel_tests/rspec/runtime_logger'
 require 'parallel_tests/rspec/summary_logger'
 
-require 'parallel_tests/cucumber/runner'
 
 OutputLogger = Struct.new(:output) do
   attr_reader :flock, :flush
@@ -20,8 +17,17 @@ OutputLogger = Struct.new(:output) do
   end
 end
 
+RSpec.configure do |config|
+  config.filter_run :focus => true
+  config.run_all_when_everything_filtered = true
+
+  config.after do
+    ENV.delete("TEST_ENV_NUMBER")
+  end
+end
+
 def mocked_process
-  open('|cat /dev/null')
+  StringIO.new
 end
 
 def size_of(group)
@@ -56,7 +62,7 @@ def test_tests_in_groups(klass, folder, suffix)
   test_root = "#{FAKE_RAILS_ROOT}/#{folder}"
 
   describe :tests_in_groups do
-    before :all do
+    before do
       system "rm -rf #{FAKE_RAILS_ROOT}; mkdir -p #{test_root}/temp"
 
       @files = [0,1,2,3,4,5,6,7].map do |i|
@@ -71,8 +77,8 @@ def test_tests_in_groups(klass, folder, suffix)
       `rm -f #{@log}`
     end
 
-    after :all do
-      `rm -f #{klass.runtime_log}`
+    after do
+      `rm -f #{@log}`
     end
 
     def setup_runtime_log
@@ -84,7 +90,7 @@ def test_tests_in_groups(klass, folder, suffix)
 
     it "groups when given an array of files" do
       list_of_files = Dir["#{test_root}/**/*#{suffix}"]
-      found = klass.with_runtime_info(list_of_files)
+      found = klass.send(:with_runtime_info, list_of_files)
       found.should =~ list_of_files.map{ |file| [file, File.stat(file).size]}
     end
 
@@ -135,7 +141,7 @@ def test_tests_in_groups(klass, folder, suffix)
     it "partitions by round-robin when not sorting" do
       files = ["file1.rb", "file2.rb", "file3.rb", "file4.rb"]
       klass.should_receive(:find_tests).and_return(files)
-      groups = klass.tests_in_groups(files, 2, :no_sort => true)
+      groups = klass.tests_in_groups(files, 2, :group_by => :found).sort
       groups[0].should == ["file1.rb", "file3.rb"]
       groups[1].should == ["file2.rb", "file4.rb"]
     end
@@ -143,9 +149,20 @@ def test_tests_in_groups(klass, folder, suffix)
     it "alpha-sorts partitions when not sorting by runtime" do
       files = %w[q w e r t y u i o p a s d f g h j k l z x c v b n m]
       klass.should_receive(:find_tests).and_return(files)
-      groups = klass.tests_in_groups(files, 2, :no_sort => true)
+      groups = klass.tests_in_groups(files, 2, :group_by => :found).sort
       groups[0].should == groups[0].sort
       groups[1].should == groups[1].sort
     end
+  end
+end
+
+def with_files(files)
+  Dir.mktmpdir do |root|
+    files.each do |file|
+      parent = "#{root}/#{File.dirname(file)}"
+      `mkdir -p #{parent}` unless File.exist?(parent)
+      `touch #{root}/#{file}`
+    end
+    yield root
   end
 end

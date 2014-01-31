@@ -2,4 +2,4 @@
 $LOAD_PATH << File.expand_path("../../lib", __FILE__)
 require "parallel_tests"
 
-ParallelTests::CLI.new.run(["--type", "rspec"] + ARGV)
+ParallelTests::CLI.new.run(["--type", "spinach"] + ARGV)
