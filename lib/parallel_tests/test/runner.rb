@@ -53,7 +53,7 @@ module ParallelTests
 
         def execute_command(cmd, process_number,  num_processes, options)
           env = (options[:env] || {}).merge(
-            "TEST_ENV_NUMBER" => test_env_number(process_number),
+            "TEST_ENV_NUMBER" => test_env_number(process_number, num_processes),
             "PARALLEL_TEST_GROUPS" => num_processes
           )
           cmd = "nice #{cmd}" if options[:nice]
@@ -87,8 +87,12 @@ module ParallelTests
           }.compact
         end
 
-        def test_env_number(process_number)
-          process_number == 0 ? '' : process_number + 1
+        def test_env_number(process_number, num_processes)
+          if ( num_processes == 1 )
+            process_number = ''
+          else
+            process_number == 0 ? 1 : process_number + 1
+          end
         end
 
         def summarize_results(results)
