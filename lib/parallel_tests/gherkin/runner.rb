@@ -7,11 +7,8 @@ module ParallelTests
 
       class << self
         def run_tests(test_files, process_number, num_processes, options)
-          if RbConfig::CONFIG['host_os'] =~ /cygwin|mswin|mingw|bccwin|wince|emx/ #Shellwords doesn't work for windows
-            sanitized_test_files = test_files.map { |val| "\"#{val}\"" }
-          else
-            sanitized_test_files = test_files.map { |val| Shellwords.escape(val) }
-          end
+          windows = (RbConfig::CONFIG['host_os'] =~ /cygwin|mswin|mingw|bccwin|wince|emx/) #Shellwords doesn't work for windows
+          sanitized_test_files = test_files.map { |val| windows ? "\"#{val}\"" : Shellwords.escape(val) }
 
           options = options.merge(:env => {"AUTOTEST" => "1"}) if $stdout.tty? # display color when we are in a terminal
           cmd = [
