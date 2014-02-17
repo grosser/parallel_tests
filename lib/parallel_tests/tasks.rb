@@ -142,8 +142,9 @@ namespace :parallel do
         type = 'features'
       end
       executable = File.join(File.dirname(__FILE__), '..', '..', 'bin', 'parallel_test')
+      ruby_binary = File.join(RbConfig::CONFIG['bindir'], RbConfig::CONFIG['ruby_install_name'])
 
-      command = "#{executable} #{type} --type #{test_framework} " \
+      command = "#{ruby_binary} #{executable} #{type} --type #{test_framework} " \
         "-n #{count} "                     \
         "--pattern '#{pattern}' "          \
         "--test-options '#{options}'"
