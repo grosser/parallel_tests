@@ -142,12 +142,15 @@ namespace :parallel do
         type = 'features'
       end
       executable = File.join(File.dirname(__FILE__), '..', '..', 'bin', 'parallel_test')
-      ruby_binary = File.join(RbConfig::CONFIG['bindir'], RbConfig::CONFIG['ruby_install_name'])
 
-      command = "#{ruby_binary} #{executable} #{type} --type #{test_framework} " \
+      command = "#{executable} #{type} --type #{test_framework} " \
         "-n #{count} "                     \
         "--pattern '#{pattern}' "          \
         "--test-options '#{options}'"
+      if RbConfig::CONFIG['host_os'] =~ /cygwin|mswin|mingw|bccwin|wince|emx/
+        ruby_binary = File.join(RbConfig::CONFIG['bindir'], RbConfig::CONFIG['ruby_install_name'])
+        command = "#{ruby_binary} #{command}"
+      end
       abort unless system(command) # allow to chain tasks e.g. rake parallel:spec parallel:features
     end
   end
