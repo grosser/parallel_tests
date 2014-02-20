@@ -147,7 +147,7 @@ namespace :parallel do
         "-n #{count} "                     \
         "--pattern '#{pattern}' "          \
         "--test-options '#{options}'"
-      if RbConfig::CONFIG['host_os'] =~ /cygwin|mswin|mingw|bccwin|wince|emx/
+      if RbConfig::CONFIG["target_os"] =~ /mingw|mswin/ # not using ParallelTests.windows? so we do not need to require it
         ruby_binary = File.join(RbConfig::CONFIG['bindir'], RbConfig::CONFIG['ruby_install_name'])
         command = "#{ruby_binary} #{command}"
       end
