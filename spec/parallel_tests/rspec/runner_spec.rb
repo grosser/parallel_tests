@@ -44,6 +44,7 @@ describe ParallelTests::RSpec::Runner do
 
     it "runs with color for rspec 1 when called for the cmdline" do
       File.should_receive(:file?).with('script/spec').and_return true
+      ParallelTests.stub!(:rspec_in_path?).and_return false
       ParallelTests::Test::Runner.should_receive(:execute_command).with { |a, b, c, d| d[:env] == {"RSPEC_COLOR" => "1"} }
       $stdout.should_receive(:tty?).and_return true
       call('xxx', 1, 22, {})
@@ -51,6 +52,7 @@ describe ParallelTests::RSpec::Runner do
 
     it "runs without color for rspec 1 when not called for the cmdline" do
       File.should_receive(:file?).with('script/spec').and_return true
+      ParallelTests.stub!(:rspec_in_path?).and_return false
       ParallelTests::Test::Runner.should_receive(:execute_command).with { |a, b, c, d| d[:env] == {} }
       $stdout.should_receive(:tty?).and_return false
       call('xxx', 1, 22, {})
@@ -59,6 +61,7 @@ describe ParallelTests::RSpec::Runner do
     it "run bundle exec spec when on bundler rspec 1" do
       File.stub!(:file?).with('script/spec').and_return false
       ParallelTests.stub!(:bundler_enabled?).and_return true
+      ParallelTests.stub!(:rspec_in_path?).and_return false
       ParallelTests::RSpec::Runner.stub!(:run).with("bundle show rspec-core").and_return "Could not find gem 'rspec-core' in bundler."
       should_run_with %r{bundle exec spec}
       call('xxx', 1, 22, {})
@@ -67,6 +70,7 @@ describe ParallelTests::RSpec::Runner do
     it "run bundle exec rspec when on bundler rspec 2" do
       File.stub!(:file?).with('script/spec').and_return false
       ParallelTests.stub!(:bundler_enabled?).and_return true
+      ParallelTests.stub!(:rspec_in_path?).and_return false
       ParallelTests::RSpec::Runner.stub!(:run).with("bundle show rspec-core").and_return "/foo/bar/rspec-core-2.0.2"
       should_run_with %r{bundle exec rspec}
       call('xxx', 1, 22, {})
@@ -74,6 +78,7 @@ describe ParallelTests::RSpec::Runner do
 
     it "runs script/spec when script/spec can be found" do
       File.should_receive(:file?).with('script/spec').and_return true
+      ParallelTests.stub!(:rspec_in_path?).and_return false
       should_run_with %r{script/spec}
       call('xxx' ,1, 22, {})
     end
@@ -86,7 +91,14 @@ describe ParallelTests::RSpec::Runner do
 
     it "uses bin/rspec when present" do
       File.stub(:exists?).with('bin/rspec').and_return true
+      ParallelTests.stub!(:rspec_in_path?).and_return false
       should_run_with %r{bin/rspec}
+      call('xxx', 1, 22, {})
+    end
+
+    it "uses rspec when rspec found in execution path" do
+      ParallelTests.stub!(:rspec_in_path?).and_return true
+      should_run_with %r{rspec}
       call('xxx', 1, 22, {})
     end
 
@@ -99,6 +111,7 @@ describe ParallelTests::RSpec::Runner do
     it "uses -O spec/spec.opts when found (with script/spec)" do
       File.stub!(:file?).with('script/spec').and_return true
       File.stub!(:file?).with('spec/spec.opts').and_return true
+      ParallelTests.stub!(:rspec_in_path?).and_return false
       should_run_with %r{script/spec\s+-O spec/spec.opts}
       call('xxx', 1, 22, {})
     end
@@ -106,6 +119,7 @@ describe ParallelTests::RSpec::Runner do
     it "uses -O spec/parallel_spec.opts when found (with script/spec)" do
       File.stub!(:file?).with('script/spec').and_return true
       File.should_receive(:file?).with('spec/parallel_spec.opts').and_return true
+      ParallelTests.stub!(:rspec_in_path?).and_return false
       should_run_with %r{script/spec\s+-O spec/parallel_spec.opts}
       call('xxx', 1, 22, {})
     end
@@ -113,6 +127,7 @@ describe ParallelTests::RSpec::Runner do
     it "uses -O .rspec_parallel when found (with script/spec)" do
       File.stub!(:file?).with('script/spec').and_return true
       File.should_receive(:file?).with('.rspec_parallel').and_return true
+      ParallelTests.stub!(:rspec_in_path?).and_return false
       should_run_with %r{script/spec\s+-O .rspec_parallel}
       call('xxx', 1, 22, {})
     end
@@ -121,6 +136,7 @@ describe ParallelTests::RSpec::Runner do
       File.should_receive(:file?).with('spec/parallel_spec.opts').and_return true
 
       ParallelTests.stub!(:bundler_enabled?).and_return true
+      ParallelTests.stub!(:rspec_in_path?).and_return false
       ParallelTests::RSpec::Runner.stub!(:run).with("bundle show rspec-core").and_return "Could not find gem 'rspec-core'."
 
       should_run_with %r{spec\s+-O spec/parallel_spec.opts}
@@ -132,6 +148,7 @@ describe ParallelTests::RSpec::Runner do
       File.should_receive(:file?).with('spec/parallel_spec.opts').and_return true
 
       ParallelTests.stub!(:bundler_enabled?).and_return true
+      ParallelTests.stub!(:rspec_in_path?).and_return false
       ParallelTests::RSpec::Runner.stub!(:run).with("bundle show rspec-core").and_return "/foo/bar/rspec-core-2.4.2"
 
       should_run_with %r{rspec\s+--color --tty -O spec/parallel_spec.opts}

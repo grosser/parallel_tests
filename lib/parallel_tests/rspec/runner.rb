@@ -16,6 +16,8 @@ module ParallelTests
 
         def determine_executable
           cmd = case
+          when ParallelTests.rspec_in_path?
+            'rspec'
           when File.exists?("bin/rspec")
             "bin/rspec"
           when File.file?("script/spec")
@@ -46,7 +48,8 @@ module ParallelTests
 
         # so it can be stubbed....
         def run(cmd)
-          `#{cmd}`
+          pid = Process.spawn("#{cmd}")
+          Process.wait(pid)
         end
 
         def rspec_1_color

@@ -2,11 +2,12 @@ require "rubygems"
 require "parallel"
 require "parallel_tests/railtie" if defined? Rails::Railtie
 require "rbconfig"
+require "tempfile"
 
 module ParallelTests
   GREP_PROCESSES_COMMAND = \
   if RbConfig::CONFIG['host_os'] =~ /win32/
-    "wmic process get commandline | findstr TEST_ENV_NUMBER 2>&1"
+    "wmic process get commandline | findstr TEST_ENV_NUMBER | find /c \"TEST_ENV_NUMBER=\" 2>&1"
   else
     "ps -ef | grep [T]EST_ENV_NUMBER= 2>&1"
   end
@@ -38,6 +39,10 @@ module ParallelTests
       end
 
       false
+    end
+
+    def rspec_in_path?
+      `rspec -v`.index(/[\d]+(.)[\d]+/) != nil
     end
 
     def first_process?
