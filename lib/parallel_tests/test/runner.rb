@@ -79,10 +79,10 @@ module ParallelTests
             pid = Process.spawn(cmd, :out=>output_path, :err=>output_path)
             Process.wait(pid)
           }
-          capture_output(t, output_path, silence)
+          result = capture_output(t, output_path, silence)
           exitstatus = $?.exitstatus
 
-          {:stdout => output, :exit_status => exitstatus}
+          {:stdout => result, :exit_status => exitstatus}
         ensure
           output.close
           output.unlink
