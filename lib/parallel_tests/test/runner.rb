@@ -75,17 +75,16 @@ module ParallelTests
 
           output = Tempfile.new('parallel_tests')
           output_path = output.path
+          output.close
+          exitstatus = nil
           t = Thread.new {
             pid = Process.spawn(cmd, :out=>output_path, :err=>output_path)
             Process.wait(pid)
+            exitstatus = $?.exitstatus
           }
           result = capture_output(t, output_path, silence)
-          exitstatus = $?.exitstatus
 
           {:stdout => result, :exit_status => exitstatus}
-        ensure
-          output.close
-          output.unlink
         end
 
         def find_results(test_output)
