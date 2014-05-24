@@ -48,8 +48,7 @@ module ParallelTests
 
         # so it can be stubbed....
         def run(cmd)
-          pid = Process.spawn("#{cmd}")
-          Process.wait(pid)
+          `#{cmd}`
         end
 
         def rspec_1_color
