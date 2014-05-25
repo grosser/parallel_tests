@@ -18,7 +18,7 @@ module ParallelTests
         def determine_executable
           cmd = case
           when File.exists?("bin/rspec")
-            "bin/rspec"
+            WINDOWS ? "ruby bin/rspec" : "bin/rspec"
           when File.file?("script/spec")
             "script/spec"
           when ParallelTests.bundler_enabled?
