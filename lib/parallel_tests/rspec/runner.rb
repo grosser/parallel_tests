@@ -3,6 +3,7 @@ require "parallel_tests/test/runner"
 module ParallelTests
   module RSpec
     class Runner < ParallelTests::Test::Runner
+      DEV_NULL = (RbConfig::CONFIG['host_os'] =~ /win32/ ? "NUL" : "/dev/null")
       NAME = 'RSpec'
 
       class << self
@@ -24,7 +25,7 @@ module ParallelTests
             cmd = (run("bundle show rspec-core") =~ %r{Could not find gem.*} ? "spec" : "rspec")
             "bundle exec #{cmd}"
           else
-            %w[spec rspec].detect{|cmd| system "#{cmd} --version > /dev/null 2>&1" }
+            %w[spec rspec].detect{|cmd| system "#{cmd} --version > #{DEV_NULL} 2>&1" }
           end
 
           cmd or raise("Can't find executables rspec or spec")
