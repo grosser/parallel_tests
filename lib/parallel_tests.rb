@@ -4,8 +4,9 @@ require "parallel_tests/railtie" if defined? Rails::Railtie
 require "rbconfig"
 
 module ParallelTests
+  WINDOWS = (RbConfig::CONFIG['host_os'] =~ /cygwin|mswin|mingw|bccwin|wince|emx/)
   GREP_PROCESSES_COMMAND = \
-  if RbConfig::CONFIG['host_os'] =~ /win32/
+  if WINDOWS
     "wmic process get commandline | findstr TEST_ENV_NUMBER 2>&1"
   else
     "ps -ef | grep [T]EST_ENV_NUMBER= 2>&1"

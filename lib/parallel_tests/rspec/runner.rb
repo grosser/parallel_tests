@@ -3,7 +3,7 @@ require "parallel_tests/test/runner"
 module ParallelTests
   module RSpec
     class Runner < ParallelTests::Test::Runner
-      DEV_NULL = (RbConfig::CONFIG['host_os'] =~ /win32/ ? "NUL" : "/dev/null")
+      DEV_NULL = (WINDOWS ? "NUL" : "/dev/null")
       NAME = 'RSpec'
 
       class << self

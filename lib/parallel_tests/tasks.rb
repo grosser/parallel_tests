@@ -147,7 +147,7 @@ namespace :parallel do
         "-n #{count} "                     \
         "--pattern '#{pattern}' "          \
         "--test-options '#{options}'"
-      if RbConfig::CONFIG['host_os'] =~ /cygwin|mswin|mingw|bccwin|wince|emx/
+      if ParallelTests::WINDOWS
         ruby_binary = File.join(RbConfig::CONFIG['bindir'], RbConfig::CONFIG['ruby_install_name'])
         command = "#{ruby_binary} #{command}"
       end
