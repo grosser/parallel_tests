@@ -14,6 +14,12 @@ module ParallelTests
           else
             []
           end
+          tags = if options[:test_options]
+            options[:test_options].split.select {|opt| opt =~ /@\w+/}
+          else
+            []
+          end
+          tag_expressions.concat(tags).uniq
           split_into_scenarios files, tag_expressions
         end
 
