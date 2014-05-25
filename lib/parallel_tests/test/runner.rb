@@ -62,8 +62,8 @@ module ParallelTests
 
         def execute_command_and_capture_output(env, cmd, silence)
           # make processes descriptive / visible in ps -ef
-          windows = RbConfig::CONFIG['host_os'] =~ /cygwin|mswin|mingw|bccwin|wince|emx/
-          separator = windows ? ' & ' : ';'
+          windows = ParallelTests.windows?
+          separator = (windows ? ' & ' : ';')
           exports = env.map do |k,v|
             if windows
               "(SET \"#{k}=#{v}\")"

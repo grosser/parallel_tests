@@ -64,5 +64,9 @@ module ParallelTests
         Time.now
       end
     end
+
+    def windows?
+      RbConfig::CONFIG["target_os"] =~ /mingw|mswin/
+    end
   end
 end
