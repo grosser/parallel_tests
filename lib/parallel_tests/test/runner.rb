@@ -1,4 +1,4 @@
-require 'open3'
+require 'parallel_tests'
 
 module ParallelTests
   module Test
