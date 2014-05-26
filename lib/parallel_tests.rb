@@ -7,7 +7,7 @@ module ParallelTests
   WINDOWS = (RbConfig::CONFIG['host_os'] =~ /cygwin|mswin|mingw|bccwin|wince|emx/)
   GREP_PROCESSES_COMMAND = \
   if WINDOWS
-    "wmic process get commandline | findstr TEST_ENV_NUMBER 2>&1"
+    "wmic process get commandline | findstr TEST_ENV_NUMBER | find /c \"TEST_ENV_NUMBER=\" 2>&1"
   else
     "ps -ef | grep [T]EST_ENV_NUMBER= 2>&1"
   end
