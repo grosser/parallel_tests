@@ -11,7 +11,7 @@ module ParallelTests
         def all(files, options={})
           tags = []
           tags.concat options[:ignore_tag_pattern].to_s.split(/\s*,\s*/).map {|tag| "~#{tag}" }
-          tags.concat options[:test_options].to_s.scan(/(?:-t|--tags) (@\w+)/).flatten
+          tags.concat options[:test_options].to_s.scan(/(?:-t|--tags) (~?@[\w,~@]+)/).flatten
           split_into_scenarios files, tags.uniq
         end
 
