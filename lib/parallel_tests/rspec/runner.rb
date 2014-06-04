@@ -16,6 +16,8 @@ module ParallelTests
 
         def determine_executable
           cmd = case
+          when ParallelTests.rspec_in_path?
+            'rspec'
           when File.exists?("bin/rspec")
             "bin/rspec"
           when File.file?("script/spec")

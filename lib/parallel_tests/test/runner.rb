@@ -73,10 +73,18 @@ module ParallelTests
           end.join(separator)
           cmd = "#{exports}#{separator}#{cmd}"
 
-          output = open("|#{cmd}", "r") { |output| capture_output(output, silence) }
-          exitstatus = $?.exitstatus
+          output = Tempfile.new('parallel_tests')
+          output_path = output.path
+          output.close
+          exitstatus = nil
+          t = Thread.new {
+            pid = Process.spawn(cmd, :out=>output_path, :err=>output_path)
+            Process.wait(pid)
+            exitstatus = $?.exitstatus
+          }
+          result = capture_output(t, output_path, silence)
 
-          {:stdout => output, :exit_status => exitstatus}
+          {:stdout => result, :exit_status => exitstatus}
         end
 
         def find_results(test_output)
@@ -116,18 +124,22 @@ module ParallelTests
         end
 
         # read output of the process and print it in chunks
-        def capture_output(out, silence)
+        def capture_output(thread, out_path, silence)
           result = ""
-          loop do
-            begin
-              read = out.readpartial(1000000) # read whatever chunk we can get
-              result << read
-              unless silence
-                $stdout.print read
-                $stdout.flush
-              end
+          File.open(out_path, "r") { |out|
+            while thread.alive? do
+              loop do
+                begin
+                  read = out.readpartial(1000000) # read whatever chunk we can get
+                  result << read
+                  unless silence
+                    $stdout.print read
+                    $stdout.flush
+                  end
+                end
+              end rescue EOFError
             end
-          end rescue EOFError
+          }
           result
         end
 
