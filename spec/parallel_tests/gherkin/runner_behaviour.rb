@@ -24,6 +24,13 @@ shared_examples_for 'gherkin runners' do
       ENV.delete('PARALLEL_TESTS_EXECUTABLE')
     end
 
+    it "permits setting env options" do
+      ParallelTests::Test::Runner.should_receive(:execute_command).with { |a, b, c, options|
+        options[:env]["TEST"] == "ME"
+      }
+      call(['xxx'], 1, 22, {:env => {'TEST' => 'ME'}})
+    end
+
     it "runs bundle exec {runner_name} when on bundler 0.9" do
       ParallelTests.stub!(:bundler_enabled?).and_return true
       should_run_with %r{bundle exec #{runner_name}}
