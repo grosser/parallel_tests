@@ -46,6 +46,11 @@ describe ParallelTests::CLI do
       subject.send(:load_runner, "rspec").should == ParallelTests::RSpec::Runner
     end
 
+    it "requires and loads runner with underscores" do
+      subject.should_receive(:require).with("parallel_tests/my_test_runner/runner")
+      subject.send(:load_runner, "my_test_runner").should == ParallelTests::MyTestRunner::Runner
+    end
+
     it "fails to load unfindable runner" do
       expect{
         subject.send(:load_runner, "foo").should == ParallelTests::RSpec::Runner
@@ -69,3 +74,13 @@ describe ParallelTests::CLI do
     end
   end
 end
+
+
+
+module ParallelTests
+  module MyTestRunner
+    class Runner
+    end
+  end
+end
+
