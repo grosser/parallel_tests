@@ -162,7 +162,8 @@ TEXT
 
     def load_runner(type)
       require "parallel_tests/#{type}/runner"
-      klass_name = "ParallelTests::#{type.capitalize.sub("Rspec", "RSpec")}::Runner"
+      runner_classname = type.split("_").map(&:capitalize).join.sub("Rspec", "RSpec")
+      klass_name = "ParallelTests::#{runner_classname}::Runner"
       klass_name.split('::').inject(Object) { |x, y| x.const_get(y) }
     end
 
