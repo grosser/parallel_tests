@@ -22,15 +22,14 @@ describe ParallelTests::RSpec::RuntimeLogger do
       end
 
       if RSpec::Core::Version::STRING.start_with?('3')
-        notification = double(:group => double(:file_path => "#{Dir.pwd}/spec/foo.rb"))
-        logger.example_group_started notification
-        logger.example_group_finished notification
+        notification_or_example = double(:group => double(:file_path => "#{Dir.pwd}/spec/foo.rb"))
       else
-        example = (double(:file_path => "#{Dir.pwd}/spec/foo.rb"))
-        logger.example_group_started example
-        logger.example_group_finished example
-      end
+        notification_or_example = double(:file_path => "#{Dir.pwd}/spec/foo.rb")
+      end        
 
+      logger.example_group_started notification_or_example
+      logger.example_group_finished notification_or_example
+      
       logger.start_dump
 
       #f.close
@@ -96,7 +95,7 @@ describe ParallelTests::RSpec::RuntimeLogger do
       end
 
       system("TEST_ENV_NUMBER=1 rspec spec -I #{Bundler.root.join("lib")} --format ParallelTests::RSpec::RuntimeLogger --out runtime.log 2>&1") || raise("nope")
-
+      
       result = File.read("runtime.log")
       result.should include "a_spec.rb:0.5"
       result.should include "b_spec.rb:0.5"

@@ -29,20 +29,14 @@ class ParallelTests::RSpec::RuntimeLogger < ParallelTests::RSpec::LoggerBase
 
     if RSpec::Core::Version::STRING.start_with?('3')
       RSpec::Core::Formatters.register self, :example_group_started, :example_group_finished, :start_dump
-      def example_group_finished(notification)
-        @group_nesting -= 1
-        if @group_nesting == 0
-          @example_times[notification.group.file_path] += ParallelTests.now - @time
-        end
+    end
+    def example_group_finished(notification)
+      @group_nesting -= 1
+      if @group_nesting == 0
+        path = RSPEC_3 ? notification.group.file_path : notification.file_path
+        @example_times[path] += ParallelTests.now - @time
       end
-    else
-      def example_group_finished(example_group)
-        @group_nesting -= 1
-        if @group_nesting == 0
-          @example_times[example_group.file_path] += ParallelTests.now - @time
-        end
-        super
-      end
+      super if defined?(super)
     end
   end
 
