@@ -32,7 +32,7 @@ class ParallelTests::RSpec::LoggerBase < ParallelTests::RSpec::LoggerBaseBase
   end
 
   #stolen from Rspec
-  def close
+  def close(*args)
     @output.close  if (IO === @output) & (@output != $stdout)
   end
 
