@@ -1,19 +1,19 @@
 require 'parallel_tests/rspec/failures_logger'
 
 class ParallelTests::RSpec::SummaryLogger < ParallelTests::RSpec::LoggerBase
-  # RSpec 1: dumps 1 failed spec
-  def dump_failure(*args)
-    lock_output do
-      super
-    end
-    @output.flush
+  if RSPEC_3
+    RSpec::Core::Formatters.register self, :dump_failures
   end
 
-  # RSpec 2: dumps all failed specs
-  def dump_failures(*args)
-    lock_output do
-      super
+  if RSPEC_1
+    def dump_failure(*args)
+      lock_output { super }
+      @output.flush
     end
-    @output.flush
+  else
+    def dump_failures(*args)
+      lock_output { super }
+      @output.flush
+    end
   end
 end

@@ -21,9 +21,14 @@ describe ParallelTests::RSpec::RuntimeLogger do
         ParallelTests::RSpec::RuntimeLogger.new(f)
       end
 
-      example = (mock(:file_path => "#{Dir.pwd}/spec/foo.rb"))
+      example = double(:file_path => "#{Dir.pwd}/spec/foo.rb")
+      if ParallelTests::RSpec::RuntimeLogger::RSPEC_3
+        example = double(:group => example)
+      end
+
       logger.example_group_started example
       logger.example_group_finished example
+
       logger.start_dump
 
       #f.close
