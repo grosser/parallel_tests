@@ -297,6 +297,7 @@ inspired by [pivotal labs](http://pivotallabs.com/users/miked/blog/articles/849-
  - [Brandon Turner](https://github.com/blt04)
  - [Matt Hodgson](https://github.com/mhodgson)
  - [bicarbon8](https://github.com/bicarbon8)
+ - [seichner](https://github.com/seichner)
 
 [Michael Grosser](http://grosser.it)<br/>
 michael@grosser.it<br/>
