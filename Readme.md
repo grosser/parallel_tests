@@ -99,7 +99,6 @@ so that each process should finish around the same time.
 
 Rspec: Add to your `.rspec_parallel` (or `.rspec`) :
 
-    If installed as plugin: -I vendor/plugins/parallel_tests/lib
     --format progress
     --format ParallelTests::RSpec::RuntimeLogger --out tmp/parallel_runtime_rspec.log
 
@@ -115,7 +114,6 @@ This logger logs the test output without the different processes overwriting eac
 
 Add the following to your `.rspec_parallel` (or `.rspec`) :
 
-    If installed as plugin: -I vendor/plugins/parallel_tests/lib
     --format progress
     --format ParallelTests::RSpec::SummaryLogger --out tmp/spec_summary.log
 
@@ -130,7 +128,6 @@ E.g.
 
 Add the following to your `.rspec_parallel` (or `.rspec`) :
 
-    If installed as plugin: -I vendor/plugins/parallel_tests/lib
     --format progress
     --format ParallelTests::RSpec::FailuresLogger --out tmp/failing_specs.log
 
