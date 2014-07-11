@@ -8,14 +8,18 @@ module ParallelTests
       class << self
         def run_tests(test_files, process_number, num_processes, options)
           features = {}
-          test_files.each do |f|
-            scenario_components = f.split(':')
-            features[scenario_components.first] ||= []
-            features[scenario_components.first] << scenario_components.last
-          end
+          combined_scenarios = test_files
 
-          combined_scenarios = features.map do |k,v|
-            "#{k}:#{v.join(':')}"
+          if options[:group_by] == :scenarios
+            test_files.each do |f|
+              scenario_components = f.split(':')
+              features[scenario_components.first] ||= []
+              features[scenario_components.first] << scenario_components.last
+            end
+
+            combined_scenarios = features.map do |k,v|
+              "#{k}:#{v.join(':')}"
+            end
           end
 
           sanitized_test_files = combined_scenarios.map { |val| WINDOWS ? "\"#{val}\"" : Shellwords.escape(val) }
