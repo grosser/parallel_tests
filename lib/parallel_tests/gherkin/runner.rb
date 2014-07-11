@@ -17,8 +17,8 @@ module ParallelTests
           combined_scenarios = features.map do |k,v|
             "#{k}:#{v.join(':')}"
           end
-          
-          sanitized_test_files = test_files.map { |val| WINDOWS ? "\"#{val}\"" : Shellwords.escape(val) }
+
+          sanitized_test_files = combined_scenarios.map { |val| WINDOWS ? "\"#{val}\"" : Shellwords.escape(val) }
 
           options[:env] ||= {}
           options[:env] = options[:env].merge({"AUTOTEST" => "1"}) if $stdout.tty? # display color when we are in a terminal
