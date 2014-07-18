@@ -295,6 +295,7 @@ inspired by [pivotal labs](http://pivotallabs.com/users/miked/blog/articles/849-
  - [Matt Hodgson](https://github.com/mhodgson)
  - [bicarbon8](https://github.com/bicarbon8)
  - [seichner](https://github.com/seichner)
+ - [Matt Southerden](https://github.com/mattsoutherden)
 
 [Michael Grosser](http://grosser.it)<br/>
 michael@grosser.it<br/>
