@@ -192,10 +192,10 @@ EOF
       test_files = %w(features/a.rb:23 features/a.rb:44 features/b.rb:12)
 
       ParallelTests::Test::Runner.should_receive(:execute_command).with do |a,b,c,d|
-        a =~ Regexp.new('features/a.rb:23 features/a.rb:44 features/b.rb:12')
+        a =~ Regexp.new('features/a.rb:23:44 features/b.rb:12')
       end
 
-      call(test_files, 1, 2, {})
+      call(test_files, 1, 2, { :group_by => :scenarios })
     end
   end
 
