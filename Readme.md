@@ -296,9 +296,9 @@ inspired by [pivotal labs](http://pivotallabs.com/users/miked/blog/articles/849-
  - [bicarbon8](https://github.com/bicarbon8)
  - [seichner](https://github.com/seichner)
  - [Matt Southerden](https://github.com/mattsoutherden)
+ - [Stanislaw Wozniak](https://github.com/sponte)
 
 [Michael Grosser](http://grosser.it)<br/>
 michael@grosser.it<br/>
 License: MIT<br/>
 [![Build Status](https://travis-ci.org/grosser/parallel_tests.png)](https://travis-ci.org/grosser/parallel_tests)
-
