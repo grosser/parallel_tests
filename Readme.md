@@ -301,3 +301,4 @@ inspired by [pivotal labs](http://pivotallabs.com/users/miked/blog/articles/849-
 michael@grosser.it<br/>
 License: MIT<br/>
 [![Build Status](https://travis-ci.org/grosser/parallel_tests.png)](https://travis-ci.org/grosser/parallel_tests)
+
