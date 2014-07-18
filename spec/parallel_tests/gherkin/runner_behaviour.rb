@@ -182,6 +182,23 @@ EOF
     end
   end
 
+  describe 'grouping by scenarios for cucumber' do
+    def call(*args)
+      ParallelTests::Gherkin::Runner.send(:run_tests, *args)
+    end
+
+    it 'groups cucumber invocation by feature files to achieve correct cucumber hook behaviour' do
+
+      test_files = %w(features/a.rb:23 features/a.rb:44 features/b.rb:12)
+
+      ParallelTests::Test::Runner.should_receive(:execute_command).with do |a,b,c,d|
+        a =~ Regexp.new('features/a.rb:23 features/a.rb:44 features/b.rb:12')
+      end
+
+      call(test_files, 1, 2, {})
+    end
+  end
+
   describe ".find_tests" do
     def call(*args)
       ParallelTests::Gherkin::Runner.send(:find_tests, *args)
