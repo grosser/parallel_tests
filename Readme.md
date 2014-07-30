@@ -297,6 +297,7 @@ inspired by [pivotal labs](http://pivotallabs.com/users/miked/blog/articles/849-
  - [seichner](https://github.com/seichner)
  - [Matt Southerden](https://github.com/mattsoutherden)
  - [Stanislaw Wozniak](https://github.com/sponte)
+ - [Dmitry Polushkin](https://github.com/dmitry)
 
 [Michael Grosser](http://grosser.it)<br/>
 michael@grosser.it<br/>
