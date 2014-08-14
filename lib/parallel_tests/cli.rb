@@ -40,7 +40,7 @@ module ParallelTests
 
           [run_tests(group_to_run, 0, num_processes, options)]
         elsif options[:groups]
-          groups_to_run = options[:groups].collect{|i| groups[i]}
+          groups_to_run = options[:groups].collect{|i| groups[i - 1]}
           report_number_of_tests(groups_to_run)
           execute_in_parallel(groups_to_run, groups_to_run.size, options) do |group|
             run_tests(group, groups_to_run.index(group), 1, options)
