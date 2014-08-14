@@ -33,6 +33,10 @@ describe ParallelTests::CLI do
     it "parses nice as nice" do
       call(["--nice"]).should == defaults.merge(:nice => true)
     end
+
+    it "parses nice as nice" do
+      call(["--groups", '4,5']).should == defaults.merge(:groups => [4,5])
+    end
   end
 
   describe "#load_runner" do

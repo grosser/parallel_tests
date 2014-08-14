@@ -39,6 +39,12 @@ module ParallelTests
           group_to_run = groups[options[:only_group] - 1]
 
           [run_tests(group_to_run, 0, num_processes, options)]
+        elsif options[:groups]
+          groups_to_run = options[:groups].collect{|i| groups[i]}
+          report_number_of_tests(groups_to_run)
+          execute_in_parallel(groups_to_run, groups_to_run.size, options) do |group|
+            run_tests(group, groups_to_run.index(group), 1, options)
+          end
         else
           report_number_of_tests(groups)
 
@@ -125,6 +131,7 @@ TEXT
         end
 
         opts.on("--only-group [INTEGER]", Integer) { |group| options[:only_group] = group }
+        opts.on("--groups [INTEGER,INTEGER]", "specify the groups you want to run when the -n option is given", Array){ |groups| options[:groups] = groups.map(&:to_i) }
 
         opts.on("-e", "--exec [COMMAND]", "execute this code parallel and with ENV['TEST_ENV_NUM']") { |path| options[:execute] = path }
         opts.on("-o", "--test-options '[OPTIONS]'", "execute test commands with those options") { |arg| options[:test_options] = arg }

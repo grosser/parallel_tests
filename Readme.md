@@ -185,6 +185,7 @@ Options are:
         --ignore-tags [PATTERN]      When counting steps ignore scenarios with tags that match this pattern
         --nice                       execute test commands with low priority.
         --only-group [INTEGER]       Group the files, but only run the group specified here. Requires group-by filesize (will be set automatically if group-by is blank and only-group is specified)
+        --groups [INTEGER],[INTEGER] specify the groups you want to run.  Requires the -n option is given
     -v, --version                    Show Version
     -h, --help                       Show this.
 
