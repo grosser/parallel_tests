@@ -85,7 +85,7 @@ namespace :parallel do
     if defined?(ActiveRecord) && ActiveRecord::Base.schema_format == :ruby
       Rake::Task['db:schema:dump'].invoke
       Rake::Task['parallel:load_schema'].invoke(args[:count])
-    elsif defined?(ActiveRecord) && ActiveRecord::Base.schema_format == :sql
+    else
       Rake::Task['db:structure:dump'].invoke
       Rake::Task['parallel:load_structure'].invoke(args[:count])
     end
