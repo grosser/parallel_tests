@@ -85,7 +85,7 @@ namespace :parallel do
       # dump then load in parallel
       Rake::Task['db:schema:dump'].invoke
       Rake::Task['parallel:load_schema'].invoke(args[:count])
-    elsif defined?(ActiveRecord) && ActiveRecord::Base.schema_format == :sql
+    else
       # there is no separate dump / load for schema_format :sql -> do it safe and slow
       args = args.to_hash.merge(:non_parallel => true) # normal merge returns nil
       taskname = Rake::Task.task_defined?('db:test:prepare') ? 'db:test:prepare' : 'app:db:test:prepare'
