@@ -81,13 +81,15 @@ namespace :parallel do
   desc "update test databases by dumping and loading --> parallel:prepare[num_cpus]"
   task(:prepare, [:count]) do |t,args|
     ParallelTests::Tasks.check_for_pending_migrations
-    # dump then load in parallel for ruby or sql schema formats
     if defined?(ActiveRecord) && ActiveRecord::Base.schema_format == :ruby
+      # dump then load in parallel
       Rake::Task['db:schema:dump'].invoke
       Rake::Task['parallel:load_schema'].invoke(args[:count])
     elsif defined?(ActiveRecord) && ActiveRecord::Base.schema_format == :sql
-      Rake::Task['db:structure:dump'].invoke
-      Rake::Task['parallel:load_structure'].invoke(args[:count])
+      # there is no separate dump / load for schema_format :sql -> do it safe and slow
+      args = args.to_hash.merge(:non_parallel => true) # normal merge returns nil
+      taskname = Rake::Task.task_defined?('db:test:prepare') ? 'db:test:prepare' : 'app:db:test:prepare'
+      ParallelTests::Tasks.run_in_parallel("rake #{taskname}", args)
     end
   end
 
