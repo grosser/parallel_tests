@@ -35,7 +35,6 @@ describe ParallelTests::CLI do
     end
 
     context "parse only-group" do
-
       it "group_by should be set to filesize" do
         call(["--only-group", '1']).should == defaults.merge(:group_by=>:filesize, :only_group => [1])
       end

@@ -184,7 +184,7 @@ Options are:
         --no-symlinks                Do not traverse symbolic links to find test files
         --ignore-tags [PATTERN]      When counting steps ignore scenarios with tags that match this pattern
         --nice                       execute test commands with low priority.
-        --only-group [INT],[INT]     Group the files, but only run the group(s) specified here. Requires group-by filesize (will be set automatically if group-by is blank and only-group is specified)
+        --only-group INT[, INT]      Group the files, but only run the group(s) specified here. Requires group-by filesize (will be set automatically if group-by is blank and only-group is specified)
     -v, --version                    Show Version
     -h, --help                       Show this.
 
