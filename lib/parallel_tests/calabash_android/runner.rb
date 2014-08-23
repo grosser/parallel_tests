@@ -5,7 +5,7 @@ module ParallelTests
     class Runner < ParallelTests::Gherkin::Runner
       class << self
         def name
-          'calabash-android run /Users/rajdeepverma/work/droid/android/artifacts/automation/FlyDelta-release.apk '
+          'calabash-android run'
         end
 
         def run_tests(test_files, process_number, num_processes, options)
