@@ -9,6 +9,6 @@ Gem::Specification.new name, ParallelTests::VERSION do |s|
   s.homepage = "http://github.com/grosser/#{name}"
   s.files = `git ls-files`.split("\n")
   s.license = "MIT"
-  s.executables = ["calabash_android","parallel_spinach", "parallel_cucumber", "parallel_rspec", "parallel_test"]
+  s.executables = ["parallel_android","parallel_spinach", "parallel_cucumber", "parallel_rspec", "parallel_test"]
   s.add_runtime_dependency "parallel"
 end
