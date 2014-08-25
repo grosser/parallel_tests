@@ -27,7 +27,7 @@ module ParallelTests
               cucumber_opts(options[:test_options]),
               *sanitized_test_files
           ].compact.join(' ')
-          cmd = cmd + " ADB_DEVICE_ARG=#{device_for_current_process process_number}"
+          cmd = cmd + " ADB_DEVICE_ARG=#{device_for_current_process process_number}" unless device_for_current_process(process_number).nil?
           execute_command(cmd, process_number, num_processes, options)
         end
 
