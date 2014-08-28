@@ -99,7 +99,6 @@ so that each process should finish around the same time.
 
 Rspec: Add to your `.rspec_parallel` (or `.rspec`) :
 
-    If installed as plugin: -I vendor/plugins/parallel_tests/lib
     --format progress
     --format ParallelTests::RSpec::RuntimeLogger --out tmp/parallel_runtime_rspec.log
 
@@ -115,7 +114,6 @@ This logger logs the test output without the different processes overwriting eac
 
 Add the following to your `.rspec_parallel` (or `.rspec`) :
 
-    If installed as plugin: -I vendor/plugins/parallel_tests/lib
     --format progress
     --format ParallelTests::RSpec::SummaryLogger --out tmp/spec_summary.log
 
@@ -130,7 +128,6 @@ E.g.
 
 Add the following to your `.rspec_parallel` (or `.rspec`) :
 
-    If installed as plugin: -I vendor/plugins/parallel_tests/lib
     --format progress
     --format ParallelTests::RSpec::FailuresLogger --out tmp/failing_specs.log
 
@@ -174,6 +171,7 @@ Options are:
         --group-by [TYPE]            group tests by:
           found - order of finding files
           steps - number of cucumber steps
+          filesize - size of files on disk
           default - runtime or filesize
     -m, --multiply-processes [FLOAT] use given number as a multiplier of processes to run
     -s, --single [PATTERN]           Run all matching files in the same process
@@ -186,6 +184,7 @@ Options are:
         --no-symlinks                Do not traverse symbolic links to find test files
         --ignore-tags [PATTERN]      When counting steps ignore scenarios with tags that match this pattern
         --nice                       execute test commands with low priority.
+        --only-group INT[, INT]      Group the files, but only run the group(s) specified here. Requires group-by filesize (will be set automatically if group-by is blank and only-group is specified)
     -v, --version                    Show Version
     -h, --help                       Show this.
 
@@ -208,7 +207,7 @@ TIPS
 ====
  - [RSpec] add a `.rspec_parallel` to use different options, e.g. **no --drb**
  - [RSpec] delete `script/spec`
- - [[Spork](https://github.com/sporkrb/spork)] does not work with parallel_tests
+ - [[Spork](https://github.com/sporkrb/spork)] does not work with parallel_tests except when using [sqlite in memory](https://github.com/grosser/parallel_tests/wiki#wiki-with-spork)
  - [RSpec] remove --loadby from you spec/*.opts
  - [RSpec] Instantly see failures (instead of just a red F) with [rspec-instafail](https://github.com/grosser/rspec-instafail)
  - [Bundler] if you have a `Gemfile` then `bundle exec` will be used to run tests
@@ -223,6 +222,7 @@ TIPS
  - [email_spec and/or action_mailer_cache_delivery](https://github.com/grosser/parallel_tests/wiki)
  - [Memcached] use different namespaces e.g. `config.cache_store = ..., :namespace => "test_#{ENV['TEST_ENV_NUMBER']}"`
  - [zeus-parallel_tests](https://github.com/sevos/zeus-parallel_tests)
+ - [Distributed parallel test (e.g. Travis Support)](https://github.com/grosser/parallel_tests/wiki/Distributed-Parallel-Tests-and-Travis-Support)
 
 TODO
 ====
@@ -291,6 +291,14 @@ inspired by [pivotal labs](http://pivotallabs.com/users/miked/blog/articles/849-
  - [sidfarkus](https://github.com/sidfarkus)
  - [Colin Harris](https://github.com/aberant)
  - [Wataru MIYAGUNI](https://github.com/gongo)
+ - [Brandon Turner](https://github.com/blt04)
+ - [Matt Hodgson](https://github.com/mhodgson)
+ - [bicarbon8](https://github.com/bicarbon8)
+ - [seichner](https://github.com/seichner)
+ - [Matt Southerden](https://github.com/mattsoutherden)
+ - [Stanislaw Wozniak](https://github.com/sponte)
+ - [Dmitry Polushkin](https://github.com/dmitry)
+ - [Samer Masry](https://github.com/smasry)
 
 [Michael Grosser](http://grosser.it)<br/>
 michael@grosser.it<br/>

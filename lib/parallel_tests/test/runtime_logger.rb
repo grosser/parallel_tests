@@ -87,10 +87,11 @@ class ::Test::Unit::TestSuite
   alias :run_without_timing :run unless defined? @@timing_installed
 
   def run(result, &progress_block)
+    first_test = self.tests.first
     start_time = ParallelTests.now
     run_without_timing(result, &progress_block)
     end_time = ParallelTests.now
-    ParallelTests::Test::RuntimeLogger.log(self.tests.first, start_time, end_time)
+    ParallelTests::Test::RuntimeLogger.log(first_test, start_time, end_time)
   end
 
   @@timing_installed = true

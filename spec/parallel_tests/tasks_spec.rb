@@ -22,6 +22,15 @@ describe ParallelTests::Tasks do
       args = {:count => 2, :pattern => "plain", :options => "-p default"}
       ParallelTests::Tasks.parse_args(args).should == [2, "plain", "-p default"]
     end
+
+    it "should return the count, pattern, and options" do
+      args = {
+        :count => 2,
+        :pattern => "plain",
+        :options => "-p default --group-by steps",
+      }
+      ParallelTests::Tasks.parse_args(args).should == [2, "plain", "-p default --group-by steps"]
+    end
   end
 
   describe ".rails_env" do
@@ -82,13 +91,16 @@ describe ParallelTests::Tasks do
 
   describe ".suppress_output" do
     def call(command, grep)
-      result = `#{ParallelTests::Tasks.suppress_output(command, grep)}`
+      # Explictly run as a parameter to /bin/sh to simulate how
+      # the command will be run by parallel_test --exec
+      # This also tests shell escaping of single quotes
+      result = `/bin/sh -c '#{ParallelTests::Tasks.suppress_output(command, grep)}'`
       [result, $?.success?]
     end
 
     context "with pipefail supported" do
       before :all do
-        if not system("set -o pipefail 2>/dev/null && test 1")
+        if not system("/bin/bash", "-c", "set -o pipefail 2>/dev/null && test 1")
           pending "pipefail is not supported on your system"
         end
       end
@@ -112,7 +124,7 @@ describe ParallelTests::Tasks do
 
     context "without pipefail supported" do
       before do
-        ParallelTests::Tasks.should_receive(:system).with("set -o pipefail 2>/dev/null && test 1").and_return false
+        ParallelTests::Tasks.should_receive(:system).with('/bin/bash', '-c', 'set -o pipefail 2>/dev/null && test 1').and_return false
       end
 
       it "should not filter and succeed" do

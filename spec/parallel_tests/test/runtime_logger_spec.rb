@@ -87,4 +87,26 @@ describe ParallelTests::Test::RuntimeLogger do
       end
     end
   end
+
+  describe '::Test::Unit::TestSuite' do
+    it 'passes correct parameters to log' do
+      require 'test/unit'
+      require 'test/unit/ui/xml/testrunner'
+
+      class FakeUnitTest < Test::Unit::TestCase
+        def test_fake
+          assert true
+        end
+      end
+
+      ParallelTests::Test::RuntimeLogger.
+        should_receive(:log).
+        with(kind_of(FakeUnitTest), kind_of(Time),  kind_of(Time))
+
+      my_tests = Test::Unit::TestSuite.new
+      my_tests << FakeUnitTest.new('test_fake')
+      output = StringIO.new
+      Test::Unit::UI::XML::TestRunner.run(my_tests, :output => output)
+    end
+  end
 end
