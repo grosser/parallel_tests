@@ -34,10 +34,19 @@ module ParallelTests
 
       report_time_taken do
         groups = @runner.tests_in_groups(options[:files], num_processes, options)
-        report_number_of_tests(groups)
 
-        test_results = execute_in_parallel(groups, groups.size, options) do |group|
-          run_tests(group, groups.index(group), num_processes, options)
+        test_results = if options[:only_group]
+          groups_to_run = options[:only_group].collect{|i| groups[i - 1]}
+          report_number_of_tests(groups_to_run)
+          execute_in_parallel(groups_to_run, groups_to_run.size, options) do |group|
+            run_tests(group, groups_to_run.index(group), 1, options)
+          end
+        else
+          report_number_of_tests(groups)
+
+          execute_in_parallel(groups, groups.size, options) do |group|
+            run_tests(group, groups.index(group), num_processes, options)
+          end
         end
 
         report_results(test_results)
@@ -97,6 +106,8 @@ BANNER
 group tests by:
           found - order of finding files
           steps - number of cucumber/spinach steps
+          scenarios - individual cucumber scenarios
+          filesize - by size of the file
           default - runtime or filesize
 TEXT
 ) { |type| options[:group_by] = type.to_sym }
@@ -115,6 +126,8 @@ TEXT
           options[:isolate] = true
         end
 
+        opts.on("--only-group INT[, INT]", Array) { |groups| options[:only_group] = groups.map(&:to_i) }
+
         opts.on("-e", "--exec [COMMAND]", "execute this code parallel and with ENV['TEST_ENV_NUM']") { |path| options[:execute] = path }
         opts.on("-o", "--test-options '[OPTIONS]'", "execute test commands with those options") { |arg| options[:test_options] = arg }
         opts.on("-t", "--type [TYPE]", "test(default) / rspec / cucumber / spinach") do |type|
@@ -130,11 +143,10 @@ TEXT
         opts.on("--no-symlinks", "Do not traverse symbolic links to find test files") { options[:symlinks] = false }
         opts.on('--ignore-tags [PATTERN]', 'When counting steps ignore scenarios with tags that match this pattern')  { |arg| options[:ignore_tag_pattern] = arg }
         opts.on("--nice", "execute test commands with low priority.") { options[:nice] = true }
+        opts.on("--runtime-log [PATH]", "Location of previously recorded test runtimes") { |path| options[:runtime_log] = path }
         opts.on("-v", "--version", "Show Version") { puts ParallelTests::VERSION; exit }
         opts.on("-h", "--help", "Show this.") { puts opts; exit }
       end.parse!(argv)
-
-      raise "--group-by found and --single-process are not supported" if options[:group_by] == :found and options[:single_process]
 
       if options[:count] == 0
         options.delete(:count)
@@ -142,12 +154,19 @@ TEXT
       end
 
       options[:files] = argv
+
+      options[:group_by] ||= :filesize if options[:only_group]
+
+      raise "--group-by found and --single-process are not supported" if options[:group_by] == :found and options[:single_process]
+      raise "--group-by filesize is required for --only-group" if options[:group_by] != :filesize and options[:only_group]
+
       options
     end
 
     def load_runner(type)
       require "parallel_tests/#{type}/runner"
-      klass_name = "ParallelTests::#{type.capitalize.sub("Rspec", "RSpec")}::Runner"
+      runner_classname = type.split("_").map(&:capitalize).join.sub("Rspec", "RSpec")
+      klass_name = "ParallelTests::#{runner_classname}::Runner"
       klass_name.split('::').inject(Object) { |x, y| x.const_get(y) }
     end
 

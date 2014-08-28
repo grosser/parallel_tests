@@ -30,8 +30,10 @@ module ParallelTests
         activate_pipefail = "set -o pipefail"
         remove_ignored_lines = %Q{(grep -v "#{ignore_regex}" || test 1)}
 
-        if system("#{activate_pipefail} 2>/dev/null && test 1")
-          "#{activate_pipefail} && (#{command}) | #{remove_ignored_lines}"
+        if File.executable?('/bin/bash') && system('/bin/bash', '-c', "#{activate_pipefail} 2>/dev/null && test 1")
+          # We need to shell escape single quotes (' becomes '"'"') because
+          # run_in_parallel wraps command in single quotes
+          %Q{/bin/bash -c '"'"'#{activate_pipefail} && (#{command}) | #{remove_ignored_lines}'"'"'}
         else
           command
         end
@@ -87,7 +89,7 @@ namespace :parallel do
       # there is no separate dump / load for schema_format :sql -> do it safe and slow
       args = args.to_hash.merge(:non_parallel => true) # normal merge returns nil
       taskname = Rake::Task.task_defined?('db:test:prepare') ? 'db:test:prepare' : 'app:db:test:prepare'
-      ParallelTests::Tasks.run_in_parallel("rake #{taskname} --trace", args)
+      ParallelTests::Tasks.run_in_parallel("rake #{taskname}", args)
     end
   end
 
@@ -145,6 +147,10 @@ namespace :parallel do
         "-n #{count} "                     \
         "--pattern '#{pattern}' "          \
         "--test-options '#{options}'"
+      if ParallelTests::WINDOWS
+        ruby_binary = File.join(RbConfig::CONFIG['bindir'], RbConfig::CONFIG['ruby_install_name'])
+        command = "#{ruby_binary} #{command}"
+      end
       abort unless system(command) # allow to chain tasks e.g. rake parallel:spec parallel:features
     end
   end

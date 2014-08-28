@@ -24,6 +24,13 @@ shared_examples_for 'gherkin runners' do
       ENV.delete('PARALLEL_TESTS_EXECUTABLE')
     end
 
+    it "permits setting env options" do
+      ParallelTests::Test::Runner.should_receive(:execute_command).with { |a, b, c, options|
+        options[:env]["TEST"] == "ME"
+      }
+      call(['xxx'], 1, 22, {:env => {'TEST' => 'ME'}})
+    end
+
     it "runs bundle exec {runner_name} when on bundler 0.9" do
       ParallelTests.stub!(:bundler_enabled?).and_return true
       should_run_with %r{bundle exec #{runner_name}}
@@ -172,6 +179,24 @@ EOF
 
     it "does not pluralize 1" do
       call(["1 scenario (1 passed)", "1 step (1 passed)"]).should == "1 scenario (1 passed)\n1 step (1 passed)"
+    end
+  end
+
+  describe 'grouping by scenarios for cucumber' do
+    def call(*args)
+      ParallelTests::Gherkin::Runner.send(:run_tests, *args)
+    end
+
+    it 'groups cucumber invocation by feature files to achieve correct cucumber hook behaviour' do
+
+      test_files = %w(features/a.rb:23 features/a.rb:44 features/b.rb:12)
+
+      ParallelTests::Test::Runner.should_receive(:execute_command).with do |a,b,c,d|
+        argv = a.split("--").last.split(" ")[2..-1].sort
+        argv == ["features/a.rb:23:44", "features/b.rb:12"]
+      end
+
+      call(test_files, 1, 2, { :group_by => :scenarios })
     end
   end
 

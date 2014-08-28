@@ -7,19 +7,29 @@ module ParallelTests
 
       class << self
         def run_tests(test_files, process_number, num_processes, options)
-          sanitized_test_files = test_files.map { |val| Shellwords.escape(val) }
-          options = options.merge(:env => {"AUTOTEST" => "1"}) if $stdout.tty? # display color when we are in a terminal
+          combined_scenarios = test_files
+
+          if options[:group_by] == :scenarios
+            grouped = test_files.map { |t| t.split(':') }.group_by(&:first)
+            combined_scenarios = grouped.map {|file,files_and_lines| "#{file}:#{files_and_lines.map(&:last).join(':')}" }
+          end
+
+          sanitized_test_files = combined_scenarios.map { |val| WINDOWS ? "\"#{val}\"" : Shellwords.escape(val) }
+
+          options[:env] ||= {}
+          options[:env] = options[:env].merge({'AUTOTEST' => '1'}) if $stdout.tty? # display color when we are in a terminal
+
           cmd = [
             executable,
             (runtime_logging if File.directory?(File.dirname(runtime_log))),
             cucumber_opts(options[:test_options]),
             *sanitized_test_files
-          ].compact.join(" ")
+          ].compact.join(' ')
           execute_command(cmd, process_number, num_processes, options)
         end
 
         def test_file_name
-          "feature"
+          @test_file_name || 'feature'
         end
 
         def test_suffix
@@ -37,7 +47,7 @@ module ParallelTests
           sort_order = %w[scenario step failed undefined skipped pending passed]
 
           %w[scenario step].map do |group|
-            group_results = results.grep /^\d+ #{group}/
+            group_results = results.grep(/^\d+ #{group}/)
             next if group_results.empty?
 
             sums = sum_up_results(group_results)
@@ -67,8 +77,12 @@ module ParallelTests
         end
 
         def tests_in_groups(tests, num_groups, options={})
-          if options[:group_by] == :steps
-            Grouper.by_steps(find_tests(tests, options), num_groups, options)
+          if options[:group_by] == :scenarios
+            @test_file_name = "scenario"
+          end
+          method = "by_#{options[:group_by]}"
+          if Grouper.respond_to?(method)
+            Grouper.send(method, find_tests(tests, options), num_groups, options)
           else
             super
           end
@@ -85,14 +99,14 @@ module ParallelTests
 
         def determine_executable
           case
-            when File.exists?("bin/#{name}")
-              "bin/#{name}"
-            when ParallelTests.bundler_enabled?
-              "bundle exec #{name}"
-            when File.file?("script/#{name}")
-              "script/#{name}"
-            else
-              "#{name}"
+          when File.exists?("bin/#{name}")
+            "bin/#{name}"
+          when ParallelTests.bundler_enabled?
+            "bundle exec #{name}"
+          when File.file?("script/#{name}")
+            "script/#{name}"
+          else
+            "#{name}"
           end
         end
 

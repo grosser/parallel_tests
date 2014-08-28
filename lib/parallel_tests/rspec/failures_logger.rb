@@ -2,6 +2,10 @@ require 'parallel_tests/rspec/logger_base'
 require 'parallel_tests/rspec/runner'
 
 class ParallelTests::RSpec::FailuresLogger < ParallelTests::RSpec::LoggerBase
+  if RSPEC_3
+    RSpec::Core::Formatters.register self, :dump_failures, :dump_summary
+  end
+
   # RSpec 1: does not keep track of failures, so we do
   def example_failed(example, *args)
     if RSPEC_1
@@ -12,18 +16,24 @@ class ParallelTests::RSpec::FailuresLogger < ParallelTests::RSpec::LoggerBase
     end
   end
 
-  # RSpec 1: dumps 1 failed spec
-  def dump_failure(*args)
-  end
-
-  # RSpec 2: dumps all failed specs
-  def dump_failures(*args)
+  if RSPEC_1
+    def dump_failure(*args)
+    end
+  else
+    def dump_failures(*args)
+    end
   end
 
   def dump_summary(*args)
     lock_output do
       if RSPEC_1
         dump_commands_to_rerun_failed_examples_rspec_1
+      elsif RSPEC_3
+        notification = args.first
+        unless notification.failed_examples.empty?
+          colorizer = ::RSpec::Core::Formatters::ConsoleCodes
+          output.puts notification.colorized_rerun_commands(colorizer)
+        end
       else
         dump_commands_to_rerun_failed_examples
       end

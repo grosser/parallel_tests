@@ -127,6 +127,19 @@ def test_tests_in_groups(klass, folder, suffix)
       groups[1].should == [@files[2],@files[4],@files[6],@files[7]]
     end
 
+    it 'partitions from custom runtime-data location' do
+      klass.stub!(:puts)
+      @log = 'tmp/custom_runtime.log'
+      setup_runtime_log
+
+      groups = klass.tests_in_groups([test_root], 2, :runtime_log => @log)
+      groups.size.should == 2
+      # 10 + 1 + 3 + 5 = 19
+      groups[0].should == [@files[0],@files[1],@files[3],@files[5]]
+      # 2 + 4 + 6 + 7 = 19
+      groups[1].should == [@files[2],@files[4],@files[6],@files[7]]
+    end
+
     it "alpha-sorts partitions when runtime-data is available" do
       klass.stub!(:puts)
       setup_runtime_log

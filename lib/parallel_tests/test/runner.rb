@@ -1,4 +1,4 @@
-require 'open3'
+require 'parallel_tests'
 
 module ParallelTests
   module Test
@@ -43,8 +43,10 @@ module ParallelTests
 
           tests = if options[:group_by] == :found
             tests.map { |t| [t, 1] }
+          elsif options[:group_by] == :filesize
+            with_filesize_info(tests)
           else
-            with_runtime_info(tests)
+            with_runtime_info(tests, options)
           end
           Grouper.in_even_groups_by_size(tests, num_groups, options)
         end
@@ -60,10 +62,9 @@ module ParallelTests
 
         def execute_command_and_capture_output(env, cmd, silence)
           # make processes descriptive / visible in ps -ef
-          windows = RbConfig::CONFIG['host_os'] =~ /cygwin|mswin|mingw|bccwin|wince|emx/ 
-          separator = windows ? ' & ' : ';'
+          separator = (WINDOWS ? ' & ' : ';')
           exports = env.map do |k,v|
-            if windows
+            if WINDOWS
               "(SET \"#{k}=#{v}\")"
             else
               "#{k}=#{v};export #{k}"
@@ -129,12 +130,13 @@ module ParallelTests
           result
         end
 
-        def with_runtime_info(tests)
-          lines = File.read(runtime_log).split("\n") rescue []
+        def with_runtime_info(tests, options = {})
+          log = options[:runtime_log] || runtime_log
+          lines = File.read(log).split("\n") rescue []
 
           # use recorded test runtime if we got enough data
           if lines.size * 1.5 > tests.size
-            puts "Using recorded test runtime"
+            puts "Using recorded test runtime: #{log}"
             times = Hash.new(1)
             lines.each do |line|
               test, time = line.split(":")
@@ -143,8 +145,13 @@ module ParallelTests
             end
             tests.sort.map{|test| [test, times[File.expand_path(test)]] }
           else # use file sizes
-            tests.sort.map{|test| [test, File.stat(test).size] }
+            with_filesize_info(tests)
           end
+        end
+
+        def with_filesize_info(tests)
+          # use filesize to group files
+          tests.sort.map { |test| [test, File.stat(test).size] }
         end
 
         def find_tests(tests, options = {})
