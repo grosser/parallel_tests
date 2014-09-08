@@ -51,7 +51,7 @@ module ParallelTests
       # parallel:spec[:count, :pattern, :options]
       def parse_args(args)
         # order as given by user
-        args = [args[:count], args[:pattern], args[:options]]
+        args = [args[:count], args[:pattern], args[:options], args[:nice]]
 
         # count given or empty ?
         # parallel:spec[2,models,options]
@@ -60,8 +60,9 @@ module ParallelTests
         num_processes = count.to_i unless count.to_s.empty?
         pattern = args.shift
         options = args.shift
+        nice = args.shift
 
-        [num_processes, pattern.to_s, options.to_s]
+        [num_processes, pattern.to_s, options.to_s, nice]
       end
     end
   end
@@ -130,7 +131,7 @@ namespace :parallel do
       $LOAD_PATH << File.expand_path(File.join(File.dirname(__FILE__), '..'))
       require "parallel_tests"
 
-      count, pattern, options = ParallelTests::Tasks.parse_args(args)
+      count, pattern, options, nice = ParallelTests::Tasks.parse_args(args)
       test_framework = {
         'spec' => 'rspec',
         'test' => 'test',
@@ -147,6 +148,8 @@ namespace :parallel do
         "-n #{count} "                     \
         "--pattern '#{pattern}' "          \
         "--test-options '#{options}'"
+      command = "#{command} --nice" if nice
+
       if ParallelTests::WINDOWS
         ruby_binary = File.join(RbConfig::CONFIG['bindir'], RbConfig::CONFIG['ruby_install_name'])
         command = "#{ruby_binary} #{command}"
