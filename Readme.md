@@ -299,6 +299,7 @@ inspired by [pivotal labs](http://pivotallabs.com/users/miked/blog/articles/849-
  - [Stanislaw Wozniak](https://github.com/sponte)
  - [Dmitry Polushkin](https://github.com/dmitry)
  - [Samer Masry](https://github.com/smasry)
+ - [Volodymyr Mykhailyk](https:/github.com/volodymyr-mykhailyk)
 
 [Michael Grosser](http://grosser.it)<br/>
 michael@grosser.it<br/>
