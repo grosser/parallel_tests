@@ -32,12 +32,12 @@ class ParallelTests::RSpec::LoggerBase < ParallelTests::RSpec::LoggerBaseBase
     end
   end
 
-  protected
-
   #stolen from Rspec
   def close(*args)
     @output.close  if (IO === @output) & (@output != $stdout)
   end
+
+  protected
 
   # do not let multiple processes get in each others way
   def lock_output
