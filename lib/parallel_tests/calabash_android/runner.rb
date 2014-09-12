@@ -2,7 +2,7 @@ require "parallel_tests/gherkin/runner"
 
 module ParallelTests
   module CalabashAndroid
-    class Runner < ParallelTests::Gherkin::Runner
+    class Runner < ParallelTests::Cucumber::Runner
       class << self
         def name
           'calabash-android run'
@@ -39,29 +39,6 @@ module ParallelTests
           adb_devices[process_num]
         end
 
-        def line_is_result?(line)
-          super or line =~ failing_scenario_regex
-        end
-
-        def summarize_results(results)
-          output = []
-
-          failing_scenarios = results.grep(failing_scenario_regex)
-          if failing_scenarios.any?
-            failing_scenarios.unshift("Failing Scenarios:")
-            output << failing_scenarios.join("\n")
-          end
-
-          output << super
-
-          output.join("\n\n")
-        end
-
-        private
-
-        def failing_scenario_regex
-          /^cucumber features\/.+:\d+/
-        end
       end
     end
   end
