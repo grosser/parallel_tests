@@ -1,4 +1,4 @@
-require "parallel_tests/gherkin/runner"
+require "parallel_tests/cucumber/runner"
 
 module ParallelTests
   module CalabashAndroid
