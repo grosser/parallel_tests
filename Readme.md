@@ -1,6 +1,8 @@
 Adding support for parallel calabash-android tests.
 
-bundle exec parallel_android -n 2 [feature_path] -o [apk_path]
+number of parallel process will be equal to number of android devices connected.
+
+bundle exec parallel_android [feature_path] -o '[apk_path] [cucumber_opts]'
 
 
 Speedup Test::Unit + RSpec + Cucumber by running parallel on multiple CPUs (or cores).<br/>
