@@ -32,7 +32,11 @@ module ParallelTests
         end
 
         def adb_devices
-          `adb devices`.scan(/\n(.*)\t/).flatten
+          begin
+            `adb devices`.scan(/\n(.*)\t/).flatten
+          rescue
+            []
+          end
         end
 
         def device_for_current_process process_num
