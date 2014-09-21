@@ -10,6 +10,8 @@ module ParallelTests
       num_processes = ParallelTests.determine_number_of_processes(options[:count])
       num_processes = num_processes * (options[:multiply] || 1)
 
+      show_parallel_droid_devices if @runner == ParallelTests::CalabashAndroid::Runner
+
       if options[:execute]
         execute_shell_command_in_parallel(options[:execute], num_processes, options)
       else
@@ -18,6 +20,14 @@ module ParallelTests
     end
 
     private
+
+    def show_parallel_droid_devices
+      devices = ParallelTests::CalabashAndroid::Runner.adb_devices.size
+      puts "*******************************"
+      puts " #{devices} DEVICES FOUND"
+      puts "*******************************"
+      raise '**** NO DEVICE FOUND ****' if devices==0
+    end
 
     def execute_in_parallel(items, num_processes, options)
       Tempfile.open 'parallel_tests-lock' do |lock|

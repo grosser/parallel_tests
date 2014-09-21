@@ -20,6 +20,7 @@ module ParallelTests
     def determine_number_of_processes(count)
       [
         count,
+        ParallelTests::CalabashAndroid::Runner.adb_devices.size,
         ENV["PARALLEL_TEST_PROCESSORS"],
         Parallel.processor_count
       ].detect{|c| not c.to_s.strip.empty? }.to_i
