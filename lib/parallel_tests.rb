@@ -2,6 +2,7 @@ require "rubygems"
 require "parallel"
 require "parallel_tests/railtie" if defined? Rails::Railtie
 require "rbconfig"
+require 'parallel_tests/calabash_android/runner.rb'
 
 module ParallelTests
   WINDOWS = (RbConfig::CONFIG['host_os'] =~ /cygwin|mswin|mingw|bccwin|wince|emx/)
@@ -19,10 +20,16 @@ module ParallelTests
   class << self
     def determine_number_of_processes(count)
       [
-        count,
-        ENV["PARALLEL_TEST_PROCESSORS"],
-        Parallel.processor_count
-      ].detect{|c| not c.to_s.strip.empty? }.to_i
+          count,
+          number_of_processes_for_calabash,
+          ENV["PARALLEL_TEST_PROCESSORS"],
+          Parallel.processor_count
+      ].detect { |c| not c.to_s.strip.empty? }.to_i
+    end
+
+    def number_of_processes_for_calabash
+      no_of_connected_devices = ParallelTests::CalabashAndroid::Runner.adb_devices.size
+      no_of_connected_devices == 0 ? nil : no_of_connected_devices
     end
 
     # copied from http://github.com/carlhuda/bundler Bundler::SharedHelpers#find_gemfile
