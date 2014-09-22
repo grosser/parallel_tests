@@ -51,7 +51,7 @@ module ParallelTests
           Grouper.in_even_groups_by_size(tests, num_groups, options)
         end
 
-        def execute_command(cmd, process_number,  num_processes, options)
+        def execute_command(cmd, process_number, num_processes, options)
           env = (options[:env] || {}).merge(
             "TEST_ENV_NUMBER" => test_env_number(process_number),
             "PARALLEL_TEST_GROUPS" => num_processes
