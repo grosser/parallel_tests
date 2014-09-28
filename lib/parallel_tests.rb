@@ -27,6 +27,9 @@ module ParallelTests
 
     # copied from http://github.com/carlhuda/bundler Bundler::SharedHelpers#find_gemfile
     def bundler_enabled?
+      env = ENV["PARALLEL_TEST_BUNDLER"]
+      return ['true', '1'].include?(env.downcase) unless env.nil?
+
       return true if Object.const_defined?(:Bundler)
 
       previous = nil

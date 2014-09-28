@@ -39,9 +39,20 @@ describe ParallelTests do
       Object.stub!(:const_defined?).with(:Bundler).and_return false
     end
 
+    after do
+      ENV.delete("PARALLEL_TEST_BUNDLER")
+    end
+
     it "should return false" do
       use_temporary_directory_for do
         ParallelTests.send(:bundler_enabled?).should == false
+      end
+    end
+
+    it "should return 'PARALLEL_TEST_BUNDLER' env flag" do
+      use_temporary_directory_for do
+        ENV["PARALLEL_TEST_BUNDLER"] = 'true'
+        ParallelTests.send(:bundler_enabled?).should == true
       end
     end
 
