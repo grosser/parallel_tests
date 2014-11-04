@@ -1,28 +1,6 @@
 require "spec_helper"
 
 describe ParallelTests do
-  describe :parse_rake_args do
-    it "should return the count" do
-      args = {:count => 2}
-      ParallelTests.parse_rake_args(args).should == [2, '', ""]
-    end
-
-    it "should default to the prefix" do
-      args = {:count => "models"}
-      ParallelTests.parse_rake_args(args).should == [nil, "models", ""]
-    end
-
-    it "should return the count and pattern" do
-      args = {:count => 2, :pattern => "models"}
-      ParallelTests.parse_rake_args(args).should == [2, "models", ""]
-    end
-
-    it "should return the count, pattern, and options" do
-      args = {:count => 2, :pattern => "plain", :options => "-p default" }
-      ParallelTests.parse_rake_args(args).should == [2, "plain", "-p default"]
-    end
-  end
-
   describe ".determine_number_of_processes" do
     before do
       ENV.delete('PARALLEL_TEST_PROCESSORS')
@@ -56,7 +34,7 @@ describe ParallelTests do
     end
   end
 
-  describe :bundler_enabled? do
+  describe ".bundler_enabled?" do
     before do
       Object.stub!(:const_defined?).with(:Bundler).and_return false
     end
@@ -86,6 +64,70 @@ describe ParallelTests do
         FileUtils.touch(File.join("..", "Gemfile"))
         ParallelTests.send(:bundler_enabled?).should == true
       end
+    end
+  end
+
+  describe ".wait_for_other_processes_to_finish" do
+    def with_running_processes(count, wait=0.2)
+      count.times { Thread.new{ `TEST_ENV_NUMBER=1; sleep #{wait}` } }
+      sleep 0.1
+      yield
+    ensure
+      sleep wait # make sure the threads have finished
+    end
+
+    it "does not wait if not run in parallel" do
+      ParallelTests.should_not_receive(:sleep)
+      ParallelTests.wait_for_other_processes_to_finish
+    end
+
+    it "stops if only itself is running" do
+      ENV["TEST_ENV_NUMBER"] = "2"
+      ParallelTests.should_not_receive(:sleep)
+      with_running_processes(1) do
+          ParallelTests.wait_for_other_processes_to_finish
+        end
+    end
+
+    it "waits for other processes to finish" do
+      pending if RUBY_PLATFORM == "java"
+      ENV["TEST_ENV_NUMBER"] = "2"
+      counter = 0
+      ParallelTests.stub(:sleep).with{ sleep 0.1; counter += 1 }
+      with_running_processes(2, 0.6) do
+        ParallelTests.wait_for_other_processes_to_finish
+      end
+      counter.should >= 2
+    end
+  end
+
+  describe ".number_of_running_processes" do
+    it "is 0 for nothing" do
+      ParallelTests.number_of_running_processes.should == 0
+    end
+
+    it "is 2 when 2 are running" do
+      wait = 0.2
+      2.times { Thread.new { `TEST_ENV_NUMBER=1; sleep #{wait}` } }
+      sleep wait / 2
+      ParallelTests.number_of_running_processes.should == 2
+      sleep wait
+    end
+  end
+
+  describe ".first_process?" do
+    it "is first if no env is set" do
+      ParallelTests.first_process?.should == true
+    end
+
+    it "is first if env is set to blank" do
+      ENV["TEST_ENV_NUMBER"] = ""
+      ParallelTests.first_process?.should == true
+    end
+
+    it "is not first if env is set to something" do
+      ENV["TEST_ENV_NUMBER"] = "2"
+      ParallelTests.first_process?.should == false
     end
   end
 

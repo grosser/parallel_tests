@@ -1,3 +1,4 @@
+require 'spec_helper'
 require 'parallel_tests/grouper'
 require 'tmpdir'
 
@@ -14,7 +15,7 @@ describe ParallelTests::Grouper do
         write("#{dir}/a.feature", "Feature: xxx\n  Scenario: xxx\n    Given something")
         write("#{dir}/b.feature", "Feature: xxx\n  Scenario: xxx\n    Given something\n  Scenario: yyy\n    Given something")
         write("#{dir}/c.feature", "Feature: xxx\n  Scenario: xxx\n    Given something")
-        ParallelTests::Grouper.by_steps(["#{dir}/a.feature", "#{dir}/b.feature", "#{dir}/c.feature"],2)
+        ParallelTests::Grouper.by_steps(["#{dir}/a.feature", "#{dir}/b.feature", "#{dir}/c.feature"], 2, {})
       end
 
       # testing inside mktmpdir is always green
@@ -46,16 +47,6 @@ describe ParallelTests::Grouper do
 
     it "adds empty groups if there are more groups than feature files" do
       call(6).should == [["5"], ["4"], ["3"], ["2"], ["1"], []]
-    end
-  end
-
-  describe :in_groups do
-    it "groups" do
-      ParallelTests::Grouper.in_groups([1,2,3],2).should == [[1,3],[2]]
-    end
-
-    it "keeps groups sorted" do
-      ParallelTests::Grouper.in_groups([3,2,1],2).should == [[1,3],[2]]
     end
   end
 end

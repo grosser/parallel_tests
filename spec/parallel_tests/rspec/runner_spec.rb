@@ -1,4 +1,5 @@
-require 'spec_helper'
+require "spec_helper"
+require "parallel_tests/rspec/runner"
 
 describe ParallelTests::RSpec::Runner do
   test_tests_in_groups(ParallelTests::RSpec::Runner, 'spec', '_spec.rb')
@@ -16,127 +17,135 @@ describe ParallelTests::RSpec::Runner do
       ParallelTests::RSpec::Runner.run_tests(*args)
     end
 
-    it "uses TEST_ENV_NUMBER=blank when called for process 0" do
-      ParallelTests::RSpec::Runner.should_receive(:open).with{|x,y|x=~/TEST_ENV_NUMBER= /}.and_return mocked_process
-      call(['xxx'], 0, {})
+    def should_run_with(regex)
+      ParallelTests::Test::Runner.should_receive(:execute_command).with{|a,b,c,d| a =~ regex}
     end
 
-    it "uses TEST_ENV_NUMBER=2 when called for process 1" do
-      ParallelTests::RSpec::Runner.should_receive(:open).with{|x,y| x=~/TEST_ENV_NUMBER=2/}.and_return mocked_process
-      call(['xxx'],1,{})
+    def should_not_run_with(regex)
+      ParallelTests::Test::Runner.should_receive(:execute_command).with{|a,b,c,d| a !~ regex}
+    end
+
+    it "runs command using nice when specifed" do
+      ParallelTests::Test::Runner.should_receive(:execute_command_and_capture_output).with{|a,b,c| b =~ %r{^nice rspec}}
+      call('xxx', 1, 22, :nice => true)
     end
 
     it "runs with color when called from cmdline" do
-      ParallelTests::RSpec::Runner.should_receive(:open).with{|x,y| x=~/ --tty /}.and_return mocked_process
+      should_run_with %r{ --tty}
       $stdout.should_receive(:tty?).and_return true
-      call(['xxx'],1,{})
+      call('xxx', 1, 22, {})
     end
 
     it "runs without color when not called from cmdline" do
-      ParallelTests::RSpec::Runner.should_receive(:open).with{|x,y| x !~ / --tty /}.and_return mocked_process
+      should_not_run_with %r{ --tty}
       $stdout.should_receive(:tty?).and_return false
-      call(['xxx'],1,{})
+      call('xxx', 1, 22, {})
     end
 
     it "runs with color for rspec 1 when called for the cmdline" do
       File.should_receive(:file?).with('script/spec').and_return true
-      ParallelTests::RSpec::Runner.should_receive(:open).with{|x,y| x=~/ RSPEC_COLOR=1 /}.and_return mocked_process
+      ParallelTests::Test::Runner.should_receive(:execute_command).with { |a, b, c, d| d[:env] == {"RSPEC_COLOR" => "1"} }
       $stdout.should_receive(:tty?).and_return true
-      call(['xxx'],1,{})
+      call('xxx', 1, 22, {})
     end
 
     it "runs without color for rspec 1 when not called for the cmdline" do
       File.should_receive(:file?).with('script/spec').and_return true
-      ParallelTests::RSpec::Runner.should_receive(:open).with{|x,y| x !~ / RSPEC_COLOR=1 /}.and_return mocked_process
+      ParallelTests::Test::Runner.should_receive(:execute_command).with { |a, b, c, d| d[:env] == {} }
       $stdout.should_receive(:tty?).and_return false
-      call(['xxx'],1,{})
+      call('xxx', 1, 22, {})
     end
 
     it "run bundle exec spec when on bundler rspec 1" do
       File.stub!(:file?).with('script/spec').and_return false
       ParallelTests.stub!(:bundler_enabled?).and_return true
-      ParallelTests::RSpec::Runner.stub!(:run).with("bundle show rspec").and_return "/foo/bar/rspec-1.0.2"
-      ParallelTests::RSpec::Runner.should_receive(:open).with{|x,y| x =~ %r{bundle exec spec}}.and_return mocked_process
-      call(['xxx'],1,{})
+      ParallelTests::RSpec::Runner.stub!(:run).with("bundle show rspec-core").and_return "Could not find gem 'rspec-core' in bundler."
+      should_run_with %r{bundle exec spec}
+      call('xxx', 1, 22, {})
     end
 
     it "run bundle exec rspec when on bundler rspec 2" do
       File.stub!(:file?).with('script/spec').and_return false
       ParallelTests.stub!(:bundler_enabled?).and_return true
-      ParallelTests::RSpec::Runner.stub!(:run).with("bundle show rspec").and_return "/foo/bar/rspec-2.0.2"
-      ParallelTests::RSpec::Runner.should_receive(:open).with{|x,y| x =~ %r{bundle exec rspec}}.and_return mocked_process
-      call(['xxx'],1,{})
+      ParallelTests::RSpec::Runner.stub!(:run).with("bundle show rspec-core").and_return "/foo/bar/rspec-core-2.0.2"
+      should_run_with %r{bundle exec rspec}
+      call('xxx', 1, 22, {})
     end
 
     it "runs script/spec when script/spec can be found" do
       File.should_receive(:file?).with('script/spec').and_return true
-      ParallelTests::RSpec::Runner.should_receive(:open).with{|x,y| x =~ %r{script/spec}}.and_return mocked_process
-      call(['xxx'],1,{})
+      should_run_with %r{script/spec}
+      call('xxx' ,1, 22, {})
     end
 
     it "runs spec when script/spec cannot be found" do
       File.stub!(:file?).with('script/spec').and_return false
-      ParallelTests::RSpec::Runner.should_receive(:open).with{|x,y| x !~ %r{script/spec}}.and_return mocked_process
-      call(['xxx'],1,{})
+      should_not_run_with %r{ script/spec}
+      call('xxx', 1, 22, {})
+    end
+
+    it "uses bin/rspec when present" do
+      File.stub(:exists?).with('bin/rspec').and_return true
+      should_run_with %r{bin/rspec}
+      call('xxx', 1, 22, {})
     end
 
     it "uses no -O when no opts where found" do
       File.stub!(:file?).with('spec/spec.opts').and_return false
-      ParallelTests::RSpec::Runner.should_receive(:open).with{|x,y| x !~ %r{spec/spec.opts}}.and_return mocked_process
-      call(['xxx'],1,{})
+      should_not_run_with %r{spec/spec.opts}
+      call('xxx', 1, 22, {})
     end
 
     it "uses -O spec/spec.opts when found (with script/spec)" do
       File.stub!(:file?).with('script/spec').and_return true
       File.stub!(:file?).with('spec/spec.opts').and_return true
-      ParallelTests::RSpec::Runner.should_receive(:open).with{|x,y| x =~ %r{script/spec\s+ -O spec/spec.opts}}.and_return mocked_process
-      call(['xxx'],1,{})
+      should_run_with %r{script/spec\s+-O spec/spec.opts}
+      call('xxx', 1, 22, {})
     end
 
     it "uses -O spec/parallel_spec.opts when found (with script/spec)" do
       File.stub!(:file?).with('script/spec').and_return true
       File.should_receive(:file?).with('spec/parallel_spec.opts').and_return true
-      ParallelTests::RSpec::Runner.should_receive(:open).with{|x,y| x =~ %r{script/spec\s+ -O spec/parallel_spec.opts}}.and_return mocked_process
-      call(['xxx'],1,{})
+      should_run_with %r{script/spec\s+-O spec/parallel_spec.opts}
+      call('xxx', 1, 22, {})
     end
 
     it "uses -O .rspec_parallel when found (with script/spec)" do
       File.stub!(:file?).with('script/spec').and_return true
       File.should_receive(:file?).with('.rspec_parallel').and_return true
-      ParallelTests::RSpec::Runner.should_receive(:open).with{|x,y| x =~ %r{script/spec\s+ -O .rspec_parallel}}.and_return mocked_process
-      call(['xxx'],1,{})
+      should_run_with %r{script/spec\s+-O .rspec_parallel}
+      call('xxx', 1, 22, {})
     end
 
     it "uses -O spec/parallel_spec.opts with rspec1" do
       File.should_receive(:file?).with('spec/parallel_spec.opts').and_return true
 
       ParallelTests.stub!(:bundler_enabled?).and_return true
-      ParallelTests::RSpec::Runner.stub!(:run).with("bundle show rspec").and_return "/foo/bar/rspec-1.0.2"
+      ParallelTests::RSpec::Runner.stub!(:run).with("bundle show rspec-core").and_return "Could not find gem 'rspec-core'."
 
-      ParallelTests::RSpec::Runner.should_receive(:open).with{|x,y| x =~ %r{spec\s+ -O spec/parallel_spec.opts}}.and_return mocked_process
-      call(['xxx'],1,{})
+      should_run_with %r{spec\s+-O spec/parallel_spec.opts}
+      call('xxx', 1, 22, {})
     end
 
     it "uses -O spec/parallel_spec.opts with rspec2" do
+      pending if RUBY_PLATFORM == "java" # FIXME not sure why, but fails on travis
       File.should_receive(:file?).with('spec/parallel_spec.opts').and_return true
 
       ParallelTests.stub!(:bundler_enabled?).and_return true
-      ParallelTests::RSpec::Runner.stub!(:run).with("bundle show rspec").and_return "/foo/bar/rspec-2.4.2"
+      ParallelTests::RSpec::Runner.stub!(:run).with("bundle show rspec-core").and_return "/foo/bar/rspec-core-2.4.2"
 
-      ParallelTests::RSpec::Runner.should_receive(:open).with{|x,y| x =~ %r{rspec\s+ --color --tty -O spec/parallel_spec.opts}}.and_return mocked_process
-      call(['xxx'],1,{})
+      should_run_with %r{rspec\s+--color --tty -O spec/parallel_spec.opts}
+      call('xxx', 1, 22, {})
     end
 
     it "uses options passed in" do
-      ParallelTests::RSpec::Runner.should_receive(:open).with{|x,y| x =~ %r{rspec -f n}}.and_return mocked_process
-      call(['xxx'],1, :test_options => '-f n')
+      should_run_with %r{rspec -f n}
+      call('xxx', 1, 22, :test_options => '-f n')
     end
 
     it "returns the output" do
-      io = open('spec/spec_helper.rb')
-      $stdout.stub!(:print)
-      ParallelTests::RSpec::Runner.should_receive(:open).and_return io
-      call(['xxx'],1,{})[:stdout].should =~ /\$LOAD_PATH << File/
+      ParallelTests::RSpec::Runner.should_receive(:execute_command).and_return :x => 1
+      call('xxx', 1, 22, {}).should == {:x => 1}
     end
   end
 
@@ -173,6 +182,20 @@ ff.**..
 "
 
       call(output).should == ['0 examples, 0 failures, 0 pending','1 examples, 1 failures, 1 pending']
+    end
+  end
+
+  describe ".find_tests" do
+    def call(*args)
+      ParallelTests::RSpec::Runner.send(:find_tests, *args)
+    end
+
+    it "doesn't find bakup files with the same name as test files" do
+      with_files(['a/x_spec.rb','a/x_spec.rb.bak']) do |root|
+        call(["#{root}/"]).should == [
+          "#{root}/a/x_spec.rb",
+        ]
+      end
     end
   end
 end

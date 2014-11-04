@@ -38,7 +38,7 @@ class ParallelTests::RSpec::FailuresLogger < ParallelTests::RSpec::LoggerBase
       file, line = example.location.to_s.split(':')
       next unless file and line
       file.gsub!(%r(^.*?/spec/), './spec/')
-      @output.puts "#{ParallelTests::RSpec::Runner.executable} #{file}:#{line} # #{example.description}"
+      @output.puts "#{ParallelTests::RSpec::Runner.send(:executable)} #{file}:#{line} # #{example.description}"
     end
   end
 end

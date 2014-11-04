@@ -5,28 +5,30 @@ ParallelTests splits tests into even groups(by number of tests or runtime) and r
 
 Setup for Rails
 ===============
+[RailsCasts episode #413 Fast Tests](http://railscasts.com/episodes/413-fast-tests)
 [still using Rails 2?](https://github.com/grosser/parallel_tests/blob/master/ReadmeRails2.md)
 
 ### Install
-If you use RSpec: ensure you got >= 2.4
+If you use RSpec: ensure you have >= 2.4
 
 As gem
 
-    # add to Gemfile
-    gem "parallel_tests", :group => :development
-
-OR as plugin
-
-    rails plugin install git://github.com/grosser/parallel_tests.git
-
-    # add to Gemfile
-    gem "parallel", :group => :development
+```ruby
+# add to Gemfile
+gem "parallel_tests", :group => :development
+```
 
 ### Add to `config/database.yml`
-ParallelTests uses 1 database per test-process, 2 processes will use `*_test` and `*_test2`.
+ParallelTests uses 1 database per test-process.
+<table>
+  <tr><td>Process number</td><td>1</td><td>2</td><td>3</td></tr>
+  <tr><td>`ENV['TEST_ENV_NUMBER']`</td><td>''</td><td>'2'</td><td>'3'</td></tr>
+</table>
 
-    test:
-      database: yourproject_test<%= ENV['TEST_ENV_NUMBER'] %>
+```yaml
+test:
+  database: yourproject_test<%= ENV['TEST_ENV_NUMBER'] %>
+```
 
 ### Create additional database(s)
     rake parallel:create
@@ -38,6 +40,7 @@ ParallelTests uses 1 database per test-process, 2 processes will use `*_test` an
     rake parallel:test          # Test::Unit
     rake parallel:spec          # RSpec
     rake parallel:features      # Cucumber
+    rake parallel:features-spinach       # Spinach
 
     rake parallel:test[1] --> force 1 CPU --> 86 seconds
     rake parallel:test    --> got 2 CPUs? --> 47 seconds
@@ -60,13 +63,39 @@ Test by pattern (e.g. use one integration server per subfolder / see if you brok
 
     Took 29.925333 seconds
 
+### Run an arbitrary task in parallel
+```Bash
+RAILS_ENV=test parallel_test -e "rake my:custom:task"
+# or
+rake parallel:rake[my:custom:task]
+```
+
+
+Running things once
+===================
+
+```Ruby
+# effected by race-condition: first process may boot slower the second
+# either sleep a bit or use a lock for example File.lock
+ParallelTests.first_process? ? do_something : sleep(1)
+
+at_exit do
+  if ParallelTests.first_process?
+    ParallelTests.wait_for_other_processes_to_finish
+    undo_something
+  end
+end
+```
+
 Loggers
 ===================
 
-Even process runtimes
------------------
+Even test group run-times
+-------------------------
 
-Log test runtime to give each process the same runtime.
+Add the `RuntimeLogger` to log how long each test takes to run.
+This log file will be loaded on the next test run, and the tests will be grouped
+so that each process should finish around the same time.
 
 Rspec: Add to your `.rspec_parallel` (or `.rspec`) :
 
@@ -75,9 +104,9 @@ Rspec: Add to your `.rspec_parallel` (or `.rspec`) :
     --format ParallelTests::RSpec::RuntimeLogger --out tmp/parallel_runtime_rspec.log
 
 Test::Unit:  Add to your `test_helper.rb`:
-
-    require 'parallel_tests/test/runtime_logger'
-
+```ruby
+require 'parallel_tests/test/runtime_logger'
+```
 
 RSpec: SummaryLogger
 --------------------
@@ -105,6 +134,25 @@ Add the following to your `.rspec_parallel` (or `.rspec`) :
     --format progress
     --format ParallelTests::RSpec::FailuresLogger --out tmp/failing_specs.log
 
+Cucumber: FailuresLogger
+-----------------------
+
+This logger logs failed cucumber scenarios to the specified file. The filename can be passed to cucumber, prefixed with '@' to rerun failures.
+
+Usage:
+
+    cucumber --format ParallelTests::Cucumber::FailuresLogger --out tmp/cucumber_failures.log
+
+Or add the formatter to the `parallel:` profile of your `cucumber.yml`:
+
+    parallel: --format progress --format ParallelTests::Cucumber::FailuresLogger --out tmp/cucumber_failures.log
+
+Note if your `cucumber.yml` default profile uses `<%= std_opts %>` you may need to insert this as follows `parallel: <%= std_opts %> --format progress...`
+
+To rerun failures:
+
+	cucumber @tmp/cucumber_failures.log
+
 Setup for non-rails
 ===================
     gem install parallel_tests
@@ -112,6 +160,7 @@ Setup for non-rails
     parallel_test test/
     parallel_rspec spec/
     parallel_cucumber features/
+    parallel_spinach features/
 
  - use ENV['TEST_ENV_NUMBER'] inside your tests to select separate db/memcache/etc.
  - Only run selected files & folders:
@@ -122,17 +171,21 @@ Options are:
 
     -n [PROCESSES]                   How many processes to use, default: available CPUs
     -p, --pattern [PATTERN]          run tests matching this pattern
-        --group-by                   group tests by:
+        --group-by [TYPE]            group tests by:
           found - order of finding files
           steps - number of cucumber steps
           default - runtime or filesize
     -m, --multiply-processes [FLOAT] use given number as a multiplier of processes to run
-    -s, --single [PATTERN]           Run all matching files in only one process
+    -s, --single [PATTERN]           Run all matching files in the same process
+    -i, --isolate                    Do not run any other tests in the group used by --single(-s)
     -e, --exec [COMMAND]             execute this code parallel and with ENV['TEST_ENV_NUM']
     -o, --test-options '[OPTIONS]'   execute test commands with those options
-    -t, --type [TYPE]                test(default) / rspec / cucumber
+    -t, --type [TYPE]                test(default) / rspec / cucumber / spinach
+        --serialize-stdout           Serialize stdout output, nothing will be written until everything is done
         --non-parallel               execute same commands but do not in parallel, needs --exec
-        --chunk-timeout [TIMEOUT]    timeout before re-printing the output of a child-process
+        --no-symlinks                Do not traverse symbolic links to find test files
+        --ignore-tags [PATTERN]      When counting steps ignore scenarios with tags that match this pattern
+        --nice                       execute test commands with low priority.
     -v, --version                    Show Version
     -h, --help                       Show this.
 
@@ -160,19 +213,23 @@ TIPS
  - [RSpec] Instantly see failures (instead of just a red F) with [rspec-instafail](https://github.com/grosser/rspec-instafail)
  - [Bundler] if you have a `Gemfile` then `bundle exec` will be used to run tests
  - [Cucumber] add a `parallel: foo` profile to your `config/cucumber.yml` and it will be used to run parallel tests
+ - [Cucumber] Pass in cucumber options by not giving the options an identifier ex: parallel:features[x,y,'cucumber_opts']
  - [Capybara setup](https://github.com/grosser/parallel_tests/wiki)
  - [Sphinx setup](https://github.com/grosser/parallel_tests/wiki)
  - [Capistrano setup](https://github.com/grosser/parallel_tests/wiki/Remotely-with-capistrano) let your tests run on a big box instead of your laptop
  - [SQL schema format] use :ruby schema format to get faster parallel:prepare`
- - [ActiveRecord] if you do not have `db:abort_if_pending_migrations` add this to your Rakefile: `task('db:abort_if_pending_migrations'){}`
  - `export PARALLEL_TEST_PROCESSORS=X` in your environment and parallel_tests will use this number of processors by default
  - [ZSH] use quotes to use rake arguments `rake "parallel:prepare[3]"`
  - [email_spec and/or action_mailer_cache_delivery](https://github.com/grosser/parallel_tests/wiki)
+ - [Memcached] use different namespaces e.g. `config.cache_store = ..., :namespace => "test_#{ENV['TEST_ENV_NUMBER']}"`
+ - [zeus-parallel_tests](https://github.com/sevos/zeus-parallel_tests)
 
 TODO
 ====
+ - make tests consistently pass with `--order random` in .rspec
+ - fix tests vs cucumber >= 1.2 `unknown option --format`
+ - add integration tests for the rake tasks, maybe generate a rails project ...
  - add unit tests for cucumber runtime formatter
- - make jRuby compatible [basics](http://yehudakatz.com/2009/07/01/new-rails-isolation-testing/)
  - make windows compatible
 
 Authors
@@ -212,7 +269,30 @@ inspired by [pivotal labs](http://pivotallabs.com/users/miked/blog/articles/849-
  - [Pablo Manrubia Díez](https://github.com/pmanrubia)
  - [Slawomir Smiechura](https://github.com/ssmiech)
  - [Georg Friedrich](https://github.com/georg)
+ - [R. Tyler Croy](https://github.com/rtyler)
+ - [Ulrich Berkmüller](https://github.com/ulrich-berkmueller)
+ - [Grzegorz Derebecki](https://github.com/madmax)
+ - [Florian Motlik](https://github.com/flomotlik)
+ - [Artem Kuzko](https://github.com/akuzko)
+ - [Zeke Fast](https://github.com/zekefast)
+ - [Joseph Shraibman](https://github.com/jshraibman-mdsol)
+ - [David Davis](https://github.com/daviddavis)
+ - [Ari Pollak](https://github.com/aripollak)
+ - [Aaron Jensen](https://github.com/aaronjensen)
+ - [Artur Roszczyk](https://github.com/sevos)
+ - [Caleb Tomlinson](https://github.com/calebTomlinson)
+ - [Jawwad Ahmad](https://github.com/jawwad)
+ - [Iain Beeston](https://github.com/iainbeeston)
+ - [Alejandro Pulver](https://github.com/alepulver)
+ - [Felix Clack](https://github.com/felixclack)
+ - [Izaak Alpert](https://github.com/karlhungus)
+ - [Micah Geisel](https://github.com/botandrose)
+ - [Exoth](https://github.com/Exoth)
+ - [sidfarkus](https://github.com/sidfarkus)
+ - [Colin Harris](https://github.com/aberant)
+ - [Wataru MIYAGUNI](https://github.com/gongo)
 
 [Michael Grosser](http://grosser.it)<br/>
 michael@grosser.it<br/>
-License: MIT
+License: MIT<br/>
+[![Build Status](https://travis-ci.org/grosser/parallel_tests.png)](https://travis-ci.org/grosser/parallel_tests)

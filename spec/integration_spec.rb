@@ -1,3 +1,5 @@
+#encoding: utf-8
+
 require 'spec_helper'
 
 describe 'CLI' do
@@ -39,7 +41,7 @@ describe 'CLI' do
   def run_tests(test_folder, options={})
     ensure_folder folder
     processes = "-n #{options[:processes]||2}" unless options[:processes] == false
-    command = "cd #{folder} && #{options[:export]} #{executable(options)} #{test_folder} --chunk-timeout 999 #{processes} #{options[:add]} 2>&1"
+    command = "cd #{folder} && #{options[:export]} #{executable(options)} #{test_folder} #{processes} #{options[:add]} 2>&1"
     result = `#{command}`
     raise "FAILED #{command}\n#{result}" if $?.success? == !!options[:fail]
     result
@@ -61,6 +63,13 @@ describe 'CLI' do
     result.scan(/Took \d+\.\d+ seconds/).size.should == 1 # parallel summary
   end
 
+  it "runs tests which outputs accented characters" do
+    write "spec/xxx_spec.rb", "#encoding: utf-8\ndescribe('it'){it('should'){puts 'Byłem tu'}}"
+    result = run_tests "spec", :type => 'rspec'
+    # test ran and gave their puts
+    result.should include('Byłem tu')
+  end
+
   it "does not run any tests if there are none" do
     write 'spec/xxx_spec.rb', '1'
     result = run_tests "spec", :type => 'rspec'
@@ -78,6 +87,15 @@ describe 'CLI' do
     result.scan('2 examples, 1 failure').size.should == 1
   end
 
+  it "can serialize stdout" do
+    write 'spec/xxx_spec.rb', '5.times{describe("it"){it("should"){sleep 0.01; puts "TEST1"}}}'
+    write 'spec/xxx2_spec.rb', 'sleep 0.01; 5.times{describe("it"){it("should"){sleep 0.01; puts "TEST2"}}}'
+    result = run_tests "spec", :type => 'rspec', :add => "--serialize-stdout"
+
+    result.should_not =~ /TEST1.*TEST2.*TEST1/m
+    result.should_not =~ /TEST2.*TEST1.*TEST2/m
+  end
+
   context "with given commands" do
     it "can exec given commands with ENV['TEST_ENV_NUM']" do
       result = `#{executable} -e 'ruby -e "print ENV[:TEST_ENV_NUMBER.to_s].to_i"' -n 4`
@@ -87,6 +105,12 @@ describe 'CLI' do
     it "can exec given command non-parallel" do
       result = `#{executable} -e 'ruby -e "sleep(rand(10)/100.0); puts ENV[:TEST_ENV_NUMBER.to_s].inspect"' -n 4 --non-parallel`
       result.split("\n").should == %w["" "2" "3" "4"]
+    end
+
+    it "can serialize stdout" do
+      result = `#{executable} -e 'ruby -e "5.times{sleep 0.01;puts ENV[:TEST_ENV_NUMBER.to_s].to_i;STDOUT.flush}"' -n 2 --serialize-stdout`
+      result.should_not =~ /0.*2.*0/m
+      result.should_not =~ /2.*0.*2/m
     end
 
     it "exists with success if all sub-processes returned success" do
@@ -108,6 +132,11 @@ describe 'CLI' do
     `#{bin_folder}/parallel_cucumber -v`.should == version
   end
 
+  it "runs through parallel_spinach" do
+    version = `#{executable} -v`
+    `#{bin_folder}/parallel_spinach -v`.should == version
+  end
+
   it "runs with --group-by found" do
     # it only tests that it does not blow up, as it did before fixing...
     write "spec/x1_spec.rb", "puts '111'"
@@ -115,6 +144,7 @@ describe 'CLI' do
   end
 
   it "runs faster with more processes" do
+    pending if RUBY_PLATFORM == "java"  # just too slow ...
     2.times{|i|
       write "spec/xxx#{i}_spec.rb",  'describe("it"){it("should"){sleep 5}}; $stderr.puts ENV["TEST_ENV_NUMBER"]'
     }
@@ -172,6 +202,15 @@ describe 'CLI' do
     result.should include('ZZZ')
   end
 
+  it "can wait_for_other_processes_to_finish" do
+    pending if RUBY_PLATFORM == "java" # just too slow ...
+    write "test/a_test.rb", "require 'parallel_tests'; sleep 0.5 ; ParallelTests.wait_for_other_processes_to_finish; puts 'a'"
+    write "test/b_test.rb", "sleep 1; puts 'b'"
+    write "test/c_test.rb", "sleep 1.5; puts 'c'"
+    write "test/d_test.rb", "sleep 2; puts 'd'"
+    run_tests("test", :processes => 4).should include("b\nc\nd\na\n")
+  end
+
   context "Test::Unit" do
     it "runs" do
       write "test/x1_test.rb", "require 'test/unit'; class XTest < Test::Unit::TestCase; def test_xxx; end; end"
@@ -197,7 +236,16 @@ describe 'CLI' do
       write "features/steps/a.rb", "
         Given('I print TEST_ENV_NUMBER'){ puts \"YOUR TEST ENV IS \#{ENV['TEST_ENV_NUMBER']}!\" }
         And('I sleep a bit'){ sleep 0.2 }
+        And('I pass'){ true }
+        And('I fail'){ fail }
       "
+    end
+
+    it "runs tests which outputs accented characters" do
+      write "features/good1.feature", "Feature: xxx\n  Scenario: xxx\n    Given I print accented characters"
+      write "features/steps/a.rb", "#encoding: utf-8\nGiven('I print accented characters'){ puts \"I tu też\" }"
+      result = run_tests "features", :type => "cucumber", :add => '--pattern good'
+      result.should include('I tu też')
     end
 
     it "passes TEST_ENV_NUMBER when running with pattern (issue #86)" do
@@ -237,6 +285,78 @@ describe 'CLI' do
 
     it "runs successfully without any files" do
       results = run_tests("", :type => "cucumber")
+      results.should include("2 processes for 0 features")
+      results.should include("Took")
+    end
+
+    it "collates failing scenarios" do
+      write "features/pass.feature", "Feature: xxx\n  Scenario: xxx\n    Given I pass"
+      write "features/fail1.feature", "Feature: xxx\n  Scenario: xxx\n    Given I fail"
+      write "features/fail2.feature", "Feature: xxx\n  Scenario: xxx\n    Given I fail"
+      results = run_tests "features", :processes => 3, :type => "cucumber", :fail => true
+
+      results.should include """
+Failing Scenarios:
+cucumber features/fail2.feature:2 # Scenario: xxx
+cucumber features/fail1.feature:2 # Scenario: xxx
+
+3 scenarios (2 failed, 1 passed)
+3 steps (2 failed, 1 passed)
+"""
+    end
+  end
+
+  context "Spinach", :fails_on_ruby_187 => true do
+    before do
+      write "features/steps/a.rb", "class A < Spinach::FeatureSteps\n  Given 'I print TEST_ENV_NUMBER' do\n    puts \"YOUR TEST ENV IS \#{ENV['TEST_ENV_NUMBER']}!\"\n  end\n  And 'I sleep a bit' do\n    sleep 0.2\n  end\nend"
+    end
+
+    it "runs tests which outputs accented characters" do
+      write "features/good1.feature", "Feature: a\n  Scenario: xxx\n    Given I print accented characters"
+      write "features/steps/a.rb", "#encoding: utf-8\nclass A < Spinach::FeatureSteps\nGiven 'I print accented characters' do\n  puts \"I tu też\" \n  end\nend"
+      result = run_tests "features", :type => "spinach", :add => 'features/good1.feature'#, :add => '--pattern good'
+      result.should include('I tu też')
+    end
+
+    it "passes TEST_ENV_NUMBER when running with pattern (issue #86)" do
+      write "features/good1.feature", "Feature: a\n  Scenario: xxx\n    Given I print TEST_ENV_NUMBER"
+      write "features/good2.feature", "Feature: a\n  Scenario: xxx\n    Given I print TEST_ENV_NUMBER"
+      write "features/b.feature", "Feature: b\n  Scenario: xxx\n    Given I FAIL" #Expect this not to be run
+      write "features/steps/a.rb", "class A < Spinach::FeatureSteps\nGiven('I print TEST_ENV_NUMBER'){ puts \"YOUR TEST ENV IS \#{ENV['TEST_ENV_NUMBER']}!\" }\nend"
+
+      result = run_tests "features", :type => "spinach", :add => '--pattern good'
+
+      result.should include('YOUR TEST ENV IS 2!')
+      result.should include('YOUR TEST ENV IS !')
+      result.should_not include('I FAIL')
+    end
+
+    it "writes a runtime log" do
+      pending 'not yet implemented -- custom runtime logging'
+      log = "tmp/parallel_runtime_spinach.log"
+      write(log, "x")
+
+      2.times{|i|
+        # needs sleep so that runtime loggers dont overwrite each other initially
+        write "features/good#{i}.feature", "Feature: A\n  Scenario: xxx\n    Given I print TEST_ENV_NUMBER\n    And I sleep a bit"
+      }
+      result = run_tests "features", :type => "spinach"
+      read(log).gsub(/\.\d+/,'').split("\n").should =~ [
+        "features/good0.feature:0",
+        "features/good1.feature:0"
+      ]
+    end
+
+    it "runs each feature once when there are more processes then features (issue #89)" do
+      2.times{|i|
+        write "features/good#{i}.feature", "Feature: A\n  Scenario: xxx\n    Given I print TEST_ENV_NUMBER\n"
+      }
+      result = run_tests "features", :type => "spinach", :add => '-n 3'
+      result.scan(/YOUR TEST ENV IS \d?!/).sort.should == ["YOUR TEST ENV IS !", "YOUR TEST ENV IS 2!"]
+    end
+
+    it "runs successfully without any files" do
+      results = run_tests("", :type => "spinach")
       results.should include("2 processes for 0 features")
       results.should include("Took")
     end

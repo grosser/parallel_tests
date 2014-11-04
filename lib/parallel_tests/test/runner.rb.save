@@ -33,9 +33,9 @@ module ParallelTests
         end
 
         def run_tests(test_files, process_number, num_processes, options)
-          require_list = ([File.expand_path('../test_unit_filename', __FILE__)] + test_files).map { |filename| %<"#{File.expand_path filename}"> }.join(",")
-          cmd = "#{executable} -Itest -e 'ROOT_DIR=\"#{ROOT_DIR}\"; [#{require_list}].each {|f| require f }' -- #{options[:test_options]}"
-          execute_command_and_capture_output({}, cmd, process_number, num_processes)
+          require_list = ([File.expand_path('../test_unit_filename', __FILE__)] + test_files).map { |filename| %{"#{File.expand_path filename}"} }.join(",")
+          cmd = "#{executable} -Itest -e 'ROOT_DIR=\"#{ROOT_DIR}\"; '[#{require_list}].each {|f| require f }' -- #{options[:test_options]}"
+          execute_command_and_capture_output(cmd, process_number, options)
         end
 
         def line_is_result?(line)
@@ -59,44 +59,25 @@ module ParallelTests
 
         # executes command without redirecting stdout and stderr.
         # returns exitstatus
-        def execute_command(cmd, process_number, num_processes, options)
-          env = options[:env] || {}
+        def execute_command(cmd, process_number,  num_processes, options)
+          env = (options[:env] || {}).merge(
+            "TEST_ENV_NUMBER" => test_env_number(process_number),
+            "PARALLEL_TEST_GROUPS" => num_processes
+          )
           cmd = "nice #{cmd}" if options[:nice]
-          result = execute_command_and_capture_output(env, cmd, process_number, num_processes)
-          if result[:exit_status].nonzero?
-            $stdout.write(result[:stdout])
-          end
-          result[:exit_status]
+          execute_command_and_capture_output(env, cmd, options[:serialize_stdout])
         end
 
         # executes command and returns stdout and stderr combined in a hash with keys :stdout, :summary_lines, :deferred_tests, and :exit_status
-        def execute_command_and_capture_output(initial_env, plain_cmd, process_number, num_processes)
-          env = initial_env.merge(
-            "TEST_ENV_NUMBER"       => test_env_number(process_number),
-            "PARALLEL_TEST_GROUPS"  => num_processes
-          )
-          # make processes descriptive / visible in ps -ef
-          windows = RbConfig::CONFIG['host_os'] =~ /cygwin|mswin|mingw|bccwin|wince|emx/
-          separator = windows ? ' & ' : ';'
-          exports = env.map do |k,v|
-            if windows
-              "(SET \"#{k}=#{v}\")"
-            else
-              "#{k}=#{v};export #{k}"
-            end
-          end
-          cmd = (exports + [plain_cmd]).join(separator)
-
+        def execute_command_and_capture_output(cmd, process_number, options)
+          cmd = "export TEST_ENV_NUMBER=#{test_env_number(process_number)}; #{cmd}"
           output_dir = Pathname.new(ENV['BUILD_REPORTS'] || 'tmp')
           output_file = output_dir + "#{test_env_number(process_number)}.out"
           FileUtils.mkdir_p(output_dir)
 
-          puts("Running: #{cmd} >> #{output_file} 2>&1") unless ENV['VERBOSE'] == 'false'
-
+#         puts("Running:  #{cmd} >> #{output_file} 2>&1")
           system("#{cmd} > #{output_file} 2>&1")
           output = File.read(output_file)
-          puts output unless ENV['VERBOSE'] == 'false'
-
           cleaned_output = output.gsub(/\ALoaded.*\nStarted\n/, '').gsub(/\n\n\n+/m, "\n\n")
           deferred_tests, other_lines = cleaned_output.split("\n").partition { |line| line =~ /\A  \* DEFERRED: / }
           found_summary = false
