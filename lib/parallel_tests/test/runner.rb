@@ -57,6 +57,8 @@ module ParallelTests
             "PARALLEL_TEST_GROUPS" => num_processes
           )
           cmd = "nice #{cmd}" if options[:nice]
+          cmd = "#{cmd} 2>&1" if options[:combine_stderr]
+
           execute_command_and_capture_output(env, cmd, options[:serialize_stdout])
         end
 
