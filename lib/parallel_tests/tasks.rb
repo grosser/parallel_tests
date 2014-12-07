@@ -165,4 +165,9 @@ namespace :parallel do
   task :load_fixtures, :count do |t,args|
     ParallelTests::Tasks.run_in_parallel("rake db:fixtures:load_fixtures RAILS_ENV=#{rails_env}", args)
   end
+
+  desc "total DB setup in parallel"
+    task :drop_create_load_schemas_and_fixtures, :count do |t,args|
+    ParallelTests::Tasks.run_in_parallel("rake db:drop:all_test db:create:all_test db:test:schema:load db:fixtures:load_fixtures RAILS_ENV=#{rails_env}", args.to_hash.merge(:non_parallel => true))
+  end
 end
