@@ -120,6 +120,9 @@ module ParallelTests
           loop do
             begin
               read = out.readpartial(1000000) # read whatever chunk we can get
+              if RUBY_VERSION >= "1.9" && Encoding.default_internal
+                read = read.force_encoding(Encoding.default_internal)
+              end
               result << read
               unless silence
                 $stdout.print read
