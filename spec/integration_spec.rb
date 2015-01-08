@@ -70,6 +70,24 @@ describe 'CLI' do
     result.should include('Byłem tu')
   end
 
+  it "respects default encoding when reading child stdout", :encoding => true do
+    write 'test/xxx_test.rb', <<-EOF
+      # encoding: utf-8
+      require 'test/unit'
+      class XTest < Test::Unit::TestCase
+        def test_unicode
+          raise '¯\\_(ツ)_/¯'
+        end
+      end
+    EOF
+    # Need to tell Ruby to default to utf-8 to simulate environments where
+    # this is set. (Otherwise, it defaults to nil and the undefined conversion
+    # issue doesn't come up.)
+    result = run_tests('test', :fail => true,
+                       :export => 'RUBYOPT=-Eutf-8:utf-8')
+    result.should include('¯\_(ツ)_/¯')
+  end
+
   it "does not run any tests if there are none" do
     write 'spec/xxx_spec.rb', '1'
     result = run_tests "spec", :type => 'rspec'
