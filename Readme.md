@@ -300,6 +300,7 @@ inspired by [pivotal labs](http://pivotallabs.com/users/miked/blog/articles/849-
  - [Dmitry Polushkin](https://github.com/dmitry)
  - [Samer Masry](https://github.com/smasry)
  - [Volodymyr Mykhailyk](https:/github.com/volodymyr-mykhailyk)
+ - [Mike Mueller](https://github.com/mmueller)
 
 [Michael Grosser](http://grosser.it)<br/>
 michael@grosser.it<br/>
