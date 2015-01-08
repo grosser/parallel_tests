@@ -180,6 +180,7 @@ Options are:
     -o, --test-options '[OPTIONS]'   execute test commands with those options
     -t, --type [TYPE]                test(default) / rspec / cucumber / spinach
         --serialize-stdout           Serialize stdout output, nothing will be written until everything is done
+        --combine-stderr             Combine stderr into stdout, useful in conjunction with --serialize-stdout
         --non-parallel               execute same commands but do not in parallel, needs --exec
         --no-symlinks                Do not traverse symbolic links to find test files
         --ignore-tags [PATTERN]      When counting steps ignore scenarios with tags that match this pattern

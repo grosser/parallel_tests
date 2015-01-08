@@ -114,6 +114,15 @@ describe 'CLI' do
     result.should_not =~ /TEST2.*TEST1.*TEST2/m
   end
 
+  it "can serialize stdout and stderr" do
+    write 'spec/xxx_spec.rb', '5.times{describe("it"){it("should"){sleep 0.01; $stderr.puts "errTEST1"; puts "TEST1"}}}'
+    write 'spec/xxx2_spec.rb', 'sleep 0.01; 5.times{describe("it"){it("should"){sleep 0.01; $stderr.puts "errTEST2"; puts "TEST2"}}}'
+    result = run_tests "spec", :type => 'rspec', :add => "--serialize-stdout --combine-stderr"
+
+    result.should_not =~ /TEST1.*TEST2.*TEST1/m
+    result.should_not =~ /TEST2.*TEST1.*TEST2/m
+  end
+
   context "with given commands" do
     it "can exec given commands with ENV['TEST_ENV_NUM']" do
       result = `#{executable} -e 'ruby -e "print ENV[:TEST_ENV_NUMBER.to_s].to_i"' -n 4`
