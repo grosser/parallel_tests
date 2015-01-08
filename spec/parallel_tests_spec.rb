@@ -15,6 +15,10 @@ describe ParallelTests do
       call('5').should == 5
     end
 
+    it "subtracts the given count if set" do
+      call('-2').should == 18
+    end
+
     it "uses the processor count from Parallel" do
       call(nil).should == 20
     end
@@ -22,6 +26,11 @@ describe ParallelTests do
     it "uses the processor count from ENV before Parallel" do
       ENV['PARALLEL_TEST_PROCESSORS'] = '22'
       call(nil).should == 22
+    end
+
+    it "subtracts from the the processor count from ENV before Parallel" do
+      ENV['PARALLEL_TEST_PROCESSORS'] = '22'
+      call('-2').should == 20
     end
 
     it "does not use blank count" do

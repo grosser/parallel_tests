@@ -18,11 +18,12 @@ module ParallelTests
 
   class << self
     def determine_number_of_processes(count)
+      count, reserved_processors = reserve_processors(count)
       [
         count,
         ENV["PARALLEL_TEST_PROCESSORS"],
         Parallel.processor_count
-      ].detect{|c| not c.to_s.strip.empty? }.to_i
+      ].detect{|c| not c.to_s.strip.empty? }.to_i - reserved_processors
     end
 
     # copied from http://github.com/carlhuda/bundler Bundler::SharedHelpers#find_gemfile
@@ -64,6 +65,18 @@ module ParallelTests
       else
         Time.now
       end
+    end
+
+    private
+
+    def reserve_processors(count)
+      if count.to_i < 0
+        reservered_count = count.to_i.abs
+        count = nil
+      else
+        reservered_count = 0
+      end
+      [count, reservered_count]
     end
   end
 end
