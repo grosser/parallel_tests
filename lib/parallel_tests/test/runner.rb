@@ -165,6 +165,8 @@ module ParallelTests
               {}
             end
 
+          filename_warning = " [from file #{runtime_log}]"
+
           # use recorded test runtime if we got enough data
           if stats.size * 1.5 > tests.size
             puts "Using recorded test runtime"# unless ENV['VERBOSE'] == 'false'
@@ -176,17 +178,19 @@ module ParallelTests
                   if !_seconds.nil? && seconds != ''
                     _seconds.to_f
                   else
-                    STDERR.puts "Missing _seconds for #{test}: #{file_stats.inspect}"
+                    STDERR.puts "Missing _seconds for #{test}: #{file_stats.inspect}#{filename_warning}"
+                    filename_warning = nil
                     10.0
                   end
                 else
-                  STDERR.puts "Guessing run time of 10 seconds for #{test}"# unless ENV['VERBOSE'] == 'false'
+                  STDERR.puts "Guessing run time of 10 seconds for #{test}#{filename_warning}"# unless ENV['VERBOSE'] == 'false'
+                  filename_warning = nil
                   10.0
                 end
               [test, seconds]
             end
           else # use file sizes
-            puts "Using test file size in bytes"# unless ENV['VERBOSE'] == 'false'
+            puts "Using test file size in bytes#{filename_warning}"# unless ENV['VERBOSE'] == 'false'
             tests.sort.map{|test| [test, File.stat(test).size] }
           end
         end
