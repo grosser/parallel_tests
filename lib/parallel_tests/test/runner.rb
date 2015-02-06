@@ -54,7 +54,8 @@ module ParallelTests
         def execute_command(cmd, process_number, num_processes, options)
           env = (options[:env] || {}).merge(
             "TEST_ENV_NUMBER" => test_env_number(process_number),
-            "PARALLEL_TEST_GROUPS" => num_processes
+            "PARALLEL_TEST_GROUPS" => num_processes,
+            "DISABLE_SPRING" => true
           )
           cmd = "nice #{cmd}" if options[:nice]
           cmd = "#{cmd} 2>&1" if options[:combine_stderr]
