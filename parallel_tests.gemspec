@@ -1,6 +1,5 @@
-$LOAD_PATH.unshift File.expand_path("../lib", __FILE__)
 name = "parallel_tests"
-require "#{name}/version"
+require "./lib/#{name}/version"
 
 Gem::Specification.new name, ParallelTests::VERSION do |s|
   s.summary = "Run Test::Unit / RSpec / Cucumber / Spinach in parallel"
