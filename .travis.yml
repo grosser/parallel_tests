@@ -4,6 +4,8 @@ rvm:
   - 2.1.0
   - jruby-1.7.6
   - jruby-head
+branches:
+  only: [master]
 matrix:
   allow_failures:
     - rvm: jruby-head
