@@ -170,12 +170,14 @@ Options are:
     -p, --pattern [PATTERN]          run tests matching this pattern
         --group-by [TYPE]            group tests by:
           found - order of finding files
-          steps - number of cucumber steps
-          filesize - size of files on disk
+          steps - number of cucumber/spinach steps
+          scenarios - individual cucumber scenarios
+          filesize - by size of the file
           default - runtime or filesize
     -m, --multiply-processes [FLOAT] use given number as a multiplier of processes to run
     -s, --single [PATTERN]           Run all matching files in the same process
     -i, --isolate                    Do not run any other tests in the group used by --single(-s)
+        --only-group INT[, INT]
     -e, --exec [COMMAND]             execute this code parallel and with ENV['TEST_ENV_NUM']
     -o, --test-options '[OPTIONS]'   execute test commands with those options
     -t, --type [TYPE]                test(default) / rspec / cucumber / spinach
@@ -185,7 +187,8 @@ Options are:
         --no-symlinks                Do not traverse symbolic links to find test files
         --ignore-tags [PATTERN]      When counting steps ignore scenarios with tags that match this pattern
         --nice                       execute test commands with low priority.
-        --only-group INT[, INT]      Group the files, but only run the group(s) specified here. Requires group-by filesize (will be set automatically if group-by is blank and only-group is specified)
+        --runtime-log [PATH]         Location of previously recorded test runtimes
+        --verbose                    Print more output
     -v, --version                    Show Version
     -h, --help                       Show this.
 

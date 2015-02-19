@@ -95,6 +95,14 @@ describe 'CLI' do
     result.should include('Took')
   end
 
+  it "shows command with --verbose" do
+    write 'spec/xxx_spec.rb', 'describe("it"){it("should"){puts "TEST1"}}'
+    write 'spec/xxx2_spec.rb', 'describe("it"){it("should"){1.should == 1}}'
+    result = run_tests "spec --verbose", :type => 'rspec'
+    result.should include "bundle exec rspec spec/xxx_spec.rb"
+    result.should include "bundle exec rspec spec/xxx2_spec.rb"
+  end
+
   it "fails when tests fail" do
     write 'spec/xxx_spec.rb', 'describe("it"){it("should"){puts "TEST1"}}'
     write 'spec/xxx2_spec.rb', 'describe("it"){it("should"){1.should == 2}}'

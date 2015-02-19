@@ -58,6 +58,7 @@ module ParallelTests
           )
           cmd = "nice #{cmd}" if options[:nice]
           cmd = "#{cmd} 2>&1" if options[:combine_stderr]
+          puts cmd if options[:verbose]
 
           execute_command_and_capture_output(env, cmd, options[:serialize_stdout])
         end

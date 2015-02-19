@@ -2,7 +2,6 @@ require "spec_helper"
 require "parallel_tests/cli"
 require "parallel_tests/rspec/runner"
 
-
 describe ParallelTests::CLI do
   subject { ParallelTests::CLI.new }
 
@@ -32,6 +31,10 @@ describe ParallelTests::CLI do
 
     it "parses nice as nice" do
       call(["--nice"]).should == defaults.merge(:nice => true)
+    end
+
+    it "parses --verbose" do
+      call(["--verbose"]).should == defaults.merge(:verbose => true)
     end
 
     context "parse only-group" do
@@ -97,7 +100,7 @@ describe ParallelTests::CLI do
       subject.send(:final_fail_message).should == "\e[31mTests Failed\e[0m"
     end
   end
-  
+
   describe "#run_tests_in_parallel" do
     context "specific groups to run" do
       let(:results){ {:stdout => "", :exit_status => 0} }
@@ -121,13 +124,13 @@ describe ParallelTests::CLI do
         subject.should_receive(:run_tests).twice.and_return(results)
         subject.run(['-n', '3', '--only-group', '1,2', '-t', 'my_test_runner'])
       end
-      
+
       it "run only one group specified" do
         options = {:count=>3, :only_group=>[2], :files=>[], :group_by=>:filesize}
         subject.should_receive(:run_tests).once.with(['ccc', 'ddd'], 0, 1, options).and_return(results)
         subject.run(['-n', '3', '--only-group', '2', '-t', 'my_test_runner'])
       end
-      
+
       it "run twice with multiple groups" do
         options = {:count=>3, :only_group=>[2,3], :files=>[], :group_by=>:filesize}
         subject.should_receive(:run_tests).once.ordered.with(['ccc', 'ddd'], 0, 1, options).and_return(results)
@@ -137,8 +140,6 @@ describe ParallelTests::CLI do
     end
   end
 end
-
-
 
 module ParallelTests
   module MyTestRunner
