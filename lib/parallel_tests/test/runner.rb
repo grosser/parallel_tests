@@ -58,6 +58,7 @@ module ParallelTests
           )
           cmd = "nice #{cmd}" if options[:nice]
           cmd = "#{cmd} 2>&1" if options[:combine_stderr]
+          puts cmd if options[:verbose]
 
           execute_command_and_capture_output(env, cmd, options[:serialize_stdout])
         end
@@ -122,7 +123,7 @@ module ParallelTests
           loop do
             begin
               read = out.readpartial(1000000) # read whatever chunk we can get
-              if RUBY_VERSION >= "1.9" && Encoding.default_internal
+              if Encoding.default_internal
                 read = read.force_encoding(Encoding.default_internal)
               end
               result << read

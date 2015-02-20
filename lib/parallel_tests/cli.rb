@@ -92,25 +92,25 @@ module ParallelTests
     def parse_options!(argv)
       options = {}
       OptionParser.new do |opts|
-        opts.banner = <<BANNER
-Run all tests in parallel, giving each process ENV['TEST_ENV_NUMBER'] ('', '2', '3', ...)
+        opts.banner = <<-BANNER.gsub(/^          /, '')
+          Run all tests in parallel, giving each process ENV['TEST_ENV_NUMBER'] ('', '2', '3', ...)
 
-[optional] Only run selected files & folders:
-    parallel_test test/bar test/baz/xxx_text.rb
+          [optional] Only run selected files & folders:
+              parallel_test test/bar test/baz/xxx_text.rb
 
-Options are:
-BANNER
+          Options are:
+        BANNER
         opts.on("-n [PROCESSES]", Integer, "How many processes to use, default: available CPUs") { |n| options[:count] = n }
         opts.on("-p", "--pattern [PATTERN]", "run tests matching this pattern") { |pattern| options[:pattern] = /#{pattern}/ }
-        opts.on("--group-by [TYPE]", <<-TEXT
-group tests by:
-          found - order of finding files
-          steps - number of cucumber/spinach steps
-          scenarios - individual cucumber scenarios
-          filesize - by size of the file
-          default - runtime or filesize
-TEXT
-) { |type| options[:group_by] = type.to_sym }
+        opts.on("--group-by [TYPE]", <<-TEXT.gsub(/^          /, '')
+          group tests by:
+                    found - order of finding files
+                    steps - number of cucumber/spinach steps
+                    scenarios - individual cucumber scenarios
+                    filesize - by size of the file
+                    default - runtime or filesize
+          TEXT
+          ) { |type| options[:group_by] = type.to_sym }
         opts.on("-m [FLOAT]", "--multiply-processes [FLOAT]", Float, "use given number as a multiplier of processes to run") { |multiply| options[:multiply] = multiply }
 
         opts.on("-s [PATTERN]", "--single [PATTERN]",
@@ -145,6 +145,7 @@ TEXT
         opts.on('--ignore-tags [PATTERN]', 'When counting steps ignore scenarios with tags that match this pattern')  { |arg| options[:ignore_tag_pattern] = arg }
         opts.on("--nice", "execute test commands with low priority.") { options[:nice] = true }
         opts.on("--runtime-log [PATH]", "Location of previously recorded test runtimes") { |path| options[:runtime_log] = path }
+        opts.on("--verbose", "Print more output") { options[:verbose] = true }
         opts.on("-v", "--version", "Show Version") { puts ParallelTests::VERSION; exit }
         opts.on("-h", "--help", "Show this.") { puts opts; exit }
       end.parse!(argv)
