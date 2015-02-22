@@ -6,45 +6,54 @@ describe ParallelTests::CLI do
   subject { ParallelTests::CLI.new }
 
   describe "#parse_options" do
-    let(:defaults){ {:files => []} }
+    let(:defaults){ {:files => ["test"]} }
 
     def call(*args)
       subject.send(:parse_options!, *args)
     end
 
+    it "fails without file" do
+      subject.should_receive(:abort).with("Pass files or folders to run")
+      call(["-n3"])
+    end
+
+    it "parses execute" do
+      call(["--exec", "echo"]).should == {execute: "echo", files: []}
+    end
+
     it "parses regular count" do
-      call(["-n3"]).should == defaults.merge(:count => 3)
+      call(["test", "-n3"]).should == defaults.merge(:count => 3)
     end
 
     it "parses count 0 as non-parallel" do
-      call(["-n0"]).should == defaults.merge(:non_parallel => true)
+      call(["test", "-n0"]).should == defaults.merge(:non_parallel => true)
     end
 
     it "parses non-parallel as non-parallel" do
-      call(["--non-parallel"]).should == defaults.merge(:non_parallel => true)
+      call(["test", "--non-parallel"]).should == defaults.merge(:non_parallel => true)
     end
 
     it "finds the correct type when multiple are given" do
-      call(["--type", "test", "-t", "rspec"])
+      call(["test", "--type", "test", "-t", "rspec"])
       subject.instance_variable_get(:@runner).should == ParallelTests::RSpec::Runner
     end
 
     it "parses nice as nice" do
-      call(["--nice"]).should == defaults.merge(:nice => true)
+      call(["test", "--nice"]).should == defaults.merge(:nice => true)
     end
 
     it "parses --verbose" do
-      call(["--verbose"]).should == defaults.merge(:verbose => true)
+      call(["test", "--verbose"]).should == defaults.merge(:verbose => true)
     end
 
     context "parse only-group" do
       it "group_by should be set to filesize" do
-        call(["--only-group", '1']).should == defaults.merge(:group_by=>:filesize, :only_group => [1])
+        call(["test", "--only-group", '1']).should == defaults.merge(:group_by=>:filesize, :only_group => [1])
       end
 
       it "raise error when group_by isn't filesize" do
         expect{
-          call(["--only-group", '1', '--group-by', 'steps'])
+          call(["test", "--only-group", '1', '--group-by', 'steps'])
         }.to raise_error(RuntimeError)
       end
 
@@ -52,11 +61,11 @@ describe ParallelTests::CLI do
         let(:defaults_with_filesize){defaults.merge(:group_by => :filesize)}
 
         it "with multiple groups" do
-          call(["--only-group", '4,5']).should == defaults_with_filesize.merge(:only_group => [4,5])
+          call(["test", "--only-group", '4,5']).should == defaults_with_filesize.merge(:only_group => [4,5])
         end
 
         it "with a single group" do
-          call(["--only-group", '4']).should == defaults_with_filesize.merge(:only_group => [4])
+          call(["test", "--only-group", '4']).should == defaults_with_filesize.merge(:only_group => [4])
         end
       end
     end
@@ -105,6 +114,7 @@ describe ParallelTests::CLI do
     context "specific groups to run" do
       let(:results){ {:stdout => "", :exit_status => 0} }
       before do
+        subject.stub(:puts)
         subject.should_receive(:load_runner).with("my_test_runner").and_return(ParallelTests::MyTestRunner::Runner)
         ParallelTests::MyTestRunner::Runner.stub(:test_file_name).and_return("test")
         ParallelTests::MyTestRunner::Runner.should_receive(:tests_in_groups).and_return([
@@ -117,25 +127,25 @@ describe ParallelTests::CLI do
 
       it "calls run_tests once when one group specified" do
         subject.should_receive(:run_tests).once.and_return(results)
-        subject.run(['-n', '3', '--only-group', '1', '-t', 'my_test_runner'])
+        subject.run(['test', '-n', '3', '--only-group', '1', '-t', 'my_test_runner'])
       end
 
       it "calls run_tests twice when two groups are specified" do
         subject.should_receive(:run_tests).twice.and_return(results)
-        subject.run(['-n', '3', '--only-group', '1,2', '-t', 'my_test_runner'])
+        subject.run(['test', '-n', '3', '--only-group', '1,2', '-t', 'my_test_runner'])
       end
 
       it "run only one group specified" do
-        options = {:count=>3, :only_group=>[2], :files=>[], :group_by=>:filesize}
+        options = {count: 3, only_group: [2], files: ["test"], group_by: :filesize}
         subject.should_receive(:run_tests).once.with(['ccc', 'ddd'], 0, 1, options).and_return(results)
-        subject.run(['-n', '3', '--only-group', '2', '-t', 'my_test_runner'])
+        subject.run(['test', '-n', '3', '--only-group', '2', '-t', 'my_test_runner'])
       end
 
       it "run twice with multiple groups" do
-        options = {:count=>3, :only_group=>[2,3], :files=>[], :group_by=>:filesize}
+        options = {count: 3, only_group: [2,3], files: ["test"], group_by: :filesize}
         subject.should_receive(:run_tests).once.ordered.with(['ccc', 'ddd'], 0, 1, options).and_return(results)
         subject.should_receive(:run_tests).once.ordered.with(['eee', 'fff'], 1, 1, options).and_return(results)
-        subject.run(['-n', '3', '--only-group', '2,3', '-t', 'my_test_runner'])
+        subject.run(['test', '-n', '3', '--only-group', '2,3', '-t', 'my_test_runner'])
       end
     end
   end

@@ -47,6 +47,13 @@ describe 'CLI' do
     result
   end
 
+  def self.it_fails_without_any_files(type)
+    it "fails without any files" do
+      results = run_tests("", fail: true, type: type)
+      results.should include("Pass files or folders to run")
+    end
+  end
+
   it "runs tests in parallel" do
     write 'spec/xxx_spec.rb', 'describe("it"){it("should"){puts "TEST1"}}'
     write 'spec/xxx2_spec.rb', 'describe("it"){it("should"){puts "TEST2"}}'
@@ -180,11 +187,11 @@ describe 'CLI' do
 
   it "runs faster with more processes" do
     pending if RUBY_PLATFORM == "java"  # just too slow ...
-    2.times{|i|
-      write "spec/xxx#{i}_spec.rb",  'describe("it"){it("should"){sleep 5}}; $stderr.puts ENV["TEST_ENV_NUMBER"]'
-    }
+    2.times do |i|
+      write "spec/xxx#{i}_spec.rb", 'describe("it"){it("should"){sleep 5}}'
+    end
     t = Time.now
-    run_tests("spec", :processes => 2, :type => 'rspec')
+    run_tests("spec", processes: 2, type: 'rspec')
     expected = 10
     (Time.now - t).should <= expected
   end
@@ -197,12 +204,6 @@ describe 'CLI' do
     result.should include('111')
     result.should include('333')
     result.should_not include('222')
-  end
-
-  it "runs successfully without any files" do
-    results = run_tests "", :type => 'rspec'
-    results.should include("2 processes for 0 specs")
-    results.should include("Took")
   end
 
   it "can run with test-options" do
@@ -260,6 +261,10 @@ describe 'CLI' do
     group_2_result.should include("short test")
   end
 
+  context "RSpec" do
+    it_fails_without_any_files "rspec"
+  end
+
   context "Test::Unit" do
     it "runs" do
       write "test/x1_test.rb", "require 'test/unit'; class XTest < Test::Unit::TestCase; def test_xxx; end; end"
@@ -273,11 +278,7 @@ describe 'CLI' do
       result.should include('test_xxx') # verbose output of every test
     end
 
-    it "runs successfully without any files" do
-      results = run_tests("")
-      results.should include("2 processes for 0 tests")
-      results.should include("Took")
-    end
+    it_fails_without_any_files "test"
   end
 
   context "Cucumber" do
@@ -334,11 +335,7 @@ describe 'CLI' do
       result.scan(/YOUR TEST ENV IS \d?!/).sort.should == ["YOUR TEST ENV IS !", "YOUR TEST ENV IS 2!"]
     end
 
-    it "runs successfully without any files" do
-      results = run_tests("", :type => "cucumber")
-      results.should include("2 processes for 0 features")
-      results.should include("Took")
-    end
+    it_fails_without_any_files "cucumber"
 
     it "collates failing scenarios" do
       write "features/pass.feature", "Feature: xxx\n  Scenario: xxx\n    Given I pass"
@@ -387,7 +384,7 @@ cucumber features/fail1.feature:2 # Scenario: xxx
     end
   end
 
-  context "Spinach", :fails_on_ruby_187 => true do
+  context "Spinach" do
     before do
       write "features/steps/a.rb", "class A < Spinach::FeatureSteps\n  Given 'I print TEST_ENV_NUMBER' do\n    puts \"YOUR TEST ENV IS \#{ENV['TEST_ENV_NUMBER']}!\"\n  end\n  And 'I sleep a bit' do\n    sleep 0.2\n  end\nend"
     end
@@ -436,10 +433,6 @@ cucumber features/fail1.feature:2 # Scenario: xxx
       result.scan(/YOUR TEST ENV IS \d?!/).sort.should == ["YOUR TEST ENV IS !", "YOUR TEST ENV IS 2!"]
     end
 
-    it "runs successfully without any files" do
-      results = run_tests("", :type => "spinach")
-      results.should include("2 processes for 0 features")
-      results.should include("Took")
-    end
+    it_fails_without_any_files "spinach"
   end
 end

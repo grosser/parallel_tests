@@ -146,10 +146,15 @@ end
 RSpec.configure do |config|
   config.filter_run :focus => true
   config.run_all_when_everything_filtered = true
+  config.include SpecHelper
+  config.extend SharedExamples
+
+  # sometimes stuff hangs -> do not hang everything
+  config.around do |example|
+    Timeout::timeout(30, &example)
+  end
 
   config.after do
     ENV.delete("TEST_ENV_NUMBER")
   end
-  config.include SpecHelper
-  config.extend SharedExamples
 end

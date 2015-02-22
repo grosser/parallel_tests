@@ -155,6 +155,8 @@ module ParallelTests
         options[:non_parallel] = true
       end
 
+      abort "Pass files or folders to run" if argv.empty? && !options[:execute]
+
       options[:files] = argv
 
       options[:group_by] ||= :filesize if options[:only_group]
