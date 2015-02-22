@@ -39,28 +39,30 @@ describe ParallelTests do
       Object.stub!(:const_defined?).with(:Bundler).and_return false
     end
 
-    it "should return false" do
-      use_temporary_directory_for do
+    it "is false" do
+      use_temporary_directory do
         ParallelTests.send(:bundler_enabled?).should == false
       end
     end
 
-    it "should return true when there is a constant called Bundler" do
-      use_temporary_directory_for do
+    it "is true when there is a constant called Bundler" do
+      use_temporary_directory do
         Object.stub!(:const_defined?).with(:Bundler).and_return true
         ParallelTests.send(:bundler_enabled?).should == true
       end
     end
 
-    it "should be true when there is a Gemfile" do
-      use_temporary_directory_for do
+    it "is true when there is a Gemfile" do
+      use_temporary_directory do
         FileUtils.touch("Gemfile")
         ParallelTests.send(:bundler_enabled?).should == true
       end
     end
 
-    it "should be true when there is a Gemfile in the parent directory" do
-      use_temporary_directory_for do
+    it "is true when there is a Gemfile in the parent directory" do
+      use_temporary_directory do
+        FileUtils.mkdir "nested"
+        Dir.chdir "nested"
         FileUtils.touch(File.join("..", "Gemfile"))
         ParallelTests.send(:bundler_enabled?).should == true
       end
@@ -85,8 +87,8 @@ describe ParallelTests do
       ENV["TEST_ENV_NUMBER"] = "2"
       ParallelTests.should_not_receive(:sleep)
       with_running_processes(1) do
-          ParallelTests.wait_for_other_processes_to_finish
-        end
+        ParallelTests.wait_for_other_processes_to_finish
+      end
     end
 
     it "waits for other processes to finish" do
