@@ -2,7 +2,7 @@ require "spec_helper"
 require "parallel_tests/rspec/runner"
 
 describe ParallelTests::RSpec::Runner do
-  test_tests_in_groups(ParallelTests::RSpec::Runner, 'spec', '_spec.rb')
+  test_tests_in_groups(ParallelTests::RSpec::Runner, '_spec.rb')
 
   describe :run_tests do
     before do
