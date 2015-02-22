@@ -62,9 +62,10 @@ describe ParallelTests do
     it "is true when there is a Gemfile in the parent directory" do
       use_temporary_directory do
         FileUtils.mkdir "nested"
-        Dir.chdir "nested"
-        FileUtils.touch(File.join("..", "Gemfile"))
-        ParallelTests.send(:bundler_enabled?).should == true
+        Dir.chdir "nested" do
+          FileUtils.touch(File.join("..", "Gemfile"))
+          ParallelTests.send(:bundler_enabled?).should == true
+        end
       end
     end
   end
