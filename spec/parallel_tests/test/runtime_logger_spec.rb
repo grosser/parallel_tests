@@ -1,7 +1,38 @@
 require 'spec_helper'
 
 describe ParallelTests::Test::RuntimeLogger do
-  describe :writing do
+  it "writes a correct log" do
+    use_temporary_directory do
+      # setup simple structure
+      FileUtils.mkdir "test"
+      2.times do |i|
+        File.write("test/#{i}_test.rb", <<-RUBY)
+          require 'test/unit'
+          require 'parallel_tests/test/runtime_logger'
+
+          class Foo#{i} < Test::Unit::TestCase
+            def test_foo
+              sleep 0.5
+              assert true
+            end
+          end
+        RUBY
+      end
+
+      # run tests
+      result = `#{Bundler.root}/bin/parallel_test test -n 2`
+      raise "FAILED: #{result}" unless $?.success?
+
+      # log looking good ?
+      lines = File.read("tmp/parallel_runtime_test.log").split("\n").sort.map { |x|x .sub!(/\d$/, '') }
+      lines.should == [
+        "test/foo0.rb:0.5",
+        "test/foo1.rb:0.5",
+      ]
+    end
+  end
+
+  describe "writing" do
     around do |example|
       use_temporary_directory do
         FileUtils.mkdir_p(File.dirname(log))

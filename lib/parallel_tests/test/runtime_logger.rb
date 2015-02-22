@@ -11,7 +11,8 @@ module ParallelTests
           return if test.is_a? ::Test::Unit::TestSuite # don't log for suites-of-suites
 
           if !@@has_started # make empty log file
-            File.open(logfile, 'w'){}
+            FileUtils.mkdir_p(File.dirname(logfile))
+            File.write(logfile, '')
             @@has_started = true
           end
 

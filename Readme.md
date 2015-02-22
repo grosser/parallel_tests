@@ -111,6 +111,8 @@ Add to your `test_helper.rb`:
 require 'parallel_tests/test/runtime_logger'
 ```
 
+results will be logged to tmp/parallel_runtime_test.log
+
 RSpec: SummaryLogger
 --------------------
 
