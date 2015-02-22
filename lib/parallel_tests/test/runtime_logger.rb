@@ -4,17 +4,19 @@ require 'parallel_tests/test/runner'
 module ParallelTests
   module Test
     class RuntimeLogger
-      @@has_started = false
+      @@previous_log_cleaned = false
 
       class << self
+        # ensure folder exists + clean out previous log
+        # this will happen in multiple processes, but should be roughly at the same time
+        # so there should be no log message lost
+        def prepare
+          FileUtils.mkdir_p(File.dirname(logfile))
+          File.write(logfile, '')
+        end
+
         def log(test, start_time, end_time)
           return if test.is_a? ::Test::Unit::TestSuite # don't log for suites-of-suites
-
-          if !@@has_started # make empty log file
-            FileUtils.mkdir_p(File.dirname(logfile))
-            File.write(logfile, '')
-            @@has_started = true
-          end
 
           locked_appending_to(logfile) do |file|
             file.puts(message(test, start_time, end_time))
@@ -88,6 +90,7 @@ class ::Test::Unit::TestSuite
   alias :run_without_timing :run unless defined? @@timing_installed
 
   def run(result, &progress_block)
+    ParallelTests::Test::RuntimeLogger.prepare
     first_test = self.tests.first
     start_time = ParallelTests.now
     run_without_timing(result, &progress_block)
