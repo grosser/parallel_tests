@@ -1,9 +1,8 @@
-$LOAD_PATH << File.expand_path("../lib", File.dirname(__FILE__))
-
-FAKE_RAILS_ROOT = './tmp/pspecs/fixtures'
-
+require 'bundler/setup'
 require 'tempfile'
 require 'tmpdir'
+
+FAKE_RAILS_ROOT = './tmp/pspecs/fixtures'
 
 require 'parallel_tests'
 require 'parallel_tests/test/runtime_logger'
