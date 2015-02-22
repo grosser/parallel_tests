@@ -20,7 +20,6 @@ end
 
 RSpec.configure do |config|
   config.filter_run :focus => true
-  config.filter_run_excluding :encoding => (RUBY_VERSION < "1.9")
   config.run_all_when_everything_filtered = true
 
   config.after do

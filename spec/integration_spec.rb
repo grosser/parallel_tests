@@ -70,7 +70,7 @@ describe 'CLI' do
     result.should include('Byłem tu')
   end
 
-  it "respects default encoding when reading child stdout", :encoding => true do
+  it "respects default encoding when reading child stdout" do
     write 'test/xxx_test.rb', <<-EOF
       # encoding: utf-8
       require 'test/unit'
