@@ -93,6 +93,8 @@ Loggers
 Even test group run-times
 -------------------------
 
+### RSpec
+
 Add the `RuntimeLogger` to log how long each test takes to run.
 This log file will be loaded on the next test run, and the tests will be grouped
 so that each process should finish around the same time.
@@ -102,7 +104,9 @@ Rspec: Add to your `.rspec_parallel` (or `.rspec`) :
     --format progress
     --format ParallelTests::RSpec::RuntimeLogger --out tmp/parallel_runtime_rspec.log
 
-Test::Unit:  Add to your `test_helper.rb`:
+### Test::Unit
+
+Add to your `test_helper.rb`:
 ```ruby
 require 'parallel_tests/test/runtime_logger'
 ```
