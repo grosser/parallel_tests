@@ -190,15 +190,15 @@ shared_examples_for 'gherkin runners' do
 
   describe 'grouping by scenarios for cucumber' do
     def call(*args)
-      ParallelTests::Gherkin::Runner.send(:run_tests, *args)
+      runner_class().send(:run_tests, *args)
     end
 
     it 'groups cucumber invocation by feature files to achieve correct cucumber hook behaviour' do
       test_files = %w(features/a.rb:23 features/a.rb:44 features/b.rb:12)
 
       ParallelTests::Test::Runner.should_receive(:execute_command).with do |a,b,c,d|
-        argv = a.split("--").last.split(" ")[2..-1].sort
-        argv == ["features/a.rb:23:44", "features/b.rb:12"]
+        argv = a.split(" ").last(2)
+        argv.should == ["features/a.rb:23:44", "features/b.rb:12"]
       end
 
       call(test_files, 1, 2, { :group_by => :scenarios })
