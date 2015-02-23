@@ -185,15 +185,12 @@ describe 'CLI' do
     run_tests "spec", :type => 'rspec', :add => '--group-by found'
   end
 
-  it "runs faster with more processes" do
-    pending if RUBY_PLATFORM == "java"  # just too slow ...
+  it "runs in parallel" do
     2.times do |i|
-      write "spec/xxx#{i}_spec.rb", 'describe("it"){it("should"){sleep 5}}'
+      write "spec/xxx#{i}_spec.rb", 'describe("it") { it("should"){ puts "START"; sleep 1; puts "END" } }'
     end
-    t = Time.now
-    run_tests("spec", processes: 2, type: 'rspec')
-    expected = 10
-    (Time.now - t).should <= expected
+    result = run_tests("spec", processes: 2, type: 'rspec')
+    result.scan(/START|END/).should == ["START", "START", "END", "END"]
   end
 
   it "can run with given files" do
