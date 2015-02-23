@@ -1,24 +1,19 @@
-Speedup Test::Unit + RSpec + Cucumber by running parallel on multiple CPUs (or cores).<br/>
-ParallelTests splits tests into even groups(by number of tests or runtime) and runs each group in a single process with its own database.
-
-[upgrading from 0.6 ?](https://github.com/grosser/parallel_tests/wiki/Upgrading-0.6.x-to-0.7.x)
+Speedup Test::Unit + RSpec + Cucumber + Spinach by running parallel on multiple CPU cores.<br/>
+ParallelTests splits tests into even groups (by number of lines or runtime) and runs each group in a single process with its own database.
 
 Setup for Rails
 ===============
 [RailsCasts episode #413 Fast Tests](http://railscasts.com/episodes/413-fast-tests)
-[still using Rails 2?](https://github.com/grosser/parallel_tests/blob/master/ReadmeRails2.md)
 
 ### Install
-If you use RSpec: ensure you have >= 2.4
-
-As gem
 
 ```ruby
-# add to Gemfile
+# Gemfile
 gem "parallel_tests", :group => :development
 ```
 
 ### Add to `config/database.yml`
+
 ParallelTests uses 1 database per test-process.
 <table>
   <tr><td>Process number</td><td>1</td><td>2</td><td>3</td></tr>
@@ -116,7 +111,7 @@ results will be logged to tmp/parallel_runtime_test.log
 RSpec: SummaryLogger
 --------------------
 
-This logger logs the test output without the different processes overwriting each other.
+Log the test output without the different processes overwriting each other.
 
 Add the following to your `.rspec_parallel` (or `.rspec`) :
 
@@ -126,7 +121,7 @@ Add the following to your `.rspec_parallel` (or `.rspec`) :
 RSpec: FailuresLogger
 -----------------------
 
-This logger produces pasteable command-line snippets for each failed example.
+Produce pasteable command-line snippets for each failed example.
 
 E.g.
 
@@ -140,7 +135,7 @@ Add the following to your `.rspec_parallel` (or `.rspec`) :
 Cucumber: FailuresLogger
 -----------------------
 
-This logger logs failed cucumber scenarios to the specified file. The filename can be passed to cucumber, prefixed with '@' to rerun failures.
+Log failed cucumber scenarios to the specified file. The filename can be passed to cucumber, prefixed with '@' to rerun failures.
 
 Usage:
 
@@ -154,10 +149,11 @@ Note if your `cucumber.yml` default profile uses `<%= std_opts %>` you may need 
 
 To rerun failures:
 
-	cucumber @tmp/cucumber_failures.log
+    cucumber @tmp/cucumber_failures.log
 
 Setup for non-rails
 ===================
+
     gem install parallel_tests
     # go to your project dir
     parallel_test test/
@@ -216,13 +212,10 @@ You can run any kind of code in parallel with -e / --execute
 TIPS
 ====
  - [RSpec] add a `.rspec_parallel` to use different options, e.g. **no --drb**
- - [RSpec] delete `script/spec`
- - [[Spork](https://github.com/sporkrb/spork)] does not work with parallel_tests except when using [sqlite in memory](https://github.com/grosser/parallel_tests/wiki#wiki-with-spork)
- - [RSpec] remove --loadby from you spec/*.opts
+ - Spring does not work with parallel_tests, use `DISABLE_SPRING=1 rake parallel:spec` if you have spring hardcoded in your binaries
+ - [RSpec] remove `--loadby` from `.rspec`
  - [RSpec] Instantly see failures (instead of just a red F) with [rspec-instafail](https://github.com/grosser/rspec-instafail)
- - [Bundler] if you have a `Gemfile` then `bundle exec` will be used to run tests
  - [Cucumber] add a `parallel: foo` profile to your `config/cucumber.yml` and it will be used to run parallel tests
- - [Cucumber] Pass in cucumber options by not giving the options an identifier ex: `rake parallel:features[,,'cucumber_opts']`
  - [Capybara setup](https://github.com/grosser/parallel_tests/wiki)
  - [Sphinx setup](https://github.com/grosser/parallel_tests/wiki)
  - [Capistrano setup](https://github.com/grosser/parallel_tests/wiki/Remotely-with-capistrano) let your tests run on a big box instead of your laptop
@@ -230,9 +223,10 @@ TIPS
  - `export PARALLEL_TEST_PROCESSORS=X` in your environment and parallel_tests will use this number of processors by default
  - [ZSH] use quotes to use rake arguments `rake "parallel:prepare[3]"`
  - [email_spec and/or action_mailer_cache_delivery](https://github.com/grosser/parallel_tests/wiki)
- - [Memcached] use different namespaces e.g. `config.cache_store = ..., :namespace => "test_#{ENV['TEST_ENV_NUMBER']}"`
+ - [Memcached] use different namespaces e.g. `config.cache_store = ..., namespace: "test_#{ENV['TEST_ENV_NUMBER']}"`
  - [zeus-parallel_tests](https://github.com/sevos/zeus-parallel_tests)
  - [Distributed parallel test (e.g. Travis Support)](https://github.com/grosser/parallel_tests/wiki/Distributed-Parallel-Tests-and-Travis-Support)
+ - Contribute your own gotaches to the [Wiki](https://github.com/grosser/parallel_tests/wiki) or even better open a PR :)
 
 TODO
 ====
@@ -246,7 +240,7 @@ Authors
 ====
 inspired by [pivotal labs](http://pivotallabs.com/users/miked/blog/articles/849-parallelize-your-rspec-suite)
 
-### [Contributors](http://github.com/grosser/parallel_tests/contributors)
+### [Contributors](https://github.com/grosser/parallel_tests/contributors)
  - [Charles Finkel](http://charlesfinkel.com/)
  - [Indrek Juhkam](http://urgas.eu)
  - [Jason Morrison](http://jayunit.net)
