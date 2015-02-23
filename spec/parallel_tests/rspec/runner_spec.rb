@@ -85,7 +85,7 @@ describe ParallelTests::RSpec::Runner do
     end
 
     it "uses bin/rspec when present" do
-      File.stub(:exists?).with('bin/rspec').and_return true
+      File.stub(:exist?).with('bin/rspec').and_return true
       should_run_with %r{bin/rspec}
       call('xxx', 1, 22, {})
     end

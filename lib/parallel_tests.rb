@@ -33,7 +33,7 @@ module ParallelTests
 
       until !File.directory?(current) || current == previous
         filename = File.join(current, "Gemfile")
-        return true if File.exists?(filename)
+        return true if File.exist?(filename)
         current, previous = File.expand_path("..", current), current
       end
 

@@ -7,10 +7,6 @@ describe ParallelTests::RSpec::RuntimeLogger do
     @clean_output = %r{^spec/foo.rb:[-\.e\d]+$}m
   end
 
-  after do
-    ENV.delete 'TEST_ENV_NUMBER'
-  end
-
   def log_for_a_file(options={})
     Tempfile.open('xxx') do |temp|
       temp.close

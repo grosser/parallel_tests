@@ -3,7 +3,6 @@ require "spec_helper"
 describe ParallelTests do
   describe ".determine_number_of_processes" do
     before do
-      ENV.delete('PARALLEL_TEST_PROCESSORS')
       Parallel.stub(:processor_count).and_return 20
     end
 

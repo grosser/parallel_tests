@@ -11,13 +11,9 @@ describe ParallelTests::Test::Runner do
     end
 
     it "allows to override runner executable via PARALLEL_TESTS_EXECUTABLE" do
-      begin
-        ENV['PARALLEL_TESTS_EXECUTABLE'] = 'script/custom_rspec'
-        ParallelTests::Test::Runner.should_receive(:execute_command).with{|a,b,c,d| a.include?("script/custom_rspec") }
-        call(['xxx'], 1, 22, {})
-      ensure
-        ENV.delete('PARALLEL_TESTS_EXECUTABLE')
-      end
+      ENV['PARALLEL_TESTS_EXECUTABLE'] = 'script/custom_rspec'
+      ParallelTests::Test::Runner.should_receive(:execute_command).with{|a,b,c,d| a.include?("script/custom_rspec") }
+      call(['xxx'], 1, 22, {})
     end
 
     it "uses options" do

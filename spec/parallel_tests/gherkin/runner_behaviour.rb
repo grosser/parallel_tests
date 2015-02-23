@@ -14,20 +14,25 @@ shared_examples_for 'gherkin runners' do
     end
 
     def should_run_with(regex)
-      ParallelTests::Test::Runner.should_receive(:execute_command).with { |a, b, c, d| a =~ regex }
+      ParallelTests::Test::Runner.should_receive(:execute_command).with do |a, b, c, d|
+        if a =~ regex
+          true
+        else
+          puts "Expected #{regex} got #{a}"
+        end
+      end
     end
 
     it "allows to override runner executable via PARALLEL_TESTS_EXECUTABLE" do
       ENV['PARALLEL_TESTS_EXECUTABLE'] = 'script/custom_rspec'
       should_run_with /script\/custom_rspec/
       call(['xxx'], 1, 22, {})
-      ENV.delete('PARALLEL_TESTS_EXECUTABLE')
     end
 
     it "permits setting env options" do
-      ParallelTests::Test::Runner.should_receive(:execute_command).with { |a, b, c, options|
+      ParallelTests::Test::Runner.should_receive(:execute_command).with do |a, b, c, options|
         options[:env]["TEST"] == "ME"
-      }
+      end
       call(['xxx'], 1, 22, {:env => {'TEST' => 'ME'}})
     end
 
@@ -49,7 +54,7 @@ shared_examples_for 'gherkin runners' do
     end
 
     it "uses bin/{runner_name} when present" do
-      File.stub(:exists?).with("bin/#{runner_name}").and_return true
+      File.stub(:exist?).with("bin/#{runner_name}").and_return true
       should_run_with %r{bin/#{runner_name}}
       call(['xxx'], 1, 22, {})
     end
@@ -131,26 +136,25 @@ shared_examples_for 'gherkin runners' do
 
   describe :find_results do
     it "finds multiple results in test output" do
-      output = <<EOF
-And I should not see "/en/"                                       # features/step_definitions/webrat_steps.rb:87
+      output = <<-EOF.gsub(/^        /, "")
+        And I should not see "/en/"                                       # features/step_definitions/webrat_steps.rb:87
 
-7 scenarios (3 failed, 4 passed)
-33 steps (3 failed, 2 skipped, 28 passed)
-/apps/rs/features/signup.feature:2
-    Given I am on "/"                                           # features/step_definitions/common_steps.rb:12
-    When I click "register"                                     # features/step_definitions/common_steps.rb:6
-    And I should have "2" emails                                # features/step_definitions/user_steps.rb:25
+        7 scenarios (3 failed, 4 passed)
+        33 steps (3 failed, 2 skipped, 28 passed)
+        /apps/rs/features/signup.feature:2
+            Given I am on "/"                                           # features/step_definitions/common_steps.rb:12
+            When I click "register"                                     # features/step_definitions/common_steps.rb:6
+            And I should have "2" emails                                # features/step_definitions/user_steps.rb:25
 
-4 scenarios (4 passed)
-40 steps (40 passed)
+        4 scenarios (4 passed)
+        40 steps (40 passed)
 
-And I should not see "foo"                                       # features/step_definitions/webrat_steps.rb:87
+        And I should not see "foo"                                       # features/step_definitions/webrat_steps.rb:87
 
-1 scenario (1 passed)
-1 step (1 passed)
-
-EOF
-      runner_class().find_results(output).should == ["7 scenarios (3 failed, 4 passed)", "33 steps (3 failed, 2 skipped, 28 passed)", "4 scenarios (4 passed)", "40 steps (40 passed)", "1 scenario (1 passed)", "1 step (1 passed)"]
+        1 scenario (1 passed)
+        1 step (1 passed)
+      EOF
+      runner_class.find_results(output).should == ["7 scenarios (3 failed, 4 passed)", "33 steps (3 failed, 2 skipped, 28 passed)", "4 scenarios (4 passed)", "40 steps (40 passed)", "1 scenario (1 passed)", "1 step (1 passed)"]
     end
   end
 
@@ -160,20 +164,26 @@ EOF
     end
 
     it "sums up results for scenarios and steps separately from each other" do
-      results = ["7 scenarios (3 failed, 4 passed)", "33 steps (3 failed, 2 skipped, 28 passed)", "4 scenarios (4 passed)",
-                 "40 steps (40 passed)", "1 scenario (1 passed)", "1 step (1 passed)"]
+      results = [
+        "7 scenarios (3 failed, 4 passed)", "33 steps (3 failed, 2 skipped, 28 passed)", "4 scenarios (4 passed)",
+        "40 steps (40 passed)", "1 scenario (1 passed)", "1 step (1 passed)"
+      ]
       call(results).should == "12 scenarios (3 failed, 9 passed)\n74 steps (3 failed, 2 skipped, 69 passed)"
     end
 
     it "adds same results with plurals" do
-      results = ["1 scenario (1 passed)", "2 steps (2 passed)",
-                 "2 scenarios (2 passed)", "7 steps (7 passed)"]
+      results = [
+        "1 scenario (1 passed)", "2 steps (2 passed)",
+        "2 scenarios (2 passed)", "7 steps (7 passed)"
+      ]
       call(results).should == "3 scenarios (3 passed)\n9 steps (9 passed)"
     end
 
     it "adds non-similar results" do
-      results = ["1 scenario (1 passed)", "1 step (1 passed)",
-                 "2 scenarios (1 failed, 1 pending)", "2 steps (1 failed, 1 pending)"]
+      results = [
+        "1 scenario (1 passed)", "1 step (1 passed)",
+        "2 scenarios (1 failed, 1 pending)", "2 steps (1 failed, 1 pending)"
+      ]
       call(results).should == "3 scenarios (1 failed, 1 pending, 1 passed)\n3 steps (1 failed, 1 pending, 1 passed)"
     end
 
@@ -188,7 +198,6 @@ EOF
     end
 
     it 'groups cucumber invocation by feature files to achieve correct cucumber hook behaviour' do
-
       test_files = %w(features/a.rb:23 features/a.rb:44 features/b.rb:12)
 
       ParallelTests::Test::Runner.should_receive(:execute_command).with do |a,b,c,d|

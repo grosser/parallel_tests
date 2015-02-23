@@ -99,7 +99,7 @@ module ParallelTests
 
         def determine_executable
           case
-          when File.exists?("bin/#{name}")
+          when File.exist?("bin/#{name}")
             "bin/#{name}"
           when ParallelTests.bundler_enabled?
             "bundle exec #{name}"

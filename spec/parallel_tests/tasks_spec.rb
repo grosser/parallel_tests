@@ -34,16 +34,6 @@ describe ParallelTests::Tasks do
   end
 
   describe ".rails_env" do
-    around do |example|
-      begin
-        old = ENV["RAILS_ENV"]
-        ENV.delete "RAILS_ENV"
-        example.call
-      ensure
-        ENV["RAILS_ENV"] = old
-      end
-    end
-
     it "should be test when nothing was set" do
       ParallelTests::Tasks.rails_env.should == "test"
     end

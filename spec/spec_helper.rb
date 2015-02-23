@@ -155,6 +155,9 @@ RSpec.configure do |config|
   end
 
   config.after do
-    ENV.delete("TEST_ENV_NUMBER")
+    ENV.delete "PARALLEL_TEST_PROCESSORS"
+    ENV.delete "PARALLEL_TESTS_EXECUTABLE"
+    ENV.delete "TEST_ENV_NUMBER"
+    ENV.delete "RAILS_ENV"
   end
 end
