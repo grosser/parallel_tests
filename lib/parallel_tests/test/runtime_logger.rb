@@ -17,6 +17,15 @@ module ParallelTests
           result
         end
 
+        def unique_log
+          lock do
+            separator = "\n"
+            groups = File.read(logfile).split(separator).map { |line| line.split(":") }.group_by(&:first)
+            lines = groups.map { |file, times| "#{file}:#{times.map(&:last).map(&:to_f).inject(:+)}" }
+            File.write(logfile, lines.join(separator) + separator)
+          end
+        end
+
         private
 
         # ensure folder exists + clean out previous log
@@ -31,8 +40,8 @@ module ParallelTests
 
         def log(test, time)
           return unless message = message(test, time)
-          locked_appending_to(logfile) do |file|
-            file.puts(message)
+          lock do
+            File.open(logfile, 'a') { |f| f.puts message }
           end
         end
 
@@ -43,11 +52,11 @@ module ParallelTests
           "#{filename}:#{delta}"
         end
 
-        def locked_appending_to(file)
-          File.open(file, 'a') do |f|
+        def lock
+          File.open(logfile, 'r') do |f|
             begin
               f.flock File::LOCK_EX
-              yield f
+              yield
             ensure
               f.flock File::LOCK_UN
             end
@@ -65,11 +74,17 @@ end
 if defined?(MiniTest::Unit)
   MiniTest::Unit.class_eval do
     alias_method :_run_suite_without_runtime_log, :_run_suite
-
     def _run_suite(*args)
       ParallelTests::Test::RuntimeLogger.log_test_run(args.first) do
         _run_suite_without_runtime_log(*args)
       end
+    end
+
+    alias_method :_run_suites_without_runtime_log, :_run_suites
+    def _run_suites(*args)
+      result = _run_suites_without_runtime_log(*args)
+      ParallelTests::Test::RuntimeLogger.unique_log
+      result
     end
   end
 else
@@ -80,8 +95,9 @@ else
     def run(result, &block)
       test = tests.first
 
-      if test.is_a? ::Test::Unit::TestSuite # don't log for suites-of-suites
+      if test.is_a? ::Test::Unit::TestSuite # all tests ?
         run_without_timing(result, &block)
+        ParallelTests::Test::RuntimeLogger.unique_log
       else
         ParallelTests::Test::RuntimeLogger.log_test_run(test.class) do
           run_without_timing(result, &block)
