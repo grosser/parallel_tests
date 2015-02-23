@@ -15,11 +15,7 @@ shared_examples_for 'gherkin runners' do
 
     def should_run_with(regex)
       ParallelTests::Test::Runner.should_receive(:execute_command).with do |a, b, c, d|
-        if a =~ regex
-          true
-        else
-          puts "Expected #{regex} got #{a}"
-        end
+        a.should =~ regex
       end
     end
 
@@ -60,7 +56,7 @@ shared_examples_for 'gherkin runners' do
     end
 
     it "uses options passed in" do
-      should_run_with %r{script/#{runner_name} .* -p default}
+      should_run_with %r{script/#{runner_name} .*-p default}
       call(['xxx'], 1, 22, :test_options => '-p default')
     end
 
@@ -77,24 +73,24 @@ shared_examples_for 'gherkin runners' do
       end
 
       it "uses parallel profile" do
-        should_run_with %r{script/#{runner_name} .* foo bar --profile parallel xxx}
+        should_run_with %r{script/#{runner_name} .*foo bar --profile parallel xxx}
         call(['xxx'], 1, 22, :test_options => 'foo bar')
       end
 
       it "uses given profile via --profile" do
-        should_run_with %r{script/#{runner_name} .* --profile foo xxx$}
+        should_run_with %r{script/#{runner_name} .*--profile foo xxx$}
         call(['xxx'], 1, 22, :test_options => '--profile foo')
       end
 
       it "uses given profile via -p" do
-        should_run_with %r{script/#{runner_name} .* -p foo xxx$}
+        should_run_with %r{script/#{runner_name} .*-p foo xxx$}
         call(['xxx'], 1, 22, :test_options => '-p foo')
       end
     end
 
     it "does not use parallel profile if config/{runner_name}.yml does not contain it" do
       file_contents = 'blob: -f progress'
-      should_run_with %r{script/#{runner_name} .* foo bar}
+      should_run_with %r{script/#{runner_name} .*foo bar}
       Dir.should_receive(:glob).and_return ["config/#{runner_name}.yml"]
       File.should_receive(:read).with("config/#{runner_name}.yml").and_return file_contents
       call(['xxx'], 1, 22, :test_options => 'foo bar')
