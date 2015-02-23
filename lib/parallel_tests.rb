@@ -64,5 +64,11 @@ module ParallelTests
         Time.now
       end
     end
+
+    def delta
+      before = now.to_f
+      yield
+      now.to_f - before
+    end
   end
 end

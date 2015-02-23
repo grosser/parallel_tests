@@ -7,6 +7,18 @@ module ParallelTests
       @@prepared = false
 
       class << self
+        def log_test_run(test)
+          prepare
+
+          result = nil
+          time = ParallelTests.delta { result = yield }
+          log(test, time)
+
+          result
+        end
+
+        private
+
         # ensure folder exists + clean out previous log
         # this will happen in multiple processes, but should be roughly at the same time
         # so there should be no log message lost
@@ -17,20 +29,17 @@ module ParallelTests
           File.write(logfile, '')
         end
 
-        def log(test, start_time, end_time)
-          return if test.is_a? ::Test::Unit::TestSuite # don't log for suites-of-suites
-
+        def log(test, time)
+          return unless message = message(test, time)
           locked_appending_to(logfile) do |file|
-            file.puts(message(test, start_time, end_time))
+            file.puts(message)
           end
         end
 
-        private
-
-        def message(test, start_time, end_time)
-          delta = "%.2f" % (end_time.to_f - start_time.to_f)
-          method = test.public_methods(true).first
-          filename = test.method(method).source_location.first.sub("#{Dir.pwd}/", "")
+        def message(test, time)
+          return unless method = test.public_instance_methods(true).detect { |method| method =~ /^test_/ }
+          delta = "%.2f" % time
+          filename = test.instance_method(method).source_location.first.sub("#{Dir.pwd}/", "")
           "#{filename}:#{delta}"
         end
 
@@ -53,16 +62,31 @@ module ParallelTests
   end
 end
 
-require 'test/unit/testsuite'
-class ::Test::Unit::TestSuite
-  alias_method :run_without_timing, :run
+if defined?(MiniTest::Unit)
+  MiniTest::Unit.class_eval do
+    alias_method :_run_suite_without_runtime_log, :_run_suite
 
-  def run(result, &block)
-    ParallelTests::Test::RuntimeLogger.prepare
-    first_test = tests.first
-    start_time = ParallelTests.now
-    run_without_timing(result, &block)
-    end_time = ParallelTests.now
-    ParallelTests::Test::RuntimeLogger.log(first_test, start_time, end_time)
+    def _run_suite(*args)
+      ParallelTests::Test::RuntimeLogger.log_test_run(args.first) do
+        _run_suite_without_runtime_log(*args)
+      end
+    end
+  end
+else
+  require 'test/unit/testsuite'
+  class ::Test::Unit::TestSuite
+    alias_method :run_without_timing, :run
+
+    def run(result, &block)
+      test = tests.first
+
+      if test.is_a? ::Test::Unit::TestSuite # don't log for suites-of-suites
+        run_without_timing(result, &block)
+      else
+        ParallelTests::Test::RuntimeLogger.log_test_run(test.class) do
+          run_without_timing(result, &block)
+        end
+      end
+    end
   end
 end

@@ -99,7 +99,7 @@ Rspec: Add to your `.rspec_parallel` (or `.rspec`) :
     --format progress
     --format ParallelTests::RSpec::RuntimeLogger --out tmp/parallel_runtime_rspec.log
 
-### Test::Unit
+### Test::Unit & Minitest 4
 
 Add to your `test_helper.rb`:
 ```ruby
