@@ -193,6 +193,20 @@ describe 'CLI' do
     result.scan(/START|END/).should == ["START", "START", "END", "END"]
   end
 
+  it "runs with files that have spaces" do
+    write "test/xxx _test.rb", 'puts "YES"'
+    result = run_tests("test", processes: 2, type: 'test')
+    result.should include "YES"
+  end
+
+  it "uses relative paths for easy copying" do
+    write "test/xxx_test.rb", 'puts "YES"'
+    result = run_tests("test", processes: 2, type: 'test', add: '--verbose')
+    result.should include "YES"
+    result.should include "[test/xxx_test.rb]"
+    result.should_not include Dir.pwd
+  end
+
   it "can run with given files" do
     write "spec/x1_spec.rb", "puts '111'"
     write "spec/x2_spec.rb", "puts '222'"

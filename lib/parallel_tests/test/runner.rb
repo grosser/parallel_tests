@@ -25,8 +25,8 @@ module ParallelTests
         end
 
         def run_tests(test_files, process_number, num_processes, options)
-          require_list = test_files.map { |filename| %{"#{File.expand_path filename}"} }.join(",")
-          cmd = "#{executable} -Itest -e '[#{require_list}].each {|f| require f }' -- #{options[:test_options]}"
+          require_list = test_files.map { |file| file.sub(" ", "\\ ") }.join(" ")
+          cmd = "#{executable} -Itest -e '%w[#{require_list}].each { |f| require %{./\#{f}} }' -- #{options[:test_options]}"
           execute_command(cmd, process_number, num_processes, options)
         end
 
@@ -147,9 +147,9 @@ module ParallelTests
             lines.each do |line|
               test, time = line.split(":")
               next unless test and time
-              times[File.expand_path(test)] = time.to_f
+              times[test] = time.to_f
             end
-            tests.sort.map{|test| [test, times[File.expand_path(test)]] }
+            tests.sort.map { |test| [test, times[test]] }
           else # use file sizes
             with_filesize_info(tests)
           end
