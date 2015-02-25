@@ -192,7 +192,11 @@ module ParallelTests
     def report_time_taken
       start = Time.now
       yield
-      puts "\nTook #{Time.now - start} seconds"
+      elapsed = Time.now - start
+      rounded = elapsed.round
+      display_parts = [ rounded / 3600, rounded % 3600 / 60, rounded % 60 ].drop_while {|dp| dp == 0}
+      display_time = display_parts.map {|dp| "%02d" % dp}.join(':').sub(/^0/, '')
+      puts "\nTook #{elapsed} seconds" + (display_parts.size > 1 ? " (#{display_time})" : "")
     end
 
     def final_fail_message
