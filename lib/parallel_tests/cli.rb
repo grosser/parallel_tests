@@ -193,10 +193,15 @@ module ParallelTests
       start = Time.now
       yield
       elapsed = Time.now - start
+      display_elapsed = display_duration(elapsed)
+      puts "\nTook #{elapsed} seconds" + (display_elapsed.include?(':') ? " (#{display_elapsed})" : "")
+    end
+
+    def display_duration(elapsed)
       rounded = elapsed.round
-      display_parts = [ rounded / 3600, rounded % 3600 / 60, rounded % 60 ].drop_while {|dp| dp == 0}
-      display_time = display_parts.map {|dp| "%02d" % dp}.join(':').sub(/^0/, '')
-      puts "\nTook #{elapsed} seconds" + (display_parts.size > 1 ? " (#{display_time})" : "")
+      display_parts = [ rounded / 3600, rounded % 3600 / 60, rounded % 60 ].drop_while(&:zero?)
+      display_parts = [0] if display_parts.empty?
+      display_parts.map {|dp| "%02d" % dp}.join(':').sub(/^0/, '')
     end
 
     def final_fail_message
