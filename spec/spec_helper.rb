@@ -63,8 +63,9 @@ module SharedExamples
 
       it "groups when given an array of files" do
         list_of_files = Dir["#{test_root}/**/*#{suffix}"]
-        found = klass.send(:with_runtime_info, list_of_files)
-        found.should =~ list_of_files.map{ |file| [file, File.stat(file).size]}
+        result = list_of_files.dup
+        klass.send(:sort_by_filesize, result)
+        result.should =~ list_of_files.map{ |file| [file, File.stat(file).size]}
       end
 
       it "finds all tests" do

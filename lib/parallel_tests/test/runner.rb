@@ -41,13 +41,26 @@ module ParallelTests
         def tests_in_groups(tests, num_groups, options={})
           tests = find_tests(tests, options)
 
-          tests = if options[:group_by] == :found
-            tests.map { |t| [t, 1] }
-          elsif options[:group_by] == :filesize
-            with_filesize_info(tests)
+          case options[:group_by]
+          when :found
+            tests.map! { |t| [t, 1] }
+          when :filesize
+            sort_by_filesize(tests)
+          when :runtime
+            sort_by_runtime(tests, runtimes(options))
+          when nil
+            # use recorded test runtime if we got enough data
+            runtimes = runtimes(options) rescue []
+            if runtimes.size * 1.5 > tests.size
+              puts "Using recorded test runtime"
+              sort_by_runtime(tests, runtimes)
+            else
+              sort_by_filesize(tests)
+            end
           else
-            with_runtime_info(tests, options)
+            raise ArgumentError, "Unsupported option #{options[:group_by]}"
           end
+
           Grouper.in_even_groups_by_size(tests, num_groups, options)
         end
 
@@ -136,28 +149,25 @@ module ParallelTests
           result
         end
 
-        def with_runtime_info(tests, options = {})
-          log = options[:runtime_log] || runtime_log
-          lines = File.read(log).split("\n") rescue []
-
-          # use recorded test runtime if we got enough data
-          if lines.size * 1.5 > tests.size
-            puts "Using recorded test runtime: #{log}"
-            times = Hash.new(1)
-            lines.each do |line|
-              test, time = line.split(":")
-              next unless test and time
-              times[test] = time.to_f
-            end
-            tests.sort.map { |test| [test, times[test]] }
-          else # use file sizes
-            with_filesize_info(tests)
+        def sort_by_runtime(tests, runtimes)
+          times = {}
+          runtimes.each do |line|
+            test, time = line.split(":", 2)
+            next unless test and time
+            times[test] = time.to_f
           end
+          tests.sort!
+          tests.map! { |test| [test, times[test] || 1] }
         end
 
-        def with_filesize_info(tests)
-          # use filesize to group files
-          tests.sort.map { |test| [test, File.stat(test).size] }
+        def runtimes(options)
+          log = options[:runtime_log] || runtime_log
+          File.read(log).split("\n")
+        end
+
+        def sort_by_filesize(tests)
+          tests.sort!
+          tests.map! { |test| [test, File.stat(test).size] }
         end
 
         def find_tests(tests, options = {})

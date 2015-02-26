@@ -99,7 +99,7 @@ Rspec: Add to your `.rspec_parallel` (or `.rspec`) :
     --format progress
     --format ParallelTests::RSpec::RuntimeLogger --out tmp/parallel_runtime_rspec.log
 
-### Test::Unit & Minitest 4
+### Test::Unit & Minitest 4/5
 
 Add to your `test_helper.rb`:
 ```ruby
@@ -175,7 +175,8 @@ Options are:
           steps - number of cucumber/spinach steps
           scenarios - individual cucumber scenarios
           filesize - by size of the file
-          default - runtime or filesize
+          runtime - info from runtime log
+          default - runtime when runtime log is filled otherwise filesize
     -m, --multiply-processes [FLOAT] use given number as a multiplier of processes to run
     -s, --single [PATTERN]           Run all matching files in the same process
     -i, --isolate                    Do not run any other tests in the group used by --single(-s)
