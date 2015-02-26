@@ -306,6 +306,7 @@ inspired by [pivotal labs](http://pivotallabs.com/users/miked/blog/articles/849-
  - [Volodymyr Mykhailyk](https:/github.com/volodymyr-mykhailyk)
  - [Mike Mueller](https://github.com/mmueller)
  - [Aaron Jensen](https://github.com/aaronjensen)
+ - [Ed Slocomb](https://github.com/edslocomb)
 
 [Michael Grosser](http://grosser.it)<br/>
 michael@grosser.it<br/>
