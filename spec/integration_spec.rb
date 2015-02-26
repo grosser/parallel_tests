@@ -67,7 +67,7 @@ describe 'CLI' do
     result.scan('1 example, 0 failure').size.should == 2 # 2 results
     result.scan('2 examples, 0 failures').size.should == 1 # 1 summary
     result.scan(/Finished in \d+\.\d+ seconds/).size.should == 2
-    result.scan(/Took \d+\.\d+ seconds/).size.should == 1 # parallel summary
+    result.scan(/Took \d+ seconds/).size.should == 1 # parallel summary
   end
 
   it "runs tests which outputs accented characters" do
