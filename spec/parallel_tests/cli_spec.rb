@@ -149,6 +149,36 @@ describe ParallelTests::CLI do
       end
     end
   end
+
+  describe "#display_duration" do
+
+    def call(*args)
+      subject.send(:display_duration, *args)
+    end
+
+    it "displays the correct string for durations near one minute" do
+      call(59.4).should == "59"
+      call(59.6).should == "1:00"
+      call(60.4).should == "1:00"
+      call(60.6).should == "1:01"
+    end
+
+    it "displays the correct string for durations near one hour" do
+      call(3599.4).should == "59:59"
+      call(3599.6).should == "1:00:00"
+      call(3600.4).should == "1:00:00"
+      call(3600.6).should == "1:00:01"
+    end
+
+    it "displays the correct string for miscellaneous durations" do
+      call(9296).should  == "2:34:56"
+      call(45296).should == "12:34:56"
+      call(2756601).should == "765:43:21" # hours into three digits?  Buy more CI hardware...
+      call(0.3).should == "0"
+      call(0.6).should == "1"
+    end
+  end
+
 end
 
 module ParallelTests
@@ -157,4 +187,3 @@ module ParallelTests
     end
   end
 end
-
