@@ -190,18 +190,15 @@ module ParallelTests
     end
 
     def report_time_taken
-      start = Time.now
-      yield
-      elapsed = Time.now - start
-      display_elapsed = display_duration(elapsed)
-      puts "\nTook #{elapsed} seconds" + (display_elapsed.include?(':') ? " (#{display_elapsed})" : "")
+      seconds = ParallelTests.delta { yield }.to_i
+      puts "\nTook #{seconds} seconds#{detailed_duration(seconds)}"
     end
 
-    def display_duration(elapsed)
-      rounded = elapsed.round
-      display_parts = [ rounded / 3600, rounded % 3600 / 60, rounded % 60 ].drop_while(&:zero?)
-      display_parts = [0] if display_parts.empty?
-      display_parts.map {|dp| "%02d" % dp}.join(':').sub(/^0/, '')
+    def detailed_duration(seconds)
+      parts = [ seconds / 3600, seconds % 3600 / 60, seconds % 60 ].drop_while(&:zero?)
+      return if parts.size < 2
+      parts = parts.map { |i| "%02d" % i }.join(':').sub(/^0/, '')
+      " (#{parts})"
     end
 
     def final_fail_message
