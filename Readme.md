@@ -103,10 +103,11 @@ Rspec: Add to your `.rspec_parallel` (or `.rspec`) :
 
 Add to your `test_helper.rb`:
 ```ruby
-require 'parallel_tests/test/runtime_logger'
+require 'parallel_tests/test/runtime_logger' if ENV['RECORD_RUNTIME']
 ```
 
-results will be logged to tmp/parallel_runtime_test.log
+results will be logged to tmp/parallel_runtime_test.log when `RECORD_RUNTIME` is set,
+so it is not always required or overwritten.
 
 RSpec: SummaryLogger
 --------------------
