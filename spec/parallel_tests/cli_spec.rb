@@ -48,7 +48,11 @@ describe ParallelTests::CLI do
 
     context "parse only-group" do
       it "group_by should be set to filesize" do
-        call(["test", "--only-group", '1']).should == defaults.merge(:group_by=>:filesize, :only_group => [1])
+        call(["test", "--only-group", '1']).should == defaults.merge(only_group: [1], group_by: :filesize)
+      end
+
+      it "allows runtime" do
+        call(["test", "--only-group", '1', '--group-by', 'runtime']).should == defaults.merge(only_group: [1], group_by: :runtime)
       end
 
       it "raise error when group_by isn't filesize" do
@@ -57,16 +61,12 @@ describe ParallelTests::CLI do
         }.to raise_error(RuntimeError)
       end
 
-      context "with group_by default to filesize" do
-        let(:defaults_with_filesize){defaults.merge(:group_by => :filesize)}
+      it "with multiple groups" do
+        call(["test", "--only-group", '4,5']).should == defaults.merge(only_group: [4,5], group_by: :filesize)
+      end
 
-        it "with multiple groups" do
-          call(["test", "--only-group", '4,5']).should == defaults_with_filesize.merge(:only_group => [4,5])
-        end
-
-        it "with a single group" do
-          call(["test", "--only-group", '4']).should == defaults_with_filesize.merge(:only_group => [4])
-        end
+      it "with a single group" do
+        call(["test", "--only-group", '4']).should == defaults.merge(:only_group => [4], group_by: :filesize)
       end
     end
   end

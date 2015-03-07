@@ -3,7 +3,7 @@ gemspec
 
 gem 'bump'
 gem 'test-unit'
-gem 'minitest', '~> 4.7.5'
+gem 'minitest', '~> 5.5.0'
 gem 'rspec', '>=2.4'
 gem 'cucumber'
 gem 'spinach'

@@ -108,7 +108,8 @@ module ParallelTests
                     steps - number of cucumber/spinach steps
                     scenarios - individual cucumber scenarios
                     filesize - by size of the file
-                    default - runtime or filesize
+                    runtime - info from runtime log
+                    default - runtime when runtime log is filled otherwise filesize
           TEXT
           ) { |type| options[:group_by] = type.to_sym }
         opts.on("-m [FLOAT]", "--multiply-processes [FLOAT]", Float, "use given number as a multiplier of processes to run") { |multiply| options[:multiply] = multiply }
@@ -162,7 +163,10 @@ module ParallelTests
       options[:group_by] ||= :filesize if options[:only_group]
 
       raise "--group-by found and --single-process are not supported" if options[:group_by] == :found and options[:single_process]
-      raise "--group-by filesize is required for --only-group" if options[:group_by] != :filesize and options[:only_group]
+      allowed = [:filesize, :runtime, :found]
+      if !allowed.include?(options[:group_by]) && options[:only_group]
+        raise "--group-by #{allowed.join(" or ")} is required for --only-group"
+      end
 
       options
     end

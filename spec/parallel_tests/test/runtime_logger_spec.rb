@@ -1,10 +1,13 @@
 require 'spec_helper'
-require 'test/unit/ui/xml/testrunner'
 
 describe ParallelTests::Test::RuntimeLogger do
-  def run_tests
-    result = `#{Bundler.root}/bin/parallel_test test -n 2 2>&1`
+  def sh(command)
+    result = `#{command} 2>&1`
     raise "FAILED: #{result}" unless $?.success?
+  end
+
+  def run_tests
+    sh "#{Bundler.root}/bin/parallel_test test -n 2"
   end
 
   it "writes a correct log on test-unit" do
@@ -43,7 +46,25 @@ describe ParallelTests::Test::RuntimeLogger do
     end
   end
 
+  # static directory with gems so it's fast on travis
   it "writes a correct log on minitest-4" do
+    Dir.chdir(Bundler.root.join("spec/fixtures/minitest4")) do
+      Bundler.with_clean_env do
+        sh "bundle --local --quiet"
+        run_tests
+      end
+
+      # log looking good ?
+      lines = File.read("tmp/parallel_runtime_test.log").split("\n").sort.map { |x| x.sub(/\d$/, "") }
+      lines.should == [
+        "test/0_test.rb:0.7",
+        "test/1_test.rb:0.7",
+      ]
+      FileUtils.rm("tmp/parallel_runtime_test.log")
+    end
+  end
+
+  it "writes a correct log on minitest-5" do
     use_temporary_directory do
       # setup simple structure
       FileUtils.mkdir "test"
@@ -52,14 +73,14 @@ describe ParallelTests::Test::RuntimeLogger do
           require 'minitest/autorun'
           require 'parallel_tests/test/runtime_logger'
 
-          class Foo#{i} < MiniTest::Unit::TestCase
+          class Foo#{i} < Minitest::Test
             def test_foo
               sleep 0.5
               assert true
             end
           end
 
-          class Bar#{i} < MiniTest::Unit::TestCase
+          class Bar#{i} < Minitest::Test
             def test_foo
               sleep 0.25
               assert true
@@ -77,22 +98,5 @@ describe ParallelTests::Test::RuntimeLogger do
         "test/1_test.rb:0.7",
       ]
     end
-  end
-
-  it 'passes correct test to log' do
-    class FakeUnitTest < Test::Unit::TestCase
-      def test_fake
-        assert true
-      end
-    end
-
-    ParallelTests::Test::RuntimeLogger.
-      should_receive(:log).
-      with(FakeUnitTest, kind_of(Float))
-
-    my_tests = Test::Unit::TestSuite.new
-    my_tests << FakeUnitTest.new('test_fake')
-    output = StringIO.new
-    Test::Unit::UI::XML::TestRunner.run(my_tests, :output => output)
   end
 end
