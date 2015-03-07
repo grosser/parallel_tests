@@ -47,7 +47,7 @@ module ParallelTests
           when :filesize
             sort_by_filesize(tests)
           when :runtime
-            sort_by_runtime(tests, runtimes(options), allowed_missing: 0.5)
+            sort_by_runtime(tests, runtimes(options), options.merge(allowed_missing: 0.5))
           when nil
             # use recorded test runtime if we got enough data
             runtimes = runtimes(options) rescue []
@@ -153,6 +153,7 @@ module ParallelTests
           allowed_missing = options[:allowed_missing] || 1.0
           allowed_missing = tests.size * allowed_missing
 
+          # build runtime hash
           times = {}
           runtimes.each do |line|
             test, time = line.split(":", 2)
@@ -160,12 +161,22 @@ module ParallelTests
             times[test] = time.to_f
           end
 
+          # set know runtime for each test
           tests.sort!
           tests.map! do |test|
             allowed_missing -= 1 unless time = times[test]
             raise "Too little runtime info" if allowed_missing < 0
-            [test, time || 1]
+            [test, time]
           end
+
+          if options[:verbose]
+            puts "Runtime found for #{tests.count(&:last)} of #{tests.size} tests"
+          end
+
+          # fill gaps with average runtime
+          known, unknown = tests.partition(&:last)
+          average = known.map!(&:last).inject(:+) / known.size
+          unknown.each { |set| set[1] = average }
         end
 
         def runtimes(options)

@@ -67,7 +67,7 @@ describe ParallelTests::Test::Runner do
     context "when passed runtime" do
       around { |test| Dir.mktmpdir { |dir| Dir.chdir(dir, &test) } }
       before do
-        ["aaa", "bbb", "ccc"].each { |f| File.write(f, f) }
+        ["aaa", "bbb", "ccc", "ddd"].each { |f| File.write(f, f) }
         FileUtils.mkdir("tmp")
       end
 
@@ -83,6 +83,11 @@ describe ParallelTests::Test::Runner do
       it "groups when there is enough log" do
         File.write("tmp/parallel_runtime_test.log", "xxx:123\nbbb:123\naaa:123")
         call(["aaa", "bbb", "ccc"], 3, group_by: :runtime)
+      end
+
+      it "groups with average for missing" do
+        File.write("tmp/parallel_runtime_test.log", "xxx:123\nbbb:10\nccc:1")
+        call(["aaa", "bbb", "ccc", "ddd"], 2, group_by: :runtime).should == [["bbb", "ccc"], ["aaa", "ddd"]]
       end
 
       it "groups by single_process pattern and then via size" do
