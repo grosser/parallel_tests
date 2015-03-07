@@ -65,6 +65,26 @@ describe ParallelTests::Test::Runner do
     end
 
     context "when passed runtime" do
+      around { |test| Dir.mktmpdir { |dir| Dir.chdir(dir, &test) } }
+      before do
+        ["aaa", "bbb", "ccc"].each { |f| File.write(f, f) }
+        FileUtils.mkdir("tmp")
+      end
+
+      it "fails when there is no log" do
+        lambda { call(["aaa"], 3, group_by: :runtime) }.should raise_error(Errno::ENOENT)
+      end
+
+      it "fails when there is too little log" do
+        File.write("tmp/parallel_runtime_test.log", "xxx:123\nyyy:123\naaa:123")
+        lambda { call(["aaa", "bbb", "ccc"], 3, group_by: :runtime) }.should raise_error(RuntimeError)
+      end
+
+      it "groups when there is enough log" do
+        File.write("tmp/parallel_runtime_test.log", "xxx:123\nbbb:123\naaa:123")
+        call(["aaa", "bbb", "ccc"], 3, group_by: :runtime)
+      end
+
       it "groups by single_process pattern and then via size" do
         ParallelTests::Test::Runner.should_receive(:runtimes).
           and_return(%w[aaa:5 aaa2:5 bbb:2 ccc:1 ddd:1])
