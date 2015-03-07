@@ -82,7 +82,7 @@ describe ParallelTests::Test::RuntimeLogger do
 
           class Bar#{i} < Minitest::Test
             def test_foo
-              sleep 0.25
+              sleep 0.25111
               assert true
             end
           end

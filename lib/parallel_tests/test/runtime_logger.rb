@@ -21,7 +21,10 @@ module ParallelTests
           lock do
             separator = "\n"
             groups = File.read(logfile).split(separator).map { |line| line.split(":") }.group_by(&:first)
-            lines = groups.map { |file, times| "#{file}:#{times.map(&:last).map(&:to_f).inject(:+)}" }
+            lines = groups.map do |file, times|
+              time = "%.2f" % times.map(&:last).map(&:to_f).inject(:+)
+              "#{file}:#{time}"
+            end
             File.write(logfile, lines.join(separator) + separator)
           end
         end
@@ -45,9 +48,8 @@ module ParallelTests
           end
         end
 
-        def message(test, time)
+        def message(test, delta)
           return unless method = test.public_instance_methods(true).detect { |method| method =~ /^test_/ }
-          delta = "%.2f" % time
           filename = test.instance_method(method).source_location.first.sub("#{Dir.pwd}/", "")
           "#{filename}:#{delta}"
         end
