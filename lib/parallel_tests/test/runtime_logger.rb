@@ -71,7 +71,7 @@ module ParallelTests
   end
 end
 
-if defined?(Minitest::Test) # Minitest 5
+if defined?(Minitest::Runnable) # Minitest 5
   class << Minitest::Runnable
     alias_method :run_without_runtime_log, :run
     def run(*args)
