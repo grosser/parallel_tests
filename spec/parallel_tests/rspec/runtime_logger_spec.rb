@@ -92,8 +92,8 @@ describe ParallelTests::RSpec::RuntimeLogger do
       system("TEST_ENV_NUMBER=1 rspec spec -I #{Bundler.root.join("lib")} --format ParallelTests::RSpec::RuntimeLogger --out runtime.log 2>&1") || raise("nope")
 
       result = File.read("runtime.log")
-      result.should include "a_spec.rb:0.5"
-      result.should include "b_spec.rb:0.5"
+      result.should =~ %r{^spec/a_spec.rb:0.5}
+      result.should =~ %r{^spec/b_spec.rb:0.5}
       result.should_not include "spec_helper"
     end
 

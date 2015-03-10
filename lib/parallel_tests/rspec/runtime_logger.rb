@@ -50,7 +50,7 @@ class ParallelTests::RSpec::RuntimeLogger < ParallelTests::RSpec::LoggerBase
     # TODO: Figure out why sometimes time can be less than 0
     lock_output do
       @example_times.each do |file, time|
-        relative_path = file.sub(/^#{Regexp.escape Dir.pwd}\//,'')
+        relative_path = file.sub(/^#{Regexp.escape Dir.pwd}\//,'').sub(/^\.\//, "")
         @output.puts "#{relative_path}:#{time > 0 ? time : 0}"
       end
     end
