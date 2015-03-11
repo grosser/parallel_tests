@@ -50,8 +50,14 @@ describe ParallelTests::Test::Runner do
 
       it "sorts by runtime when runtime is available" do
         ParallelTests::Test::Runner.should_receive(:puts).with("Using recorded test runtime")
-        ParallelTests::Test::Runner.should_receive(:runtimes).and_return(["a:1", "b:1", "c:3"])
+        ParallelTests::Test::Runner.should_receive(:runtimes).and_return({"a" => 1, "b" => 1, "c" => 3})
         call(["a", "b", "c"], 2).should == [["c"], ["a", "b"]]
+      end
+
+      it "sorts by filesize when there are no files" do
+        ParallelTests::Test::Runner.should_receive(:puts).never
+        ParallelTests::Test::Runner.should_receive(:runtimes).and_return({})
+        call([], 2).should == [[], []]
       end
 
       it "sorts by filesize when runtime is too little" do
@@ -92,7 +98,7 @@ describe ParallelTests::Test::Runner do
 
       it "groups by single_process pattern and then via size" do
         ParallelTests::Test::Runner.should_receive(:runtimes).
-          and_return(%w[aaa:5 aaa2:5 bbb:2 ccc:1 ddd:1])
+          and_return({"aaa" => 5, "bbb" => 2, "ccc" => 1, "ddd" => 1})
         result = call(["aaa", "aaa2", "bbb", "ccc", "ddd"], 3, single_process: [/^a.a/], group_by: :runtime)
         result.should == [["aaa", "aaa2"], ["bbb"], ["ccc", "ddd"]]
       end
@@ -100,7 +106,7 @@ describe ParallelTests::Test::Runner do
       it "groups by size and adds isolated separately" do
         pending if RUBY_PLATFORM == "java"
         ParallelTests::Test::Runner.should_receive(:runtimes).
-          and_return(%w[aaa:0 bbb:3 ccc:1 ddd:2 eee:1])
+          and_return({"aaa" => 0, "bbb" => 3, "ccc" => 1, "ddd" => 2})
         result = call(["aaa", "bbb", "ccc", "ddd", "eee"], 3, isolate: true, single_process: [/^aaa/], group_by: :runtime)
         result.should == [["aaa"], ["bbb", "eee"], ["ccc", "ddd"]]
       end

@@ -47,10 +47,10 @@ module ParallelTests
           when :filesize
             sort_by_filesize(tests)
           when :runtime
-            sort_by_runtime(tests, runtimes(options), options.merge(allowed_missing: 0.5))
+            sort_by_runtime(tests, runtimes(tests, options), options.merge(allowed_missing: 0.5))
           when nil
             # use recorded test runtime if we got enough data
-            runtimes = runtimes(options) rescue []
+            runtimes = runtimes(tests, options) rescue []
             if runtimes.size * 1.5 > tests.size
               puts "Using recorded test runtime"
               sort_by_runtime(tests, runtimes)
@@ -153,18 +153,10 @@ module ParallelTests
           allowed_missing = options[:allowed_missing] || 1.0
           allowed_missing = tests.size * allowed_missing
 
-          # build runtime hash
-          times = {}
-          runtimes.each do |line|
-            test, time = line.split(":", 2)
-            next unless test and time
-            times[test] = time.to_f
-          end
-
           # set know runtime for each test
           tests.sort!
           tests.map! do |test|
-            allowed_missing -= 1 unless time = times[test]
+            allowed_missing -= 1 unless time = runtimes[test]
             raise "Too little runtime info" if allowed_missing < 0
             [test, time]
           end
@@ -175,13 +167,18 @@ module ParallelTests
 
           # fill gaps with average runtime
           known, unknown = tests.partition(&:last)
-          average = known.map!(&:last).inject(:+) / known.size
+          average = (known.any? ? known.map!(&:last).inject(:+) / known.size : 1)
           unknown.each { |set| set[1] = average }
         end
 
-        def runtimes(options)
+        def runtimes(tests, options)
           log = options[:runtime_log] || runtime_log
-          File.read(log).split("\n")
+          lines = File.read(log).split("\n")
+          lines.each_with_object({}) do |line, times|
+            test, time = line.split(":", 2)
+            next unless test and time
+            times[test] = time.to_f if tests.include?(test)
+          end
         end
 
         def sort_by_filesize(tests)
