@@ -39,6 +39,11 @@ module ParallelTests
 
         # finds all tests and partitions them into groups
         def tests_in_groups(tests, num_groups, options={})
+          tests = tests_with_size(tests, options)
+          Grouper.in_even_groups_by_size(tests, num_groups, options)
+        end
+
+        def tests_with_size(tests, options)
           tests = find_tests(tests, options)
 
           case options[:group_by]
@@ -61,7 +66,7 @@ module ParallelTests
             raise ArgumentError, "Unsupported option #{options[:group_by]}"
           end
 
-          Grouper.in_even_groups_by_size(tests, num_groups, options)
+          tests
         end
 
         def execute_command(cmd, process_number, num_processes, options)
