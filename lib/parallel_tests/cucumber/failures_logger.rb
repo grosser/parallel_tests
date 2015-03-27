@@ -8,6 +8,7 @@ module ParallelTests
 
       def initialize(runtime, path_or_io, options)
         @io = prepare_io(path_or_io)
+        @lines = {}
       end
 
       def after_feature(feature)
