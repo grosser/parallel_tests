@@ -66,7 +66,9 @@ module ParallelTests
     def report_output(result, lock)
       lock.flock File::LOCK_EX
       $stdout.puts result[:stdout]
+      # Make sure we have written all stdout
       $stdout.flush
+      sleep 0.1
     ensure
       lock.flock File::LOCK_UN
     end
