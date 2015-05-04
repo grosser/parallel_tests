@@ -23,7 +23,7 @@ module ParallelTests
       Tempfile.open 'parallel_tests-lock' do |lock|
         return Parallel.map(items, :in_threads => num_processes) do |item|
           result = yield(item)
-          report_output(result, lock) if options[:serialize_stdout]
+          reprint_output(result, lock.path) if options[:serialize_stdout]
           result
         end
       end
@@ -63,11 +63,17 @@ module ParallelTests
       end
     end
 
-    def report_output(result, lock)
-      File.open(lock.path) do |open_lock|
-        open_lock.flock File::LOCK_EX
+    def reprint_output(result, lockfile)
+      lock(lockfile) do
         $stdout.puts result[:stdout]
         $stdout.flush
+      end
+    end
+
+    def lock(lockfile)
+      File.open(lockfile) do |lock|
+        lock.flock File::LOCK_EX
+        yield
       end
     end
 
