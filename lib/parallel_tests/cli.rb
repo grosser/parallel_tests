@@ -64,11 +64,11 @@ module ParallelTests
     end
 
     def report_output(result, lock)
-      lock.flock File::LOCK_EX
-      $stdout.puts result[:stdout]
-      $stdout.flush
-    ensure
-      lock.flock File::LOCK_UN
+      File.open(lock.path) do |open_lock|
+        open_lock.flock File::LOCK_EX
+        $stdout.puts result[:stdout]
+        $stdout.flush
+      end
     end
 
     def report_results(test_results)
