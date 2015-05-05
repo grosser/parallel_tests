@@ -72,8 +72,13 @@ module ParallelTests
 
     def lock(lockfile)
       File.open(lockfile) do |lock|
-        lock.flock File::LOCK_EX
-        yield
+        begin
+          lock.flock File::LOCK_EX
+          yield
+        ensure
+          # This shouldn't be necessary, but appears to be
+          lock.flock File::LOCK_UN
+        end
       end
     end
 
