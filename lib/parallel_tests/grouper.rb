@@ -25,7 +25,7 @@ module ParallelTests
 
         puts "Final Balance:"
         index = 0
-        groups.each { |g| puts "#{index += 1}: #{g[:size]}" }
+        groups.each { |g| puts "#{index += 1}: #{g[:size]}" } unless ENV['VERBOSE'] == 'false'
 
         groups.map!{|g| g[:items].sort }
       end
