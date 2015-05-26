@@ -60,8 +60,8 @@ describe ParallelTests::CLI do
 
     it 'returns a plain fail message if colors are nor supported' do
       subject.should_receive(:use_colors?).and_return(false)
-      subject.send(:final_fail_message).should ==  "Tests Failed"
-    end
+      subject.send(:final_fail_message).should ==  "Tests Failed" unless ENV['VERBOSE'] == 'false' 
+   end
 
     it 'returns a colorized fail message if colors are supported' do
       subject.should_receive(:use_colors?).and_return(true)
