@@ -23,7 +23,7 @@ module ParallelTests
           add_to_group(smallest, item, size)
         end
 
-        puts "Final Balance:" unless ENV['VERBOSE'] == 'false' 
+        { puts "Final Balance:" } unless ENV['VERBOSE'] == 'false' 
         index = 0
         groups.each { |g| puts "#{index += 1}: #{g[:size]}" } unless ENV['VERBOSE'] == 'false'
 
