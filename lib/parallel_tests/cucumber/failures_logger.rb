@@ -14,7 +14,7 @@ module ParallelTests
         unless @lines.empty?
           lock_output do
             @lines.each do |line|
-              @io.puts "#{feature.file}:#{line}"
+              @io.print "#{feature.file}:#{line}"
             end
           end
         end
