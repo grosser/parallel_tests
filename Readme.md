@@ -196,7 +196,7 @@ Options are:
     -v, --version                    Show Version
     -h, --help                       Show this.
 
-You can run any kind of code in parallel with -e / --execute
+You can run any kind of code in parallel with -e / --exec
 
     parallel_test -n 5 -e 'ruby -e "puts %[hello from process #{ENV[:TEST_ENV_NUMBER.to_s].inspect}]"'
     hello from process "2"
