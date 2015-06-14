@@ -182,7 +182,7 @@ Options are:
     -s, --single [PATTERN]           Run all matching files in the same process
     -i, --isolate                    Do not run any other tests in the group used by --single(-s)
         --only-group INT[, INT]
-    -e, --exec [COMMAND]             execute this code parallel and with ENV['TEST_ENV_NUM']
+    -e, --exec [COMMAND]             execute this code parallel and with ENV['TEST_ENV_NUMBER']
     -o, --test-options '[OPTIONS]'   execute test commands with those options
     -t, --type [TYPE]                test(default) / rspec / cucumber / spinach
         --serialize-stdout           Serialize stdout output, nothing will be written until everything is done
