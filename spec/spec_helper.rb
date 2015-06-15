@@ -150,6 +150,8 @@ RSpec.configure do |config|
   config.include SpecHelper
   config.extend SharedExamples
 
+  config.raise_errors_for_deprecations!
+
   # sometimes stuff hangs -> do not hang everything
   config.around do |example|
     Timeout::timeout(30, &example)
