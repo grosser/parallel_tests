@@ -18,7 +18,7 @@ describe ParallelTests::CLI do
     end
 
     it "parses execute" do
-      call(["--exec", "echo"]).should == {execute: "echo", files: []}
+      call(["--exec", "echo"]).should == {execute: "echo"}
     end
 
     it "parses regular count" do
@@ -67,6 +67,45 @@ describe ParallelTests::CLI do
 
       it "with a single group" do
         call(["test", "--only-group", '4']).should == defaults.merge(:only_group => [4], group_by: :filesize)
+      end
+    end
+
+    context "when the -- option separator is used" do
+      it "interprets arguments as files/directories" do
+        expect(call(%w(-- test))).to eq( files: %w(test))
+        expect(call(%w(-- test test2))).to eq( files: %w(test test2))
+        expect(call(%w(-- --foo test))).to eq( files: %w(--foo test))
+        expect(call(%w(-- test --foo test2))).to eq( files: %w(test --foo test2))
+
+      end
+
+      it "corectly handles arguments with spaces" do
+        expect(call(['--', 'file name with space'])).to eq( files: ['file name with space'])
+      end
+
+      context "when the -o options has also been given" do
+        it "merges the options together" do
+          expect(call(%w(-o '-f' -- test --foo test2))).to eq( files: %w(test --foo test2), test_options: "'-f'")
+        end
+      end
+
+      context "when a second -- option separator is used" do
+        it "interprets the first set as test_options" do
+          expect(call(%w(-- -r foo -- test))).to eq( files: %w(test), test_options: '-r foo')
+          expect(call(%w(-- -r foo -- test test2))).to eq( files: %w(test test2), test_options: '-r foo')
+          expect(call(%w(-- -r foo -o out.log -- test test2))).to eq( files: %w(test test2), test_options: '-r foo -o out.log')
+        end
+
+        context "when existing test_options have previously been given" do
+          it "appends the new options" do
+            expect(call(%w(-o '-f' -- -r foo.rb -- test))).to eq( files: %w(test), test_options: "'-f' -r foo.rb")
+          end
+          it "corectly handles argument values with spaces" do
+            argv = ["-o 'path with spaces1'", '--', '--out', 'path with spaces2', '--', 'foo']
+            expected_test_options = "'path with spaces1' --out path\\ with\\ spaces2"
+            expect(call(argv)).to eq( files: %w(foo), test_options: expected_test_options)
+          end
+        end
       end
     end
   end
