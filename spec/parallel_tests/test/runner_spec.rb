@@ -12,12 +12,16 @@ describe ParallelTests::Test::Runner do
 
     it "allows to override runner executable via PARALLEL_TESTS_EXECUTABLE" do
       ENV['PARALLEL_TESTS_EXECUTABLE'] = 'script/custom_rspec'
-      expect(ParallelTests::Test::Runner).to receive(:execute_command).with{|a,b,c,d| a.include?("script/custom_rspec") }
+      expect(ParallelTests::Test::Runner).to receive(:execute_command) do |a,b,c,d|
+        expect(a).to include("script/custom_rspec")
+      end
       call(['xxx'], 1, 22, {})
     end
 
     it "uses options" do
-      expect(ParallelTests::Test::Runner).to receive(:execute_command).with{|a,b,c,d| a =~ %r{ruby -Itest .* -- -v}}
+      expect(ParallelTests::Test::Runner).to receive(:execute_command) do |a,b,c,d|
+        expect(a).to match(%r{ruby -Itest .* -- -v})
+      end
       call(['xxx'], 1, 22, :test_options => '-v')
     end
 
@@ -392,7 +396,10 @@ EOF
       skip "too slow" if RUBY_PLATFORM == " java"
       run_with_file("$stdout.sync = true; puts 123; sleep 0.1; print 345; sleep 0.1; puts 567") do |path|
         received = ""
-        allow($stdout).to receive(:print).with{|x| received << x.strip }
+        allow($stdout).to receive(:print) do |x|
+          received << x.strip
+        end
+
         result = call("ruby #{path}", 1, 4, {})
         expect(received).to eq("123345567")
         expect(result).to eq({

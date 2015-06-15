@@ -95,7 +95,11 @@ describe ParallelTests do
       skip if RUBY_PLATFORM == "java"
       ENV["TEST_ENV_NUMBER"] = "2"
       counter = 0
-      allow(ParallelTests).to receive(:sleep).with{ sleep 0.1; counter += 1 }
+      allow(ParallelTests).to receive(:sleep) do
+        sleep 0.1;
+        counter += 1
+      end
+
       with_running_processes(2, 0.6) do
         ParallelTests.wait_for_other_processes_to_finish
       end

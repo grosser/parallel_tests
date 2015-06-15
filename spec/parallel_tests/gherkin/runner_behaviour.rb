@@ -13,12 +13,6 @@ shared_examples_for 'gherkin runners' do
       runner_class().run_tests(*args)
     end
 
-    def should_run_with(regex)
-      expect(ParallelTests::Test::Runner).to receive(:execute_command).with { |a, b, c, d|
-        expect(a).to match(regex)
-      }
-    end
-
     it "allows to override runner executable via PARALLEL_TESTS_EXECUTABLE" do
       ENV['PARALLEL_TESTS_EXECUTABLE'] = 'script/custom_rspec'
       should_run_with /script\/custom_rspec/
@@ -26,9 +20,9 @@ shared_examples_for 'gherkin runners' do
     end
 
     it "permits setting env options" do
-      expect(ParallelTests::Test::Runner).to receive(:execute_command).with { |a, b, c, options|
-        options[:env]["TEST"] == "ME"
-      }
+      expect(ParallelTests::Test::Runner).to receive(:execute_command) do |a, b, c, options|
+        expect(options[:env]["TEST"]).to eq("ME")
+      end
       call(['xxx'], 1, 22, {:env => {'TEST' => 'ME'}})
     end
 
@@ -196,10 +190,10 @@ shared_examples_for 'gherkin runners' do
     it 'groups cucumber invocation by feature files to achieve correct cucumber hook behaviour' do
       test_files = %w(features/a.rb:23 features/a.rb:44 features/b.rb:12)
 
-      expect(ParallelTests::Test::Runner).to receive(:execute_command).with { |a,b,c,d|
+      expect(ParallelTests::Test::Runner).to receive(:execute_command) do |a,b,c,d|
         argv = a.split(" ").last(2)
         expect(argv).to eq(["features/a.rb:23:44", "features/b.rb:12"])
-      }
+      end
 
       call(test_files, 1, 2, { :group_by => :scenarios })
     end

@@ -37,6 +37,18 @@ module SpecHelper
       yield root
     end
   end
+
+  def should_run_with(regex)
+    expect(ParallelTests::Test::Runner).to receive(:execute_command) do |a, b, c, d|
+      expect(a).to match(regex)
+    end
+  end
+
+  def should_not_run_with(regex)
+    expect(ParallelTests::Test::Runner).to receive(:execute_command) do |a, b, c, d|
+      expect(a).to_not match(regex)
+    end
+  end
 end
 
 module SharedExamples

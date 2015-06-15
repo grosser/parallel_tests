@@ -17,16 +17,11 @@ describe ParallelTests::RSpec::Runner do
       ParallelTests::RSpec::Runner.run_tests(*args)
     end
 
-    def should_run_with(regex)
-      expect(ParallelTests::Test::Runner).to receive(:execute_command).with{|a,b,c,d| a =~ regex}
-    end
-
-    def should_not_run_with(regex)
-      expect(ParallelTests::Test::Runner).to receive(:execute_command).with{|a,b,c,d| a !~ regex}
-    end
-
     it "runs command using nice when specifed" do
-      expect(ParallelTests::Test::Runner).to receive(:execute_command_and_capture_output).with{|a,b,c| b =~ %r{^nice rspec}}
+      expect(ParallelTests::Test::Runner).to receive(:execute_command_and_capture_output)do |a,b,c|
+        expect(b).to match(%r{^nice rspec})
+      end
+
       call('xxx', 1, 22, :nice => true)
     end
 
@@ -44,14 +39,20 @@ describe ParallelTests::RSpec::Runner do
 
     it "runs with color for rspec 1 when called for the cmdline" do
       expect(File).to receive(:file?).with('script/spec').and_return true
-      expect(ParallelTests::Test::Runner).to receive(:execute_command).with { |a, b, c, d| d[:env] == {"RSPEC_COLOR" => "1"} }
+      expect(ParallelTests::Test::Runner).to receive(:execute_command) do |a, b, c, d|
+        expect(d[:env]).to eq("RSPEC_COLOR" => "1")
+      end
+
       expect($stdout).to receive(:tty?).and_return true
       call('xxx', 1, 22, {})
     end
 
     it "runs without color for rspec 1 when not called for the cmdline" do
       expect(File).to receive(:file?).with('script/spec').and_return true
-      expect(ParallelTests::Test::Runner).to receive(:execute_command).with { |a, b, c, d| d[:env] == {} }
+      expect(ParallelTests::Test::Runner).to receive(:execute_command) do |a, b, c, d|
+        expect(d[:env]).to eq({})
+      end
+
       expect($stdout).to receive(:tty?).and_return false
       call('xxx', 1, 22, {})
     end
