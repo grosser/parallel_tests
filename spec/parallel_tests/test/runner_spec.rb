@@ -108,7 +108,18 @@ describe ParallelTests::Test::Runner do
         ParallelTests::Test::Runner.should_receive(:runtimes).
           and_return({"aaa" => 0, "bbb" => 3, "ccc" => 1, "ddd" => 2})
         result = call(["aaa", "bbb", "ccc", "ddd", "eee"], 3, isolate: true, single_process: [/^aaa/], group_by: :runtime)
-        result.should == [["aaa"], ["bbb", "eee"], ["ccc", "ddd"]]
+
+        isolated, *groups = result
+        isolated.should == ["aaa"]
+        actual = groups.map(&:to_set).to_set
+
+        # both eee and ccs are the same size, so either can be in either group
+        valid_combinations = [
+          [["bbb", "eee"], ["ccc", "ddd"]].map(&:to_set).to_set,
+          [["bbb", "ccc"], ["eee", "ddd"]].map(&:to_set).to_set
+        ]
+
+        valid_combinations.should include(actual)
       end
     end
   end
