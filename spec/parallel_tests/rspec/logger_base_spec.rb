@@ -16,13 +16,13 @@ describe ParallelTests::RSpec::LoggerBase do
     end
 
     it 'should close output' do
-      @temp_file.should_receive(:close)
+      expect(@temp_file).to receive(:close)
       @logger.close
     end
 
     it 'should not close stdout' do
       @logger = ParallelTests::RSpec::LoggerBase.new($stdout)
-      $stdout.should_not_receive(:close)
+      expect($stdout).not_to receive(:close)
       @logger.close
     end
 

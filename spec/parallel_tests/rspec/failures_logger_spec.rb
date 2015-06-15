@@ -10,10 +10,10 @@ describe ParallelTests::RSpec::FailuresLogger do
 
   before do
     @output     = OutputLogger.new([])
-    @example1   = mock( 'example', :location => "#{Dir.pwd}/spec/path/to/example:123", :full_description => 'should do stuff', :description => 'd' )
-    @example2   = mock( 'example', :location => "#{Dir.pwd}/spec/path/to/example2:456", :full_description => 'should do other stuff', :description => 'd')
-    @exception1 = mock( :to_s => 'exception', :backtrace => [ '/path/to/error/line:33' ] )
-    @failure1   = mock( 'example', :location => "#{Dir.pwd}/example:123", :header => 'header', :exception => @exception1 )
+    @example1   = double( 'example', :location => "#{Dir.pwd}/spec/path/to/example:123", :full_description => 'should do stuff', :description => 'd' )
+    @example2   = double( 'example', :location => "#{Dir.pwd}/spec/path/to/example2:456", :full_description => 'should do other stuff', :description => 'd')
+    @exception1 = double( :to_s => 'exception', :backtrace => [ '/path/to/error/line:33' ] )
+    @failure1   = double( 'example', :location => "#{Dir.pwd}/example:123", :header => 'header', :exception => @exception1 )
     @logger = ParallelTests::RSpec::FailuresLogger.new(@output)
   end
 
@@ -32,31 +32,31 @@ describe ParallelTests::RSpec::FailuresLogger do
     @logger.dump_failures
     @logger.dump_summary(1,2,3,4)
 
-    clean_output.should =~ /^rspec .*? should do stuff/
-    clean_output.should =~ /^rspec .*? should do other stuff/
+    expect(clean_output).to match(/^rspec .*? should do stuff/)
+    expect(clean_output).to match(/^rspec .*? should do other stuff/)
   end
 
   it "should invoke spec for rspec 1" do
     silence_warnings{ ParallelTests::RSpec::LoggerBase::RSPEC_1 = true }
-    ParallelTests.stub!(:bundler_enabled?).and_return true
-    ParallelTests::RSpec::Runner.stub!(:run).with("bundle show rspec-core").and_return "Could not find gem 'rspec-core'."
+    allow(ParallelTests).to receive(:bundler_enabled?).and_return true
+    allow(ParallelTests::RSpec::Runner).to receive(:run).with("bundle show rspec-core").and_return "Could not find gem 'rspec-core'."
     @logger.example_failed @example1
 
     @logger.dump_failures
     @logger.dump_summary(1,2,3,4)
 
-    clean_output.should =~ /^bundle exec spec/
+    expect(clean_output).to match(/^bundle exec spec/)
   end
 
   it "should invoke rspec for rspec 2" do
-    ParallelTests.stub!(:bundler_enabled?).and_return true
-    ParallelTests::RSpec::Runner.stub!(:run).with("bundle show rspec").and_return "/foo/bar/rspec-core-2.0.2"
+    allow(ParallelTests).to receive(:bundler_enabled?).and_return true
+    allow(ParallelTests::RSpec::Runner).to receive(:run).with("bundle show rspec").and_return "/foo/bar/rspec-core-2.0.2"
     @logger.example_failed @example1
 
     @logger.dump_failures
     @logger.dump_summary(1,2,3,4)
 
-    clean_output.should =~ /^rspec/
+    expect(clean_output).to match(/^rspec/)
   end
 
   it "should return relative paths" do
@@ -66,17 +66,17 @@ describe ParallelTests::RSpec::FailuresLogger do
     @logger.dump_failures
     @logger.dump_summary(1,2,3,4)
 
-    clean_output.should =~ %r(\./spec/path/to/example:123)
-    clean_output.should =~ %r(\./spec/path/to/example2:456)
+    expect(clean_output).to match(%r(\./spec/path/to/example:123))
+    expect(clean_output).to match(%r(\./spec/path/to/example2:456))
   end
 
 
   # should not longer be a problem since its using native rspec methods
   xit "should not log examples without location" do
-    example = mock('example', :location => 'bla', :full_description => 'before :all')
+    example = double('example', :location => 'bla', :full_description => 'before :all')
     @logger.example_failed example
     @logger.dump_failures
     @logger.dump_summary(1,2,3,4)
-    clean_output.should == ''
+    expect(clean_output).to eq('')
   end
 end

@@ -39,10 +39,10 @@ describe ParallelTests::Test::RuntimeLogger do
 
       # log looking good ?
       lines = File.read("tmp/parallel_runtime_test.log").split("\n").sort.map { |x|x .sub!(/\d$/, '') }
-      lines.should == [
+      expect(lines).to eq([
         "test/0_test.rb:0.7",
         "test/1_test.rb:0.7",
-      ]
+      ])
     end
   end
 
@@ -56,10 +56,10 @@ describe ParallelTests::Test::RuntimeLogger do
 
       # log looking good ?
       lines = File.read("tmp/parallel_runtime_test.log").split("\n").sort.map { |x| x.sub(/\d$/, "") }
-      lines.should == [
+      expect(lines).to eq([
         "test/0_test.rb:0.7",
         "test/1_test.rb:0.7",
-      ]
+      ])
       FileUtils.rm("tmp/parallel_runtime_test.log")
     end
   end
@@ -93,10 +93,10 @@ describe ParallelTests::Test::RuntimeLogger do
 
       # log looking good ?
       lines = File.read("tmp/parallel_runtime_test.log").split("\n").sort.map { |x| x.sub(/\d$/, "") }
-      lines.should == [
+      expect(lines).to eq([
         "test/0_test.rb:0.7",
         "test/1_test.rb:0.7",
-      ]
+      ])
     end
   end
 end

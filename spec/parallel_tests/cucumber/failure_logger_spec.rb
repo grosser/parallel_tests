@@ -6,15 +6,15 @@ describe ParallelTests::Cucumber::FailuresLogger do
 
   before do
     @output = OutputLogger.new([])
-    @output.stub(:write)
+    allow(@output).to receive(:write)
 
     @logger1 = ParallelTests::Cucumber::FailuresLogger.new(nil, @output, nil)
     @logger2 = ParallelTests::Cucumber::FailuresLogger.new(nil, @output, nil)
     @logger3 = ParallelTests::Cucumber::FailuresLogger.new(nil, @output, nil)
 
-    @feature1 = mock('feature', :file => "feature/path/to/feature1.feature")
-    @feature2 = mock('feature', :file => "feature/path/to/feature2.feature")
-    @feature3 = mock('feature', :file => "feature/path/to/feature3.feature")
+    @feature1 = double('feature', :file => "feature/path/to/feature1.feature")
+    @feature2 = double('feature', :file => "feature/path/to/feature2.feature")
+    @feature3 = double('feature', :file => "feature/path/to/feature3.feature")
 
     @logger1.instance_variable_set("@lines", [1, 2, 3])
     @logger2.instance_variable_set("@lines", [2, 4, 6])
@@ -28,7 +28,7 @@ describe ParallelTests::Cucumber::FailuresLogger do
 
     output_file_contents = @output.output.join("\n").concat("\n")
 
-    output_file_contents.should == <<END
+    expect(output_file_contents).to eq <<END
 feature/path/to/feature1.feature:1
 feature/path/to/feature1.feature:2
 feature/path/to/feature1.feature:3

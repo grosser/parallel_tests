@@ -20,7 +20,7 @@ describe ParallelTests::Cucumber::Runner do
           "Failing Scenarios:", "cucumber features/failure:3", "cucumber features/failure:4",
           "Failing Scenarios:", "cucumber features/failure:5", "cucumber features/failure:6"
         ]
-        call(results).should == "Failing Scenarios:\ncucumber features/failure:1\ncucumber features/failure:2\ncucumber features/failure:3\ncucumber features/failure:4\ncucumber features/failure:5\ncucumber features/failure:6\n\n"
+        expect(call(results)).to eq("Failing Scenarios:\ncucumber features/failure:1\ncucumber features/failure:2\ncucumber features/failure:3\ncucumber features/failure:4\ncucumber features/failure:5\ncucumber features/failure:6\n\n")
       end
     end
   end

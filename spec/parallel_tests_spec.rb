@@ -3,7 +3,7 @@ require "spec_helper"
 describe ParallelTests do
   describe ".determine_number_of_processes" do
     before do
-      Parallel.stub(:processor_count).and_return 20
+      allow(Parallel).to receive(:processor_count).and_return 20
     end
 
     def call(count)
@@ -11,50 +11,50 @@ describe ParallelTests do
     end
 
     it "uses the given count if set" do
-      call('5').should == 5
+      expect(call('5')).to eq(5)
     end
 
     it "uses the processor count from Parallel" do
-      call(nil).should == 20
+      expect(call(nil)).to eq(20)
     end
 
     it "uses the processor count from ENV before Parallel" do
       ENV['PARALLEL_TEST_PROCESSORS'] = '22'
-      call(nil).should == 22
+      expect(call(nil)).to eq(22)
     end
 
     it "does not use blank count" do
-      call('   ').should == 20
+      expect(call('   ')).to eq(20)
     end
 
     it "does not use blank env" do
       ENV['PARALLEL_TEST_PROCESSORS'] = '   '
-      call(nil).should == 20
+      expect(call(nil)).to eq(20)
     end
   end
 
   describe ".bundler_enabled?" do
     before do
-      Object.stub!(:const_defined?).with(:Bundler).and_return false
+      allow(Object).to receive(:const_defined?).with(:Bundler).and_return false
     end
 
     it "is false" do
       use_temporary_directory do
-        ParallelTests.send(:bundler_enabled?).should == false
+        expect(ParallelTests.send(:bundler_enabled?)).to eq(false)
       end
     end
 
     it "is true when there is a constant called Bundler" do
       use_temporary_directory do
-        Object.stub!(:const_defined?).with(:Bundler).and_return true
-        ParallelTests.send(:bundler_enabled?).should == true
+        allow(Object).to receive(:const_defined?).with(:Bundler).and_return true
+        expect(ParallelTests.send(:bundler_enabled?)).to eq(true)
       end
     end
 
     it "is true when there is a Gemfile" do
       use_temporary_directory do
         FileUtils.touch("Gemfile")
-        ParallelTests.send(:bundler_enabled?).should == true
+        expect(ParallelTests.send(:bundler_enabled?)).to eq(true)
       end
     end
 
@@ -63,7 +63,7 @@ describe ParallelTests do
         FileUtils.mkdir "nested"
         Dir.chdir "nested" do
           FileUtils.touch(File.join("..", "Gemfile"))
-          ParallelTests.send(:bundler_enabled?).should == true
+          expect(ParallelTests.send(:bundler_enabled?)).to eq(true)
         end
       end
     end
@@ -79,61 +79,61 @@ describe ParallelTests do
     end
 
     it "does not wait if not run in parallel" do
-      ParallelTests.should_not_receive(:sleep)
+      expect(ParallelTests).not_to receive(:sleep)
       ParallelTests.wait_for_other_processes_to_finish
     end
 
     it "stops if only itself is running" do
       ENV["TEST_ENV_NUMBER"] = "2"
-      ParallelTests.should_not_receive(:sleep)
+      expect(ParallelTests).not_to receive(:sleep)
       with_running_processes(1) do
         ParallelTests.wait_for_other_processes_to_finish
       end
     end
 
     it "waits for other processes to finish" do
-      pending if RUBY_PLATFORM == "java"
+      skip if RUBY_PLATFORM == "java"
       ENV["TEST_ENV_NUMBER"] = "2"
       counter = 0
-      ParallelTests.stub(:sleep).with{ sleep 0.1; counter += 1 }
+      allow(ParallelTests).to receive(:sleep).with{ sleep 0.1; counter += 1 }
       with_running_processes(2, 0.6) do
         ParallelTests.wait_for_other_processes_to_finish
       end
-      counter.should >= 2
+      expect(counter).to be >= 2
     end
   end
 
   describe ".number_of_running_processes" do
     it "is 0 for nothing" do
-      ParallelTests.number_of_running_processes.should == 0
+      expect(ParallelTests.number_of_running_processes).to eq(0)
     end
 
     it "is 2 when 2 are running" do
       wait = 0.2
       2.times { Thread.new { `TEST_ENV_NUMBER=1; sleep #{wait}` } }
       sleep wait / 2
-      ParallelTests.number_of_running_processes.should == 2
+      expect(ParallelTests.number_of_running_processes).to eq(2)
       sleep wait
     end
   end
 
   describe ".first_process?" do
     it "is first if no env is set" do
-      ParallelTests.first_process?.should == true
+      expect(ParallelTests.first_process?).to eq(true)
     end
 
     it "is first if env is set to blank" do
       ENV["TEST_ENV_NUMBER"] = ""
-      ParallelTests.first_process?.should == true
+      expect(ParallelTests.first_process?).to eq(true)
     end
 
     it "is not first if env is set to something" do
       ENV["TEST_ENV_NUMBER"] = "2"
-      ParallelTests.first_process?.should == false
+      expect(ParallelTests.first_process?).to eq(false)
     end
   end
 
   it "has a version" do
-    ParallelTests::VERSION.should =~ /^\d+\.\d+\.\d+/
+    expect(ParallelTests::VERSION).to match(/^\d+\.\d+\.\d+/)
   end
 end
