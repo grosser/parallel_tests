@@ -139,7 +139,7 @@ describe 'CLI' do
   end
 
   context "with given commands" do
-    it "can exec given commands with ENV['TEST_ENV_NUM']" do
+    it "can exec given commands with ENV['TEST_ENV_NUMBER']" do
       result = `#{executable} -e 'ruby -e "print ENV[:TEST_ENV_NUMBER.to_s].to_i"' -n 4`
       result.gsub('"','').split('').sort.should == %w[0 2 3 4]
     end

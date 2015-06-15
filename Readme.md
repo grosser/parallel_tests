@@ -182,7 +182,7 @@ Options are:
     -s, --single [PATTERN]           Run all matching files in the same process
     -i, --isolate                    Do not run any other tests in the group used by --single(-s)
         --only-group INT[, INT]
-    -e, --exec [COMMAND]             execute this code parallel and with ENV['TEST_ENV_NUM']
+    -e, --exec [COMMAND]             execute this code parallel and with ENV['TEST_ENV_NUMBER']
     -o, --test-options '[OPTIONS]'   execute test commands with those options
     -t, --type [TYPE]                test(default) / rspec / cucumber / spinach
         --serialize-stdout           Serialize stdout output, nothing will be written until everything is done
@@ -196,7 +196,7 @@ Options are:
     -v, --version                    Show Version
     -h, --help                       Show this.
 
-You can run any kind of code in parallel with -e / --execute
+You can run any kind of code in parallel with -e / --exec
 
     parallel_test -n 5 -e 'ruby -e "puts %[hello from process #{ENV[:TEST_ENV_NUMBER.to_s].inspect}]"'
     hello from process "2"
