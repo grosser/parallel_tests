@@ -164,11 +164,11 @@ Setup for non-rails
 
  - use `ENV['TEST_ENV_NUMBER']` inside your tests to select separate db/memcache/etc.
  - Only run selected files & folders:
- 
+
     `parallel_test test/bar test/baz/foo_text.rb`
 
  - Pass test-options and files via `--`:
- 
+
     `parallel_test -- -t acceptance -f progress -- spec/foo_spec.rb spec/acceptance`
 
 Options are:
@@ -315,6 +315,7 @@ inspired by [pivotal labs](http://pivotallabs.com/users/miked/blog/articles/849-
  - [Mike Mueller](https://github.com/mmueller)
  - [Aaron Jensen](https://github.com/aaronjensen)
  - [Ed Slocomb](https://github.com/edslocomb)
+ - [Cezary Baginski](https://github.com/e2)
 
 [Michael Grosser](http://grosser.it)<br/>
 michael@grosser.it<br/>
