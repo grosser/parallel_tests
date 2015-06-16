@@ -1,6 +1,7 @@
 require 'optparse'
 require 'tempfile'
 require 'parallel_tests'
+require 'shellwords'
 
 module ParallelTests
   class CLI
@@ -141,7 +142,7 @@ module ParallelTests
         opts.on("--only-group INT[, INT]", Array) { |groups| options[:only_group] = groups.map(&:to_i) }
 
         opts.on("-e", "--exec [COMMAND]", "execute this code parallel and with ENV['TEST_ENV_NUMBER']") { |path| options[:execute] = path }
-        opts.on("-o", "--test-options '[OPTIONS]'", "execute test commands with those options") { |arg| options[:test_options] = arg }
+        opts.on("-o", "--test-options '[OPTIONS]'", "execute test commands with those options") { |arg| options[:test_options] = arg.lstrip }
         opts.on("-t", "--type [TYPE]", "test(default) / rspec / cucumber / spinach") do |type|
           begin
             @runner = load_runner(type)
@@ -167,9 +168,13 @@ module ParallelTests
         options[:non_parallel] = true
       end
 
-      abort "Pass files or folders to run" if argv.empty? && !options[:execute]
+      files, remaining = extract_file_paths(argv)
+      unless options[:execute]
+        abort "Pass files or folders to run" unless files.any?
+        options[:files] = files
+      end
 
-      options[:files] = argv
+      append_test_options(options, remaining)
 
       options[:group_by] ||= :filesize if options[:only_group]
 
@@ -180,6 +185,25 @@ module ParallelTests
       end
 
       options
+    end
+
+    def extract_file_paths(argv)
+      dash_index = argv.rindex("--")
+      file_args_at = (dash_index || -1) + 1
+      [argv[file_args_at..-1], argv[0...(dash_index || 0)]]
+    end
+
+    def extract_test_options(argv)
+      dash_index = argv.index("--") || -1
+      argv[dash_index+1..-1]
+    end
+
+    def append_test_options(options, argv)
+      new_opts = extract_test_options(argv)
+      return if new_opts.empty?
+
+      prev_and_new = [options[:test_options], new_opts.shelljoin]
+      options[:test_options] = prev_and_new.compact.join(' ')
     end
 
     def load_runner(type)

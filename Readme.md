@@ -183,7 +183,7 @@ Options are:
     -i, --isolate                    Do not run any other tests in the group used by --single(-s)
         --only-group INT[, INT]
     -e, --exec [COMMAND]             execute this code parallel and with ENV['TEST_ENV_NUMBER']
-    -o, --test-options '[OPTIONS]'   execute test commands with those options
+    -o, --test-options '[OPTIONS]'   execute test commands with those options (see Test Options below)
     -t, --type [TYPE]                test(default) / rspec / cucumber / spinach
         --serialize-stdout           Serialize stdout output, nothing will be written until everything is done
         --combine-stderr             Combine stderr into stdout, useful in conjunction with --serialize-stdout
@@ -210,6 +210,31 @@ You can run any kind of code in parallel with -e / --exec
 <tr><td>RSpec spec-suite</td><td>18s</td><td>14s</td><td>10s</td></tr>
 <tr><td>Rails-ActionPack</td><td>88s</td><td>53s</td><td>44s</td></tr>
 </table>
+
+Test Options
+============
+
+While the '-o' option allows you to pass any arguments to the test tool, you
+may find it more convenient to pass test tool options and paths by separating
+them with two '--'s, e.g. like this:
+
+    parallel_test -- -t acceptance -f progress -- spec/foo_spec.rb spec/acceptance
+
+which is more similar to how you'd run things without parallel_test:
+
+    rspec -t acceptance -f progress -- spec/foo_spec.rb spec/acceptance
+
+instead of using the '-o' option for the same thing:
+
+    parallel_test -o '-t acceptance -f progress' spec/foo_spec.rb spec/acceptance
+
+This should make it easier to integrate parallel_test with other tools, e.g.
+you could create a shell alias:
+
+    alias prspec='parallel_rspec -m 2 --'
+
+to easily switch between rspec and parallel_rspec.
+
 
 TIPS
 ====
