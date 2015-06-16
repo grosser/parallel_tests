@@ -107,8 +107,11 @@ module ParallelTests
         opts.banner = <<-BANNER.gsub(/^          /, '')
           Run all tests in parallel, giving each process ENV['TEST_ENV_NUMBER'] ('', '2', '3', ...)
 
-          [optional] Only run selected files & folders:
-              parallel_test test/bar test/baz/xxx_text.rb
+          [optional] Only selected files & folders:
+            parallel_test test/bar test/baz/xxx_text.rb
+
+          [optional] Pass test-options and files via `--`:
+            parallel_test -- -t acceptance -f progress -- spec/foo_spec.rb spec/acceptance
 
           Options are:
         BANNER
