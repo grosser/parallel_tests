@@ -2,3 +2,4 @@
 tmp
 .bundle
 vendor
+**/*.gem
