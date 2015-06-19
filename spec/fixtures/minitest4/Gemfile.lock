@@ -8,7 +8,7 @@ GEM
   remote: https://rubygems.org/
   specs:
     minitest (4.7.5)
-    parallel (1.4.0)
+    parallel (1.6.0)
 
 PLATFORMS
   ruby

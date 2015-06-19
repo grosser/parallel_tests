@@ -102,7 +102,7 @@ namespace :parallel do
   # just load the schema (good for integration server <-> no development db)
   desc "load dumped schema for test databases via db:schema:load --> parallel:load_schema[num_cpus]"
   task :load_schema, :count do |t,args|
-    command = "rake db:schema:load RAILS_ENV=#{ParallelTests::Tasks.rails_env}"
+    command = "rake db:test:purge db:schema:load RAILS_ENV=#{ParallelTests::Tasks.rails_env}"
     ParallelTests::Tasks.run_in_parallel(ParallelTests::Tasks.suppress_output(command, "^   ->\\|^-- "), args)
   end
 
