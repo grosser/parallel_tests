@@ -17,7 +17,7 @@ gem "parallel_tests", :group => :development
 ParallelTests uses 1 database per test-process.
 <table>
   <tr><td>Process number</td><td>1</td><td>2</td><td>3</td></tr>
-  <tr><td>`ENV['TEST_ENV_NUMBER']`</td><td>''</td><td>'2'</td><td>'3'</td></tr>
+  <tr><td>ENV['TEST_ENV_NUMBER']</td><td>''</td><td>'2'</td><td>'3'</td></tr>
 </table>
 
 ```yaml
