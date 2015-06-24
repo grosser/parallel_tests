@@ -9,7 +9,7 @@ Setup for Rails
 
 ```ruby
 # Gemfile
-gem "parallel_tests", :group => :development
+gem "parallel_tests", group: :development
 ```
 
 ### Add to `config/database.yml`
