@@ -1,4 +1,4 @@
 *.sh
 tmp
 .bundle
-vendor
+**/vendor/bundle

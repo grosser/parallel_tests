@@ -9,7 +9,7 @@ Setup for Rails
 
 ```ruby
 # Gemfile
-gem "parallel_tests", :group => :development
+gem "parallel_tests", group: :development
 ```
 
 ### Add to `config/database.yml`
@@ -240,7 +240,6 @@ TIPS
 TODO
 ====
  - fix tests vs cucumber >= 1.2 `unknown option --format`
- - add integration tests for the rake tasks, maybe generate a rails project ...
  - add unit tests for cucumber runtime formatter
  - make windows compatible
 
