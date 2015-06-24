@@ -240,7 +240,6 @@ TIPS
 TODO
 ====
  - fix tests vs cucumber >= 1.2 `unknown option --format`
- - add integration tests for the rake tasks, maybe generate a rails project ...
  - add unit tests for cucumber runtime formatter
  - make windows compatible
 
