@@ -7,6 +7,7 @@ module ParallelTests
         attr_reader :scenarios
 
         def initialize(tag_expression = ::Gherkin::TagExpression.new([]))
+          raise "ScenarioLineLogger not supported anymore after upgrading to Cucumber 2.0, please fix!"
           @scenarios = []
           @tag_expression = tag_expression
         end
