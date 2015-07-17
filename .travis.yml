@@ -6,6 +6,7 @@ rvm:
   - jruby-head
 branches:
   only: [master]
+sudo: false
 cache: bundler
 matrix:
   allow_failures:
