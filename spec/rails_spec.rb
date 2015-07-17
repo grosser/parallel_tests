@@ -19,7 +19,7 @@ describe 'rails' do
           ENV.delete("RAILS_ENV")
           ENV.delete("RACK_ENV")
 
-          sh "bundle --local --deployment --path vendor/bundle"
+          sh "bundle --local --path vendor/bundle"
           sh "rm -rf db/*.sqlite3"
           sh "bundle exec rake db:setup parallel:create 2>&1"
           sh "bundle exec rake parallel:prepare"
