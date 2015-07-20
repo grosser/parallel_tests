@@ -15,6 +15,7 @@ ParallelTests::RSpec::LoggerBaseBase = base
 
 class ParallelTests::RSpec::LoggerBase < ParallelTests::RSpec::LoggerBaseBase
   RSPEC_1 = !defined?(RSpec::Core::Formatters::BaseTextFormatter) # do not test for Spec, this will trigger deprecation warning in rspec 2
+  RSPEC_2 = !RSPEC_1 && RSpec::Core::Version::STRING.start_with?('2')
   RSPEC_3 = !RSPEC_1 && RSpec::Core::Version::STRING.start_with?('3')
 
   def initialize(*args)
@@ -32,12 +33,12 @@ class ParallelTests::RSpec::LoggerBase < ParallelTests::RSpec::LoggerBaseBase
     end
   end
 
-  protected
-
   #stolen from Rspec
   def close(*args)
     @output.close  if (IO === @output) & (@output != $stdout)
   end
+
+  protected
 
   # do not let multiple processes get in each others way
   def lock_output

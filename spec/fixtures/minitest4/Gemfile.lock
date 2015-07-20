@@ -1,0 +1,21 @@
+PATH
+  remote: ../../../
+  specs:
+    parallel_tests (1.4.0)
+      parallel
+
+GEM
+  remote: https://rubygems.org/
+  specs:
+    minitest (4.7.5)
+    parallel (1.6.0)
+
+PLATFORMS
+  ruby
+
+DEPENDENCIES
+  minitest (~> 4.7.5)
+  parallel_tests!
+
+BUNDLED WITH
+   1.10.2

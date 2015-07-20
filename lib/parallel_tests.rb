@@ -1,4 +1,3 @@
-require "rubygems"
 require "parallel"
 require "parallel_tests/railtie" if defined? Rails::Railtie
 require "rbconfig"
@@ -34,7 +33,7 @@ module ParallelTests
 
       until !File.directory?(current) || current == previous
         filename = File.join(current, "Gemfile")
-        return true if File.exists?(filename)
+        return true if File.exist?(filename)
         current, previous = File.expand_path("..", current), current
       end
 
@@ -64,6 +63,12 @@ module ParallelTests
       else
         Time.now
       end
+    end
+
+    def delta
+      before = now.to_f
+      yield
+      now.to_f - before
     end
   end
 end

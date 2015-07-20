@@ -25,8 +25,8 @@ module ParallelTests
         end
 
         def run_tests(test_files, process_number, num_processes, options)
-          require_list = test_files.map { |filename| %{"#{File.expand_path filename}"} }.join(",")
-          cmd = "#{executable} -Itest -e '[#{require_list}].each {|f| require f }' -- #{options[:test_options]}"
+          require_list = test_files.map { |file| file.sub(" ", "\\ ") }.join(" ")
+          cmd = "#{executable} -Itest -e '%w[#{require_list}].each { |f| require %{./\#{f}} }' -- #{options[:test_options]}"
           execute_command(cmd, process_number, num_processes, options)
         end
 
@@ -39,24 +39,45 @@ module ParallelTests
 
         # finds all tests and partitions them into groups
         def tests_in_groups(tests, num_groups, options={})
-          tests = find_tests(tests, options)
-
-          tests = if options[:group_by] == :found
-            tests.map { |t| [t, 1] }
-          elsif options[:group_by] == :filesize
-            with_filesize_info(tests)
-          else
-            with_runtime_info(tests, options)
-          end
+          tests = tests_with_size(tests, options)
           Grouper.in_even_groups_by_size(tests, num_groups, options)
         end
 
-        def execute_command(cmd, process_number,  num_processes, options)
+        def tests_with_size(tests, options)
+          tests = find_tests(tests, options)
+
+          case options[:group_by]
+          when :found
+            tests.map! { |t| [t, 1] }
+          when :filesize
+            sort_by_filesize(tests)
+          when :runtime
+            sort_by_runtime(tests, runtimes(tests, options), options.merge(allowed_missing: 0.5))
+          when nil
+            # use recorded test runtime if we got enough data
+            runtimes = runtimes(tests, options) rescue []
+            if runtimes.size * 1.5 > tests.size
+              puts "Using recorded test runtime"
+              sort_by_runtime(tests, runtimes)
+            else
+              sort_by_filesize(tests)
+            end
+          else
+            raise ArgumentError, "Unsupported option #{options[:group_by]}"
+          end
+
+          tests
+        end
+
+        def execute_command(cmd, process_number, num_processes, options)
           env = (options[:env] || {}).merge(
             "TEST_ENV_NUMBER" => test_env_number(process_number),
             "PARALLEL_TEST_GROUPS" => num_processes
           )
           cmd = "nice #{cmd}" if options[:nice]
+          cmd = "#{cmd} 2>&1" if options[:combine_stderr]
+          puts cmd if options[:verbose]
+
           execute_command_and_capture_output(env, cmd, options[:serialize_stdout])
         end
 
@@ -120,6 +141,9 @@ module ParallelTests
           loop do
             begin
               read = out.readpartial(1000000) # read whatever chunk we can get
+              if Encoding.default_internal
+                read = read.force_encoding(Encoding.default_internal)
+              end
               result << read
               unless silence
                 $stdout.print read
@@ -130,28 +154,41 @@ module ParallelTests
           result
         end
 
-        def with_runtime_info(tests, options = {})
-          log = options[:runtime_log] || runtime_log
-          lines = File.read(log).split("\n") rescue []
+        def sort_by_runtime(tests, runtimes, options={})
+          allowed_missing = options[:allowed_missing] || 1.0
+          allowed_missing = tests.size * allowed_missing
 
-          # use recorded test runtime if we got enough data
-          if lines.size * 1.5 > tests.size
-            puts "Using recorded test runtime: #{log}"
-            times = Hash.new(1)
-            lines.each do |line|
-              test, time = line.split(":")
-              next unless test and time
-              times[File.expand_path(test)] = time.to_f
-            end
-            tests.sort.map{|test| [test, times[File.expand_path(test)]] }
-          else # use file sizes
-            with_filesize_info(tests)
+          # set know runtime for each test
+          tests.sort!
+          tests.map! do |test|
+            allowed_missing -= 1 unless time = runtimes[test]
+            raise "Too little runtime info" if allowed_missing < 0
+            [test, time]
+          end
+
+          if options[:verbose]
+            puts "Runtime found for #{tests.count(&:last)} of #{tests.size} tests"
+          end
+
+          # fill gaps with average runtime
+          known, unknown = tests.partition(&:last)
+          average = (known.any? ? known.map!(&:last).inject(:+) / known.size : 1)
+          unknown.each { |set| set[1] = average }
+        end
+
+        def runtimes(tests, options)
+          log = options[:runtime_log] || runtime_log
+          lines = File.read(log).split("\n")
+          lines.each_with_object({}) do |line, times|
+            test, time = line.split(":", 2)
+            next unless test and time
+            times[test] = time.to_f if tests.include?(test)
           end
         end
 
-        def with_filesize_info(tests)
-          # use filesize to group files
-          tests.sort.map { |test| [test, File.stat(test).size] }
+        def sort_by_filesize(tests)
+          tests.sort!
+          tests.map! { |test| [test, File.stat(test).size] }
         end
 
         def find_tests(tests, options = {})

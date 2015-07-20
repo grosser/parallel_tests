@@ -19,10 +19,10 @@ describe ParallelTests::Grouper do
       end
 
       # testing inside mktmpdir is always green
-      result.should =~ [
+      expect(result).to match_array([
         ["#{tmpdir}/a.feature", "#{tmpdir}/c.feature"],
         ["#{tmpdir}/b.feature"]
-      ]
+      ])
     end
   end
 
@@ -34,19 +34,19 @@ describe ParallelTests::Grouper do
     end
 
     it "groups 1 by 1 for same groups as size" do
-      call(5).should == [["5"], ["4"], ["3"], ["2"], ["1"]]
+      expect(call(5)).to eq([["5"], ["4"], ["3"], ["2"], ["1"]])
     end
 
     it "groups into even groups" do
-      call(2).should ==  [["1", "2", "5"], ["3", "4"]]
+      expect(call(2)).to eq([["1", "2", "5"], ["3", "4"]])
     end
 
     it "groups into a single group" do
-      call(1).should == [["1", "2", "3", "4", "5"]]
+      expect(call(1)).to eq([["1", "2", "3", "4", "5"]])
     end
 
     it "adds empty groups if there are more groups than feature files" do
-      call(6).should == [["5"], ["4"], ["3"], ["2"], ["1"], []]
+      expect(call(6)).to eq([["5"], ["4"], ["3"], ["2"], ["1"], []])
     end
   end
 
@@ -54,7 +54,7 @@ describe ParallelTests::Grouper do
     let(:feature_file) { double 'file' }
 
     it 'splits a feature into individual scenarios' do
-      ParallelTests::Cucumber::Scenarios.should_receive(:all).and_return({ 'feature_file:3' => 1 })
+      expect(ParallelTests::Cucumber::Scenarios).to receive(:all).and_return({ 'feature_file:3' => 1 })
       ParallelTests::Grouper.by_scenarios([feature_file], 1)
     end
   end

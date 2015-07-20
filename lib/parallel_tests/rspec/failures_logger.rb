@@ -2,26 +2,24 @@ require 'parallel_tests/rspec/logger_base'
 require 'parallel_tests/rspec/runner'
 
 class ParallelTests::RSpec::FailuresLogger < ParallelTests::RSpec::LoggerBase
-  if RSPEC_3
-    RSpec::Core::Formatters.register self, :dump_failures, :dump_summary
-  end
-
-  # RSpec 1: does not keep track of failures, so we do
-  def example_failed(example, *args)
-    if RSPEC_1
-      @failed_examples ||= []
-      @failed_examples << example
-    else
-      super
-    end
-  end
-
   if RSPEC_1
+    # RSpec 1: does not keep track of failures, so we do
+    def example_failed(example, *args)
+      if RSPEC_1
+        @failed_examples ||= []
+        @failed_examples << example
+      else
+        super
+      end
+    end
+
     def dump_failure(*args)
     end
-  else
+  elsif RSPEC_2
     def dump_failures(*args)
     end
+  else
+    RSpec::Core::Formatters.register self, :dump_summary
   end
 
   def dump_summary(*args)

@@ -1,2 +1,3 @@
 --color
---backtrace
+--order random
+--exclude-pattern spec/fixtures/minitest4/vendor/bundle/**/*

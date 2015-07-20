@@ -1,6 +1,7 @@
 require 'optparse'
 require 'tempfile'
 require 'parallel_tests'
+require 'shellwords'
 
 module ParallelTests
   class CLI
@@ -23,7 +24,7 @@ module ParallelTests
       Tempfile.open 'parallel_tests-lock' do |lock|
         return Parallel.map(items, :in_threads => num_processes) do |item|
           result = yield(item)
-          report_output(result, lock) if options[:serialize_stdout]
+          reprint_output(result, lock.path) if options[:serialize_stdout]
           result
         end
       end
@@ -63,12 +64,23 @@ module ParallelTests
       end
     end
 
-    def report_output(result, lock)
-      lock.flock File::LOCK_EX
-      $stdout.puts result[:stdout]
-      $stdout.flush
-    ensure
-      lock.flock File::LOCK_UN
+    def reprint_output(result, lockfile)
+      lock(lockfile) do
+        $stdout.puts result[:stdout]
+        $stdout.flush
+      end
+    end
+
+    def lock(lockfile)
+      File.open(lockfile) do |lock|
+        begin
+          lock.flock File::LOCK_EX
+          yield
+        ensure
+          # This shouldn't be necessary, but appears to be
+          lock.flock File::LOCK_UN
+        end
+      end
     end
 
     def report_results(test_results)
@@ -92,25 +104,29 @@ module ParallelTests
     def parse_options!(argv)
       options = {}
       OptionParser.new do |opts|
-        opts.banner = <<BANNER
-Run all tests in parallel, giving each process ENV['TEST_ENV_NUMBER'] ('', '2', '3', ...)
+        opts.banner = <<-BANNER.gsub(/^          /, '')
+          Run all tests in parallel, giving each process ENV['TEST_ENV_NUMBER'] ('', '2', '3', ...)
 
-[optional] Only run selected files & folders:
-    parallel_test test/bar test/baz/xxx_text.rb
+          [optional] Only selected files & folders:
+            parallel_test test/bar test/baz/xxx_text.rb
 
-Options are:
-BANNER
+          [optional] Pass test-options and files via `--`:
+            parallel_test -- -t acceptance -f progress -- spec/foo_spec.rb spec/acceptance
+
+          Options are:
+        BANNER
         opts.on("-n [PROCESSES]", Integer, "How many processes to use, default: available CPUs") { |n| options[:count] = n }
         opts.on("-p", "--pattern [PATTERN]", "run tests matching this pattern") { |pattern| options[:pattern] = /#{pattern}/ }
-        opts.on("--group-by [TYPE]", <<-TEXT
-group tests by:
-          found - order of finding files
-          steps - number of cucumber/spinach steps
-          scenarios - individual cucumber scenarios
-          filesize - by size of the file
-          default - runtime or filesize
-TEXT
-) { |type| options[:group_by] = type.to_sym }
+        opts.on("--group-by [TYPE]", <<-TEXT.gsub(/^          /, '')
+          group tests by:
+                    found - order of finding files
+                    steps - number of cucumber/spinach steps
+                    scenarios - individual cucumber scenarios
+                    filesize - by size of the file
+                    runtime - info from runtime log
+                    default - runtime when runtime log is filled otherwise filesize
+          TEXT
+          ) { |type| options[:group_by] = type.to_sym }
         opts.on("-m [FLOAT]", "--multiply-processes [FLOAT]", Float, "use given number as a multiplier of processes to run") { |multiply| options[:multiply] = multiply }
 
         opts.on("-s [PATTERN]", "--single [PATTERN]",
@@ -128,8 +144,8 @@ TEXT
 
         opts.on("--only-group INT[, INT]", Array) { |groups| options[:only_group] = groups.map(&:to_i) }
 
-        opts.on("-e", "--exec [COMMAND]", "execute this code parallel and with ENV['TEST_ENV_NUM']") { |path| options[:execute] = path }
-        opts.on("-o", "--test-options '[OPTIONS]'", "execute test commands with those options") { |arg| options[:test_options] = arg }
+        opts.on("-e", "--exec [COMMAND]", "execute this code parallel and with ENV['TEST_ENV_NUMBER']") { |path| options[:execute] = path }
+        opts.on("-o", "--test-options '[OPTIONS]'", "execute test commands with those options") { |arg| options[:test_options] = arg.lstrip }
         opts.on("-t", "--type [TYPE]", "test(default) / rspec / cucumber / spinach") do |type|
           begin
             @runner = load_runner(type)
@@ -139,11 +155,13 @@ TEXT
           end
         end
         opts.on("--serialize-stdout", "Serialize stdout output, nothing will be written until everything is done") { options[:serialize_stdout] = true }
+        opts.on("--combine-stderr", "Combine stderr into stdout, useful in conjunction with --serialize-stdout") { options[:combine_stderr] = true }
         opts.on("--non-parallel", "execute same commands but do not in parallel, needs --exec") { options[:non_parallel] = true }
         opts.on("--no-symlinks", "Do not traverse symbolic links to find test files") { options[:symlinks] = false }
         opts.on('--ignore-tags [PATTERN]', 'When counting steps ignore scenarios with tags that match this pattern')  { |arg| options[:ignore_tag_pattern] = arg }
         opts.on("--nice", "execute test commands with low priority.") { options[:nice] = true }
         opts.on("--runtime-log [PATH]", "Location of previously recorded test runtimes") { |path| options[:runtime_log] = path }
+        opts.on("--verbose", "Print more output") { options[:verbose] = true }
         opts.on("-v", "--version", "Show Version") { puts ParallelTests::VERSION; exit }
         opts.on("-h", "--help", "Show this.") { puts opts; exit }
       end.parse!(argv)
@@ -153,14 +171,42 @@ TEXT
         options[:non_parallel] = true
       end
 
-      options[:files] = argv
+      files, remaining = extract_file_paths(argv)
+      unless options[:execute]
+        abort "Pass files or folders to run" unless files.any?
+        options[:files] = files
+      end
+
+      append_test_options(options, remaining)
 
       options[:group_by] ||= :filesize if options[:only_group]
 
       raise "--group-by found and --single-process are not supported" if options[:group_by] == :found and options[:single_process]
-      raise "--group-by filesize is required for --only-group" if options[:group_by] != :filesize and options[:only_group]
+      allowed = [:filesize, :runtime, :found]
+      if !allowed.include?(options[:group_by]) && options[:only_group]
+        raise "--group-by #{allowed.join(" or ")} is required for --only-group"
+      end
 
       options
+    end
+
+    def extract_file_paths(argv)
+      dash_index = argv.rindex("--")
+      file_args_at = (dash_index || -1) + 1
+      [argv[file_args_at..-1], argv[0...(dash_index || 0)]]
+    end
+
+    def extract_test_options(argv)
+      dash_index = argv.index("--") || -1
+      argv[dash_index+1..-1]
+    end
+
+    def append_test_options(options, argv)
+      new_opts = extract_test_options(argv)
+      return if new_opts.empty?
+
+      prev_and_new = [options[:test_options], new_opts.shelljoin]
+      options[:test_options] = prev_and_new.compact.join(' ')
     end
 
     def load_runner(type)
@@ -186,9 +232,15 @@ TEXT
     end
 
     def report_time_taken
-      start = Time.now
-      yield
-      puts "\nTook #{Time.now - start} seconds"
+      seconds = ParallelTests.delta { yield }.to_i
+      puts "\nTook #{seconds} seconds#{detailed_duration(seconds)}"
+    end
+
+    def detailed_duration(seconds)
+      parts = [ seconds / 3600, seconds % 3600 / 60, seconds % 60 ].drop_while(&:zero?)
+      return if parts.size < 2
+      parts = parts.map { |i| "%02d" % i }.join(':').sub(/^0/, '')
+      " (#{parts})"
     end
 
     def final_fail_message

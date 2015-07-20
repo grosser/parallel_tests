@@ -1,3 +1,4 @@
+require 'bundler/setup'
 require 'bump/tasks'
 require 'bundler/gem_tasks'
 

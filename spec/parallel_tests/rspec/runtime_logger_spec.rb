@@ -7,10 +7,6 @@ describe ParallelTests::RSpec::RuntimeLogger do
     @clean_output = %r{^spec/foo.rb:[-\.e\d]+$}m
   end
 
-  after do
-    ENV.delete 'TEST_ENV_NUMBER'
-  end
-
   def log_for_a_file(options={})
     Tempfile.open('xxx') do |temp|
       temp.close
@@ -37,12 +33,12 @@ describe ParallelTests::RSpec::RuntimeLogger do
   end
 
   it "logs runtime with relative paths" do
-    log_for_a_file.should =~ @clean_output
+    expect(log_for_a_file).to match(@clean_output)
   end
 
   it "does not log if we do not run in parallel" do
     ENV.delete 'TEST_ENV_NUMBER'
-    log_for_a_file.should == ""
+    expect(log_for_a_file).to eq("")
   end
 
   it "appends to a given file" do
@@ -50,8 +46,8 @@ describe ParallelTests::RSpec::RuntimeLogger do
       f.write 'FooBar'
       ParallelTests::RSpec::RuntimeLogger.new(f)
     end
-    result.should include('FooBar')
-    result.should include('foo.rb')
+    expect(result).to include('FooBar')
+    expect(result).to include('foo.rb')
   end
 
   it "overwrites a given path" do
@@ -59,8 +55,8 @@ describe ParallelTests::RSpec::RuntimeLogger do
       f.write 'FooBar'
       ParallelTests::RSpec::RuntimeLogger.new(f.path)
     end
-    result.should_not include('FooBar')
-    result.should include('foo.rb')
+    expect(result).not_to include('FooBar')
+    expect(result).to include('foo.rb')
   end
 
   context "integration" do
@@ -96,9 +92,9 @@ describe ParallelTests::RSpec::RuntimeLogger do
       system("TEST_ENV_NUMBER=1 rspec spec -I #{Bundler.root.join("lib")} --format ParallelTests::RSpec::RuntimeLogger --out runtime.log 2>&1") || raise("nope")
 
       result = File.read("runtime.log")
-      result.should include "a_spec.rb:0.5"
-      result.should include "b_spec.rb:0.5"
-      result.should_not include "spec_helper"
+      expect(result).to match(%r{^spec/a_spec.rb:0.5})
+      expect(result).to match(%r{^spec/b_spec.rb:0.5})
+      expect(result).not_to include "spec_helper"
     end
 
     it "logs multiple describe blocks" do
@@ -125,7 +121,7 @@ describe ParallelTests::RSpec::RuntimeLogger do
       system("TEST_ENV_NUMBER=1 rspec spec -I #{Bundler.root.join("lib")} --format ParallelTests::RSpec::RuntimeLogger --out runtime.log 2>&1") || raise("nope")
 
       result = File.read("runtime.log")
-      result.should include "a_spec.rb:1.5"
+      expect(result).to include "a_spec.rb:1.5"
     end
   end
 end

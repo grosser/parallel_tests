@@ -24,7 +24,7 @@ module ParallelTests
             (runtime_logging if File.directory?(File.dirname(runtime_log))),
             cucumber_opts(options[:test_options]),
             *sanitized_test_files
-          ].compact.join(' ')
+          ].compact.reject(&:empty?).join(' ')
           execute_command(cmd, process_number, num_processes, options)
         end
 
@@ -90,7 +90,7 @@ module ParallelTests
 
 
         def runtime_logging
-          " --format ParallelTests::Gherkin::RuntimeLogger --out #{runtime_log}"
+          "--format ParallelTests::Gherkin::RuntimeLogger --out #{runtime_log}"
         end
 
         def runtime_log
@@ -99,7 +99,7 @@ module ParallelTests
 
         def determine_executable
           case
-          when File.exists?("bin/#{name}")
+          when File.exist?("bin/#{name}")
             "bin/#{name}"
           when ParallelTests.bundler_enabled?
             "bundle exec #{name}"

@@ -1,10 +1,13 @@
 rvm:
-  - ree
   - 1.9.3
   - 2.0.0
-  - 2.1.0
-  - jruby-1.7.6
+  - 2.1.5
+  - jruby-1.7.9
   - jruby-head
+branches:
+  only: [master]
+sudo: false
+cache: bundler
 matrix:
   allow_failures:
     - rvm: jruby-head
