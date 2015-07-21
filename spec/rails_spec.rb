@@ -10,7 +10,7 @@ describe 'rails' do
   end
 
   ["rails32", "rails42"].each do |rails|
-    it "can create and run" do
+    it "can create and run on #{rails}" do
       skip if RUBY_PLATFORM == "java"
 
       Dir.chdir("spec/fixtures/#{rails}") do
