@@ -7,7 +7,7 @@ describe ParallelTests::RSpec::SummaryLogger do
   it "prints failing examples" do
     logger.dump_failures(double(:failure_notifications => [1], :fully_formatted_failed_examples => "HEYHO"))
     expect(output.output).to eq([
-      "HEYHO"
+      "HEYHO\n"
     ])
   end
 end

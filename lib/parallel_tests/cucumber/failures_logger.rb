@@ -7,14 +7,16 @@ module ParallelTests
       include ParallelTests::Gherkin::Io
 
       def initialize(runtime, path_or_io, options)
+        super
         @io = prepare_io(path_or_io)
       end
 
-      def after_feature(feature)
-        unless @lines.empty?
-          lock_output do
-            @lines.each do |line|
-              @io.puts "#{feature.file}:#{line}"
+      def done
+        return if @failures.empty?
+        lock_output do
+          @failures.each do |file, lines|
+            lines.each do |line|
+              @io.print "#{file}:#{line} "
             end
           end
         end

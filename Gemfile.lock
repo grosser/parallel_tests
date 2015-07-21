@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    parallel_tests (1.5.1)
+    parallel_tests (1.6.0)
       parallel
 
 GEM
@@ -10,12 +10,15 @@ GEM
     builder (3.2.2)
     bump (0.5.2)
     colorize (0.7.7)
-    cucumber (1.3.19)
+    cucumber (2.0.0)
       builder (>= 2.1.2)
+      cucumber-core (~> 1.1.3)
       diff-lcs (>= 1.1.3)
       gherkin (~> 2.12)
       multi_json (>= 1.7.5, < 2.0)
       multi_test (>= 0.1.2)
+    cucumber-core (1.1.3)
+      gherkin (~> 2.12.0)
     diff-lcs (1.2.5)
     gherkin (2.12.2)
       multi_json (~> 1.3)
@@ -56,7 +59,7 @@ PLATFORMS
 
 DEPENDENCIES
   bump
-  cucumber (~> 1.3)
+  cucumber (~> 2.0)
   minitest (~> 5.5.0)
   parallel_tests!
   rake

@@ -10,7 +10,10 @@ require 'parallel_tests/rspec/summary_logger'
 OutputLogger = Struct.new(:output) do
   attr_reader :flock, :flush
   def puts(s=nil)
-    self.output << s.to_s
+    self.output << "#{s}\n"
+  end
+  def print(s=nil)
+    self.output << "#{s}"
   end
 end
 
