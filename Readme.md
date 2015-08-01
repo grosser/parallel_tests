@@ -235,6 +235,7 @@ TIPS
  - [Distributed parallel test (e.g. Travis Support)](https://github.com/grosser/parallel_tests/wiki/Distributed-Parallel-Tests-and-Travis-Support)
  - Debug errors that only happen with multiple files using `--verbose` and [cleanser](https://github.com/grosser/cleanser)
  - Shell alias: `alias prspec='parallel_rspec -m 2 --'`
+ - See tests ran together as part of a group by running ```ps -ax | grep 'TEST_ENV_NUMBER'``` in another terminal window while running tests in parallel
  - Contribute your own gotaches to the [Wiki](https://github.com/grosser/parallel_tests/wiki) or even better open a PR :)
 
 TODO
