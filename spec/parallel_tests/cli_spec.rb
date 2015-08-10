@@ -180,6 +180,12 @@ describe ParallelTests::CLI do
         subject.run(['test', '-n', '3', '--only-group', '2', '-t', 'my_test_runner'])
       end
 
+      it "run no group when only_group uses invalid index" do
+        group_number = 99
+        expect(subject).to_not receive(:run_tests)
+        subject.run(['test', '-n', '3', '--only-group', group_number.to_s, '-t', 'my_test_runner'])
+      end
+
       it "run twice with multiple groups" do
         skip "fails on jruby" if RUBY_PLATFORM == "java"
         options = {count: 3, only_group: [2,3], files: ["test"], group_by: :filesize}
