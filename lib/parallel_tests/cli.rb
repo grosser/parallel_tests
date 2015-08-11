@@ -93,8 +93,8 @@ module ParallelTests
     def report_number_of_tests(groups)
       name = @runner.test_file_name
       num_processes = groups.size
-      num_tests = groups.empty? ? 0 : groups.map(&:size).inject(:+)
-      tests_per_process = num_processes <= 0 ? 0 : num_tests / num_processes
+      num_tests = groups.map(&:size).inject(0, :+)
+      tests_per_process = (num_processes == 0 ? 0 : num_tests / num_processes)
       puts "#{num_processes} processes for #{num_tests} #{name}s, ~ #{tests_per_process} #{name}s per process"
     end
 

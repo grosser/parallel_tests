@@ -180,9 +180,10 @@ describe ParallelTests::CLI do
         subject.run(['test', '-n', '3', '--only-group', '2', '-t', 'my_test_runner'])
       end
 
-      it "run no group when only_group uses invalid index" do
-        group_number = 99
-        expect(subject).to_not receive(:run_tests)
+      it "run last group" do
+        group_number = 3
+        options = {count: 3, only_group: [group_number], files: ["test"], group_by: :filesize}
+        expect(subject).to receive(:run_tests).once.with(['eee', 'fff'], 0, 1, options).and_return(results)
         subject.run(['test', '-n', '3', '--only-group', group_number.to_s, '-t', 'my_test_runner'])
       end
 
