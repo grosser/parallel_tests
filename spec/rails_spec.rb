@@ -11,10 +11,10 @@ describe 'rails' do
 
   ["rails32", "rails42"].each do |rails|
     it "can create and run" do
-      skip if RUBY_PLATFORM == "java"
-      if rails == 'rails32'
-        ruby_2_2_2_or_newer = Gem::Version.new(RUBY_VERSION) >= Gem::Version.new('2.2.2')
-        skip 'rails 3.2 does not work on ruby >= 2.2.2' if ruby_2_2_2_or_newer
+      if RUBY_PLATFORM == "java"
+        skip 'rails fixtures are not set up for java'
+      elsif rails == 'rails32' && RUBY_VERSION >= '2.2.0'
+        skip 'rails 3.2 does not work on ruby >= 2.2.0'
       end
 
       Dir.chdir("spec/fixtures/#{rails}") do

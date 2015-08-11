@@ -180,11 +180,11 @@ describe ParallelTests::CLI do
         subject.run(['test', '-n', '3', '--only-group', '2', '-t', 'my_test_runner'])
       end
 
-      it "run last group" do
-        group_number = 3
-        options = {count: 3, only_group: [group_number], files: ["test"], group_by: :filesize}
+      it "run last group when passing a group that is not filled" do
+        count = 3
+        options = {count: count, only_group: [count], files: ["test"], group_by: :filesize}
         expect(subject).to receive(:run_tests).once.with(['eee', 'fff'], 0, 1, options).and_return(results)
-        subject.run(['test', '-n', '3', '--only-group', group_number.to_s, '-t', 'my_test_runner'])
+        subject.run(['test', '-n', count.to_s, '--only-group', count.to_s, '-t', 'my_test_runner'])
       end
 
       it "run twice with multiple groups" do

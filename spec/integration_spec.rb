@@ -58,7 +58,7 @@ describe 'CLI' do
     write 'spec/xxx_spec.rb', 'describe("it"){it("should"){puts "TEST1"}}'
     write 'spec/xxx2_spec.rb', 'describe("it"){it("should"){puts "TEST2"}}'
     # set processes to false so we verify empty groups are discarded by default
-    result = run_tests "spec", :type => 'rspec', :processes => false
+    result = run_tests "spec", :type => 'rspec', :processes => 4
 
     # test ran and gave their puts
     expect(result).to include('TEST1')
@@ -69,8 +69,9 @@ describe 'CLI' do
     expect(result.scan('2 examples, 0 failures').size).to eq(1) # 1 summary
     expect(result.scan(/Finished in \d+\.\d+ seconds/).size).to eq(2)
     expect(result.scan(/Took \d+ seconds/).size).to eq(1) # parallel summary
+
     # verify empty groups are discarded. if retained then it'd say 4 processes for 2 specs
-    expect(result.scan('2 processes for 2 specs, ~ 1 specs per process').size).to eq(1)
+    expect(result).to include '2 processes for 2 specs, ~ 1 specs per process'
   end
 
   it "runs tests which outputs accented characters" do
