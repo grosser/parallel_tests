@@ -232,6 +232,7 @@ describe 'CLI' do
   end
 
   it "runs with PARALLEL_TEST_PROCESSORS processes" do
+    skip if RUBY_PLATFORM == "java" # execution expired issue on JRuby
     processes = 5
     processes.times{|i|
       write "spec/x#{i}_spec.rb", "puts %{ENV-\#{ENV['TEST_ENV_NUMBER']}-}"
