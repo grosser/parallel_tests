@@ -11,6 +11,7 @@ describe ParallelTests::Test::RuntimeLogger do
   end
 
   it "writes a correct log on test-unit" do
+    skip if RUBY_PLATFORM == "java" # just too slow ...
     use_temporary_directory do
       # setup simple structure
       FileUtils.mkdir "test"
@@ -48,6 +49,7 @@ describe ParallelTests::Test::RuntimeLogger do
 
   # static directory with gems so it's fast on travis
   it "writes a correct log on minitest-4" do
+    skip if RUBY_PLATFORM == "java" # just too slow ...
     Dir.chdir(Bundler.root.join("spec/fixtures/minitest4")) do
       Bundler.with_clean_env do
         sh "bundle --local --quiet"
@@ -65,6 +67,7 @@ describe ParallelTests::Test::RuntimeLogger do
   end
 
   it "writes a correct log on minitest-5" do
+    skip if RUBY_PLATFORM == "java" # just too slow ...
     use_temporary_directory do
       # setup simple structure
       FileUtils.mkdir "test"
