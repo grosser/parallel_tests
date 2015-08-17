@@ -222,6 +222,7 @@ TIPS
  - Spring does not work with parallel_tests, use `DISABLE_SPRING=1 rake parallel:spec` if you have spring hardcoded in your binaries
  - [RSpec] remove `--loadby` from `.rspec`
  - [RSpec] Instantly see failures (instead of just a red F) with [rspec-instafail](https://github.com/grosser/rspec-instafail)
+ - [RSpec] use [rspec-retry](https://github.com/NoRedInk/rspec-retry) to rerun failed tests. `config.default_retry_count = 3`
  - [Cucumber] add a `parallel: foo` profile to your `config/cucumber.yml` and it will be used to run parallel tests
  - [Capybara setup](https://github.com/grosser/parallel_tests/wiki)
  - [Sphinx setup](https://github.com/grosser/parallel_tests/wiki)
