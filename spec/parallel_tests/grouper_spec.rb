@@ -30,8 +30,8 @@ describe ParallelTests::Grouper do
   describe '.in_even_groups_by_size' do
     let(:files_with_size){ {"1" => 1, "2" => 2, "3" => 3, "4" => 4, "5" => 5} }
 
-    def call(num_groups)
-      ParallelTests::Grouper.in_even_groups_by_size(files_with_size, num_groups)
+    def call(num_groups, options={})
+      ParallelTests::Grouper.in_even_groups_by_size(files_with_size, num_groups, options)
     end
 
     it "groups 1 by 1 for same groups as size" do
@@ -48,6 +48,14 @@ describe ParallelTests::Grouper do
 
     it "adds empty groups if there are more groups than feature files" do
       expect(call(6)).to eq([["5"], ["4"], ["3"], ["2"], ["1"], []])
+    end
+
+    it "groups single items into first group" do
+      expect(call(2, :single_process => [/1|2|3|4/])).to eq([["1", "2", "3", "4"], ["5"]])
+    end
+
+    it "groups single items with others if there are too few" do
+      expect(call(2, :single_process => [/1/])).to eq([["1", "3", "4"], ["2", "5"]])
     end
   end
 
