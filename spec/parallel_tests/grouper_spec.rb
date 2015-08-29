@@ -1,9 +1,10 @@
 require 'spec_helper'
 require 'parallel_tests/grouper'
+require 'parallel_tests/cucumber/scenarios'
 require 'tmpdir'
 
 describe ParallelTests::Grouper do
-  describe :by_steps do
+  describe '.by_steps' do
     def write(file, content)
       File.open(file,'w'){|f| f.write content }
     end
@@ -26,7 +27,7 @@ describe ParallelTests::Grouper do
     end
   end
 
-  describe :in_even_groups_by_size do
+  describe '.in_even_groups_by_size' do
     let(:files_with_size){ {"1" => 1, "2" => 2, "3" => 3, "4" => 4, "5" => 5} }
 
     def call(num_groups)
@@ -50,7 +51,7 @@ describe ParallelTests::Grouper do
     end
   end
 
-  describe :by_scenarios do
+  describe '.by_scenarios' do
     let(:feature_file) { double 'file' }
 
     it 'splits a feature into individual scenarios' do
