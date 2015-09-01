@@ -1,4 +1,4 @@
-:require "spec_helper"
+require "spec_helper"
 require "parallel_tests/test/runner"
 
 describe ParallelTests::Test::Runner do
