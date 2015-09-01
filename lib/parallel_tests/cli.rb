@@ -163,6 +163,7 @@ module ParallelTests
         opts.on('--ignore-tags [PATTERN]', 'When counting steps ignore scenarios with tags that match this pattern')  { |arg| options[:ignore_tag_pattern] = arg }
         opts.on("--nice", "execute test commands with low priority.") { options[:nice] = true }
         opts.on("--runtime-log [PATH]", "Location of previously recorded test runtimes") { |path| options[:runtime_log] = path }
+        opts.on("--unknown-runtime [FLOAT]", "Use given number as unknown runtime (otherwise use average time)") { |time| options[:unknown_runtime] = time.to_f }
         opts.on("--verbose", "Print more output") { options[:verbose] = true }
         opts.on("-v", "--version", "Show Version") { puts ParallelTests::VERSION; exit }
         opts.on("-h", "--help", "Show this.") { puts opts; exit }

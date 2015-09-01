@@ -100,6 +100,11 @@ describe ParallelTests::Test::Runner do
         expect(call(["aaa", "bbb", "ccc", "ddd"], 2, group_by: :runtime)).to eq([["bbb", "ccc"], ["aaa", "ddd"]])
       end
 
+      it "groups with unknown-runtime for missing" do
+        File.write("tmp/parallel_runtime_test.log", "xxx:123\nbbb:10\nccc:1")
+        expect(call(["aaa", "bbb", "ccc", "ddd"], 2, group_by: :runtime, unknown_runtime: 0)).to eq([["bbb"], ["aaa", "ccc", "ddd"]])
+      end
+
       it "groups by single_process pattern and then via size" do
         expect(ParallelTests::Test::Runner).to receive(:runtimes).
           and_return({"aaa" => 5, "bbb" => 2, "ccc" => 1, "ddd" => 1})
