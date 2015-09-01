@@ -1,4 +1,4 @@
-require "spec_helper"
+:require "spec_helper"
 require "parallel_tests/test/runner"
 
 describe ParallelTests::Test::Runner do
@@ -102,7 +102,7 @@ describe ParallelTests::Test::Runner do
 
       it "groups with unknown-runtime for missing" do
         File.write("tmp/parallel_runtime_test.log", "xxx:123\nbbb:10\nccc:1")
-        expect(call(["aaa", "bbb", "ccc", "ddd"], 2, group_by: :runtime, unknown_runtime: 0)).to eq([["bbb"], ["aaa", "ccc", "ddd"]])
+        expect(call(["aaa", "bbb", "ccc", "ddd"], 2, group_by: :runtime, unknown_runtime: 0.0)).to eq([["bbb"], ["aaa", "ccc", "ddd"]])
       end
 
       it "groups by single_process pattern and then via size" do
