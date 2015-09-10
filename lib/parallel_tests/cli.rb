@@ -87,6 +87,11 @@ module ParallelTests
       results = @runner.find_results(test_results.map { |result| result[:stdout] }*"")
       puts ""
       puts @runner.summarize_results(results)
+      failing_sets = test_results.select{|test_result| test_result[:exit_status] != 0 }
+      failing_sets.each do |failing_set|
+        puts "\n\n Failed command:\t#{failing_set[:command]}"
+        puts "Seed used:\t#{failing_set[:seed]}\n"
+      end
     end
 
     def report_number_of_tests(groups)

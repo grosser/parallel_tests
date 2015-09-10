@@ -95,8 +95,8 @@ module ParallelTests
 
           output = open("|#{cmd}", "r") { |output| capture_output(output, silence) }
           exitstatus = $?.exitstatus
-
-          {:stdout => output, :exit_status => exitstatus}
+          seed = output.scan(/seed (\d+)/).flatten.first
+          {:stdout => output, :exit_status => exitstatus, :command => cmd, :seed => seed}
         end
 
         def find_results(test_output)
