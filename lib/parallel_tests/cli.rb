@@ -87,6 +87,17 @@ module ParallelTests
       results = @runner.find_results(test_results.map { |result| result[:stdout] }*"")
       puts ""
       puts @runner.summarize_results(results)
+      report_failures(test_results) if any_test_failed?(test_results)
+    end
+
+    def report_failures(test_results)
+      puts "\n\nTests have failed for a parallel_test group. Use the following command to run the group again:\n\n"
+      failing_sets = test_results.select{|test_result| test_result[:exit_status] != 0 }
+      failing_sets.each do |failing_set|
+        puts failing_set[:command]
+        puts "Checkout your local branch to the deployed SHA and add '--seed #{failing_set[:seed]}' to the command to run tests in the same order." if failing_set[:seed]
+        puts ""
+      end
     end
 
     def report_number_of_tests(groups)
