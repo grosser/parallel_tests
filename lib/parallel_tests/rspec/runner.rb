@@ -40,7 +40,13 @@ module ParallelTests
         end
 
         def test_suffix
-          /^spec\/(features\/.*\.feature|.*_spec\.rb)$/
+          if defined?(::Rutabaga::VERSION)
+            /(^spec\/features\/.*\.feature|_spec\.rb)$/
+          elsif defined?(::Turnip::RSpec)
+            /(\.feature|_spec\.rb)$/
+          else
+            /_spec\.rb$/
+          end
         end
 
         private
