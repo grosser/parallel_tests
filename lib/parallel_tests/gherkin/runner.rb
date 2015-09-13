@@ -32,7 +32,7 @@ module ParallelTests
           @test_file_name || 'feature'
         end
 
-        def test_suffix
+        def test_suffix(options={})
           /\.feature$/
         end
 

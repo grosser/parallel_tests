@@ -16,7 +16,7 @@ module ParallelTests
           'tmp/parallel_runtime_test.log'
         end
 
-        def test_suffix
+        def test_suffix(options={})
           /_(test|spec).rb$/
         end
 
@@ -195,7 +195,7 @@ module ParallelTests
           (tests || []).map do |file_or_folder|
             if File.directory?(file_or_folder)
               files = files_in_folder(file_or_folder, options)
-              files.grep(test_suffix).grep(options[:pattern]||//)
+              files.grep(test_suffix(options)).grep(options[:pattern]||//)
             else
               file_or_folder
             end
