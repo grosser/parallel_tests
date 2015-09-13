@@ -170,10 +170,11 @@ module ParallelTests
             puts "Runtime found for #{tests.count(&:last)} of #{tests.size} tests"
           end
 
-          # fill gaps with average runtime
+          # fill gaps with unknown-runtime if given, average otherwise
           known, unknown = tests.partition(&:last)
           average = (known.any? ? known.map!(&:last).inject(:+) / known.size : 1)
-          unknown.each { |set| set[1] = average }
+          unknown_runtime = options[:unknown_runtime] || average
+          unknown.each { |set| set[1] = unknown_runtime }
         end
 
         def runtimes(tests, options)

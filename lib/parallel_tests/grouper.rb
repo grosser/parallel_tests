@@ -16,24 +16,24 @@ module ParallelTests
 
         # add all files that should run in a single process to one group
         (options[:single_process] || []).each do |pattern|
-          matched, items = items.partition { |item, size| item =~ pattern }
+          matched, items = items.partition { |item, _size| item =~ pattern }
           matched.each { |item, size| add_to_group(groups.first, item, size) }
         end
 
         groups_to_fill = (options[:isolate] ? groups[1..-1] : groups)
         group_features_by_size(items_to_group(items), groups_to_fill)
 
-        groups.map!{|g| g[:items].sort }
+        groups.map! { |g| g[:items].sort }
       end
 
       private
 
       def largest_first(files)
-        files.sort_by{|item, size| size }.reverse
+        files.sort_by{|_item, size| size }.reverse
       end
 
       def smallest_group(groups)
-        groups.min_by{|g| g[:size] }
+        groups.min_by { |g| g[:size] }
       end
 
       def add_to_group(group, item, size)
@@ -46,10 +46,10 @@ module ParallelTests
         listener = ParallelTests::Gherkin::Listener.new
         listener.ignore_tag_pattern = Regexp.compile(options[:ignore_tag_pattern]) if options[:ignore_tag_pattern]
         parser = ::Gherkin::Parser::Parser.new(listener, true, 'root')
-        tests.each{|file|
+        tests.each do |file|
           parser.parse(File.read(file), file, 0)
-        }
-        listener.collect.sort_by{|_,value| -value }
+        end
+        listener.collect.sort_by { |_, value| -value }
       end
 
       def group_by_scenarios(tests, options={})

@@ -1,3 +1,8 @@
+# parallel_tests
+
+[![Gem Version](https://badge.fury.io/rb/parallel_tests.svg)](https://rubygems.org/gems/parallel_tests)
+[![Build Status](https://travis-ci.org/grosser/parallel_tests.svg)](https://travis-ci.org/grosser/parallel_tests/builds)
+
 Speedup Test::Unit + RSpec + Cucumber + Spinach by running parallel on multiple CPU cores.<br/>
 ParallelTests splits tests into even groups (by number of lines or runtime) and runs each group in a single process with its own database.
 
@@ -237,6 +242,7 @@ TIPS
  - Spring does not work with parallel_tests, use `DISABLE_SPRING=1 rake parallel:spec` if you have spring hardcoded in your binaries
  - [RSpec] remove `--loadby` from `.rspec`
  - [RSpec] Instantly see failures (instead of just a red F) with [rspec-instafail](https://github.com/grosser/rspec-instafail)
+ - [RSpec] use [rspec-retry](https://github.com/NoRedInk/rspec-retry) (not rspec-rerun) to rerun failed tests.
  - [Cucumber] add a `parallel: foo` profile to your `config/cucumber.yml` and it will be used to run parallel tests
  - [Capybara setup](https://github.com/grosser/parallel_tests/wiki)
  - [Sphinx setup](https://github.com/grosser/parallel_tests/wiki)
@@ -336,5 +342,4 @@ inspired by [pivotal labs](http://pivotallabs.com/users/miked/blog/articles/849-
 
 [Michael Grosser](http://grosser.it)<br/>
 michael@grosser.it<br/>
-License: MIT<br/>
-[![Build Status](https://travis-ci.org/grosser/parallel_tests.png)](https://travis-ci.org/grosser/parallel_tests)
+License: MIT

@@ -11,7 +11,11 @@ describe 'rails' do
 
   ["rails32", "rails42"].each do |rails|
     it "can create and run" do
-      skip if RUBY_PLATFORM == "java"
+      if RUBY_PLATFORM == "java"
+        skip 'rails fixtures are not set up for java'
+      elsif rails == 'rails32' && RUBY_VERSION >= '2.2.0'
+        skip 'rails 3.2 does not work on ruby >= 2.2.0'
+      end
 
       Dir.chdir("spec/fixtures/#{rails}") do
         Bundler.with_clean_env do
