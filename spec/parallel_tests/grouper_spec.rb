@@ -63,7 +63,6 @@ describe ParallelTests::Grouper do
     let(:feature_file) { double 'file' }
 
     it 'splits a feature into individual scenarios' do
-      require 'parallel_tests/cucumber/scenarios'
       expect(ParallelTests::Cucumber::Scenarios).to receive(:all).and_return({ 'feature_file:3' => 1 })
       ParallelTests::Grouper.by_scenarios([feature_file], 1)
     end
