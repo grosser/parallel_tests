@@ -35,9 +35,10 @@ module ParallelTests
 
       report_time_taken do
         groups = @runner.tests_in_groups(options[:files], num_processes, options)
+        groups.reject! &:empty?
 
         test_results = if options[:only_group]
-          groups_to_run = options[:only_group].collect{|i| groups[i - 1]}
+          groups_to_run = options[:only_group].collect{|i| groups[i - 1]}.compact
           report_number_of_tests(groups_to_run)
           execute_in_parallel(groups_to_run, groups_to_run.size, options) do |group|
             run_tests(group, groups_to_run.index(group), 1, options)
@@ -103,8 +104,9 @@ module ParallelTests
     def report_number_of_tests(groups)
       name = @runner.test_file_name
       num_processes = groups.size
-      num_tests = groups.map(&:size).inject(:+)
-      puts "#{num_processes} processes for #{num_tests} #{name}s, ~ #{num_tests / groups.size} #{name}s per process"
+      num_tests = groups.map(&:size).inject(0, :+)
+      tests_per_process = (num_processes == 0 ? 0 : num_tests / num_processes)
+      puts "#{num_processes} processes for #{num_tests} #{name}s, ~ #{tests_per_process} #{name}s per process"
     end
 
     #exit with correct status code so rake parallel:test && echo 123 works
@@ -172,6 +174,7 @@ module ParallelTests
         opts.on('--ignore-tags [PATTERN]', 'When counting steps ignore scenarios with tags that match this pattern')  { |arg| options[:ignore_tag_pattern] = arg }
         opts.on("--nice", "execute test commands with low priority.") { options[:nice] = true }
         opts.on("--runtime-log [PATH]", "Location of previously recorded test runtimes") { |path| options[:runtime_log] = path }
+        opts.on("--unknown-runtime [FLOAT]", "Use given number as unknown runtime (otherwise use average time)") { |time| options[:unknown_runtime] = time.to_f }
         opts.on("--verbose", "Print more output") { options[:verbose] = true }
         opts.on("-v", "--version", "Show Version") { puts ParallelTests::VERSION; exit }
         opts.on("-h", "--help", "Show this.") { puts opts; exit }
