@@ -147,10 +147,11 @@ namespace :parallel do
       end
       executable = File.join(File.dirname(__FILE__), '..', '..', 'bin', 'parallel_test')
 
-      command = "#{executable} #{type} --type #{test_framework} " \
+      command = "#{executable} --type #{test_framework} " \
         "-n #{count} "                     \
         "--pattern '#{pattern}' "          \
-        "--test-options '#{options}'"
+        "#{options} "                      \
+        "#{type} "
       if ParallelTests::WINDOWS
         ruby_binary = File.join(RbConfig::CONFIG['bindir'], RbConfig::CONFIG['ruby_install_name'])
         command = "#{ruby_binary} #{command}"
