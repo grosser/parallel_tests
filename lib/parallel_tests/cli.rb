@@ -166,7 +166,7 @@ module ParallelTests
           end
         end
         opts.on("--turnip", "Support running Turnip tests (jnicklas/turnip) using RSpec") { options[:turnip] = true }
-        opts.on("--rutabaga", "Support running Rutabaga tests (simplybusiness/rutabaga) using RSpec (supercedes --turnip") { options[:rutabaga] = true }
+        opts.on("--rutabaga", "Support running Rutabaga tests (simplybusiness/rutabaga) using RSpec (supercedes --turnip)") { options[:rutabaga] = true }
         opts.on("--serialize-stdout", "Serialize stdout output, nothing will be written until everything is done") { options[:serialize_stdout] = true }
         opts.on("--combine-stderr", "Combine stderr into stdout, useful in conjunction with --serialize-stdout") { options[:combine_stderr] = true }
         opts.on("--non-parallel", "execute same commands but do not in parallel, needs --exec") { options[:non_parallel] = true }
