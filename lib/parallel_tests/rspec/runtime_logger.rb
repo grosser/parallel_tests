@@ -24,16 +24,16 @@ class ParallelTests::RSpec::RuntimeLogger < ParallelTests::RSpec::LoggerBase
       super
     end
   else
-    def example_group_started(example_group)
+    def example_group_started(notification)
       @time = ParallelTests.now if @group_nesting == 0
-      @group_nesting += 1
+      @group_nesting += 1 unless file_path(notification) =~ detect_turnip
       super
     end
 
     def example_group_finished(notification)
-      @group_nesting -= 1
+      path = file_path(notification)
+      @group_nesting -= 1 unless path =~ detect_turnip
       if @group_nesting == 0
-        path = (RSPEC_3 ? notification.group.file_path : notification.file_path)
         @example_times[path] += ParallelTests.now - @time
       end
       super if defined?(super)
@@ -56,4 +56,15 @@ class ParallelTests::RSpec::RuntimeLogger < ParallelTests::RSpec::LoggerBase
     end
     @output.flush
   end
+
+  private
+
+  def detect_turnip
+    /turnip\/rspec\.rb$/
+  end
+
+  def file_path(notification)
+    RSPEC_3 ? notification.group.file_path : notification.file_path
+  end
+
 end

@@ -53,6 +53,16 @@ Test by pattern (e.g. use one integration server per subfolder / see if you brok
     rake parallel:test[user]  # run users_controller + user_helper + user tests
     rake parallel:test['user|product']  # run user and product related tests
 
+Pass options
+
+    rake "parallel:spec[5,, --turnip]"    --> force 5 CPU and indicate Turnip mode
+    rake "parallel:spec[,,--turnip]"      --> indicate Turnip mode
+    rake "parallel:spec[5,user,--turnip]" --> force 5 CPU, pattern users and indicate Turnip mode
+
+Quotes are needed around the command if there are any spaces. This is due to the shell.
+All options from the `parallel_test` executable are supported (but be sure to use quotes
+around the command).
+
 
 ### Example output
 
@@ -99,10 +109,13 @@ Add the `RuntimeLogger` to log how long each test takes to run.
 This log file will be loaded on the next test run, and the tests will be grouped
 so that each process should finish around the same time.
 
-Rspec: Add to your `.rspec_parallel` (or `.rspec`) :
+RSpec: Add to your `.rspec_parallel` (or `.rspec`) :
 
     --format progress
     --format ParallelTests::RSpec::RuntimeLogger --out tmp/parallel_runtime_rspec.log
+
+If you add an `.rspec_parallel`, the `.rspec` file will no longer be used when
+calling RSpec.
 
 ### Test::Unit & Minitest 4/5
 
@@ -195,6 +208,8 @@ Options are:
     -e, --exec [COMMAND]             execute this code parallel and with ENV['TEST_ENV_NUMBER']
     -o, --test-options '[OPTIONS]'   execute test commands with those options
     -t, --type [TYPE]                test(default) / rspec / cucumber / spinach
+        --turnip                     Support running Turnip tests (jnicklas/turnip) using RSpec
+        --rutabaga                   Support running Rutabaga tests (simplybusiness/rutabaga) using RSpec (supercedes --turnip)
         --serialize-stdout           Serialize stdout output, nothing will be written until everything is done
         --combine-stderr             Combine stderr into stdout, useful in conjunction with --serialize-stdout
         --non-parallel               execute same commands but do not in parallel, needs --exec
@@ -322,6 +337,7 @@ inspired by [pivotal labs](http://pivotallabs.com/users/miked/blog/articles/849-
  - [Ed Slocomb](https://github.com/edslocomb)
  - [Cezary Baginski](https://github.com/e2)
  - [Marius Ioana](https://github.com/mariusioana)
+ - [Lukas Oberhuber](https://github.com/lukaso)
 
 
 [Michael Grosser](http://grosser.it)<br/>

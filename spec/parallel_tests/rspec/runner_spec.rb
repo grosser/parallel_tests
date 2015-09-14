@@ -198,5 +198,36 @@ ff.**..
         ])
       end
     end
+
+    describe "option turnip" do
+      it "finds turnip (feature) files if option specified" do
+        with_files(['a/x_spec.rb','a/y.feature']) do |root|
+          expect(call(["#{root}/"], {turnip: true})).to eq([
+            "#{root}/a/x_spec.rb",
+            "#{root}/a/y.feature",
+          ])
+        end
+      end
+
+      it "doesn't find turnip (feature) files if option not specified" do
+        with_files(['a/x_spec.rb','a/y.feature']) do |root|
+          expect(call(["#{root}/"])).to eq([
+            "#{root}/a/x_spec.rb",
+          ])
+        end
+      end
+    end
+
+    describe "option rutabaga" do
+      it "finds turnip files only under 'spec/features' directory if rutabaga option specified" do
+        with_files(['a/x_spec.rb','a/y.feature', 'spec/features/h.feature', 'spec/features/test/g.feature']) do |root|
+          expect(call(["#{root}/"], {rutabaga: true})).to eq([
+            "#{root}/a/x_spec.rb",
+            "#{root}/spec/features/h.feature",
+            "#{root}/spec/features/test/g.feature",
+          ])
+        end
+      end
+    end
   end
 end
