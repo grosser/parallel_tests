@@ -156,6 +156,12 @@ module ParallelTests
             abort
           end
         end
+        opts.on("--suffix [PATTERN]", <<-TEXT.gsub(/^          /, '')
+          override built in test file pattern (should match suffix):
+                    '_spec\.rb$' - matches rspec files
+                    '_(test|spec).rb$' - matches test or spec files
+          TEXT
+          ) { |pattern| options[:suffix] = /#{pattern}/ }
         opts.on("--serialize-stdout", "Serialize stdout output, nothing will be written until everything is done") { options[:serialize_stdout] = true }
         opts.on("--combine-stderr", "Combine stderr into stdout, useful in conjunction with --serialize-stdout") { options[:combine_stderr] = true }
         opts.on("--non-parallel", "execute same commands but do not in parallel, needs --exec") { options[:non_parallel] = true }

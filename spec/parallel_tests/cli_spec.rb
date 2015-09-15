@@ -46,6 +46,10 @@ describe ParallelTests::CLI do
       expect(call(["test", "--verbose"])).to eq(defaults.merge(:verbose => true))
     end
 
+    it "parses --suffix" do
+      expect(call(["test", "--suffix", "_(test|spec).rb$"])).to eq(defaults.merge(:suffix => /_(test|spec).rb$/))
+    end
+
     context "parse only-group" do
       it "group_by should be set to filesize" do
         expect(call(["test", "--only-group", '1'])).to eq(defaults.merge(only_group: [1], group_by: :filesize))
