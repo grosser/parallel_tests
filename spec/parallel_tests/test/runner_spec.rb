@@ -264,6 +264,18 @@ EOF
       end
     end
 
+    it "finds test files in folders using suffix and overriding built in suffix" do
+      with_files(['a/x_test.rb','a/y_test.rb','a/z_other.rb','a/x_different.rb']) do |root|
+        Dir.chdir root do
+          expect(call(["a"], :suffix => /_(test|other)\.rb$/).sort).to eq([
+            "a/x_test.rb",
+            "a/y_test.rb",
+            "a/z_other.rb",
+          ])
+        end
+      end
+    end
+
     it "doesn't find bakup files with the same name as test files" do
       with_files(['a/x_test.rb','a/x_test.rb.bak']) do |root|
         expect(call(["#{root}/"])).to eq([

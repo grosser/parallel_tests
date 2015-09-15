@@ -195,6 +195,9 @@ Options are:
     -e, --exec [COMMAND]             execute this code parallel and with ENV['TEST_ENV_NUMBER']
     -o, --test-options '[OPTIONS]'   execute test commands with those options
     -t, --type [TYPE]                test(default) / rspec / cucumber / spinach
+        --suffix [PATTERN]           override built in test file pattern (should match suffix):
+          '_spec.rb$' - matches rspec files
+          '_(test|spec).rb$' - matches test or spec files
         --serialize-stdout           Serialize stdout output, nothing will be written until everything is done
         --combine-stderr             Combine stderr into stdout, useful in conjunction with --serialize-stdout
         --non-parallel               execute same commands but do not in parallel, needs --exec
