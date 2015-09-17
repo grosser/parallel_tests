@@ -150,7 +150,7 @@ namespace :parallel do
       command = "#{executable} #{type} --type #{test_framework} " \
         "-n #{count} "                     \
         "--pattern '#{pattern}' "          \
-        "--test-options '#{options}'"
+        "#{options}"
       if ParallelTests::WINDOWS
         ruby_binary = File.join(RbConfig::CONFIG['bindir'], RbConfig::CONFIG['ruby_install_name'])
         command = "#{ruby_binary} #{command}"

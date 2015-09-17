@@ -31,6 +31,15 @@ describe ParallelTests::Tasks do
       }
       expect(ParallelTests::Tasks.parse_args(args)).to eq([2, "plain", "-p default --group-by steps"])
     end
+
+    it "should use count, pattern, and options in calling the cli" do
+      command = ''
+      expect_any_instance_of(Object).to receive(:system)
+        .with(/parallel_test test --type test -n 5 --pattern 'foo' -p default --group-by steps/)
+        .and_return(true)
+
+      Rake.application['parallel:test'].invoke(5,"foo","-p default --group-by steps")
+    end
   end
 
   describe ".rails_env" do
