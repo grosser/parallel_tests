@@ -33,7 +33,6 @@ describe ParallelTests::Tasks do
     end
 
     it "should use count, pattern, and options in calling the cli" do
-      command = ''
       expect_any_instance_of(Object).to receive(:system)
         .with(/parallel_test test --type test -n 5 --pattern 'foo' -p default --group-by steps/)
         .and_return(true)
