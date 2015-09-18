@@ -72,6 +72,11 @@ describe ParallelTests::Tasks do
       ParallelTests::Tasks.run_in_parallel("echo", :non_parallel => true)
     end
 
+    it "runs command with :init_test_env_number option" do
+      expect(ParallelTests::Tasks).to receive(:system).with("#{full_path} --exec 'echo' --init-test-env-number 100").and_return true
+      ParallelTests::Tasks.run_in_parallel("echo", :init_test_env_number => 100)
+    end
+
     it "runs aborts if the command fails" do
       expect(ParallelTests::Tasks).to receive(:system).and_return false
       expect(ParallelTests::Tasks).to receive(:abort).and_return false
