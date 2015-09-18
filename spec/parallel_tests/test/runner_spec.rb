@@ -378,6 +378,29 @@ EOF
       end
     end
 
+    context 'with init test env number' do
+      let(:options) { { init_test_env_number: 100 } }
+      it "sets process number to '100' for 0" do
+        run_with_file("puts ENV['TEST_ENV_NUMBER'].inspect") do |path|
+          result = call("ruby #{path}", 0, 4, options)
+          expect(result).to eq({
+            :stdout => "\"100\"\n",
+            :exit_status => 0
+          })
+        end
+      end
+
+      it "sets process number to '102' for 1" do
+        run_with_file("puts ENV['TEST_ENV_NUMBER'].inspect") do |path|
+          result = call("ruby #{path}", 1, 4, options)
+          expect(result).to eq({
+            :stdout => "\"102\"\n",
+            :exit_status => 0
+          })
+        end
+      end
+    end
+
     it 'sets PARALLEL_TEST_GROUPS so child processes know that they are being run under parallel_tests' do
       run_with_file("puts ENV['PARALLEL_TEST_GROUPS']") do |path|
         result = call("ruby #{path}", 1, 4, {})

@@ -50,6 +50,10 @@ describe ParallelTests::CLI do
       expect(call(["test", "--suffix", "_(test|spec).rb$"])).to eq(defaults.merge(:suffix => /_(test|spec).rb$/))
     end
 
+    it "parses --init-test-env-number" do
+      expect(call(["test", "--init-test-env-number", "100"])).to eq(defaults.merge(:init_test_env_number => 100))
+    end
+
     context "parse only-group" do
       it "group_by should be set to filesize" do
         expect(call(["test", "--only-group", '1'])).to eq(defaults.merge(only_group: [1], group_by: :filesize))
