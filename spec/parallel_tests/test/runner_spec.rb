@@ -361,7 +361,7 @@ EOF
     it "sets process number to 2 for 1" do
       run_with_file("puts ENV['TEST_ENV_NUMBER']") do |path|
         result = call("ruby #{path}", 1, 4, {})
-        expect(result).to eq({
+        expect(result).to include({
           :stdout => "2\n",
           :exit_status => 0
         })
@@ -371,7 +371,7 @@ EOF
     it "sets process number to '' for 0" do
       run_with_file("puts ENV['TEST_ENV_NUMBER'].inspect") do |path|
         result = call("ruby #{path}", 0, 4, {})
-        expect(result).to eq({
+        expect(result).to include({
           :stdout => "\"\"\n",
           :exit_status => 0
         })
@@ -381,7 +381,7 @@ EOF
     it 'sets PARALLEL_TEST_GROUPS so child processes know that they are being run under parallel_tests' do
       run_with_file("puts ENV['PARALLEL_TEST_GROUPS']") do |path|
         result = call("ruby #{path}", 1, 4, {})
-        expect(result).to eq({
+        expect(result).to include({
           :stdout => "4\n",
           :exit_status => 0
         })
@@ -392,7 +392,7 @@ EOF
       skip "hangs on normal ruby, works on jruby" unless RUBY_PLATFORM == "java"
       run_with_file("$stdin.read; puts 123") do |path|
         result = call("ruby #{path}", 1, 2, {})
-        expect(result).to eq({
+        expect(result).to include({
           :stdout => "123\n",
           :exit_status => 0
         })
@@ -402,7 +402,7 @@ EOF
     it "waits for process to finish" do
       run_with_file("sleep 0.5; puts 123; sleep 0.5; puts 345") do |path|
         result = call("ruby #{path}", 1, 4, {})
-        expect(result).to eq({
+        expect(result).to include({
           :stdout => "123\n345\n",
           :exit_status => 0
         })
@@ -419,7 +419,7 @@ EOF
 
         result = call("ruby #{path}", 1, 4, {})
         expect(received).to eq("123345567")
-        expect(result).to eq({
+        expect(result).to include({
           :stdout => "123\n345567\n",
           :exit_status => 0
         })
@@ -429,7 +429,7 @@ EOF
     it "works with synced stdout" do
       run_with_file("$stdout.sync = true; puts 123; sleep 0.1; puts 345") do |path|
         result = call("ruby #{path}", 1, 4, {})
-        expect(result).to eq({
+        expect(result).to include({
           :stdout => "123\n345\n",
           :exit_status => 0
         })
@@ -440,7 +440,7 @@ EOF
       run_with_file("puts 123") do |path|
         expect($stdout).not_to receive(:print)
         result = call("ruby #{path}", 1, 4, :serialize_stdout => true)
-        expect(result).to eq({
+        expect(result).to include({
           :stdout => "123\n",
           :exit_status => 0
         })
@@ -450,7 +450,7 @@ EOF
     it "returns correct exit status" do
       run_with_file("puts 123; exit 5") do |path|
         result = call("ruby #{path}", 1, 4, {})
-        expect(result).to eq({
+        expect(result).to include({
           :stdout => "123\n",
           :exit_status => 5
         })
@@ -461,7 +461,7 @@ EOF
       skip "open3"
       out, err = run_with_file("puts 123 ; $stderr.puts 345 ; exit 5") do |path|
         result = call("ruby #{path}", 1, 4, {})
-        expect(result).to eq({
+        expect(result).to include({
           :stdout => "123\n",
           :exit_status => 5
         })
@@ -474,6 +474,36 @@ EOF
       priority_without_nice = run_with_file(priority_cmd){ |cmd| call("ruby #{cmd}", 1, 4, {}) }.first.to_i
       priority_with_nice = run_with_file(priority_cmd){ |cmd| call("ruby #{cmd}", 1, 4, :nice => true) }.first.to_i
       expect(priority_without_nice).to be < priority_with_nice
+    end
+  
+    it "returns command used" do
+      run_with_file("puts 123; exit 5") do |path|
+        env_vars = "TEST_ENV_NUMBER=2;export TEST_ENV_NUMBER;PARALLEL_TEST_GROUPS=4;export PARALLEL_TEST_GROUPS;"
+        result = call("ruby #{path}", 1, 4, {})
+        expect(result).to include({
+          :command => "#{env_vars}ruby #{path}"
+        })
+      end
+    end
+
+    describe "rspec seed" do
+      it "includes seed when provided" do
+        run_with_file("puts 'seed 555'") do |path|
+          result = call("ruby #{path}", 1, 4, {})
+          expect(result).to include({
+            :seed => "555"
+          })
+        end
+      end
+
+      it "seed is nil when not provided" do
+        run_with_file("puts 555") do |path|
+          result = call("ruby #{path}", 1, 4, {})
+          expect(result).to include({
+            :seed => nil
+          })
+        end
+      end
     end
   end
 end
