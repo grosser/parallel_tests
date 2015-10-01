@@ -153,6 +153,11 @@ describe 'CLI' do
       expect(result.split("\n")).to eq(%w["" "2" "3" "4"])
     end
 
+    it "can exec given command with a restricted set of groups" do
+      result = `#{executable} -e 'ruby -e "print ENV[:TEST_ENV_NUMBER.to_s].to_i"' -n 4 --only-group 1,3`
+      expect(result.gsub('"','').split('').sort).to eq(%w[0 3])
+    end
+
     it "can serialize stdout" do
       result = `#{executable} -e 'ruby -e "5.times{sleep 0.01;puts ENV[:TEST_ENV_NUMBER.to_s].to_i;STDOUT.flush}"' -n 2 --serialize-stdout`
       expect(result).not_to match(/0.*2.*0/m)
