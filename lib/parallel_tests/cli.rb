@@ -227,10 +227,10 @@ module ParallelTests
 
     def execute_shell_command_in_parallel(command, num_processes, options)
       runs = if options[:only_group]
-               options[:only_group].map{|g| g - 1}
-             else
-               (0...num_processes).to_a
-             end
+        options[:only_group].map{|g| g - 1}
+      else
+        (0...num_processes).to_a
+      end
       results = if options[:non_parallel]
         runs.map do |i|
           ParallelTests::Test::Runner.execute_command(command, i, num_processes, options)
