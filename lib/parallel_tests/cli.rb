@@ -226,13 +226,17 @@ module ParallelTests
     end
 
     def execute_shell_command_in_parallel(command, num_processes, options)
-      runs = (0...num_processes).to_a
+      runs = if options[:only_group]
+               options[:only_group].map{|g| g - 1}
+             else
+               (0...num_processes).to_a
+             end
       results = if options[:non_parallel]
         runs.map do |i|
           ParallelTests::Test::Runner.execute_command(command, i, num_processes, options)
         end
       else
-        execute_in_parallel(runs, num_processes, options) do |i|
+        execute_in_parallel(runs, runs.size, options) do |i|
           ParallelTests::Test::Runner.execute_command(command, i, num_processes, options)
         end
       end.flatten
