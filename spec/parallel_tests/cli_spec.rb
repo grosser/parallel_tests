@@ -159,6 +159,30 @@ describe ParallelTests::CLI do
         }.to output("\n\nTests have failed for a parallel_test group. Use the following command to run the group again:\n\nfoo\n").to_stdout
       end
 
+      it "prints multiple commands if there are multiple failures" do
+        expect { 
+          subject.send(:report_failure_rerun_commmand,
+            [
+              {exit_status: 1, command: 'foo', seed: nil, output: 'blah'},
+              {exit_status: 1, command: 'bar', seed: nil, output: 'blah'},
+              {exit_status: 1, command: 'baz', seed: nil, output: 'blah'},
+            ]
+          )
+        }.to output(/foo\nbar\nbaz/).to_stdout
+      end
+
+      it "only includes faiures" do
+        expect { 
+          subject.send(:report_failure_rerun_commmand,
+            [
+              {exit_status: 1, command: 'foo', seed: nil, output: 'blah'},
+              {exit_status: 0, command: 'bar', seed: nil, output: 'blah'},
+              {exit_status: 1, command: 'baz', seed: nil, output: 'blah'},
+            ]
+          )
+        }.to output(/foo\nbaz/).to_stdout
+      end
+
       it "prints the seed" do
         expect { 
           subject.send(:report_failure_rerun_commmand,
