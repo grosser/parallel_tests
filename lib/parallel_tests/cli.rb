@@ -59,7 +59,7 @@ module ParallelTests
 
     def run_tests(group, process_number, num_processes, options)
       if group.empty?
-        {:stdout => '', :exit_status => 0}
+        {:stdout => '', :exit_status => 0, :command => '', :seed => nil}
       else
         @runner.run_tests(group, process_number, num_processes, options)
       end
@@ -88,6 +88,18 @@ module ParallelTests
       results = @runner.find_results(test_results.map { |result| result[:stdout] }*"")
       puts ""
       puts @runner.summarize_results(results)
+      report_failure_rerun_commmand(test_results)
+    end
+
+    def report_failure_rerun_commmand(test_results)
+      failing_sets = test_results.select{|test_result| test_result[:exit_status] != 0 }
+      return unless failing_sets.size > 0
+
+      puts "\n\nTests have failed for a parallel_test group. Use the following command to run the group again:\n\n"
+      failing_sets.each do |failing_set|
+        puts failing_set[:command]
+        puts "\nCheckout your local branch to the deployed SHA and add '--seed #{failing_set[:seed]}' to the command to run tests in the same order.\n" if failing_set[:seed]
+      end
     end
 
     def report_number_of_tests(groups)

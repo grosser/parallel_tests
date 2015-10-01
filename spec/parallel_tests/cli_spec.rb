@@ -137,6 +137,40 @@ describe ParallelTests::CLI do
     end
   end
 
+  describe ".report_failure_rerun_commmand" do
+    it "prints nothing if there are no failures" do
+      expect($stdout).not_to receive(:puts)
+
+      subject.send(:report_failure_rerun_commmand,
+        [
+          {exit_status: 0, command: 'foo', seed: nil, output: 'blah'},
+        ]
+      )
+    end
+
+    describe "failure" do
+      it "prints a message and the command if there is a failure" do
+        expect { 
+          subject.send(:report_failure_rerun_commmand,
+            [
+              {exit_status: 1, command: 'foo', seed: nil, output: 'blah'},
+            ]
+          )
+        }.to output("\n\nTests have failed for a parallel_test group. Use the following command to run the group again:\n\nfoo\n").to_stdout
+      end
+
+      it "prints the seed" do
+        expect { 
+          subject.send(:report_failure_rerun_commmand,
+            [
+              {exit_status: 1, command: 'foo', seed: 555, output: 'blah'},
+            ]
+          )
+        }.to output(/Checkout your local branch to the deployed SHA and add '--seed 555' to the command to run tests in the same order.\n/).to_stdout
+      end
+    end
+  end
+
   describe "#final_fail_message" do
     before do
       subject.instance_variable_set(:@runner, ParallelTests::Test::Runner)
