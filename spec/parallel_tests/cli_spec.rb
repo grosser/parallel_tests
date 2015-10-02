@@ -175,22 +175,22 @@ describe ParallelTests::CLI do
         expect { 
           subject.send(:report_failure_rerun_commmand,
             [
-              {exit_status: 1, command: 'foo', seed: nil, output: 'blah'},
+              {exit_status: 1, command: 'foo --color', seed: nil, output: 'blah'},
               {exit_status: 0, command: 'bar', seed: nil, output: 'blah'},
               {exit_status: 1, command: 'baz', seed: nil, output: 'blah'},
             ]
           )
-        }.to output(/foo\nbaz/).to_stdout
+        }.to output(/foo --color\nbaz/).to_stdout
       end
 
-      it "prints the seed" do
+      it "prints the command with the seed" do
         expect { 
           subject.send(:report_failure_rerun_commmand,
             [
-              {exit_status: 1, command: 'foo', seed: 555, output: 'blah'},
+              {exit_status: 1, command: 'rspec --color spec/foo_spec.rb', seed: 555, output: 'blah'},
             ]
           )
-        }.to output(/Checkout your local branch to the deployed SHA and add '--seed 555' to the command to run tests in the same order.\n/).to_stdout
+        }.to output(/rspec --seed 555 --color spec\/foo_spec\.rb/).to_stdout
       end
     end
   end
