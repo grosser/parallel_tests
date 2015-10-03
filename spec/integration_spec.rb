@@ -408,7 +408,16 @@ cucumber features/fail1.feature:2 # Scenario: xxx
 
   context "Spinach" do
     before do
-      write "features/steps/a.rb", "class A < Spinach::FeatureSteps\n  Given 'I print TEST_ENV_NUMBER' do\n    puts \"YOUR TEST ENV IS \#{ENV['TEST_ENV_NUMBER']}!\"\n  end\n  And 'I sleep a bit' do\n    sleep 0.2\n  end\nend"
+      write "features/steps/a.rb", <<-RUBY.strip_heredoc
+        class A < Spinach::FeatureSteps
+          Given 'I print TEST_ENV_NUMBER' do
+            puts "YOUR TEST ENV IS \#{ENV['TEST_ENV_NUMBER']}!"
+          end
+          And 'I sleep a bit' do
+            sleep 0.2
+          end
+        end
+      RUBY
     end
 
     it "runs tests which outputs accented characters" do
@@ -422,7 +431,6 @@ cucumber features/fail1.feature:2 # Scenario: xxx
       write "features/good1.feature", "Feature: a\n  Scenario: xxx\n    Given I print TEST_ENV_NUMBER"
       write "features/good2.feature", "Feature: a\n  Scenario: xxx\n    Given I print TEST_ENV_NUMBER"
       write "features/b.feature", "Feature: b\n  Scenario: xxx\n    Given I FAIL" #Expect this not to be run
-      write "features/steps/a.rb", "class A < Spinach::FeatureSteps\nGiven('I print TEST_ENV_NUMBER'){ puts \"YOUR TEST ENV IS \#{ENV['TEST_ENV_NUMBER']}!\" }\nend"
 
       result = run_tests "features", :type => "spinach", :add => '--pattern good'
 
@@ -440,7 +448,7 @@ cucumber features/fail1.feature:2 # Scenario: xxx
         # needs sleep so that runtime loggers dont overwrite each other initially
         write "features/good#{i}.feature", "Feature: A\n  Scenario: xxx\n    Given I print TEST_ENV_NUMBER\n    And I sleep a bit"
       }
-      result = run_tests "features", :type => "spinach"
+      run_tests "features", :type => "spinach"
       expect(read(log).gsub(/\.\d+/,'').split("\n")).to match_array([
         "features/good0.feature:0",
         "features/good1.feature:0"
