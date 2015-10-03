@@ -488,7 +488,7 @@ EOF
 
     describe "rspec seed" do
       it "includes seed when provided" do
-        run_with_file("puts 'seed 555'") do |path|
+        run_with_file("puts 'Run options: --seed 555'") do |path|
           result = call("ruby #{path}", 1, 4, {})
           expect(result).to include({
             :seed => "555"
@@ -504,6 +504,13 @@ EOF
           })
         end
       end
+    end
+  end
+
+  describe ".command_with_seed" do
+    it "adds the randomized seed" do
+      expect(ParallelTests::Test::Runner.command_with_seed("ruby -Ilib:test test/minitest/test_minitest_unit.rb", 555)).
+        to eq("ruby -Ilib:test test/minitest/test_minitest_unit.rb --seed 555")
     end
   end
 end

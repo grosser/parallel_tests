@@ -183,14 +183,20 @@ describe ParallelTests::CLI do
         }.to output(/foo --color\nbaz/).to_stdout
       end
 
-      it "prints the command with the seed" do
+      it "prints the command with the seed added by the runner" do
+        command = 'rspec --color spec/foo_spec.rb'
+        seed = 555
+
+        subject.instance_variable_set(:@runner, ParallelTests::Test::Runner)
+        expect(ParallelTests::Test::Runner).to receive(:command_with_seed).with(command, seed).
+          and_return("my seeded command result --seed #{seed}")
         expect { 
           subject.send(:report_failure_rerun_commmand,
             [
-              {exit_status: 1, command: 'rspec --color spec/foo_spec.rb', seed: 555, output: 'blah'},
+              {exit_status: 1, command: command, seed: 555, output: 'blah'},
             ]
           )
-        }.to output(/rspec --color spec\/foo_spec\.rb --seed 555/).to_stdout
+        }.to output(/my seeded command result --seed 555/).to_stdout
       end
     end
   end

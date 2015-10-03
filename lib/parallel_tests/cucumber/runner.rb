@@ -26,6 +26,10 @@ module ParallelTests
           output.join("\n\n")
         end
 
+        def command_with_seed(cmd, seed)
+          "#{cmd} --order random:#{seed}"
+        end
+
         private
 
         def failing_scenario_regex

@@ -92,13 +92,13 @@ module ParallelTests
     end
 
     def report_failure_rerun_commmand(test_results)
-      failing_sets = test_results.select{|test_result| test_result[:exit_status] != 0 }
-      return unless failing_sets.size > 0
+      failing_sets = test_results.reject { |r| r[:exit_status] == 0 }
+      return if failing_sets.none?
 
       puts "\n\nTests have failed for a parallel_test group. Use the following command to run the group again:\n\n"
       failing_sets.each do |failing_set|
         command = failing_set[:command]
-        command = command + " --seed #{failing_set[:seed]}" if failing_set[:seed]
+        command = @runner.command_with_seed(command, failing_set[:seed]) if failing_set[:seed]
         puts command
       end
     end

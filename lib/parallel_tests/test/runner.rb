@@ -117,6 +117,10 @@ module ParallelTests
           sums.sort.map{|word, number|  "#{number} #{word}#{'s' if number != 1}" }.join(', ')
         end
 
+        def command_with_seed(cmd, seed)
+          "#{cmd} --seed #{seed}"
+        end
+
         protected
 
         def executable

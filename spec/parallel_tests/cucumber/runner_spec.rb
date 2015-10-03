@@ -24,4 +24,12 @@ describe ParallelTests::Cucumber::Runner do
       end
     end
   end
+
+  describe ".command_with_seed" do
+    it "adds the randomized seed" do
+      expect(ParallelTests::Cucumber::Runner.command_with_seed("cucumber", 555)).
+        to eq("cucumber --order random:555")
+    end
+  end
+
 end
