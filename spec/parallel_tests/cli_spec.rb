@@ -190,7 +190,7 @@ describe ParallelTests::CLI do
               {exit_status: 1, command: 'rspec --color spec/foo_spec.rb', seed: 555, output: 'blah'},
             ]
           )
-        }.to output(/rspec --seed 555 --color spec\/foo_spec\.rb/).to_stdout
+        }.to output(/rspec --color spec\/foo_spec\.rb --seed 555/).to_stdout
       end
     end
   end

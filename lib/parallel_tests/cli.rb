@@ -98,7 +98,7 @@ module ParallelTests
       puts "\n\nTests have failed for a parallel_test group. Use the following command to run the group again:\n\n"
       failing_sets.each do |failing_set|
         command = failing_set[:command]
-        command = command.gsub('rspec', "rspec --seed #{failing_set[:seed]}") if failing_set[:seed]
+        command = command + " --seed #{failing_set[:seed]}" if failing_set[:seed]
         puts command
       end
     end
