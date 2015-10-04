@@ -95,8 +95,9 @@ module ParallelTests
 
           output = open("|#{cmd}", "r") { |output| capture_output(output, silence) }
           exitstatus = $?.exitstatus
+          seed = output[/seed (\d+)/,1]
 
-          {:stdout => output, :exit_status => exitstatus}
+          {:stdout => output, :exit_status => exitstatus, :command => cmd, :seed => seed}
         end
 
         def find_results(test_output)
@@ -114,6 +115,12 @@ module ParallelTests
         def summarize_results(results)
           sums = sum_up_results(results)
           sums.sort.map{|word, number|  "#{number} #{word}#{'s' if number != 1}" }.join(', ')
+        end
+
+        def command_with_seed(cmd, seed)
+          cmd = cmd.sub(/\s--seed(\s\d*){0,1}/, '')
+          cmd = cmd.sub(/\s--order rand(:\d*){0,1}/, '')
+          "#{cmd} --seed #{seed}"
         end
 
         protected
