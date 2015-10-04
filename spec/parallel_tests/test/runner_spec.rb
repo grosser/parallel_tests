@@ -512,5 +512,22 @@ EOF
       expect(ParallelTests::Test::Runner.command_with_seed("ruby -Ilib:test test/minitest/test_minitest_unit.rb", 555)).
         to eq("ruby -Ilib:test test/minitest/test_minitest_unit.rb --seed 555")
     end
+
+    describe "existing randomization" do
+      it "does not duplicate seed" do
+        expect(ParallelTests::Test::Runner.command_with_seed("ruby -Ilib:test test/minitest/test_minitest_unit.rb --seed 123", 555)).
+          to eq("ruby -Ilib:test test/minitest/test_minitest_unit.rb --seed 555")
+      end
+
+      it "does not duplicate rand" do
+        expect(ParallelTests::Test::Runner.command_with_seed("ruby -Ilib:test test/minitest/test_minitest_unit.rb --order rand", 555)).
+          to eq("ruby -Ilib:test test/minitest/test_minitest_unit.rb --seed 555")
+      end
+
+      it "does not duplicate rand with seed" do
+        expect(ParallelTests::Test::Runner.command_with_seed("ruby -Ilib:test test/minitest/test_minitest_unit.rb --order rand:555", 555)).
+          to eq("ruby -Ilib:test test/minitest/test_minitest_unit.rb --seed 555")
+      end
+    end
   end
 end
