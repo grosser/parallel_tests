@@ -325,6 +325,7 @@ inspired by [pivotal labs](http://pivotallabs.com/users/miked/blog/articles/849-
  - [Ed Slocomb](https://github.com/edslocomb)
  - [Cezary Baginski](https://github.com/e2)
  - [Marius Ioana](https://github.com/mariusioana)
+ - [Lukas Oberhuber](https://github.com/lukaso)
 
 
 [Michael Grosser](http://grosser.it)<br/>
