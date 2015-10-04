@@ -9,7 +9,9 @@ module ParallelTests
         if path_or_io.respond_to?(:write)
           path_or_io
         else # its a path
-          if temp_lock = Tempfile.open("#{File.basename(path_or_io)}-lock", mode: File::LOCK_EX|File::LOCK_NB)
+          temp_filename = File.join(Dir.tmpdir, "#{File.basename(path_or_io)}-lock")
+          temp_lock = File.open(temp_filename, File::CREAT|File::APPEND)
+          if temp_lock.flock(File::LOCK_EX|File::LOCK_NB)
             File.open(path_or_io, 'w').close # clean out the file
 
             at_exit do
@@ -24,7 +26,7 @@ module ParallelTests
           at_exit do
             unless file.closed?
               file.flush
-              file.close
+              File.unlink(temp_filename)
             end
           end
 

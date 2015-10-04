@@ -27,13 +27,15 @@ class ParallelTests::RSpec::LoggerBase < ParallelTests::RSpec::LoggerBaseBase
 
     if String === @output # a path ?
       FileUtils.mkdir_p(File.dirname(@output))
-      if temp_lock = Tempfile.open("#{File.basename(@output)}-lock", mode: File::LOCK_EX|File::LOCK_NB)
+      temp_filename = File.join(Dir.tmpdir, "#{File.basename(@output)}-lock")
+      temp_lock = File.open(temp_filename, File::CREAT|File::APPEND)
+      if temp_lock.flock(File::LOCK_EX|File::LOCK_NB)
         File.open(@output, 'w'){} # overwrite previous results
 
         at_exit do
           unless temp_lock.closed?
             temp_lock.close
-            temp_lock.unlink
+            File.unlink(temp_filename)
           end
         end
       end
