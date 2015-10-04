@@ -27,7 +27,7 @@ module ParallelTests
         end
 
         def command_with_seed(cmd, seed)
-          cmd = cmd.sub(/\s--order random(:\d*){0,1}/, '')
+          cmd = cmd.sub(/\s--order random(:\d*)?/, '')
           "#{cmd} --order random:#{seed}"
         end
 

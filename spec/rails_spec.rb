@@ -10,7 +10,7 @@ describe 'rails' do
   end
 
   ["rails32", "rails42"].each do |rails|
-    it "can create and run" do
+    it "can create and run #{rails}" do
       if RUBY_PLATFORM == "java"
         skip 'rails fixtures are not set up for java'
       elsif rails == 'rails32' && RUBY_VERSION >= '2.2.0'

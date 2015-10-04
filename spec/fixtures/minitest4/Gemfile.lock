@@ -1,14 +1,14 @@
 PATH
   remote: ../../../
   specs:
-    parallel_tests (1.6.1)
+    parallel_tests (1.8.0)
       parallel
 
 GEM
   remote: https://rubygems.org/
   specs:
     minitest (4.7.5)
-    parallel (1.6.1)
+    parallel (1.4.0)
 
 PLATFORMS
   ruby
