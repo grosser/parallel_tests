@@ -1,3 +1,4 @@
+require 'tempfile'
 require 'parallel_tests'
 
 module ParallelTests

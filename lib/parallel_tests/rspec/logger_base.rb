@@ -1,3 +1,5 @@
+require 'tempfile'
+
 module ParallelTests
   module RSpec
   end
