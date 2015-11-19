@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    parallel_tests (1.9.0)
+    parallel_tests (2.0.0)
       parallel
 
 GEM
