@@ -51,7 +51,7 @@ module ParallelTests
           end
         end
 
-        report_results(test_results)
+        report_results(test_results, options)
       end
 
       abort final_fail_message if any_test_failed?(test_results)
@@ -84,23 +84,26 @@ module ParallelTests
       end
     end
 
-    def report_results(test_results)
+    def report_results(test_results, options)
       results = @runner.find_results(test_results.map { |result| result[:stdout] }*"")
       puts ""
       puts @runner.summarize_results(results)
-      report_failure_rerun_commmand(test_results)
+
+      report_failure_rerun_commmand(test_results, options)
     end
 
-    def report_failure_rerun_commmand(test_results)
+    def report_failure_rerun_commmand(test_results, options)
       failing_sets = test_results.reject { |r| r[:exit_status] == 0 }
       return if failing_sets.none?
 
-      puts "\n\nTests have failed for a parallel_test group. Use the following command to run the group again:\n\n"
-      failing_sets.each do |failing_set|
-        command = failing_set[:command]
-        command = command.gsub(/;export [A-Z_]+;/, ' ') # remove ugly export statements
-        command = @runner.command_with_seed(command, failing_set[:seed]) if failing_set[:seed]
-        puts command
+      if options[:verbose]
+        puts "\n\nTests have failed for a parallel_test group. Use the following command to run the group again:\n\n"
+        failing_sets.each do |failing_set|
+          command = failing_set[:command]
+          command = command.gsub(/;export [A-Z_]+;/, ' ') # remove ugly export statements
+          command = @runner.command_with_seed(command, failing_set[:seed]) if failing_set[:seed]
+          puts command
+        end
       end
     end
 
