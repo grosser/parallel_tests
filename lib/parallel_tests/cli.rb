@@ -104,8 +104,6 @@ module ParallelTests
           command = @runner.command_with_seed(command, failing_set[:seed]) if failing_set[:seed]
           puts command
         end
-      else
-        puts "\n\nUse --verbose to see detailed reproduction steps"
       end
     end
 

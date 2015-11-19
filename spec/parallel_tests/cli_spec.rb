@@ -150,7 +150,7 @@ describe ParallelTests::CLI do
     end
 
     shared_examples :not_verbose_rerun do |options|
-      it 'prints a clue to use --verbose flag to see rerun commands' do
+      it 'prints nothing about rerun commands' do
           expect {
             subject.send(:report_failure_rerun_commmand,
               [
@@ -158,7 +158,7 @@ describe ParallelTests::CLI do
               ],
               options
             )
-          }.to output("\n\nUse --verbose to see detailed reproduction steps\n").to_stdout
+          }.to_not output(/Use the following command to run the group again/).to_stdout
       end
     end
 
