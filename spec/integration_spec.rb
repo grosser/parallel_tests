@@ -285,12 +285,14 @@ describe 'CLI' do
   context "RSpec" do
     it_fails_without_any_files "rspec"
 
-    it "captures seed with random failures" do
-      write 'spec/xxx_spec.rb', 'describe("it"){it("should"){puts "TEST1"}}'
-      write 'spec/xxx2_spec.rb', 'describe("it"){it("should"){1.should == 2}}'
-      result = run_tests "spec", :add => "--test-options '--seed 1234'", :fail => true, :type => 'rspec'
-      expect(result).to include("Randomized with seed 1234")
-      expect(result).to include("bundle exec rspec spec/xxx2_spec.rb --seed 1234")
+    context 'with verbose option' do
+      it "captures seed with random failures" do
+        write 'spec/xxx_spec.rb', 'describe("it"){it("should"){puts "TEST1"}}'
+        write 'spec/xxx2_spec.rb', 'describe("it"){it("should"){1.should == 2}}'
+        result = run_tests "spec --verbose", :add => "--test-options '--seed 1234'", :fail => true, :type => 'rspec'
+        expect(result).to include("Randomized with seed 1234")
+        expect(result).to include("bundle exec rspec spec/xxx2_spec.rb --seed 1234")
+      end
     end
   end
 
@@ -413,11 +415,13 @@ cucumber features/fail1.feature:2 # Scenario: xxx
       expect(result).to include("2 processes for 2 features")
     end
 
-    it "captures seed with random failures" do
-      write "features/good1.feature", "Feature: xxx\n  Scenario: xxx\n    Given I fail"
-      result = run_tests "features", :type => "cucumber", :add => '--test-options "--order random:1234"', :fail => true
-      expect(result).to include("Randomized with seed 1234")
-      expect(result).to include("bundle exec cucumber features/good1.feature --order random:1234")
+    context 'with verbose option' do
+      it "captures seed with random failures" do
+        write "features/good1.feature", "Feature: xxx\n  Scenario: xxx\n    Given I fail"
+        result = run_tests "features --verbose", :type => "cucumber", :add => '--test-options "--order random:1234"', :fail => true
+        expect(result).to include("Randomized with seed 1234")
+        expect(result).to include("bundle exec cucumber features/good1.feature --order random:1234")
+      end
     end
   end
 
