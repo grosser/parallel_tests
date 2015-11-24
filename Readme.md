@@ -205,6 +205,8 @@ Options are:
         --ignore-tags [PATTERN]      When counting steps ignore scenarios with tags that match this pattern
         --nice                       execute test commands with low priority.
         --runtime-log [PATH]         Location of previously recorded test runtimes
+        --allowed-missing            Allowed percentage of missing runtimes (default = 50)
+        --unknown-runtime [FLOAT]    Use given number as unknown runtime (otherwise use average time)
         --verbose                    Print more output
     -v, --version                    Show Version
     -h, --help                       Show this.
@@ -326,6 +328,7 @@ inspired by [pivotal labs](http://pivotallabs.com/users/miked/blog/articles/849-
  - [Cezary Baginski](https://github.com/e2)
  - [Marius Ioana](https://github.com/mariusioana)
  - [Lukas Oberhuber](https://github.com/lukaso)
+ - [Ryan Zhang](https://github.com/ryanus)
 
 
 [Michael Grosser](http://grosser.it)<br/>

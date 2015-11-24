@@ -52,7 +52,7 @@ module ParallelTests
           when :filesize
             sort_by_filesize(tests)
           when :runtime
-            sort_by_runtime(tests, runtimes(tests, options), options.merge(allowed_missing: 0.5))
+            sort_by_runtime(tests, runtimes(tests, options), options.merge(allowed_missing: (options[:allowed_missing_percent] || 50) / 100.0))
           when nil
             # use recorded test runtime if we got enough data
             runtimes = runtimes(tests, options) rescue []
