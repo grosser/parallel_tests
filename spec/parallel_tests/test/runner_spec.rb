@@ -90,6 +90,11 @@ describe ParallelTests::Test::Runner do
         expect { call(["aaa", "bbb", "ccc"], 3, group_by: :runtime) }.to raise_error(RuntimeError)
       end
 
+      it "groups a lot of missing files when allow-missing is high" do
+        File.write("tmp/parallel_runtime_test.log", "xxx:123\nyyy:123\naaa:123")
+        call(["aaa", "bbb", "ccc"], 3, group_by: :runtime, allowed_missing_percent: 80)
+      end
+
       it "groups when there is enough log" do
         File.write("tmp/parallel_runtime_test.log", "xxx:123\nbbb:123\naaa:123")
         call(["aaa", "bbb", "ccc"], 3, group_by: :runtime)
