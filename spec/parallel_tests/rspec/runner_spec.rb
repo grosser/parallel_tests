@@ -148,6 +148,11 @@ describe ParallelTests::RSpec::Runner do
       expect(ParallelTests::RSpec::Runner).to receive(:execute_command).and_return :x => 1
       expect(call('xxx', 1, 22, {})).to eq({:x => 1})
     end
+
+    it "has DISABLE_SPRING var set" do
+      call('xxx', 1, 22, {})
+      expect(ENV['DISABLE_SPRING']).to eq '1'
+    end
   end
 
   describe :find_results do
