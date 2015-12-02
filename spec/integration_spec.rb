@@ -202,6 +202,12 @@ describe 'CLI' do
     expect(result.scan(/START|END/)).to eq(["START", "START", "END", "END"])
   end
 
+  it "disables spring so correct database is used" do
+    write "spec/xxx_spec.rb", 'puts "SPRING: #{ENV["DISABLE_SPRING"]}"'
+    result = run_tests("spec", processes: 2, type: 'rspec')
+    expect(result).to include "SPRING: 1"
+  end
+
   it "runs with files that have spaces" do
     write "test/xxx _test.rb", 'puts "YES"'
     result = run_tests("test", processes: 2, type: 'test')

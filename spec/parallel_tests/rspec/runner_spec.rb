@@ -4,7 +4,7 @@ require "parallel_tests/rspec/runner"
 describe ParallelTests::RSpec::Runner do
   test_tests_in_groups(ParallelTests::RSpec::Runner, '_spec.rb')
 
-  describe :run_tests do
+  describe '.run_tests' do
     before do
       allow(File).to receive(:file?).with('script/spec').and_return false
       allow(File).to receive(:file?).with('spec/spec.opts').and_return false
@@ -148,44 +148,39 @@ describe ParallelTests::RSpec::Runner do
       expect(ParallelTests::RSpec::Runner).to receive(:execute_command).and_return :x => 1
       expect(call('xxx', 1, 22, {})).to eq({:x => 1})
     end
-
-    it "has DISABLE_SPRING var set" do
-      call('xxx', 1, 22, {})
-      expect(ENV['DISABLE_SPRING']).to eq '1'
-    end
   end
 
-  describe :find_results do
+  describe '.find_results' do
     def call(*args)
       ParallelTests::RSpec::Runner.find_results(*args)
     end
 
     it "finds multiple results in spec output" do
-      output = "
-....F...
-..
-failute fsddsfsd
-...
-ff.**..
-0 examples, 0 failures, 0 pending
-ff.**..
-1 example, 1 failure, 1 pending
-"
+      output = <<-OUT.gsub(/^        /, '')
+        ....F...
+        ..
+        failute fsddsfsd
+        ...
+        ff.**..
+        0 examples, 0 failures, 0 pending
+        ff.**..
+        1 example, 1 failure, 1 pending
+      OUT
 
       expect(call(output)).to eq(['0 examples, 0 failures, 0 pending','1 example, 1 failure, 1 pending'])
     end
 
     it "is robust against scrambeled output" do
-      output = "
-....F...
-..
-failute fsddsfsd
-...
-ff.**..
-0 exFampl*es, 0 failures, 0 pend.ing
-ff.**..
-1 exampF.les, 1 failures, 1 pend.ing
-"
+      output = <<-OUT.gsub(/^        /, '')
+        ....F...
+        ..
+        failute fsddsfsd
+        ...
+        ff.**..
+        0 exFampl*es, 0 failures, 0 pend.ing
+        ff.**..
+        1 exampF.les, 1 failures, 1 pend.ing
+      OUT
 
       expect(call(output)).to eq(['0 examples, 0 failures, 0 pending','1 examples, 1 failures, 1 pending'])
     end
