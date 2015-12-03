@@ -246,6 +246,7 @@ TIPS
  - [Distributed parallel test (e.g. Travis Support)](https://github.com/grosser/parallel_tests/wiki/Distributed-Parallel-Tests-and-Travis-Support)
  - Debug errors that only happen with multiple files using `--verbose` and [cleanser](https://github.com/grosser/cleanser)
  - Shell alias: `alias prspec='parallel_rspec -m 2 --'`
+ - [Spring] to use spring you have to [patch it](https://github.com/grosser/parallel_tests/wiki/Spring)
  - Contribute your own gotaches to the [Wiki](https://github.com/grosser/parallel_tests/wiki) or even better open a PR :)
 
 TODO
