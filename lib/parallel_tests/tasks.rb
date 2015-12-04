@@ -19,7 +19,7 @@ module ParallelTests
       end
 
       # this is a crazy-complex solution for a very simple problem:
-      # removing certain lines from the output without chaning the exit-status
+      # removing certain lines from the output without changing the exit-status
       # normally I'd not do this, but it has been lots of fun and a great learning experience :)
       #
       # - sed does not support | without -r
