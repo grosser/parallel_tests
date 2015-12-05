@@ -208,6 +208,12 @@ describe 'CLI' do
     expect(result).to include "SPRING: 1"
   end
 
+  it "can enable spring" do
+    write "spec/xxx_spec.rb", 'puts "SPRING: #{ENV["DISABLE_SPRING"]}"'
+    result = run_tests("spec", processes: 2, type: 'rspec', export: "DISABLE_SPRING=0")
+    expect(result).to include "SPRING: 0"
+  end
+
   it "runs with files that have spaces" do
     write "test/xxx _test.rb", 'puts "YES"'
     result = run_tests("test", processes: 2, type: 'test')

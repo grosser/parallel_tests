@@ -8,7 +8,7 @@ module ParallelTests
     def run(argv)
       options = parse_options!(argv)
 
-      ENV['DISABLE_SPRING']='1'
+      ENV['DISABLE_SPRING'] ||= '1'
 
       num_processes = ParallelTests.determine_number_of_processes(options[:count])
       num_processes = num_processes * (options[:multiply] || 1)
