@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    parallel_tests (2.2.1)
+    parallel_tests (2.2.2)
       parallel
 
 GEM
@@ -68,4 +68,4 @@ DEPENDENCIES
   test-unit
 
 BUNDLED WITH
-   1.10.6
+   1.11.2
