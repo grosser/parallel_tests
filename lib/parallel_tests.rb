@@ -24,6 +24,11 @@ module ParallelTests
       ].detect{|c| not c.to_s.strip.empty? }.to_i
     end
 
+    def always_use_test_env_number_for_first_process?
+      val = ENV["PARALLEL_TEST_USE_TEST_ENV_NUMBER_FOR_FIRST_PROCESS"]
+      val && !val.strip.empty?
+    end
+
     # copied from http://github.com/carlhuda/bundler Bundler::SharedHelpers#find_gemfile
     def bundler_enabled?
       return true if Object.const_defined?(:Bundler)
@@ -41,7 +46,7 @@ module ParallelTests
     end
 
     def first_process?
-      !ENV["TEST_ENV_NUMBER"] || ENV["TEST_ENV_NUMBER"].to_i == 0
+      ENV["TEST_ENV_NUMBER"].to_i <= 1
     end
 
     def wait_for_other_processes_to_finish

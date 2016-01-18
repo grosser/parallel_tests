@@ -33,6 +33,28 @@ describe ParallelTests do
     end
   end
 
+  describe ".always_use_test_env_number_for_first_process?" do
+    let(:result) { ParallelTests.always_use_test_env_number_for_first_process? }
+
+    after do
+      ENV.delete "PARALLEL_TEST_USE_TEST_ENV_NUMBER_FOR_FIRST_PROCESS"
+    end
+
+    it "is false when the env var is not set" do
+      expect(result).to be_falsey
+    end
+
+    it "is false when the env var is blank" do
+      ENV["PARALLEL_TEST_USE_TEST_ENV_NUMBER_FOR_FIRST_PROCESS"] = ""
+      expect(result).to be_falsey
+    end
+
+    it "is true otherwise" do
+      ENV["PARALLEL_TEST_USE_TEST_ENV_NUMBER_FOR_FIRST_PROCESS"] = "true"
+      expect(result).to be_truthy
+    end
+  end
+
   describe ".bundler_enabled?" do
     before do
       allow(Object).to receive(:const_defined?).with(:Bundler).and_return false
@@ -131,7 +153,12 @@ describe ParallelTests do
       expect(ParallelTests.first_process?).to eq(true)
     end
 
-    it "is not first if env is set to something" do
+    it "is first if env is set to 1" do
+      ENV["TEST_ENV_NUMBER"] = "1"
+      expect(ParallelTests.first_process?).to eq(true)
+    end
+
+    it "is not first if env is set to something else" do
       ENV["TEST_ENV_NUMBER"] = "2"
       expect(ParallelTests.first_process?).to eq(false)
     end

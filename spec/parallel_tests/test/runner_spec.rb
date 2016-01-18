@@ -383,6 +383,16 @@ EOF
       end
     end
 
+    it "sets process number to 1 for 0 if requested" do
+      run_with_file("puts ENV['TEST_ENV_NUMBER']") do |path|
+        result = call("ruby #{path}", 0, 4, { use_test_env_number_for_first_process: true })
+        expect(result).to include({
+          :stdout => "1\n",
+          :exit_status => 0
+        })
+      end
+    end
+
     it 'sets PARALLEL_TEST_GROUPS so child processes know that they are being run under parallel_tests' do
       run_with_file("puts ENV['PARALLEL_TEST_GROUPS']") do |path|
         result = call("ruby #{path}", 1, 4, {})

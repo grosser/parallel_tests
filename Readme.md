@@ -22,7 +22,7 @@ gem "parallel_tests", group: :development
 ParallelTests uses 1 database per test-process.
 <table>
   <tr><td>Process number</td><td>1</td><td>2</td><td>3</td></tr>
-  <tr><td>ENV['TEST_ENV_NUMBER']</td><td>''</td><td>'2'</td><td>'3'</td></tr>
+  <tr><td>ENV['TEST_ENV_NUMBER']</td><td>'' (but see below)</td><td>'2'</td><td>'3'</td></tr>
 </table>
 
 ```yaml
@@ -225,6 +225,23 @@ You can run any kind of code in parallel with -e / --exec
 <tr><td>RSpec spec-suite</td><td>18s</td><td>14s</td><td>10s</td></tr>
 <tr><td>Rails-ActionPack</td><td>88s</td><td>53s</td><td>44s</td></tr>
 </table>
+
+`TEST_ENV_NUMBER`
+=================
+
+As documented above, by default `ENV["TEST_ENV_NUMBER"]` is blank for the first
+process. This means that parallel_tests' first process uses the same test
+database, etc., as when you run a single test or spec at the command line. This
+is convenient in one sense — one less environment to set up — but it does mean
+that if you have a long-running test suite you can't run other individual tests
+at the same time.
+
+If you'd like to isolate your parallel_tests runs completely from your normal
+test environment, you can set
+`PARALLEL_TEST_USE_TEST_ENV_NUMBER_FOR_FIRST_PROCESS=true` in your environment.
+This will make `ENV["TEST_ENV_NUMBER"]` in the first process be `"1"`.
+(Recommendation: set in a project-wide configuration file, e.g. using direnv.)
+
 
 TIPS
 ====
