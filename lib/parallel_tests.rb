@@ -24,11 +24,6 @@ module ParallelTests
       ].detect{|c| not c.to_s.strip.empty? }.to_i
     end
 
-    def test_env_number_first_is_1?
-      val = ENV["PARALLEL_TEST_FIRST_IS_1"]
-      val && !val.strip.empty?
-    end
-
     # copied from http://github.com/carlhuda/bundler Bundler::SharedHelpers#find_gemfile
     def bundler_enabled?
       return true if Object.const_defined?(:Bundler)

@@ -254,7 +254,7 @@ describe ParallelTests::CLI do
     context "specific groups to run" do
       let(:results){ {:stdout => "", :exit_status => 0} }
       let(:common_options) {
-        { files: ["test"], group_by: :filesize, first_is_1: nil }
+        { files: ["test"], group_by: :filesize, first_is_1: false }
       }
       before do
         allow(subject).to receive(:puts)

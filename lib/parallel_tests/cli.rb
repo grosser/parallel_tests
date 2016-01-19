@@ -13,7 +13,7 @@ module ParallelTests
       num_processes = ParallelTests.determine_number_of_processes(options[:count])
       num_processes = num_processes * (options[:multiply] || 1)
 
-      options[:first_is_1] ||= ParallelTests.test_env_number_first_is_1?
+      options[:first_is_1] ||= first_is_always_1?
 
       if options[:execute]
         execute_shell_command_in_parallel(options[:execute], num_processes, options)
@@ -288,6 +288,11 @@ module ParallelTests
 
     def use_colors?
       $stdout.tty?
+    end
+
+    def first_is_always_1?
+      val = ENV["PARALLEL_TEST_FIRST_IS_1"]
+      ['1', 'true'].include?(val)
     end
   end
 end

@@ -33,28 +33,6 @@ describe ParallelTests do
     end
   end
 
-  describe ".test_env_number_first_is_1?" do
-    let(:result) { ParallelTests.test_env_number_first_is_1? }
-
-    after do
-      ENV.delete "PARALLEL_TEST_FIRST_IS_1"
-    end
-
-    it "is false when the env var is not set" do
-      expect(result).to be_falsey
-    end
-
-    it "is false when the env var is blank" do
-      ENV["PARALLEL_TEST_FIRST_IS_1"] = ""
-      expect(result).to be_falsey
-    end
-
-    it "is true otherwise" do
-      ENV["PARALLEL_TEST_FIRST_IS_1"] = "true"
-      expect(result).to be_truthy
-    end
-  end
-
   describe ".bundler_enabled?" do
     before do
       allow(Object).to receive(:const_defined?).with(:Bundler).and_return false
