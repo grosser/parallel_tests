@@ -229,18 +229,13 @@ You can run any kind of code in parallel with -e / --exec
 `TEST_ENV_NUMBER`
 =================
 
-As documented above, by default `ENV["TEST_ENV_NUMBER"]` is blank for the first
-process. This means that parallel_tests' first process uses the same test
-database, etc., as when you run a single test or spec at the command line. This
-is convenient in one sense — one less environment to set up — but it does mean
-that if you have a long-running test suite you can't run other individual tests
-at the same time.
+By default the first `ENV["TEST_ENV_NUMBER"]` is `""`. This means
+that parallel_tests reuses your default test setup for the first process.
 
-If you'd like to isolate your parallel_tests runs completely from your normal
-test environment, you can set `PARALLEL_TEST_FIRST_IS_1=true` in your
-environment. This will make `ENV["TEST_ENV_NUMBER"]` in the first process be
-`"1"`. (Recommendation: set in a project-wide configuration file, e.g. using
-direnv.)
+If you'd like to isolate your parallel_tests runs from your normal test runs,
+you can set `PARALLEL_TEST_FIRST_IS_1=true` in your environment or use
+`--first-is-1` when invoking `parallel_test`. This will make
+`ENV["TEST_ENV_NUMBER"]="1"` in the first process.
 
 
 TIPS
