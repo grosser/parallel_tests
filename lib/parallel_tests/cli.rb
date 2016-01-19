@@ -13,7 +13,7 @@ module ParallelTests
       num_processes = ParallelTests.determine_number_of_processes(options[:count])
       num_processes = num_processes * (options[:multiply] || 1)
 
-      options[:use_test_env_number_for_first_process] ||= ParallelTests.always_use_test_env_number_for_first_process?
+      options[:first_is_1] ||= ParallelTests.test_env_number_first_is_1?
 
       if options[:execute]
         execute_shell_command_in_parallel(options[:execute], num_processes, options)
@@ -192,7 +192,7 @@ module ParallelTests
         opts.on("--runtime-log [PATH]", "Location of previously recorded test runtimes") { |path| options[:runtime_log] = path }
         opts.on("--allowed-missing [INT]", Integer, "Allowed percentage of missing runtimes (default = 50)") { |percent| options[:allowed_missing_percent] = percent }
         opts.on("--unknown-runtime [FLOAT]", Float, "Use given number as unknown runtime (otherwise use average time)") { |time| options[:unknown_runtime] = time }
-        opts.on("--use-test-env-number-for-first-process", "Provide \"1\" as TEST_ENV_NUMBER to the first process instead of blank") { options[:use_test_env_number_for_first_process] = true }
+        opts.on("--first-is-1", "Provide \"1\" as TEST_ENV_NUMBER to the first process instead of blank") { options[:first_is_1] = true }
         opts.on("--verbose", "Print more output") { options[:verbose] = true }
         opts.on("-v", "--version", "Show Version") { puts ParallelTests::VERSION; exit }
         opts.on("-h", "--help", "Show this.") { puts opts; exit }

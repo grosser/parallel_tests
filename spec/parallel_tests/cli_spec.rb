@@ -50,9 +50,9 @@ describe ParallelTests::CLI do
       expect(call(["test", "--suffix", "_(test|spec).rb$"])).to eq(defaults.merge(:suffix => /_(test|spec).rb$/))
     end
 
-    it "parses --use-test-env-number-for-first-process" do
-      expect(call(["test", "--use-test-env-number-for-first-process"])).
-        to eq(defaults.merge(:use_test_env_number_for_first_process => true))
+    it "parses --first-is-1" do
+      expect(call(["test", "--first-is-1"])).
+        to eq(defaults.merge(:first_is_1 => true))
     end
 
     context "parse only-group" do
@@ -202,7 +202,7 @@ describe ParallelTests::CLI do
         end
 
         it "only includes failures" do
-          expect { 
+          expect {
             subject.send(:report_failure_rerun_commmand,
               [
                 {exit_status: 1, command: 'foo --color', seed: nil, output: 'blah'},
@@ -221,7 +221,7 @@ describe ParallelTests::CLI do
           subject.instance_variable_set(:@runner, ParallelTests::Test::Runner)
           expect(ParallelTests::Test::Runner).to receive(:command_with_seed).with(command, seed).
             and_return("my seeded command result --seed #{seed}")
-          expect { 
+          expect {
             subject.send(:report_failure_rerun_commmand,
               [
                 {exit_status: 1, command: command, seed: 555, output: 'blah'},
@@ -254,7 +254,7 @@ describe ParallelTests::CLI do
     context "specific groups to run" do
       let(:results){ {:stdout => "", :exit_status => 0} }
       let(:common_options) {
-        { files: ["test"], group_by: :filesize, use_test_env_number_for_first_process: nil }
+        { files: ["test"], group_by: :filesize, first_is_1: nil }
       }
       before do
         allow(subject).to receive(:puts)

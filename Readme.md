@@ -237,10 +237,10 @@ that if you have a long-running test suite you can't run other individual tests
 at the same time.
 
 If you'd like to isolate your parallel_tests runs completely from your normal
-test environment, you can set
-`PARALLEL_TEST_USE_TEST_ENV_NUMBER_FOR_FIRST_PROCESS=true` in your environment.
-This will make `ENV["TEST_ENV_NUMBER"]` in the first process be `"1"`.
-(Recommendation: set in a project-wide configuration file, e.g. using direnv.)
+test environment, you can set `PARALLEL_TEST_FIRST_IS_1=true` in your
+environment. This will make `ENV["TEST_ENV_NUMBER"]` in the first process be
+`"1"`. (Recommendation: set in a project-wide configuration file, e.g. using
+direnv.)
 
 
 TIPS

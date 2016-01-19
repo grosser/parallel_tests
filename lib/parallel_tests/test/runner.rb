@@ -110,7 +110,7 @@ module ParallelTests
 
         def test_env_number(process_number, options={})
           if process_number == 0
-            options[:use_test_env_number_for_first_process] ? 1 : ''
+            options[:first_is_1] ? 1 : ''
           else
             process_number + 1
           end

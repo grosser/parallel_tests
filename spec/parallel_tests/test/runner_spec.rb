@@ -385,7 +385,7 @@ EOF
 
     it "sets process number to 1 for 0 if requested" do
       run_with_file("puts ENV['TEST_ENV_NUMBER']") do |path|
-        result = call("ruby #{path}", 0, 4, { use_test_env_number_for_first_process: true })
+        result = call("ruby #{path}", 0, 4, { first_is_1: true })
         expect(result).to include({
           :stdout => "1\n",
           :exit_status => 0

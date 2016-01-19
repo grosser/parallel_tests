@@ -33,11 +33,11 @@ describe ParallelTests do
     end
   end
 
-  describe ".always_use_test_env_number_for_first_process?" do
-    let(:result) { ParallelTests.always_use_test_env_number_for_first_process? }
+  describe ".test_env_number_first_is_1?" do
+    let(:result) { ParallelTests.test_env_number_first_is_1? }
 
     after do
-      ENV.delete "PARALLEL_TEST_USE_TEST_ENV_NUMBER_FOR_FIRST_PROCESS"
+      ENV.delete "PARALLEL_TEST_FIRST_IS_1"
     end
 
     it "is false when the env var is not set" do
@@ -45,12 +45,12 @@ describe ParallelTests do
     end
 
     it "is false when the env var is blank" do
-      ENV["PARALLEL_TEST_USE_TEST_ENV_NUMBER_FOR_FIRST_PROCESS"] = ""
+      ENV["PARALLEL_TEST_FIRST_IS_1"] = ""
       expect(result).to be_falsey
     end
 
     it "is true otherwise" do
-      ENV["PARALLEL_TEST_USE_TEST_ENV_NUMBER_FOR_FIRST_PROCESS"] = "true"
+      ENV["PARALLEL_TEST_FIRST_IS_1"] = "true"
       expect(result).to be_truthy
     end
   end

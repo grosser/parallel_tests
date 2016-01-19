@@ -24,8 +24,8 @@ module ParallelTests
       ].detect{|c| not c.to_s.strip.empty? }.to_i
     end
 
-    def always_use_test_env_number_for_first_process?
-      val = ENV["PARALLEL_TEST_USE_TEST_ENV_NUMBER_FOR_FIRST_PROCESS"]
+    def test_env_number_first_is_1?
+      val = ENV["PARALLEL_TEST_FIRST_IS_1"]
       val && !val.strip.empty?
     end
 
