@@ -50,6 +50,11 @@ describe ParallelTests::CLI do
       expect(call(["test", "--suffix", "_(test|spec).rb$"])).to eq(defaults.merge(:suffix => /_(test|spec).rb$/))
     end
 
+    it "parses --first-is-1" do
+      expect(call(["test", "--first-is-1"])).
+        to eq(defaults.merge(:first_is_1 => true))
+    end
+
     context "parse only-group" do
       it "group_by should be set to filesize" do
         expect(call(["test", "--only-group", '1'])).to eq(defaults.merge(only_group: [1], group_by: :filesize))
@@ -197,7 +202,7 @@ describe ParallelTests::CLI do
         end
 
         it "only includes failures" do
-          expect { 
+          expect {
             subject.send(:report_failure_rerun_commmand,
               [
                 {exit_status: 1, command: 'foo --color', seed: nil, output: 'blah'},
@@ -216,7 +221,7 @@ describe ParallelTests::CLI do
           subject.instance_variable_set(:@runner, ParallelTests::Test::Runner)
           expect(ParallelTests::Test::Runner).to receive(:command_with_seed).with(command, seed).
             and_return("my seeded command result --seed #{seed}")
-          expect { 
+          expect {
             subject.send(:report_failure_rerun_commmand,
               [
                 {exit_status: 1, command: command, seed: 555, output: 'blah'},
@@ -248,6 +253,9 @@ describe ParallelTests::CLI do
   describe "#run_tests_in_parallel" do
     context "specific groups to run" do
       let(:results){ {:stdout => "", :exit_status => 0} }
+      let(:common_options) {
+        { files: ["test"], group_by: :filesize, first_is_1: false }
+      }
       before do
         allow(subject).to receive(:puts)
         expect(subject).to receive(:load_runner).with("my_test_runner").and_return(ParallelTests::MyTestRunner::Runner)
@@ -271,21 +279,21 @@ describe ParallelTests::CLI do
       end
 
       it "run only one group specified" do
-        options = {count: 3, only_group: [2], files: ["test"], group_by: :filesize}
+        options = common_options.merge(count: 3, only_group: [2])
         expect(subject).to receive(:run_tests).once.with(['ccc', 'ddd'], 0, 1, options).and_return(results)
         subject.run(['test', '-n', '3', '--only-group', '2', '-t', 'my_test_runner'])
       end
 
       it "run last group when passing a group that is not filled" do
         count = 3
-        options = {count: count, only_group: [count], files: ["test"], group_by: :filesize}
+        options = common_options.merge(count: count, only_group: [count])
         expect(subject).to receive(:run_tests).once.with(['eee', 'fff'], 0, 1, options).and_return(results)
         subject.run(['test', '-n', count.to_s, '--only-group', count.to_s, '-t', 'my_test_runner'])
       end
 
       it "run twice with multiple groups" do
         skip "fails on jruby" if RUBY_PLATFORM == "java"
-        options = {count: 3, only_group: [2,3], files: ["test"], group_by: :filesize}
+        options = common_options.merge(count: 3, only_group: [2,3])
         expect(subject).to receive(:run_tests).once.ordered.with(['ccc', 'ddd'], 0, 1, options).and_return(results)
         expect(subject).to receive(:run_tests).once.ordered.with(['eee', 'fff'], 1, 1, options).and_return(results)
         subject.run(['test', '-n', '3', '--only-group', '2,3', '-t', 'my_test_runner'])

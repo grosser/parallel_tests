@@ -131,7 +131,12 @@ describe ParallelTests do
       expect(ParallelTests.first_process?).to eq(true)
     end
 
-    it "is not first if env is set to something" do
+    it "is first if env is set to 1" do
+      ENV["TEST_ENV_NUMBER"] = "1"
+      expect(ParallelTests.first_process?).to eq(true)
+    end
+
+    it "is not first if env is set to something else" do
       ENV["TEST_ENV_NUMBER"] = "2"
       expect(ParallelTests.first_process?).to eq(false)
     end

@@ -41,7 +41,7 @@ module ParallelTests
     end
 
     def first_process?
-      !ENV["TEST_ENV_NUMBER"] || ENV["TEST_ENV_NUMBER"].to_i == 0
+      ENV["TEST_ENV_NUMBER"].to_i <= 1
     end
 
     def wait_for_other_processes_to_finish

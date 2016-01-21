@@ -13,6 +13,8 @@ module ParallelTests
       num_processes = ParallelTests.determine_number_of_processes(options[:count])
       num_processes = num_processes * (options[:multiply] || 1)
 
+      options[:first_is_1] ||= first_is_always_1?
+
       if options[:execute]
         execute_shell_command_in_parallel(options[:execute], num_processes, options)
       else
@@ -190,6 +192,7 @@ module ParallelTests
         opts.on("--runtime-log [PATH]", "Location of previously recorded test runtimes") { |path| options[:runtime_log] = path }
         opts.on("--allowed-missing [INT]", Integer, "Allowed percentage of missing runtimes (default = 50)") { |percent| options[:allowed_missing_percent] = percent }
         opts.on("--unknown-runtime [FLOAT]", Float, "Use given number as unknown runtime (otherwise use average time)") { |time| options[:unknown_runtime] = time }
+        opts.on("--first-is-1", "Provide \"1\" as TEST_ENV_NUMBER to the first process instead of blank") { options[:first_is_1] = true }
         opts.on("--verbose", "Print more output") { options[:verbose] = true }
         opts.on("-v", "--version", "Show Version") { puts ParallelTests::VERSION; exit }
         opts.on("-h", "--help", "Show this.") { puts opts; exit }
@@ -285,6 +288,11 @@ module ParallelTests
 
     def use_colors?
       $stdout.tty?
+    end
+
+    def first_is_always_1?
+      val = ENV["PARALLEL_TEST_FIRST_IS_1"]
+      ['1', 'true'].include?(val)
     end
   end
 end
