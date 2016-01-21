@@ -22,7 +22,7 @@ gem "parallel_tests", group: :development
 ParallelTests uses 1 database per test-process.
 <table>
   <tr><td>Process number</td><td>1</td><td>2</td><td>3</td></tr>
-  <tr><td>ENV['TEST_ENV_NUMBER']</td><td>'' (but see below)</td><td>'2'</td><td>'3'</td></tr>
+  <tr><td>ENV['TEST_ENV_NUMBER']</td><td>''</td><td>'2'</td><td>'3'</td></tr>
 </table>
 
 ```yaml
@@ -226,22 +226,11 @@ You can run any kind of code in parallel with -e / --exec
 <tr><td>Rails-ActionPack</td><td>88s</td><td>53s</td><td>44s</td></tr>
 </table>
 
-`TEST_ENV_NUMBER`
-=================
-
-By default the first `ENV["TEST_ENV_NUMBER"]` is `""`. This means
-that parallel_tests reuses your default test setup for the first process.
-
-If you'd like to isolate your parallel_tests runs from your normal test runs,
-you can set `PARALLEL_TEST_FIRST_IS_1=true` in your environment or use
-`--first-is-1` when invoking `parallel_test`. This will make
-`ENV["TEST_ENV_NUMBER"]="1"` in the first process.
-
-
 TIPS
 ====
+ - `--first-is-1` or `export PARALLEL_TEST_FIRST_IS_1=true` will make the first environment be `1`, so you can test while running your full suite
+ - Debug errors that only happen with multiple files using `--verbose` and [cleanser](https://github.com/grosser/cleanser)
  - [RSpec] add a `.rspec_parallel` to use different options, e.g. **no --drb**
- - Spring does not work with parallel_tests, use `DISABLE_SPRING=1 rake parallel:spec` if you have spring hardcoded in your binaries
  - [RSpec] remove `--loadby` from `.rspec`
  - [RSpec] Instantly see failures (instead of just a red F) with [rspec-instafail](https://github.com/grosser/rspec-instafail)
  - [RSpec] use [rspec-retry](https://github.com/NoRedInk/rspec-retry) (not rspec-rerun) to rerun failed tests.
@@ -250,13 +239,12 @@ TIPS
  - [Sphinx setup](https://github.com/grosser/parallel_tests/wiki)
  - [Capistrano setup](https://github.com/grosser/parallel_tests/wiki/Remotely-with-capistrano) let your tests run on a big box instead of your laptop
  - [SQL schema format] use :ruby schema format to get faster parallel:prepare`
- - `export PARALLEL_TEST_PROCESSORS=X` in your environment and parallel_tests will use this number of processors by default
  - [ZSH] use quotes to use rake arguments `rake "parallel:prepare[3]"`
  - [email_spec and/or action_mailer_cache_delivery](https://github.com/grosser/parallel_tests/wiki)
  - [Memcached] use different namespaces e.g. `config.cache_store = ..., namespace: "test_#{ENV['TEST_ENV_NUMBER']}"`
  - [zeus-parallel_tests](https://github.com/sevos/zeus-parallel_tests)
  - [Distributed parallel test (e.g. Travis Support)](https://github.com/grosser/parallel_tests/wiki/Distributed-Parallel-Tests-and-Travis-Support)
- - Debug errors that only happen with multiple files using `--verbose` and [cleanser](https://github.com/grosser/cleanser)
+ - `export PARALLEL_TEST_PROCESSORS=13` to override default processor count
  - Shell alias: `alias prspec='parallel_rspec -m 2 --'`
  - [Spring] to use spring you have to [patch it](https://github.com/grosser/parallel_tests/wiki/Spring)
  - Contribute your own gotaches to the [Wiki](https://github.com/grosser/parallel_tests/wiki) or even better open a PR :)
