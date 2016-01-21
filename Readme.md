@@ -257,7 +257,7 @@ TODO
 
 Authors
 ====
-inspired by [pivotal labs](http://pivotallabs.com/users/miked/blog/articles/849-parallelize-your-rspec-suite)
+inspired by [pivotal labs](https://blog.pivotal.io/labs/labs/parallelize-your-rspec-suite)
 
 ### [Contributors](https://github.com/grosser/parallel_tests/contributors)
  - [Charles Finkel](http://charlesfinkel.com/)
