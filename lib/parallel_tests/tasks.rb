@@ -122,8 +122,8 @@ namespace :parallel do
   end
 
   desc "launch given rake command in parallel"
-  task :rake, :command do |_, args|
-    ParallelTests::Tasks.run_in_parallel("RAILS_ENV=#{ParallelTests::Tasks.rails_env} rake #{args.command}")
+  task :rake, :command, :count do |_, args|
+    ParallelTests::Tasks.run_in_parallel("RAILS_ENV=#{ParallelTests::Tasks.rails_env} rake #{args.command}", args)
   end
 
   ['test', 'spec', 'features', 'features-spinach'].each do |type|
