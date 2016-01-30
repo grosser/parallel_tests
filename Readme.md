@@ -68,10 +68,8 @@ Test by pattern (e.g. use one integration server per subfolder / see if you brok
 RAILS_ENV=test parallel_test -e "rake my:custom:task"
 # or
 rake parallel:rake[my:custom:task]
-# And with limiting to X CPUs
-RAILS_ENV=test parallel_test -n X -e "rake my:custom:task"
-# or
-rake parallel:rake[my:custom:task,X]
+# limited parallelism
+rake parallel:rake[my:custom:task,2]
 ```
 
 
