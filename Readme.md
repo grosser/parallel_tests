@@ -36,6 +36,9 @@ test:
 ### Copy development schema (repeat after migrations)
     rake parallel:prepare
 
+### Setup environment from scratch (create db and loads schema, useful for CI)
+    rake parallel:setup
+
 ### Run!
     rake parallel:test          # Test::Unit
     rake parallel:spec          # RSpec

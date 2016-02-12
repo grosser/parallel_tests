@@ -72,6 +72,11 @@ module ParallelTests
 end
 
 namespace :parallel do
+  desc "setup test databases via db:setup --> parallel:setup[num_cpus]"
+  task :setup, :count do |_,args|
+    ParallelTests::Tasks.run_in_parallel("rake db:setup RAILS_ENV=#{ParallelTests::Tasks.rails_env}", args)
+  end
+
   desc "create test databases via db:create --> parallel:create[num_cpus]"
   task :create, :count do |_,args|
     ParallelTests::Tasks.run_in_parallel("rake db:create RAILS_ENV=#{ParallelTests::Tasks.rails_env}", args)
