@@ -24,11 +24,7 @@ describe ParallelTests::Tasks do
     end
 
     it "should return the count, pattern, and options" do
-      args = {
-        :count => 2,
-        :pattern => "plain",
-        :options => "-p default --group-by steps",
-      }
+      args = {:count => 2, :pattern => "plain", :options => "-p default --group-by steps"}
       expect(ParallelTests::Tasks.parse_args(args)).to eq([2, "plain", "-p default --group-by steps"])
     end
   end
