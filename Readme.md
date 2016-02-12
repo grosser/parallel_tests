@@ -230,39 +230,42 @@ You can run any kind of code in parallel with -e / --exec
 
 TIPS
 ====
- - RSpec
-  - Add a `.rspec_parallel` to use different options, e.g. **no --drb**
-  - Remove `--loadby` from `.rspec`
-  - Instantly see failures (instead of just a red F) with [rspec-instafail](https://github.com/grosser/rspec-instafail)
-  - Use [rspec-retry](https://github.com/NoRedInk/rspec-retry) (not rspec-rerun) to rerun failed tests.
 
- - Cucumber
-  - Add a `parallel: foo` profile to your `config/cucumber.yml` and it will be used to run parallel tests
-  - [ReportBuilder](https://github.com/rajatthareja/ReportBuilder) can help with combining parallel test results
-    - Supports Cucumber 2.0+ and is actively maintained
-    - Combines many JSON files into a single file 
-    - Builds a HTML report from JSON with support for debug msgs & embedded Base64 images. 
+### RSpec
 
- - General
-  - [SQL schema format] use :ruby schema format to get faster parallel:prepare`
-  - [ZSH] use quotes to use rake arguments `rake "parallel:prepare[3]"`
-  - [Memcached] use different namespaces 
-    - e.g. `config.cache_store = ..., namespace: "test_#{ENV['TEST_ENV_NUMBER']}"`
-  - Debug errors that only happen with multiple files using `--verbose` and [cleanser](https://github.com/grosser/cleanser)
-  - `export PARALLEL_TEST_PROCESSORS=13` to override default processor count
-  - Shell alias: `alias prspec='parallel_rspec -m 2 --'`
-  - [Spring] to use spring you have to [patch it](https://github.com/grosser/parallel_tests/wiki/Spring)
-  - `--first-is-1` will make the first environment be `1`, so you can test while running your full suite.
-    - `export PARALLEL_TEST_FIRST_IS_1=true` will provide the same result
-  - [email_spec and/or action_mailer_cache_delivery](https://github.com/grosser/parallel_tests/wiki)
-  - [zeus-parallel_tests](https://github.com/sevos/zeus-parallel_tests)
-  - [Distributed parallel test (e.g. Travis Support)](https://github.com/grosser/parallel_tests/wiki/Distributed-Parallel-Tests-and-Travis-Support)
-  - [Capybara setup](https://github.com/grosser/parallel_tests/wiki)
-  - [Sphinx setup](https://github.com/grosser/parallel_tests/wiki)
-  - [Capistrano setup](https://github.com/grosser/parallel_tests/wiki/Remotely-with-capistrano) let your tests run on a big box instead of your laptop
+ - Add a `.rspec_parallel` to use different options, e.g. **no --drb**
+ - Remove `--loadby` from `.rspec`
+ - Instantly see failures (instead of just a red F) with [rspec-instafail](https://github.com/grosser/rspec-instafail)
+ - Use [rspec-retry](https://github.com/NoRedInk/rspec-retry) (not rspec-rerun) to rerun failed tests.
 
- Contribute your own gotaches to the [Wiki](https://github.com/grosser/parallel_tests/wiki) or even better open a PR :)
- 
+### Cucumber
+
+ - Add a `parallel: foo` profile to your `config/cucumber.yml` and it will be used to run parallel tests
+ - [ReportBuilder](https://github.com/rajatthareja/ReportBuilder) can help with combining parallel test results
+   - Supports Cucumber 2.0+ and is actively maintained
+   - Combines many JSON files into a single file
+   - Builds a HTML report from JSON with support for debug msgs & embedded Base64 images.
+
+### General
+ - [SQL schema format] use :ruby schema format to get faster parallel:prepare`
+ - [ZSH] use quotes to use rake arguments `rake "parallel:prepare[3]"`
+ - [Memcached] use different namespaces<br/>
+   e.g. `config.cache_store = ..., namespace: "test_#{ENV['TEST_ENV_NUMBER']}"`
+ - Debug errors that only happen with multiple files using `--verbose` and [cleanser](https://github.com/grosser/cleanser)
+ - `export PARALLEL_TEST_PROCESSORS=13` to override default processor count
+ - Shell alias: `alias prspec='parallel_rspec -m 2 --'`
+ - [Spring] to use spring you have to [patch it](https://github.com/grosser/parallel_tests/wiki/Spring)
+ - `--first-is-1` will make the first environment be `1`, so you can test while running your full suite.<br/>
+   `export PARALLEL_TEST_FIRST_IS_1=true` will provide the same result
+ - [email_spec and/or action_mailer_cache_delivery](https://github.com/grosser/parallel_tests/wiki)
+ - [zeus-parallel_tests](https://github.com/sevos/zeus-parallel_tests)
+ - [Distributed parallel test (e.g. Travis Support)](https://github.com/grosser/parallel_tests/wiki/Distributed-Parallel-Tests-and-Travis-Support)
+ - [Capybara setup](https://github.com/grosser/parallel_tests/wiki)
+ - [Sphinx setup](https://github.com/grosser/parallel_tests/wiki)
+ - [Capistrano setup](https://github.com/grosser/parallel_tests/wiki/Remotely-with-capistrano) let your tests run on a big box instead of your laptop
+
+Contribute your own gotaches to the [Wiki](https://github.com/grosser/parallel_tests/wiki) or even better open a PR :)
+
 TODO
 ====
  - fix tests vs cucumber >= 1.2 `unknown option --format`
