@@ -123,6 +123,17 @@ describe ParallelTests::Tasks do
     end
   end
 
+  describe ".suppress_schema_load_output" do
+    before do
+      allow(ParallelTests::Tasks).to receive(:suppress_output)
+    end
+
+    it 'should call suppress output with command' do
+      ParallelTests::Tasks.suppress_schema_load_output('command')
+      expect(ParallelTests::Tasks).to have_received(:suppress_output).with('command', "^   ->\\|^-- ")
+    end
+  end
+
   describe ".check_for_pending_migrations" do
     after do
       Rake.application.instance_variable_get('@tasks').delete("db:abort_if_pending_migrations")

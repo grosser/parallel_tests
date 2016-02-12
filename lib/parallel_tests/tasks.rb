@@ -43,6 +43,10 @@ module ParallelTests
         end
       end
 
+      def suppress_schema_load_output(command)
+        ParallelTests::Tasks.suppress_output(command, "^   ->\\|^-- ")
+      end
+
       def check_for_pending_migrations
         ["db:abort_if_pending_migrations", "app:db:abort_if_pending_migrations"].each do |abort_migrations|
           if Rake::Task.task_defined?(abort_migrations)
@@ -74,7 +78,8 @@ end
 namespace :parallel do
   desc "setup test databases via db:setup --> parallel:setup[num_cpus]"
   task :setup, :count do |_,args|
-    ParallelTests::Tasks.run_in_parallel("rake db:setup RAILS_ENV=#{ParallelTests::Tasks.rails_env}", args)
+    command = "rake db:setup RAILS_ENV=#{ParallelTests::Tasks.rails_env}"
+    ParallelTests::Tasks.run_in_parallel(ParallelTests::Tasks.suppress_schema_load_output(command), args)
   end
 
   desc "create test databases via db:create --> parallel:create[num_cpus]"
@@ -112,7 +117,7 @@ namespace :parallel do
   desc "load dumped schema for test databases via db:schema:load --> parallel:load_schema[num_cpus]"
   task :load_schema, :count do |_,args|
     command = "rake #{ParallelTests::Tasks.purge_before_load} db:schema:load RAILS_ENV=#{ParallelTests::Tasks.rails_env}"
-    ParallelTests::Tasks.run_in_parallel(ParallelTests::Tasks.suppress_output(command, "^   ->\\|^-- "), args)
+    ParallelTests::Tasks.run_in_parallel(ParallelTests::Tasks.suppress_schema_load_output(command), args)
   end
 
   # load the structure from the structure.sql file
