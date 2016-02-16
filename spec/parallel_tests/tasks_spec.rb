@@ -24,11 +24,7 @@ describe ParallelTests::Tasks do
     end
 
     it "should return the count, pattern, and options" do
-      args = {
-        :count => 2,
-        :pattern => "plain",
-        :options => "-p default --group-by steps",
-      }
+      args = {:count => 2, :pattern => "plain", :options => "-p default --group-by steps"}
       expect(ParallelTests::Tasks.parse_args(args)).to eq([2, "plain", "-p default --group-by steps"])
     end
   end
@@ -124,6 +120,17 @@ describe ParallelTests::Tasks do
       it "should not filter and fail" do
         expect(call("echo 123 && test", "123")).to eq(["123\n", false])
       end
+    end
+  end
+
+  describe ".suppress_schema_load_output" do
+    before do
+      allow(ParallelTests::Tasks).to receive(:suppress_output)
+    end
+
+    it 'should call suppress output with command' do
+      ParallelTests::Tasks.suppress_schema_load_output('command')
+      expect(ParallelTests::Tasks).to have_received(:suppress_output).with('command', "^   ->\\|^-- ")
     end
   end
 
