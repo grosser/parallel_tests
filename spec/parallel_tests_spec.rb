@@ -142,6 +142,17 @@ describe ParallelTests do
     end
   end
 
+  describe ".parent pid" do
+    it "returns a value" do
+      expect(ParallelTests.parent_pid).to be_truthy
+    end
+
+    it "is a string" do
+      expect(ParallelTests.parent_pid).to be_a(String)
+    end
+  end
+
+
   it "has a version" do
     expect(ParallelTests::VERSION).to match(/^\d+\.\d+\.\d+/)
   end

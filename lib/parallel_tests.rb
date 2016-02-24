@@ -43,6 +43,14 @@ module ParallelTests
     def first_process?
       ENV["TEST_ENV_NUMBER"].to_i <= 1
     end
+    
+    def parent_pid
+      if WINDOWS
+        `wmic process where (processid=#{Process.pid}) get parentprocessid`
+      else
+        `ps -o ppid= -p#{`ps -o ppid= -p#{Process.pid}`}` #the true parent is one layer up.
+      end
+    end
 
     def wait_for_other_processes_to_finish
       return unless ENV["TEST_ENV_NUMBER"]
