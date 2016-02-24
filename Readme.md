@@ -240,6 +240,7 @@ TIPS
  - Remove `--loadby` from `.rspec`
  - Instantly see failures (instead of just a red F) with [rspec-instafail](https://github.com/grosser/rspec-instafail)
  - Use [rspec-retry](https://github.com/NoRedInk/rspec-retry) (not rspec-rerun) to rerun failed tests.
+ - [JUnit formatter configuration](https://github.com/grosser/parallel_tests/wiki#with-rspec_junit_formatter----by-jgarber)
 
 ### Cucumber
 
