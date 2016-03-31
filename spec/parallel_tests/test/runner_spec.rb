@@ -163,25 +163,6 @@ EOF
       expect(call(output)).to eq(['10 tests, 20 assertions, 0 failures, 0 errors','14 tests, 20 assertions, 0 failures, 0 errors'])
     end
 
-    it "is robust against scrambled output" do
-      output = <<EOF
-Loaded suite /opt/ruby-enterprise/lib/ruby/gems/1.8/gems/rake-0.8.4/lib/rake/rake_test_loader
-Started
-..............
-Finished in 0.145069 seconds.
-
-10 tests, 20 assertions, 0 failures, 0 errors
-Loaded suite /opt/ruby-enterprise/lib/ruby/gems/1.8/gems/rake-0.8.4/lib/rake/rake_test_loader
-Started
-..............
-Finished in 0.145069 seconds.
-
-14 te.dsts, 20 assertions, 0 failures, 0 errors
-EOF
-
-      expect(call(output)).to eq(['10 tests, 20 assertions, 0 failures, 0 errors','14 tedsts, 20 assertions, 0 failures, 0 errors'])
-    end
-
     it "ignores color-codes" do
       output = <<EOF
 10 tests, 20 assertions, 0 \e[31mfailures, 0 errors
@@ -490,7 +471,7 @@ EOF
       priority_with_nice = run_with_file(priority_cmd){ |cmd| call("ruby #{cmd}", 1, 4, :nice => true) }.first.to_i
       expect(priority_without_nice).to be < priority_with_nice
     end
-  
+
     it "returns command used" do
       run_with_file("puts 123; exit 5") do |path|
         env_vars = "TEST_ENV_NUMBER=2;export TEST_ENV_NUMBER;PARALLEL_TEST_GROUPS=4;export PARALLEL_TEST_GROUPS;"

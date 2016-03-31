@@ -30,9 +30,9 @@ module ParallelTests
           execute_command(cmd, process_number, num_processes, options)
         end
 
+        # ignores other commands runner noise
         def line_is_result?(line)
-          line.gsub!(/[.F*]/,'')
-          line =~ /\d+ failure/
+          line =~ /\d+ failure(?!:)/
         end
 
         # --- usually used by other runners
@@ -101,11 +101,11 @@ module ParallelTests
         end
 
         def find_results(test_output)
-          test_output.split("\n").map {|line|
-            line.gsub!(/\e\[\d+m/,'')
+          test_output.split("\n").map do |line|
+            line.gsub!(/\e\[\d+m/, '') # remove color coding
             next unless line_is_result?(line)
             line
-          }.compact
+          end.compact
         end
 
         def test_env_number(process_number, options={})

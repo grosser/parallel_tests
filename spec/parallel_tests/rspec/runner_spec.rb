@@ -170,21 +170,6 @@ describe ParallelTests::RSpec::Runner do
       expect(call(output)).to eq(['0 examples, 0 failures, 0 pending','1 example, 1 failure, 1 pending'])
     end
 
-    it "is robust against scrambeled output" do
-      output = <<-OUT.gsub(/^        /, '')
-        ....F...
-        ..
-        failute fsddsfsd
-        ...
-        ff.**..
-        0 exFampl*es, 0 failures, 0 pend.ing
-        ff.**..
-        1 exampF.les, 1 failures, 1 pend.ing
-      OUT
-
-      expect(call(output)).to eq(['0 examples, 0 failures, 0 pending','1 examples, 1 failures, 1 pending'])
-    end
-
     it "does not mistakenly count 'pending' failures as real failures" do
       output = <<-OUT.gsub(/^        /, '')
         .....

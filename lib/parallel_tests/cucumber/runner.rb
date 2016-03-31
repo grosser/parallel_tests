@@ -3,19 +3,21 @@ require "parallel_tests/gherkin/runner"
 module ParallelTests
   module Cucumber
     class Runner < ParallelTests::Gherkin::Runner
+      FAILED_SCENARIO_REGEX = /^cucumber features\/.+:\d+/
+
       class << self
         def name
           'cucumber'
         end
 
         def line_is_result?(line)
-          super or line =~ failing_scenario_regex
+          super || line =~ FAILED_SCENARIO_REGEX
         end
 
         def summarize_results(results)
           output = []
 
-          failing_scenarios = results.grep(failing_scenario_regex)
+          failing_scenarios = results.grep(FAILED_SCENARIO_REGEX)
           if failing_scenarios.any?
             failing_scenarios.unshift("Failing Scenarios:")
             output << failing_scenarios.join("\n")
@@ -29,12 +31,6 @@ module ParallelTests
         def command_with_seed(cmd, seed)
           cmd = cmd.sub(/\s--order random(:\d*)?/, '')
           "#{cmd} --order random:#{seed}"
-        end
-
-        private
-
-        def failing_scenario_regex
-          /^cucumber features\/.+:\d+/
         end
       end
     end
