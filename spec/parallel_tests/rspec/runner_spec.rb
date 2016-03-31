@@ -184,6 +184,23 @@ describe ParallelTests::RSpec::Runner do
 
       expect(call(output)).to eq(['0 examples, 0 failures, 0 pending','1 examples, 1 failures, 1 pending'])
     end
+
+    it "does not mistakenly count 'pending' failures as real failures" do
+      output = <<-OUT.gsub(/^        /, '')
+        .....
+        Pending: (Failures listed here are expected and do not affect your suite's status)
+
+        1) Foo
+           Got 1 failure:
+
+           1.1) Failure/Error:
+                  Bar
+                  Baz
+        1 examples, 0 failures, 1 pending
+      OUT
+
+      expect(call(output)).to eq(['1 examples, 0 failures, 1 pending'])
+    end
   end
 
   describe ".find_tests" do

@@ -43,6 +43,11 @@ module ParallelTests
           /_spec\.rb$/
         end
 
+        def line_is_result?(line)
+          line.gsub!(/[.F*]/,'')
+          line =~ /\d+ examples?, \d+ failures?/
+        end
+
         private
 
         # so it can be stubbed....
