@@ -11,10 +11,11 @@ Setup for Rails
 [RailsCasts episode #413 Fast Tests](http://railscasts.com/episodes/413-fast-tests)
 
 ### Install
+Add `parallel_tests` to **both** the `:development` and `:test` groups in the
+`Gemfile`:
 
 ```ruby
-# Gemfile
-gem "parallel_tests", group: :development
+gem 'parallel_tests', group: [:development, :test]
 ```
 
 ### Add to `config/database.yml`
