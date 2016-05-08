@@ -1,7 +1,7 @@
 PATH
   remote: ../../../
   specs:
-    parallel_tests (2.4.1)
+    parallel_tests (2.5.0)
       parallel
 
 GEM
@@ -108,4 +108,4 @@ DEPENDENCIES
   sqlite3
 
 BUNDLED WITH
-   1.11.2
+   1.12.3

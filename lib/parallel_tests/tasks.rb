@@ -56,10 +56,10 @@ module ParallelTests
         end
       end
 
-      # parallel:spec[:count, :pattern, :options]
+      # parallel:spec[:count, :pattern, :options, :serialize_stdout]
       def parse_args(args)
         # order as given by user
-        args = [args[:count], args[:pattern], args[:options]]
+        args = [args[:count], args[:pattern], args[:options], args[:serialize_stdout]]
 
         # count given or empty ?
         # parallel:spec[2,models,options]
@@ -68,8 +68,9 @@ module ParallelTests
         num_processes = count.to_i unless count.to_s.empty?
         pattern = args.shift
         options = args.shift
+        serialize_stdout = args.shift
 
-        [num_processes, pattern.to_s, options.to_s]
+        [num_processes, pattern.to_s, options.to_s, !!serialize_stdout]
       end
     end
   end
@@ -138,13 +139,13 @@ namespace :parallel do
 
   ['test', 'spec', 'features', 'features-spinach'].each do |type|
     desc "run #{type} in parallel with parallel:#{type}[num_cpus]"
-    task type, [:count, :pattern, :options] do |t, args|
+    task type, [:count, :pattern, :options, :serialize_stdout] do |t, args|
       ParallelTests::Tasks.check_for_pending_migrations
 
       $LOAD_PATH << File.expand_path(File.join(File.dirname(__FILE__), '..'))
       require "parallel_tests"
 
-      count, pattern, options = ParallelTests::Tasks.parse_args(args)
+      count, pattern, options, serialize_stdout = ParallelTests::Tasks.parse_args(args)
       test_framework = {
         'spec' => 'rspec',
         'test' => 'test',
@@ -161,6 +162,10 @@ namespace :parallel do
         "-n #{count} "                     \
         "--pattern '#{pattern}' "          \
         "--test-options '#{options}'"
+
+      command = "#{command} --serialize-stdout" if serialize_stdout
+      p serialize_stdout
+      p command
       if ParallelTests::WINDOWS
         ruby_binary = File.join(RbConfig::CONFIG['bindir'], RbConfig::CONFIG['ruby_install_name'])
         command = "#{ruby_binary} #{command}"
