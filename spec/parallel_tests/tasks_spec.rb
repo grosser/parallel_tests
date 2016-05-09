@@ -5,27 +5,37 @@ describe ParallelTests::Tasks do
   describe ".parse_args" do
     it "should return the count" do
       args = {:count => 2}
-      expect(ParallelTests::Tasks.parse_args(args)).to eq([2, "", ""])
+      expect(ParallelTests::Tasks.parse_args(args)).to eq([2, "", "", false])
     end
 
     it "should default to the prefix" do
       args = {:count => "models"}
-      expect(ParallelTests::Tasks.parse_args(args)).to eq([nil, "models", ""])
+      expect(ParallelTests::Tasks.parse_args(args)).to eq([nil, "models", "", false])
     end
 
     it "should return the count and pattern" do
       args = {:count => 2, :pattern => "models"}
-      expect(ParallelTests::Tasks.parse_args(args)).to eq([2, "models", ""])
+      expect(ParallelTests::Tasks.parse_args(args)).to eq([2, "models", "", false])
     end
 
-    it "should return the count, pattern, and options" do
+    it "should return the count, pattern and options" do
       args = {:count => 2, :pattern => "plain", :options => "-p default"}
-      expect(ParallelTests::Tasks.parse_args(args)).to eq([2, "plain", "-p default"])
+      expect(ParallelTests::Tasks.parse_args(args)).to eq([2, "plain", "-p default", false])
     end
 
     it "should return the count, pattern, and options" do
       args = {:count => 2, :pattern => "plain", :options => "-p default --group-by steps"}
-      expect(ParallelTests::Tasks.parse_args(args)).to eq([2, "plain", "-p default --group-by steps"])
+      expect(ParallelTests::Tasks.parse_args(args)).to eq([2, "plain", "-p default --group-by steps", false])
+    end
+
+    it "should return the serialize-stdout" do
+      args = {:count => 2, :serialize_stdout => true}
+      expect(ParallelTests::Tasks.parse_args(args)).to eq([2, "", "", true])
+    end
+
+    it "should return the serialize-stdout" do
+      args = {:count => 2, :serialize_stdout => false}
+      expect(ParallelTests::Tasks.parse_args(args)).to eq([2, "", "", false])
     end
   end
 
