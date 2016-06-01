@@ -80,7 +80,7 @@ Running things once
 ===================
 
 ```Ruby
-# effected by race-condition: first process may boot slower the second
+# affected by race-condition: first process may boot slower the second
 # either sleep a bit or use a lock for example File.lock
 ParallelTests.first_process? ? do_something : sleep(1)
 
