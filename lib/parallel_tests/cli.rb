@@ -139,7 +139,7 @@ module ParallelTests
           Options are:
         BANNER
         opts.on("-n [PROCESSES]", Integer, "How many processes to use, default: available CPUs") { |n| options[:count] = n }
-        opts.on("-p", "--pattern [PATTERN]", "run tests matching this pattern") { |pattern| options[:pattern] = /#{pattern}/ }
+        opts.on("-p", "--pattern [PATTERN]", "run tests matching this regex pattern") { |pattern| options[:pattern] = /#{pattern}/ }
         opts.on("--group-by [TYPE]", <<-TEXT.gsub(/^          /, '')
           group tests by:
                     found - order of finding files
