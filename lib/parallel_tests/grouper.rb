@@ -42,14 +42,22 @@ module ParallelTests
       end
 
       def build_features_with_steps(tests, options)
-        require 'parallel_tests/gherkin/listener'
-        listener = ParallelTests::Gherkin::Listener.new
-        listener.ignore_tag_pattern = Regexp.compile(options[:ignore_tag_pattern]) if options[:ignore_tag_pattern]
-        parser = ::Gherkin::Parser::Parser.new(listener, true, 'root')
-        tests.each do |file|
-          parser.parse(File.read(file), file, 0)
+        require 'gherkin/parser'
+        ignore_tag_pattern = options[:ignore_tag_pattern].nil? ? nil : Regexp.compile(options[:ignore_tag_pattern])
+        parser = ::Gherkin::Parser.new
+        # format of hash will be FILENAME => NUM_STEPS
+        steps_per_file = tests.each_with_object({}) do |file,steps|
+          feature = parser.parse(File.read(file)).fetch(:feature)
+
+          # skip feature if it matches tag regex
+          next if feature[:tags].grep(ignore_tag_pattern).any?
+
+          # count the number of steps in the file
+          # will only include a feature if the regex does not match
+          all_steps = feature[:children].map{|a| a[:steps].count if a[:tags].grep(ignore_tag_pattern).empty? }.compact
+          steps[file] = all_steps.inject(0,:+)
         end
-        listener.collect.sort_by { |_, value| -value }
+        steps_per_file.sort_by { |_, value| -value }
       end
 
       def group_by_scenarios(tests, options={})

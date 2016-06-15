@@ -1,4 +1,4 @@
-require 'gherkin'
+require 'gherkin/parser'
 
 module ParallelTests
   module Gherkin
