@@ -46,17 +46,16 @@ module ParallelTests
         ignore_tag_pattern = options[:ignore_tag_pattern].nil? ? nil : Regexp.compile(options[:ignore_tag_pattern])
         parser = ::Gherkin::Parser.new
         # format of hash will be FILENAME => NUM_STEPS
-        steps_per_file = {}
-        tests.each do |file|
-          feature = parser.parse(File.read(file))[:feature]
+        steps_per_file = tests.each_with_object({}) do |file,steps|
+          feature = parser.parse(File.read(file)).fetch(:feature)
 
           # skip feature if it matches tag regex
-          next if !feature[:tags].grep(ignore_tag_pattern).empty?
+          next if feature[:tags].grep(ignore_tag_pattern).any?
 
           # count the number of steps in the file
           # will only include a feature if the regex does not match
           all_steps = feature[:children].map{|a| a[:steps].count if a[:tags].grep(ignore_tag_pattern).empty? }.compact
-          steps_per_file[file] = all_steps.inject(0){|sum,c| sum + c}
+          steps[file] = all_steps.inject(0,:+)
         end
         steps_per_file.sort_by { |_, value| -value }
       end
