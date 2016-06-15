@@ -1,6 +1,7 @@
 require "parallel"
 require "parallel_tests/railtie" if defined? Rails::Railtie
 require "rbconfig"
+#require 'shellwords'
 
 module ParallelTests
   WINDOWS = (RbConfig::CONFIG['host_os'] =~ /cygwin|mswin|mingw|bccwin|wince|emx/)
