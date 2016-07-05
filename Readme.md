@@ -30,6 +30,14 @@ test:
   database: yourproject_test<%= ENV['TEST_ENV_NUMBER'] %>
 ```
 
+### Add to `config/environments/test.rb`
+
+Concurrent access to cache files by different process can easily make your tests fail. Make each process have its own cache file store to avoid this problem.
+ 
+```ruby
+config.cache_store = :file_store, Rails.root.join("tmp", "cache", "paralleltests#{ENV['TEST_ENV_NUMBER']}"
+```
+
 ### Create additional database(s)
     rake parallel:create
 
