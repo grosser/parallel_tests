@@ -26,9 +26,9 @@ module ParallelTests
 
     def execute_in_parallel(items, num_processes, options)
       Tempfile.open 'parallel_tests-lock' do |lock|
-        # CI systems often fail when there is no output for a long time, so simulate some output
-        progress_indicator = Thread.new { while true do sleep ENV.fetch('PARALLEL_TEST_HEARTBEAT_INTERVAL', 60).to_f; print '.' end } if options[:serialize_stdout]
-        return Parallel.map(items, :in_threads => num_processes) do |item|
+        progress_indicator = simulate_output_for_ci if options[:serialize_stdout]
+
+        Parallel.map(items, :in_threads => num_processes) do |item|
           result = yield(item)
           if progress_indicator && progress_indicator.alive?
             progress_indicator.exit
@@ -299,6 +299,17 @@ module ParallelTests
     def first_is_1?
       val = ENV["PARALLEL_TEST_FIRST_IS_1"]
       ['1', 'true'].include?(val)
+    end
+
+    # CI systems often fail when there is no output for a long time, so simulate some output
+    def simulate_output_for_ci
+      Thread.new do
+        interval = ENV.fetch('PARALLEL_TEST_HEARTBEAT_INTERVAL', 60).to_f
+        loop do
+          sleep interval
+          print '.'
+        end
+      end
     end
   end
 end
