@@ -352,6 +352,7 @@ inspired by [pivotal labs](https://blog.pivotal.io/labs/labs/parallelize-your-rs
  - [Lukas Oberhuber](https://github.com/lukaso)
  - [Ryan Zhang](https://github.com/ryanus)
  - [Rhett Sutphin](https://github.com/rsutphin)
+ - [Doc Ritezel](https://github.com/ohrite)
 
 
 [Michael Grosser](http://grosser.it)<br/>
