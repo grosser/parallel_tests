@@ -44,6 +44,14 @@ module ParallelTests
       ENV["TEST_ENV_NUMBER"].to_i <= 1
     end
 
+    def last_process?
+      current_process_number = ENV['TEST_ENV_NUMBER']
+      total_processes = ENV['PARALLEL_TEST_GROUPS']
+      return true if current_process_number.nil? && total_processes.nil?
+      current_process_number = '1' if current_process_number.nil?
+      current_process_number == total_processes
+    end
+
     def parent_pid
       if WINDOWS
         `wmic process where (processid=#{Process.pid}) get parentprocessid`
