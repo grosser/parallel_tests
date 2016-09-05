@@ -172,7 +172,6 @@ describe ParallelTests do
     end
   end
 
-
   it "has a version" do
     expect(ParallelTests::VERSION).to match(/^\d+\.\d+\.\d+/)
   end

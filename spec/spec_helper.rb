@@ -180,6 +180,7 @@ RSpec.configure do |config|
   end
 
   config.after do
+    ENV.delete "PARALLEL_TEST_GROUPS"
     ENV.delete "PARALLEL_TEST_PROCESSORS"
     ENV.delete "PARALLEL_TESTS_EXECUTABLE"
     ENV.delete "TEST_ENV_NUMBER"
