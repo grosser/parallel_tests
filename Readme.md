@@ -84,12 +84,17 @@ Running things once
 # either sleep a bit or use a lock for example File.lock
 ParallelTests.first_process? ? do_something : sleep(1)
 
+# last_process? works as well
+# notice that last process does NOT mean last finished process
+ParallelTests.last_process? ? do_something : sleep(1)
+
 at_exit do
-  if ParallelTests.first_process?
+  if ParallelTests.first_process? #if ParallelTests.last_process?
     ParallelTests.wait_for_other_processes_to_finish
     undo_something
   end
 end
+
 ```
 
 Loggers
