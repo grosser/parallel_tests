@@ -30,7 +30,7 @@ describe 'rails' do
           sh "rm -rf db/*.sqlite3"
           sh "bundle exec rake db:setup parallel:create 2>&1"
           # Also test the case where the DBs need to be dropped
-          sh "bundle exec rake paralle:drop parallel:create 2>&1"
+          sh "bundle exec rake parallel:drop parallel:create"
           sh "bundle exec rake parallel:prepare"
           sh "export RAILS_ENV=test && bundle exec rails runner User.create" # pollute the db
           out = sh "bundle exec rake parallel:prepare parallel:test"
