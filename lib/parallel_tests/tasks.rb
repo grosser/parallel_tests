@@ -89,7 +89,7 @@ namespace :parallel do
 
   desc "drop test databases via db:drop --> parallel:drop[num_cpus]"
   task :drop, :count do |_,args|
-    ParallelTests::Tasks.run_in_parallel("rake db:drop RAILS_ENV=#{ParallelTests::Tasks.rails_env}", args)
+    ParallelTests::Tasks.run_in_parallel("rake db:drop RAILS_ENV=#{ParallelTests::Tasks.rails_env} DISABLE_DATABASE_ENVIRONMENT_CHECK=1", args)
   end
 
   desc "update test databases by dumping and loading --> parallel:prepare[num_cpus]"
