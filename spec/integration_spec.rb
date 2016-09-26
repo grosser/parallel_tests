@@ -333,7 +333,7 @@ describe 'CLI' do
     before do
       write "features/steps/a.rb", "
         Given('I print TEST_ENV_NUMBER'){ puts \"YOUR TEST ENV IS \#{ENV['TEST_ENV_NUMBER']}!\" }
-        And('I sleep a bit'){ sleep 0.2 }
+        And('I sleep a bit'){ sleep 0.5 }
         And('I pass'){ true }
         And('I fail'){ fail }
       "
