@@ -1,14 +1,14 @@
 rvm:
-  - 1.9.3
   - 2.0.0
   - 2.1.5
   - 2.2.2
   - 2.3.1
   - jruby-1.7.9
   - jruby-head
+branches:
+  only: [master]
 sudo: false
 cache: bundler
 matrix:
   allow_failures:
     - rvm: jruby-head
-    - rvm: 1.9.3
