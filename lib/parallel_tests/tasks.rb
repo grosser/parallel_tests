@@ -7,8 +7,12 @@ module ParallelTests
         ENV['RAILS_ENV'] || 'test'
       end
 
+      def purge_before_load?
+        ENV['PURGE_BEFORE_LOAD'].inspect.lowercase == 'false' ? false : true
+      end
+
       def purge_before_load
-        "db:test:purge" if Gem::Version.new(Rails.version) > Gem::Version.new('4.2.0')
+        "db:test:purge" if purge_before_load? && Gem::Version.new(Rails.version) > Gem::Version.new('4.2.0')
       end
 
       def run_in_parallel(cmd, options={})
@@ -115,17 +119,15 @@ namespace :parallel do
 
   # just load the schema (good for integration server <-> no development db)
   desc "load dumped schema for test databases via db:schema:load --> parallel:load_schema[num_cpus]"
-  task :load_schema, [:count, :purge] do |_,args|
-    purge = ['no', 'false'].exclude?(args[:purge])
-    command = "rake #{ParallelTests::Tasks.purge_before_load if purge} db:schema:load RAILS_ENV=#{ParallelTests::Tasks.rails_env} DISABLE_DATABASE_ENVIRONMENT_CHECK=1"
+  task :load_schema, :count do |_,args|
+    command = "rake #{ParallelTests::Tasks.purge_before_load} db:schema:load RAILS_ENV=#{ParallelTests::Tasks.rails_env} DISABLE_DATABASE_ENVIRONMENT_CHECK=1"
     ParallelTests::Tasks.run_in_parallel(ParallelTests::Tasks.suppress_schema_load_output(command), args)
   end
 
   # load the structure from the structure.sql file
   desc "load structure for test databases via db:structure:load --> parallel:load_structure[num_cpus]"
-  task :load_structure, [:count, :purge] do |_,args|
-    purge = ['no', 'false'].exclude?(args[:purge])
-    ParallelTests::Tasks.run_in_parallel("rake #{ParallelTests::Tasks.purge_before_load if purge} db:structure:load RAILS_ENV=#{ParallelTests::Tasks.rails_env} DISABLE_DATABASE_ENVIRONMENT_CHECK=1", args)
+  task :load_structure, :count do |_,args|
+    ParallelTests::Tasks.run_in_parallel("rake #{ParallelTests::Tasks.purge_before_load} db:structure:load RAILS_ENV=#{ParallelTests::Tasks.rails_env} DISABLE_DATABASE_ENVIRONMENT_CHECK=1", args)
   end
 
   desc "load the seed data from db/seeds.rb via db:seed --> parallel:seed[num_cpus]"
