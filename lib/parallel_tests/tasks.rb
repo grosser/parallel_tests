@@ -8,7 +8,7 @@ module ParallelTests
       end
 
       def purge_before_load?
-        ENV['PURGE_BEFORE_LOAD'].inspect.downcase == 'false' ? false : true
+        ENV.fetch('PURGE_BEFORE_LOAD', 'TRUE').downcase == 'false' ? false : true
       end
 
       def purge_before_load
