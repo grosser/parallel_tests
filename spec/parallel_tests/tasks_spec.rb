@@ -29,6 +29,42 @@ describe ParallelTests::Tasks do
     end
   end
 
+  describe '.purge_before_load?' do
+    subject { ParallelTests::Tasks.purge_before_load? }
+    context "PURGE_BEFORE_LOAD is set to 'false'" do
+      before { expect(ENV).to receive(:fetch).with('PURGE_BEFORE_LOAD', 'TRUE').and_return('false') }
+
+      it 'returns false' do
+        expect(subject).to be_falsey
+      end
+    end
+
+    context 'PURGE_BEFORE_LOAD is not set' do
+
+      it 'defaults to true' do
+        expect(subject).to be_truthy
+      end
+    end
+  end
+
+  describe '.purge_before_load' do
+    subject { ParallelTests::Tasks.purge_before_load }
+    context 'Rails version is 4.3.1' do
+      before do
+        class Rails; end
+        allow(Rails).to receive(:version).and_return('4.3.1')
+      end
+
+      context "PURGE_BEFORE_LOAD is set to 'false'" do
+        before { expect(ENV).to receive(:fetch).with('PURGE_BEFORE_LOAD', 'TRUE').and_return('false') }
+
+        it 'returns nil' do
+          expect(subject).to be_nil
+        end
+      end
+    end
+  end
+
   describe ".rails_env" do
     it "should be test when nothing was set" do
       expect(ParallelTests::Tasks.rails_env).to eq("test")
