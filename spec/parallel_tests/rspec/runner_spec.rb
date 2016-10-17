@@ -176,9 +176,13 @@ describe ParallelTests::RSpec::Runner do
         Pending: (Failures listed here are expected and do not affect your suite's status)
 
         1) Foo
-           Got 1 failure:
+           Got 1 failure and 1 other error:
 
            1.1) Failure/Error:
+                  Bar
+                  Baz
+
+           1.2) Failure/Error:
                   Bar
                   Baz
         1 examples, 0 failures, 1 pending
