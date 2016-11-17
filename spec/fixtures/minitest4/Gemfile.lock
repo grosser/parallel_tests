@@ -1,7 +1,7 @@
 PATH
   remote: ../../../
   specs:
-    parallel_tests (2.5.0)
+    parallel_tests (2.10.0)
       parallel
 
 GEM
@@ -18,4 +18,4 @@ DEPENDENCIES
   parallel_tests!
 
 BUNDLED WITH
-   1.11.2
+   1.12.5
