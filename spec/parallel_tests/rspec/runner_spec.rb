@@ -205,4 +205,33 @@ describe ParallelTests::RSpec::Runner do
       end
     end
   end
+
+  describe ".command_with_seed" do
+    it "adds the randomized seed" do
+      expect(described_class.command_with_seed("rspec spec/file_spec.rb", 555)).
+        to eq("rspec spec/file_spec.rb --seed 555")
+    end
+
+    describe "existing randomization" do
+      it "does not duplicate seed" do
+        expect(described_class.command_with_seed("rspec spec/file_spec.rb --seed 123", 555)).
+          to eq("rspec spec/file_spec.rb --seed 555")
+      end
+
+      it "removes rand" do
+        expect(described_class.command_with_seed("rspec spec/file_spec.rb --order rand", 555)).
+          to eq("rspec spec/file_spec.rb --seed 555")
+      end
+
+      it "removes random" do
+        expect(described_class.command_with_seed("rspec spec/file_spec.rb --order random", 555)).
+          to eq("rspec spec/file_spec.rb --seed 555")
+      end
+
+      it "removes random with seed" do
+        expect(described_class.command_with_seed("rspec spec/file_spec.rb --order random:123", 555)).
+          to eq("rspec spec/file_spec.rb --seed 555")
+      end
+    end
+  end
 end

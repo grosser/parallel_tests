@@ -47,6 +47,14 @@ module ParallelTests
           line =~ /\d+ examples?, \d+ failures?/
         end
 
+        def command_with_seed(cmd, seed)
+          cmd = cmd.sub(/ --order random:\d+/, '')
+          cmd = cmd.sub(/ --order random/, '')
+          cmd = cmd.sub(/ --order rand/, '')
+          cmd = cmd.sub(/ --seed \d+/, '')
+          "#{cmd} --seed #{seed}"
+        end
+
         private
 
         # so it can be stubbed....
