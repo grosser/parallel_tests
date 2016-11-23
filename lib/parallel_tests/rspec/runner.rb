@@ -52,6 +52,7 @@ module ParallelTests
           cmd = cmd.sub(/ --order random/, '')
           cmd = cmd.sub(/ --order rand/, '')
           cmd = cmd.sub(/ --seed \d+/, '')
+          cmd = cmd.sub(/ --color --tty/, '')
           "#{cmd} --seed #{seed}"
         end
 

@@ -212,6 +212,11 @@ describe ParallelTests::RSpec::Runner do
         to eq("rspec spec/file_spec.rb --seed 555")
     end
 
+    it "removes rspec2 color flags" do
+      expect(described_class.command_with_seed("rspec --color --tty spec/file_spec.rb", 555)).
+        to eq("rspec spec/file_spec.rb --seed 555")
+    end
+
     describe "existing randomization" do
       it "does not duplicate seed" do
         expect(described_class.command_with_seed("rspec spec/file_spec.rb --seed 123", 555)).
