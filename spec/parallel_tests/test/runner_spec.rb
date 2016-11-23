@@ -504,26 +504,26 @@ EOF
   end
 
   describe ".command_with_seed" do
-    it "adds the randomized seed" do
-      expect(ParallelTests::Test::Runner.command_with_seed("ruby -Ilib:test test/minitest/test_minitest_unit.rb", 555)).
-        to eq("ruby -Ilib:test test/minitest/test_minitest_unit.rb --seed 555")
+    def call(args)
+      base = "ruby -Ilib:test test/minitest/test_minitest_unit.rb"
+      result = ParallelTests::Test::Runner.command_with_seed("#{base}#{args}", 555)
+      result.sub(base, '')
     end
 
-    describe "existing randomization" do
-      it "does not duplicate seed" do
-        expect(ParallelTests::Test::Runner.command_with_seed("ruby -Ilib:test test/minitest/test_minitest_unit.rb --seed 123", 555)).
-          to eq("ruby -Ilib:test test/minitest/test_minitest_unit.rb --seed 555")
-      end
+    it "adds the randomized seed" do
+      expect(call("")).to eq(" --seed 555")
+    end
 
-      it "does not duplicate rand" do
-        expect(ParallelTests::Test::Runner.command_with_seed("ruby -Ilib:test test/minitest/test_minitest_unit.rb --order rand", 555)).
-          to eq("ruby -Ilib:test test/minitest/test_minitest_unit.rb --seed 555")
-      end
+    it "does not duplicate seed" do
+      expect(call(" --seed 123")).to eq(" --seed 555")
+    end
 
-      it "does not duplicate rand with seed" do
-        expect(ParallelTests::Test::Runner.command_with_seed("ruby -Ilib:test test/minitest/test_minitest_unit.rb --order rand:555", 555)).
-          to eq("ruby -Ilib:test test/minitest/test_minitest_unit.rb --seed 555")
-      end
+    it "does not match strange seeds stuff" do
+      expect(call(" --seed 123asdasd")).to eq(" --seed 123asdasd --seed 555")
+    end
+
+    it "does not match non seeds" do
+      expect(call(" --seedling 123")).to eq(" --seedling 123 --seed 555")
     end
   end
 end

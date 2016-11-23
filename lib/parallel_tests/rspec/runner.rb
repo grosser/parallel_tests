@@ -47,14 +47,16 @@ module ParallelTests
           line =~ /\d+ examples?, \d+ failures?/
         end
 
+        # remove old seed and add new seed
+        # --seed 1234
+        # --order rand
+        # --order rand:1234
+        # --order random:1234
         def command_with_seed(cmd, seed)
-          cmd = cmd.sub(/ --order random:\d+/, '')
-          cmd = cmd.sub(/ --order random/, '')
-          cmd = cmd.sub(/ --order rand/, '')
-          cmd = cmd.sub(/ --seed \d+/, '')
-          cmd = cmd.sub(/ --color --tty/, '')
-          "#{cmd} --seed #{seed}"
+          clean = cmd.sub(/\s--(seed\s+\d+|order\s+rand(om)?(:\d+)?)\b/, '')
+          "#{clean} --seed #{seed}"
         end
+
 
         private
 
