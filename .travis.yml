@@ -3,7 +3,6 @@ rvm:
   - 2.1.5
   - 2.2.2
   - 2.3.1
-  - jruby-1.7.9
   - jruby-head
 branches:
   only: [master]
