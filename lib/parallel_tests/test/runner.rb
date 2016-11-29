@@ -121,10 +121,10 @@ module ParallelTests
           sums.sort.map{|word, number|  "#{number} #{word}#{'s' if number != 1}" }.join(', ')
         end
 
+        # remove old seed and add new seed
         def command_with_seed(cmd, seed)
-          cmd = cmd.sub(/\s--seed(\s\d*){0,1}/, '')
-          cmd = cmd.sub(/\s--order rand(:\d*){0,1}/, '')
-          "#{cmd} --seed #{seed}"
+          clean = cmd.sub(/\s--seed\s+\d+\b/, '')
+          "#{clean} --seed #{seed}"
         end
 
         protected
