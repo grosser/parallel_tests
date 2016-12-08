@@ -15,7 +15,7 @@ module ParallelTests
           return unless @tag_expression.evaluate(feature_element[:tags])
           @scenarios << [uri, feature_element[:location][:line]].join(":")
 
-          #TODO= handle scenario outlines
+          #TODO handle scenario outlines
         end
 
         def method_missing(*args)

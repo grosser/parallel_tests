@@ -71,7 +71,7 @@ module ParallelTests
               result = parser.parse(scanner)
 
               result[:feature][:children].each do |feature_element|
-                if feature_element[:type] != 'Scenario'
+                if feature_element[:type].to_s != 'Scenario'
                   next
                 end
 
