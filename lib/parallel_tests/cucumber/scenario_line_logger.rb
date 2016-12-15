@@ -12,8 +12,10 @@ module ParallelTests
         end
 
         def visit_feature_element(uri, feature_element)
+          tags = feature_element[:tags].map {|tag| ::Cucumber::Core::Ast::Tag.new(tag[:location], tag[:name])}
+
           # We don't accept the feature_element if the current tags are not valid
-          return unless @tag_expression.evaluate(feature_element[:tags])
+          return unless @tag_expression.evaluate(tags)
           @scenarios << [uri, feature_element[:location][:line]].join(":")
 
           # TODO handle scenario outlines

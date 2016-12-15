@@ -2,8 +2,6 @@ require 'tempfile'
 require 'parallel_tests/cucumber/scenarios'
 
 describe ParallelTests::Cucumber::Scenarios do
-      # skip 'Skipped due to upgrade of cucumber to 2.0, please fix ScenarioLineLogger' do
-      #   describe '.all' do
   context 'by default' do
     let(:feature_file) do
       Tempfile.new('grouper.feature').tap do |feature|

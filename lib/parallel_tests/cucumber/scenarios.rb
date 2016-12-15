@@ -3,6 +3,7 @@ require 'cucumber/runtime'
 require 'cucumber'
 require 'parallel_tests/cucumber/scenario_line_logger'
 require 'parallel_tests/gherkin/listener'
+require 'gherkin/errors'
 
 module ParallelTests
   module Cucumber
@@ -12,6 +13,7 @@ module ParallelTests
           tags = []
           tags.concat options[:ignore_tag_pattern].to_s.split(/\s*,\s*/).map {|tag| "~#{tag}" }
           tags.concat options[:test_options].to_s.scan(/(?:-t|--tags) (~?@[\w,~@]+)/).flatten
+
           split_into_scenarios files, tags.uniq
         end
 
@@ -91,9 +93,9 @@ module ParallelTests
                 scenario_line_logger.visit_feature_element(document.uri, feature_element)
               end
 
-            rescue *PARSER_ERRORS => e
-              # Exception if the document is no well formated
-              raise Core::Gherkin::ParseError.new("#{document.uri}: #{e.message}")
+            rescue Exception => e
+              # Exception if the document is no well formated or error in the tags
+              raise ::Cucumber::Core::Gherkin::ParseError.new("#{document.uri}: #{e.message}")
             end
           end
 
