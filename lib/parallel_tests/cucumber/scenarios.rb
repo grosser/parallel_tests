@@ -19,45 +19,6 @@ module ParallelTests
 
         private
 
-        # Class stolen from cucumber as it was private
-        # Private class can be found here : https://github.com/cucumber/cucumber-ruby/blob/master/lib/cucumber/runtime.rb#L130
-        class NormalisedEncodingFile
-          COMMENT_OR_EMPTY_LINE_PATTERN = /^\s*#|^\s*$/ #:nodoc:
-          ENCODING_PATTERN = /^\s*#\s*encoding\s*:\s*([^\s]+)/ #:nodoc:
-
-          def self.read(path)
-            new(path).read
-          end
-
-          def initialize(path)
-            begin
-              @file = File.new(path)
-              set_encoding
-            rescue Errno::EACCES => e
-              raise FileNotFoundException.new(e, File.expand_path(path))
-            rescue Errno::ENOENT => e
-              raise FeatureFolderNotFoundException.new(e, path)
-            end
-          end
-
-          def read
-            @file.read.encode("UTF-8")
-          end
-
-          private
-
-          def set_encoding
-            @file.each do |line|
-              if ENCODING_PATTERN =~ line
-                @file.set_encoding $1
-                break
-              end
-              break unless COMMENT_OR_EMPTY_LINE_PATTERN =~ line
-            end
-            @file.rewind
-          end
-        end
-
         def split_into_scenarios(files, tags=[])
 
           # Create the tag expression instance from gherkin, this is needed to know if the scenario matches with the tags invoked by the request
@@ -70,7 +31,7 @@ module ParallelTests
           features ||= files.map do |path|
 
             # We encode the file and get the content of it
-            source = NormalisedEncodingFile.read(path)
+            source = ::Cucumber::Runtime::NormalisedEncodingFile.read(path)
             # We create a Gherkin document, this will be used to decode the details of each scenario
             document = ::Cucumber::Core::Gherkin::Document.new(path, source)
 
@@ -93,7 +54,7 @@ module ParallelTests
                 scenario_line_logger.visit_feature_element(document.uri, feature_element)
               end
 
-            rescue Exception => e
+            rescue StandardError => e
               # Exception if the document is no well formated or error in the tags
               raise ::Cucumber::Core::Gherkin::ParseError.new("#{document.uri}: #{e.message}")
             end
