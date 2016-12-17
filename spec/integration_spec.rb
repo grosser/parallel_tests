@@ -402,7 +402,6 @@ cucumber features/fail1.feature:2 # Scenario: xxx
     end
 
     it "groups by scenario" do
-      skip "ScenarioLineLogger not supported anymore after upgrading to Cucumber 2.0, please fix!"
       write "features/long.feature", <<-EOS
       Feature: xxx
         Scenario: xxx
@@ -420,7 +419,7 @@ cucumber features/fail1.feature:2 # Scenario: xxx
           | two |
       EOS
       result = run_tests "features", :type => "cucumber", :add => "--group-by scenarios"
-      expect(result).to include("2 processes for 4 scenarios")
+      expect(result).to include("2 processes for 2 scenarios")
     end
 
     it "groups by step" do
