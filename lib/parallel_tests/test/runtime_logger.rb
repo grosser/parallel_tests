@@ -75,21 +75,23 @@ end
 
 if defined?(Minitest::Runnable) # Minitest 5
   class << Minitest::Runnable
-    alias_method :run_without_runtime_log, :run
-    def run(*args)
-      ParallelTests::Test::RuntimeLogger.log_test_run(self) do
-        run_without_runtime_log(*args)
+    prepend(Module.new do
+      def run(*)
+        ParallelTests::Test::RuntimeLogger.log_test_run(self) do
+          super
+        end
       end
-    end
+    end)
   end
 
   class << Minitest
-    alias_method :run_without_runtime_log, :run
-    def run(*args)
-      result = run_without_runtime_log(*args)
-      ParallelTests::Test::RuntimeLogger.unique_log
-      result
-    end
+    prepend(Module.new do
+      def run(*args)
+        result = super
+        ParallelTests::Test::RuntimeLogger.unique_log
+        result
+      end
+    end)
   end
 elsif defined?(MiniTest::Unit) # Minitest 4
   MiniTest::Unit.class_eval do

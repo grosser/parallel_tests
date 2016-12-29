@@ -98,17 +98,13 @@ end
 
 ```
 
-Loggers
-===================
-
 Even test group run-times
--------------------------
+=========================
+
+Test groups are often not balanced and will run for different times, making everything wait for the slowest group.
+Use these loggers to record test runtime and then use the recorded runtime to balance test groups more evenly.
 
 ### RSpec
-
-Add the `RuntimeLogger` to log how long each test takes to run.
-This log file will be loaded on the next test run, and the tests will be grouped
-so that each process should finish around the same time.
 
 Rspec: Add to your `.rspec_parallel` (or `.rspec`) :
 
@@ -124,6 +120,9 @@ require 'parallel_tests/test/runtime_logger' if ENV['RECORD_RUNTIME']
 
 results will be logged to tmp/parallel_runtime_test.log when `RECORD_RUNTIME` is set,
 so it is not always required or overwritten.
+
+Loggers
+=======
 
 RSpec: SummaryLogger
 --------------------
