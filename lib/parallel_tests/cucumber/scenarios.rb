@@ -42,16 +42,15 @@ module ParallelTests
             begin
               # We make an attempt to parse the gherkin document, this could be failed if the document is not well formated
               result = parser.parse(scanner)
+              feature_tags = result[:feature][:tags].map { |tag| ::Cucumber::Core::Ast::Tag.new(tag[:location], tag[:name]) }
 
               # We loop on each children of the feature
               result[:feature][:children].each do |feature_element|
-                # If the type of the child is not a scenario, we continue, we are only interested by the name of the scenario here
-                if feature_element[:type].to_s != 'Scenario'
-                  next
-                end
+                # If the type of the child is not a scenario or scenario outline, we continue, we are only interested by the name of the scenario here
+                next unless /Scenario/.match(feature_element[:type])
 
                 # It's a scenario, we add it to the scenario_line_logger
-                scenario_line_logger.visit_feature_element(document.uri, feature_element)
+                scenario_line_logger.visit_feature_element(document.uri, feature_element, feature_tags)
               end
 
             rescue StandardError => e
