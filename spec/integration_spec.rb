@@ -419,7 +419,7 @@ cucumber features/fail1.feature:2 # Scenario: xxx
           | two |
       EOS
       result = run_tests "features", :type => "cucumber", :add => "--group-by scenarios"
-      expect(result).to include("2 processes for 2 scenarios")
+      expect(result).to include("2 processes for 4 scenarios")
     end
 
     it "groups by step" do
