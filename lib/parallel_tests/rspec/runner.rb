@@ -77,6 +77,12 @@ module ParallelTests
           '--color --tty' if $stdout.tty?
         end
 
+        # allow running single tests with line numbers: rspec ./my_spec.rb:8
+        def sort_by_filesize(tests)
+          tests.sort!
+          tests.map! { |test| [test, File.stat(test.sub(/(:\d+)*$/, "")).size] }
+        end
+
         def spec_opts
           options_file = ['.rspec_parallel', 'spec/parallel_spec.opts', 'spec/spec.opts'].detect{|f| File.file?(f) }
           return unless options_file
