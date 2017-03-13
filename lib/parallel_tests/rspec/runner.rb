@@ -17,8 +17,6 @@ module ParallelTests
           cmd = case
           when File.exist?("bin/rspec")
             WINDOWS ? "ruby bin/rspec" : "bin/rspec"
-          when File.file?("script/spec")
-            "script/spec"
           when ParallelTests.bundler_enabled?
             cmd = (run("bundle show rspec-core") =~ %r{Could not find gem.*} ? "spec" : "rspec")
             "bundle exec #{cmd}"
