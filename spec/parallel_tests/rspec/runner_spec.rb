@@ -37,34 +37,6 @@ describe ParallelTests::RSpec::Runner do
       call('xxx', 1, 22, {})
     end
 
-    it "runs with color for rspec 1 when called for the cmdline" do
-      expect(File).to receive(:file?).with('script/spec').and_return true
-      expect(ParallelTests::Test::Runner).to receive(:execute_command) do |a, b, c, d|
-        expect(d[:env]).to eq("RSPEC_COLOR" => "1")
-      end
-
-      expect($stdout).to receive(:tty?).and_return true
-      call('xxx', 1, 22, {})
-    end
-
-    it "runs without color for rspec 1 when not called for the cmdline" do
-      expect(File).to receive(:file?).with('script/spec').and_return true
-      expect(ParallelTests::Test::Runner).to receive(:execute_command) do |a, b, c, d|
-        expect(d[:env]).to eq({})
-      end
-
-      expect($stdout).to receive(:tty?).and_return false
-      call('xxx', 1, 22, {})
-    end
-
-    it "run bundle exec spec when on bundler rspec 1" do
-      allow(File).to receive(:file?).with('script/spec').and_return false
-      allow(ParallelTests).to receive(:bundler_enabled?).and_return true
-      allow(ParallelTests::RSpec::Runner).to receive(:run).with("bundle show rspec-core").and_return "Could not find gem 'rspec-core' in bundler."
-      should_run_with %r{bundle exec spec}
-      call('xxx', 1, 22, {})
-    end
-
     it "run bundle exec rspec when on bundler rspec 2" do
       allow(File).to receive(:file?).with('script/spec').and_return false
       allow(ParallelTests).to receive(:bundler_enabled?).and_return true
@@ -115,16 +87,6 @@ describe ParallelTests::RSpec::Runner do
       allow(File).to receive(:file?).with('script/spec').and_return true
       expect(File).to receive(:file?).with('.rspec_parallel').and_return true
       should_run_with %r{script/spec\s+-O .rspec_parallel}
-      call('xxx', 1, 22, {})
-    end
-
-    it "uses -O spec/parallel_spec.opts with rspec1" do
-      expect(File).to receive(:file?).with('spec/parallel_spec.opts').and_return true
-
-      allow(ParallelTests).to receive(:bundler_enabled?).and_return true
-      allow(ParallelTests::RSpec::Runner).to receive(:run).with("bundle show rspec-core").and_return "Could not find gem 'rspec-core'."
-
-      should_run_with %r{spec\s+-O spec/parallel_spec.opts}
       call('xxx', 1, 22, {})
     end
 

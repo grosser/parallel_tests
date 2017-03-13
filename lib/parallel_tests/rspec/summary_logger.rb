@@ -5,15 +5,8 @@ class ParallelTests::RSpec::SummaryLogger < ParallelTests::RSpec::LoggerBase
     RSpec::Core::Formatters.register self, :dump_failures
   end
 
-  if RSPEC_1
-    def dump_failure(*args)
-      lock_output { super }
-      @output.flush
-    end
-  else
-    def dump_failures(*args)
-      lock_output { super }
-      @output.flush
-    end
+  def dump_failures(*args)
+    lock_output { super }
+    @output.flush
   end
 end

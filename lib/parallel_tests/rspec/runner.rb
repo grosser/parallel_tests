@@ -9,9 +9,7 @@ module ParallelTests
       class << self
         def run_tests(test_files, process_number, num_processes, options)
           exe = executable # expensive, so we cache
-          version = (exe =~ /\brspec\b/ ? 2 : 1)
-          cmd = [exe, options[:test_options], (rspec_2_color if version == 2), spec_opts, *test_files].compact.join(" ")
-          options = options.merge(:env => rspec_1_color) if version == 1
+          cmd = [exe, options[:test_options], color, spec_opts, *test_files].compact.join(" ")
           execute_command(cmd, process_number, num_processes, options)
         end
 
@@ -65,15 +63,7 @@ module ParallelTests
           `#{cmd}`
         end
 
-        def rspec_1_color
-          if $stdout.tty?
-            {'RSPEC_COLOR' => "1"}
-          else
-            {}
-          end
-        end
-
-        def rspec_2_color
+        def color
           '--color --tty' if $stdout.tty?
         end
 
