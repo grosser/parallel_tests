@@ -8,7 +8,7 @@ class ParallelTests::RSpec::RuntimeLogger < ParallelTests::RSpec::LoggerBase
     @group_nesting = 0
   end
 
-  if RSPEC_3
+  unless RSPEC_2
     RSpec::Core::Formatters.register self, :example_group_started, :example_group_finished, :start_dump
   end
 
@@ -21,7 +21,7 @@ class ParallelTests::RSpec::RuntimeLogger < ParallelTests::RSpec::LoggerBase
   def example_group_finished(notification)
     @group_nesting -= 1
     if @group_nesting == 0
-      path = (RSPEC_3 ? notification.group.file_path : notification.file_path)
+      path = (RSPEC_2 ? notification.file_path : notification.group.file_path)
       @example_times[path] += ParallelTests.now - @time
     end
     super if defined?(super)

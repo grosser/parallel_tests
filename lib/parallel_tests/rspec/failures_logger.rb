@@ -11,14 +11,14 @@ class ParallelTests::RSpec::FailuresLogger < ParallelTests::RSpec::LoggerBase
 
   def dump_summary(*args)
     lock_output do
-      if RSPEC_3
+      if RSPEC_2
+        dump_commands_to_rerun_failed_examples
+      else
         notification = args.first
         unless notification.failed_examples.empty?
           colorizer = ::RSpec::Core::Formatters::ConsoleCodes
           output.puts notification.colorized_rerun_commands(colorizer)
         end
-      else
-        dump_commands_to_rerun_failed_examples
       end
     end
     @output.flush
