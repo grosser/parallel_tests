@@ -2,20 +2,7 @@ require 'parallel_tests/rspec/logger_base'
 require 'parallel_tests/rspec/runner'
 
 class ParallelTests::RSpec::FailuresLogger < ParallelTests::RSpec::LoggerBase
-  if RSPEC_1
-    # RSpec 1: does not keep track of failures, so we do
-    def example_failed(example, *args)
-      if RSPEC_1
-        @failed_examples ||= []
-        @failed_examples << example
-      else
-        super
-      end
-    end
-
-    def dump_failure(*args)
-    end
-  elsif RSPEC_2
+  if RSPEC_2
     def dump_failures(*args)
     end
   else
@@ -24,29 +11,16 @@ class ParallelTests::RSpec::FailuresLogger < ParallelTests::RSpec::LoggerBase
 
   def dump_summary(*args)
     lock_output do
-      if RSPEC_1
-        dump_commands_to_rerun_failed_examples_rspec_1
-      elsif RSPEC_3
+      if RSPEC_2
+        dump_commands_to_rerun_failed_examples
+      else
         notification = args.first
         unless notification.failed_examples.empty?
           colorizer = ::RSpec::Core::Formatters::ConsoleCodes
           output.puts notification.colorized_rerun_commands(colorizer)
         end
-      else
-        dump_commands_to_rerun_failed_examples
       end
     end
     @output.flush
-  end
-
-  private
-
-  def dump_commands_to_rerun_failed_examples_rspec_1
-    (@failed_examples||[]).each do |example|
-      file, line = example.location.to_s.split(':')
-      next unless file and line
-      file.gsub!(%r(^.*?/spec/), './spec/')
-      @output.puts "#{ParallelTests::RSpec::Runner.send(:executable)} #{file}:#{line} # #{example.description}"
-    end
   end
 end

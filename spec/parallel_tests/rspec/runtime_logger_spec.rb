@@ -18,7 +18,7 @@ describe ParallelTests::RSpec::RuntimeLogger do
       end
 
       example = double(:file_path => "#{Dir.pwd}/spec/foo.rb")
-      if ParallelTests::RSpec::RuntimeLogger::RSPEC_3
+      unless ParallelTests::RSpec::RuntimeLogger::RSPEC_2
         example = double(:group => example)
       end
 

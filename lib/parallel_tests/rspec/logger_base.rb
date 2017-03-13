@@ -3,25 +3,15 @@ module ParallelTests
   end
 end
 
-begin
-  require 'rspec/core/formatters/base_text_formatter'
-  base = RSpec::Core::Formatters::BaseTextFormatter
-rescue LoadError
-  require 'spec/runner/formatter/base_text_formatter'
-  base = Spec::Runner::Formatter::BaseTextFormatter
-end
+require 'rspec/core/formatters/base_text_formatter'
 
-ParallelTests::RSpec::LoggerBaseBase = base
-
-class ParallelTests::RSpec::LoggerBase < ParallelTests::RSpec::LoggerBaseBase
-  RSPEC_1 = !defined?(RSpec::Core::Formatters::BaseTextFormatter) # do not test for Spec, this will trigger deprecation warning in rspec 2
-  RSPEC_2 = !RSPEC_1 && RSpec::Core::Version::STRING.start_with?('2')
-  RSPEC_3 = !RSPEC_1 && RSpec::Core::Version::STRING.start_with?('3')
+class ParallelTests::RSpec::LoggerBase < RSpec::Core::Formatters::BaseTextFormatter
+  RSPEC_2 = RSpec::Core::Version::STRING.start_with?('2')
 
   def initialize(*args)
     super
 
-    @output ||= args[1] || args[0] # rspec 1 has output as second argument
+    @output ||= args[0]
 
     if String === @output # a path ?
       FileUtils.mkdir_p(File.dirname(@output))
