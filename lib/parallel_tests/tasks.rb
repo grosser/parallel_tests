@@ -7,8 +7,12 @@ module ParallelTests
         ENV['RAILS_ENV'] || 'test'
       end
 
+      def purge_before_load?
+        ENV.fetch('PURGE_BEFORE_LOAD', 'TRUE').downcase == 'false' ? false : true
+      end
+
       def purge_before_load
-        "db:test:purge" if Gem::Version.new(Rails.version) > Gem::Version.new('4.2.0')
+        "db:test:purge" if purge_before_load? && Gem::Version.new(Rails.version) > Gem::Version.new('4.2.0')
       end
 
       def run_in_parallel(cmd, options={})
