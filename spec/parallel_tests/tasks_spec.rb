@@ -172,4 +172,34 @@ describe ParallelTests::Tasks do
       expect(foo).to eq(2)
     end
   end
+
+  describe '.purge_before_load' do
+    context 'Rails < 4.2.0' do
+      before do
+        stub_const('Rails', double(version: '3.2.1'))
+      end
+
+      it "should return nil for Rails < 4.2.0" do
+        expect(ParallelTests::Tasks.purge_before_load).to eq nil
+      end
+    end
+
+    context 'Rails > 4.2.0' do
+      before do
+        stub_const('Rails', double(version: '4.2.8'))
+      end
+
+      it "should return db:test:purge when defined" do
+        allow(Rake::Task).to receive(:task_defined?).with('db:test:purge') { true }
+
+        expect(ParallelTests::Tasks.purge_before_load).to eq 'db:test:purge'
+      end
+
+      it "should return app:db:test:purge when db:test:purge is not defined" do
+        allow(Rake::Task).to receive(:task_defined?).with('db:test:purge') { false }
+
+        expect(ParallelTests::Tasks.purge_before_load).to eq 'app:db:test:purge'
+      end
+    end
+  end
 end
