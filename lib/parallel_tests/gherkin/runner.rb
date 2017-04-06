@@ -11,11 +11,13 @@ module ParallelTests
 
           if options[:group_by] == :scenarios
             grouped = test_files.map { |t| t.split(':') }.group_by(&:first)
-            combined_scenarios = grouped.map {|file,files_and_lines| "#{file}:#{files_and_lines.map(&:last).join(':')}" }
+            combined_scenarios = grouped.map do |files_and_lines|
+              files_and_lines[1].map { |file_and_line| "#{file_and_line[0]}:#{file_and_line[1]}"}
+            end
           end
 
-          sanitized_test_files = combined_scenarios.map { |val| WINDOWS ? "\"#{val}\"" : Shellwords.escape(val) }
-
+          sanitized_test_files = combined_scenarios.flatten.map { |val| WINDOWS ? "\"#{val}\"" : Shellwords.escape(val) }.join(' ')
+ 
           options[:env] ||= {}
           options[:env] = options[:env].merge({'AUTOTEST' => '1'}) if $stdout.tty? # display color when we are in a terminal
 
