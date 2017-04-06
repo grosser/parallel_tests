@@ -7,6 +7,10 @@ module ParallelTests
         ENV['RAILS_ENV'] || 'test'
       end
 
+      def skip_migration_check
+        ENV['PARALLEL_SKIP_MIGRATION_CHECK'].to_s.strip.size > 0
+      end
+
       def purge_before_load
         if Gem::Version.new(Rails.version) > Gem::Version.new('4.2.0')
           Rake::Task.task_defined?('db:test:purge') ? 'db:test:purge' : 'app:db:test:purge'
@@ -96,7 +100,7 @@ namespace :parallel do
 
   desc "update test databases by dumping and loading --> parallel:prepare[num_cpus]"
   task(:prepare, [:count]) do |_,args|
-    ParallelTests::Tasks.check_for_pending_migrations
+    ParallelTests::Tasks.check_for_pending_migrations unless ParallelTests::Tasks.skip_migration_check
     if defined?(ActiveRecord) && ActiveRecord::Base.schema_format == :ruby
       # dump then load in parallel
       Rake::Task['db:schema:dump'].invoke

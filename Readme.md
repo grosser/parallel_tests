@@ -35,8 +35,9 @@ test:
 
 ### Copy development schema (repeat after migrations)
     rake parallel:prepare
+    rake parallel:prepare PARALLEL_SKIP_MIGRATION_CHECK=true # useful for CI
 
-### Setup environment from scratch (create db and loads schema, useful for CI)
+### Setup environment from scratch (create db, load schema, and load seed)
     rake parallel:setup
 
 ### Run!
