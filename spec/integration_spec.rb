@@ -110,8 +110,8 @@ describe 'CLI' do
     write 'spec/xxx_spec.rb', 'describe("it"){it("should"){puts "TEST1"}}'
     write 'spec/xxx2_spec.rb', 'describe("it"){it("should"){1.should == 1}}'
     result = run_tests "spec --verbose", :type => 'rspec'
-    expect(result).to include "bundle exec rspec spec/xxx_spec.rb"
-    expect(result).to include "bundle exec rspec spec/xxx2_spec.rb"
+    expect(result).to match %r{bundle exec rspec _[0-9.]+_ spec/xxx_spec.rb}
+    expect(result).to match %r{bundle exec rspec _[0-9.]+_ spec/xxx2_spec.rb}
   end
 
   it "fails when tests fail" do
@@ -309,7 +309,7 @@ describe 'CLI' do
       write 'spec/xxx2_spec.rb', 'describe("it"){it("should"){1.should == 2}}'
       result = run_tests "spec --verbose", :add => "--test-options '--seed 1234'", :fail => true, :type => 'rspec'
       expect(result).to include("Randomized with seed 1234")
-      expect(result).to include("bundle exec rspec spec/xxx2_spec.rb --seed 1234")
+      expect(result).to match(%r{bundle exec rspec _[0-9.]+_ spec/xxx2_spec.rb --seed 1234})
     end
   end
 
