@@ -109,7 +109,7 @@ Use these loggers to record test runtime and then use the recorded runtime to ba
 Rspec: Add to your `.rspec_parallel` (or `.rspec`) :
 
     --format progress
-    --format ParallelTests::RSpec::RuntimeLogger --out tmp/parallel_runtime_rspec.log
+    --format ParallelTests::RSpec::RuntimeLogger --out <%= ENV['PARALLEL_RUNTIME_LOGFILE'] || 'tmp/parallel_runtime_rspec.log' %>
 
 ### Test::Unit & Minitest 4/5
 

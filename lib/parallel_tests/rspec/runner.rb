@@ -28,7 +28,7 @@ module ParallelTests
         end
 
         def runtime_log
-          'tmp/parallel_runtime_rspec.log'
+          ENV['PARALLEL_RUNTIME_LOGFILE'] || 'tmp/parallel_runtime_rspec.log'
         end
 
         def test_file_name
