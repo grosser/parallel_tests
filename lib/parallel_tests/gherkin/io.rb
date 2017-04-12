@@ -1,3 +1,4 @@
+require 'tempfile'
 require 'parallel_tests'
 
 module ParallelTests
@@ -8,13 +9,24 @@ module ParallelTests
         if path_or_io.respond_to?(:write)
           path_or_io
         else # its a path
-          File.open(path_or_io, 'w').close # clean out the file
+          temp_filename = File.join(Dir.tmpdir, "#{File.basename(path_or_io)}-lock")
+          temp_lock = File.open(temp_filename, File::CREAT|File::APPEND)
+          if temp_lock.flock(File::LOCK_EX|File::LOCK_NB)
+            File.open(path_or_io, 'w').close # clean out the file
+
+            at_exit do
+              unless temp_lock.closed?
+                temp_lock.close
+                temp_lock.unlink
+              end
+            end
+          end
           file = File.open(path_or_io, 'a')
 
           at_exit do
             unless file.closed?
               file.flush
-              file.close
+              File.unlink(temp_filename)
             end
           end
 

@@ -1,3 +1,5 @@
+require 'tempfile'
+
 module ParallelTests
   module RSpec
   end
@@ -15,7 +17,18 @@ class ParallelTests::RSpec::LoggerBase < RSpec::Core::Formatters::BaseTextFormat
 
     if String === @output # a path ?
       FileUtils.mkdir_p(File.dirname(@output))
-      File.open(@output, 'w'){} # overwrite previous results
+      temp_filename = File.join(Dir.tmpdir, "#{File.basename(@output)}-lock")
+      temp_lock = File.open(temp_filename, File::CREAT|File::APPEND)
+      if temp_lock.flock(File::LOCK_EX|File::LOCK_NB)
+        File.open(@output, 'w'){} # overwrite previous results
+
+        at_exit do
+          unless temp_lock.closed?
+            temp_lock.close
+            File.unlink(temp_filename)
+          end
+        end
+      end
       @output = File.open(@output, 'a')
     elsif File === @output # close and restart in append mode
       @output.close
