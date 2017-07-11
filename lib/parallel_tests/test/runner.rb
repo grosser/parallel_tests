@@ -192,7 +192,7 @@ module ParallelTests
           log = options[:runtime_log] || runtime_log
           lines = File.read(log).split("\n")
           lines.each_with_object({}) do |line, times|
-            test, time = line.split(":", 2)
+            test, _, time = line.rpartition(':')
             next unless test and time
             times[test] = time.to_f if tests.include?(test)
           end
