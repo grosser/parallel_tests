@@ -100,6 +100,16 @@ describe ParallelTests::Test::Runner do
         call(["aaa", "bbb", "ccc"], 3, group_by: :runtime)
       end
 
+      it "groups when test name contains colons" do
+        File.write("tmp/parallel_runtime_test.log", "ccc[1:2:3]:1\nbbb[1:2:3]:2\naaa[1:2:3]:3")
+        expect(call(["aaa[1:2:3]", "bbb[1:2:3]", "ccc[1:2:3]"], 2, group_by: :runtime)).to match_array([["aaa[1:2:3]"], ["bbb[1:2:3]", "ccc[1:2:3]"]])
+      end
+
+      it "groups when not even statistic" do
+        File.write("tmp/parallel_runtime_test.log", "aaa:1\nbbb:1\nccc:8")
+        expect(call(["aaa", "bbb", "ccc"], 2, group_by: :runtime)).to match_array([["aaa", "bbb"], ["ccc"]])
+      end
+
       it "groups with average for missing" do
         File.write("tmp/parallel_runtime_test.log", "xxx:123\nbbb:10\nccc:1")
         expect(call(["aaa", "bbb", "ccc", "ddd"], 2, group_by: :runtime)).to eq([["bbb", "ccc"], ["aaa", "ddd"]])
