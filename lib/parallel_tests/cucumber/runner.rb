@@ -31,8 +31,7 @@ module ParallelTests
 
 
         def files_from_profile(name)
-          profile = ::Cucumber::Cli::ProfileLoader.new.args_from(name)
-          profile.delete_if{|x| !x.match(self.test_suffix)}
+          ::Cucumber::Cli::ProfileLoader.new.args_from(name).grep(self.test_suffix)
         end
 
         def command_with_seed(cmd, seed)

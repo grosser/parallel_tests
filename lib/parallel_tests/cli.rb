@@ -174,7 +174,6 @@ module ParallelTests
         opts.on("--only-group INT[, INT]", Array) { |groups| options[:only_group] = groups.map(&:to_i) }
 
         opts.on("-e", "--exec [COMMAND]", "execute this code parallel and with ENV['TEST_ENV_NUMBER']") { |path| options[:execute] = path }
-        opts.on("--cucumber_profile [PROFILE]", "execute cucumber profile") {|profile| options[:cucumber_profile] = profile}
         opts.on("-o", "--test-options '[OPTIONS]'", "execute test commands with those options") { |arg| options[:test_options] = arg.lstrip }
         opts.on("-t", "--type [TYPE]", "test(default) / rspec / cucumber / spinach") do |type|
           begin
@@ -212,7 +211,7 @@ module ParallelTests
 
       files, remaining = extract_file_paths(argv)
       unless options[:execute]
-        files = extract_files_from_cucumber_profile(options[:cucumber_profile]) if (!files.any?)&&options.key?(:cucumber_profile)
+        files = extract_files_from_cucumber_profile(options) if files.empty?
         abort "Pass files or folders to run" unless files.any?
         options[:files] = files
       end
@@ -230,9 +229,15 @@ module ParallelTests
       options
     end
 
-    def extract_files_from_cucumber_profile(profile)
-      return unless @runner.name.eql?('cucumber')
-      @runner.files_from_profile(profile)
+    def extract_files_from_cucumber_profile(options)
+      return unless @runner.name == 'cucumber'
+      profile = nil
+      if options.key?(:test_options)
+        OptionParser.new do |opts|
+          opts.on("-p", "--profile [PROFILE]") { |option| profile = option }
+        end.parse!(options[:test_options].split(' '))
+      end
+      @runner.files_from_profile(profile) if profile
     end
 
     def extract_file_paths(argv)
