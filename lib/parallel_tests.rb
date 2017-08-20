@@ -10,6 +10,7 @@ module ParallelTests
   else
     "ps -ef | grep [T]EST_ENV_NUMBER= 2>&1"
   end
+  RUBY_BINARY = File.join(RbConfig::CONFIG['bindir'], RbConfig::CONFIG['ruby_install_name'])
 
   autoload :CLI, "parallel_tests/cli"
   autoload :VERSION, "parallel_tests/version"
@@ -58,6 +59,10 @@ module ParallelTests
       else
         `ps -o ppid= -p#{`ps -o ppid= -p#{Process.pid}`}` #the true parent is one layer up.
       end.to_i
+    end
+
+    def with_ruby_binary(command)
+      WINDOWS ? "#{RUBY_BINARY} -- #{command}" : command
     end
 
     def wait_for_other_processes_to_finish
