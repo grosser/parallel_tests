@@ -1,5 +1,4 @@
 require 'rake'
-require 'parallel_tests/test/runner'
 
 module ParallelTests
   module Tasks
