@@ -28,7 +28,7 @@ module ParallelTests
       Tempfile.open 'parallel_tests-lock' do |lock|
         progress_indicator = simulate_output_for_ci if options[:serialize_stdout]
 
-        Parallel.map(items, :in_threads => num_processes) do |item|
+        Parallel.map(items, :in_threads => num_processes, finish: finish_hook(options)) do |item|
           result = yield(item)
           if progress_indicator && progress_indicator.alive?
             progress_indicator.exit
@@ -65,6 +65,12 @@ module ParallelTests
       end
 
       abort final_fail_message if any_test_failed?(test_results)
+    end
+
+    def finish_hook(options)
+      -> (item, i, result) do
+        ParallelTests.pids.delete(i)
+      end
     end
 
     def run_tests(group, process_number, num_processes, options)

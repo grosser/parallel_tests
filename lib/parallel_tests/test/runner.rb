@@ -71,8 +71,9 @@ module ParallelTests
 
         def execute_command(cmd, process_number, num_processes, options)
           env = (options[:env] || {}).merge(
-            "TEST_ENV_NUMBER" => test_env_number(process_number, options),
-            "PARALLEL_TEST_GROUPS" => num_processes
+            "TEST_ENV_NUMBER" => test_env_number(process_number, options).to_s,
+            "PARALLEL_TEST_GROUPS" => num_processes.to_s,
+            "PARALLEL_PID_FILE" => ParallelTests.pids.file_path,
           )
           cmd = "nice #{cmd}" if options[:nice]
           cmd = "#{cmd} 2>&1" if options[:combine_stderr]
@@ -80,22 +81,14 @@ module ParallelTests
 
           puts cmd if options[:verbose]
 
-          execute_command_and_capture_output(env, cmd, options[:serialize_stdout])
+          execute_command_and_capture_output(env, cmd, options[:serialize_stdout], process_number)
         end
 
-        def execute_command_and_capture_output(env, cmd, silence)
-          # make processes descriptive / visible in ps -ef
-          separator = (WINDOWS ? ' & ' : ';')
-          exports = env.map do |k,v|
-            if WINDOWS
-              "(SET \"#{k}=#{v}\")"
-            else
-              "#{k}=#{v};export #{k}"
-            end
-          end.join(separator)
-          cmd = "#{exports}#{separator}#{cmd}"
-
-          output = open("|#{cmd}", "r") { |output| capture_output(output, silence) }
+        def execute_command_and_capture_output(env, cmd, silence, process_number)
+          output = IO.popen(env, cmd) do |io|
+            ParallelTests.pids.add(process_number, io.pid)
+            capture_output(io, silence)
+          end
           exitstatus = $?.exitstatus
           seed = output[/seed (\d+)/,1]
 

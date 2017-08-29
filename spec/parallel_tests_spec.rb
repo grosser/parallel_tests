@@ -70,8 +70,13 @@ describe ParallelTests do
   end
 
   describe ".wait_for_other_processes_to_finish" do
+    before do
+      ENV["PARALLEL_PID_FILE"] = ParallelTests.pids.file_path
+      ParallelTests.pids.clear
+    end
+    
     def with_running_processes(count, wait=0.2)
-      count.times { Thread.new{ `TEST_ENV_NUMBER=1; sleep #{wait}` } }
+      count.times { |x| ParallelTests.pids.add(x, 123) }
       sleep 0.1
       yield
     ensure
@@ -84,7 +89,7 @@ describe ParallelTests do
     end
 
     it "stops if only itself is running" do
-      ENV["TEST_ENV_NUMBER"] = "2"
+      ParallelTests.pids.add('', 123)
       expect(ParallelTests).not_to receive(:sleep)
       with_running_processes(1) do
         ParallelTests.wait_for_other_processes_to_finish
@@ -97,6 +102,7 @@ describe ParallelTests do
       counter = 0
       allow(ParallelTests).to receive(:sleep) do
         sleep 0.1;
+        ParallelTests.pids.delete(1) if counter > 3
         counter += 1
       end
 
@@ -108,13 +114,18 @@ describe ParallelTests do
   end
 
   describe ".number_of_running_processes" do
+    before do
+      ENV["PARALLEL_PID_FILE"] = ParallelTests.pids.file_path
+      ParallelTests.pids.clear
+    end
+    
     it "is 0 for nothing" do
       expect(ParallelTests.number_of_running_processes).to eq(0)
     end
 
     it "is 2 when 2 are running" do
       wait = 0.2
-      2.times { Thread.new { `TEST_ENV_NUMBER=1; sleep #{wait}` } }
+      2.times { |x| ParallelTests.pids.add(x, 123) }
       sleep wait / 2
       expect(ParallelTests.number_of_running_processes).to eq(2)
       sleep wait

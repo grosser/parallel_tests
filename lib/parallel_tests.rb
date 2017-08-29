@@ -4,17 +4,12 @@ require "rbconfig"
 
 module ParallelTests
   WINDOWS = (RbConfig::CONFIG['host_os'] =~ /cygwin|mswin|mingw|bccwin|wince|emx/)
-  GREP_PROCESSES_COMMAND = \
-  if WINDOWS
-    "wmic process get commandline | findstr TEST_ENV_NUMBER | find /c \"TEST_ENV_NUMBER=\" 2>&1"
-  else
-    "ps -ef | grep [T]EST_ENV_NUMBER= 2>&1"
-  end
   RUBY_BINARY = File.join(RbConfig::CONFIG['bindir'], RbConfig::CONFIG['ruby_install_name'])
 
   autoload :CLI, "parallel_tests/cli"
   autoload :VERSION, "parallel_tests/version"
   autoload :Grouper, "parallel_tests/grouper"
+  autoload :Pids, "parallel_tests/pids"
 
   class << self
     def determine_number_of_processes(count)
@@ -23,6 +18,10 @@ module ParallelTests
         ENV["PARALLEL_TEST_PROCESSORS"],
         Parallel.processor_count
       ].detect{|c| not c.to_s.strip.empty? }.to_i
+    end
+
+    def pids
+      Pids.instance
     end
 
     # copied from http://github.com/carlhuda/bundler Bundler::SharedHelpers#find_gemfile
@@ -72,9 +71,7 @@ module ParallelTests
 
     # Fun fact: this includes the current process if it's run via parallel_tests
     def number_of_running_processes
-      result = `#{GREP_PROCESSES_COMMAND}`
-      raise "Could not grep for processes -> #{result}" if result.strip != "" && !$?.success?
-      result.split("\n").size
+      ParallelTests.pids.count_from_file(ENV["PARALLEL_PID_FILE"])
     end
 
     # real time even if someone messed with timecop in tests
