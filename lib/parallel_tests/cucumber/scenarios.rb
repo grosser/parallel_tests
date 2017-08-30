@@ -27,8 +27,16 @@ module ParallelTests
           # Create the ScenarioLineLogger which will filter the scenario we want
           scenario_line_logger = ParallelTests::Cucumber::Formatters::ScenarioLineLogger.new(tag_expression)
 
-          # here we loop on the files map, each file will containe one or more scenario
+          # here we loop on the files map, each file will contain one or more scenario
           features ||= files.map do |path|
+            # Copying the string because it is frozen
+            path = path.dup
+            test_lines = []
+
+            # Gather up any line numbers attached to the file path
+            until path.slice(/:\d+$/).nil?
+              test_lines << path.slice!(/:\d+$/).delete(':').to_i
+            end
 
             # We encode the file and get the content of it
             source = ::Cucumber::Runtime::NormalisedEncodingFile.read(path)
@@ -50,7 +58,7 @@ module ParallelTests
                 next unless /Scenario/.match(feature_element[:type])
 
                 # It's a scenario, we add it to the scenario_line_logger
-                scenario_line_logger.visit_feature_element(document.uri, feature_element, feature_tags)
+                scenario_line_logger.visit_feature_element(document.uri, feature_element, feature_tags, line_numbers: test_lines)
               end
 
             rescue StandardError => e
