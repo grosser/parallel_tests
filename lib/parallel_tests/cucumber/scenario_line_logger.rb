@@ -20,7 +20,7 @@ module ParallelTests
             # We don't accept the feature_element if the current tags are not valid
             return unless @tag_expression.evaluate(scenario_tags)
             # or if it is not at the correct location
-            return unless line_numbers.empty? || line_numbers.include?(test_line)
+            return if line_numbers.any? && !line_numbers.include?(test_line)
 
             @scenarios << [uri, feature_element[:location][:line]].join(":")
           else # :ScenarioOutline
@@ -33,7 +33,7 @@ module ParallelTests
                 test_line = row[:location][:line]
                 next unless line_numbers.empty? || line_numbers.include?(test_line)
 
-                @scenarios << [uri, row[:location][:line]].join(':')
+                @scenarios << [uri, test_line].join(':')
               end
             end
           end

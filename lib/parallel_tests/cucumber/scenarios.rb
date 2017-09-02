@@ -29,14 +29,9 @@ module ParallelTests
 
           # here we loop on the files map, each file will contain one or more scenario
           features ||= files.map do |path|
-            # Copying the string because it is frozen
-            path = path.dup
-            test_lines = []
-
             # Gather up any line numbers attached to the file path
-            until path.slice(/:\d+$/).nil?
-              test_lines << path.slice!(/:\d+$/).delete(':').to_i
-            end
+            path, *test_lines = path.split(/:(?=\d+)/)
+            test_lines.map!(&:to_i)
 
             # We encode the file and get the content of it
             source = ::Cucumber::Runtime::NormalisedEncodingFile.read(path)
@@ -48,7 +43,7 @@ module ParallelTests
             scanner = ::Gherkin::TokenScanner.new(document.body)
 
             begin
-              # We make an attempt to parse the gherkin document, this could be failed if the document is not well formated
+              # We make an attempt to parse the gherkin document, this could be failed if the document is not well formatted
               result = parser.parse(scanner)
               feature_tags = result[:feature][:tags].map { |tag| ::Cucumber::Core::Ast::Tag.new(tag[:location], tag[:name]) }
 
