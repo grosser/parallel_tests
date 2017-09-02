@@ -31,7 +31,7 @@ module ParallelTests
               rows = example[:tableBody].select { |body| body[:type] == :TableRow }
               rows.each do |row|
                 test_line = row[:location][:line]
-                next unless line_numbers.empty? || line_numbers.include?(test_line)
+                next if line_numbers.any? && !line_numbers.include?(test_line)
 
                 @scenarios << [uri, test_line].join(':')
               end
