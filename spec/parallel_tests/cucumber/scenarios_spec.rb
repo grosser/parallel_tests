@@ -2,10 +2,10 @@ require 'tempfile'
 require 'parallel_tests/cucumber/scenarios'
 
 describe ParallelTests::Cucumber::Scenarios do
-  context 'by default' do
-    let(:feature_file) do
-      Tempfile.new('grouper.feature').tap do |feature|
-        feature.write <<-EOS
+
+  let(:feature_file) do
+    Tempfile.new('grouper.feature').tap do |feature|
+      feature.write <<-EOS
           Feature: Grouping by scenario
 
             Scenario: First
@@ -13,14 +13,30 @@ describe ParallelTests::Cucumber::Scenarios do
 
             Scenario: Second
               Given I don't do anything
-        EOS
-        feature.rewind
-      end
-    end
 
+            Scenario Outline: Third
+              Given I don't do anything
+            Examples:
+              | param   |
+              | value 1 |
+              | value 2 |
+      EOS
+      feature.rewind
+    end
+  end
+
+
+  context 'by default' do
     it 'returns all the scenarios' do
       scenarios = ParallelTests::Cucumber::Scenarios.all([feature_file.path])
-      expect(scenarios).to eq %W(#{feature_file.path}:3 #{feature_file.path}:6)
+      expect(scenarios).to eq %W(#{feature_file.path}:3 #{feature_file.path}:6 #{feature_file.path}:13 #{feature_file.path}:14)
+    end
+  end
+
+  context 'with line numbers' do
+    it 'only returns scenarios that match the provided lines' do
+      scenarios = ParallelTests::Cucumber::Scenarios.all(["#{feature_file.path}:6:14"])
+      expect(scenarios).to eq %W(#{feature_file.path}:6 #{feature_file.path}:14)
     end
   end
 
