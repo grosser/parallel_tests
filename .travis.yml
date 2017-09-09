@@ -4,8 +4,9 @@ rvm:
   - 2.2.2
   - 2.3.1
   - jruby-head
-branches:
-  only: [master]
+# TODO: turn back on once PR is finished
+#branches:
+#  only: [master]
 sudo: false
 cache: bundler
 matrix:
