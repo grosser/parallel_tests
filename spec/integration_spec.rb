@@ -31,7 +31,7 @@ describe 'CLI' do
   end
 
   def executable(options={})
-    "#{bin_folder}/parallel_#{options[:type] || 'test'}"
+    "ruby #{bin_folder}/parallel_#{options[:type] || 'test'}"
   end
 
   def ensure_folder(folder)
@@ -41,7 +41,7 @@ describe 'CLI' do
   def run_tests(test_folder, options={})
     ensure_folder folder
     processes = "-n #{options[:processes]||2}" unless options[:processes] == false
-    command = "cd #{folder} && #{options[:export]} ruby #{executable(options)} #{test_folder} #{processes} #{options[:add]} 2>&1"
+    command = "cd #{folder} && #{options[:export]} #{executable(options)} #{test_folder} #{processes} #{options[:add]} 2>&1"
     result = `#{command}`
     raise "FAILED #{command}\n#{result}" if $?.success? == !!options[:fail]
     result
