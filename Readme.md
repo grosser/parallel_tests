@@ -2,7 +2,7 @@
 
 [![Gem Version](https://badge.fury.io/rb/parallel_tests.svg)](https://rubygems.org/gems/parallel_tests)
 [![Build Status](https://travis-ci.org/grosser/parallel_tests.svg)](https://travis-ci.org/grosser/parallel_tests/builds)
-[![Build status](https://ci.appveyor.com/api/projects/status/hsihbptljtehuxp8/branch/windows_work?svg=true)](https://ci.appveyor.com/project/enkessler/parallel-tests/branch/windows_work)
+[![Build status](https://ci.appveyor.com/api/projects/status/708b1up4pqc34x3y?svg=true)](https://ci.appveyor.com/project/grosser/parallel-tests)
 
 Speedup Test::Unit + RSpec + Cucumber + Spinach by running parallel on multiple CPU cores.<br/>
 ParallelTests splits tests into even groups (by number of lines or runtime) and runs each group in a single process with its own database.
