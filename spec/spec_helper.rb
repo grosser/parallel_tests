@@ -42,7 +42,7 @@ module SpecHelper
       files.each do |file|
         parent = "#{root}/#{File.dirname(file)}"
         FileUtils.mkpath(parent) unless File.exist?(parent)
-        File.open("#{root}/#{file}", 'w') { |file| file.write('') } unless File.exist?("#{root}/#{file}")
+        FileUtils.touch(File.join(root, file))
       end
       yield root
     end
