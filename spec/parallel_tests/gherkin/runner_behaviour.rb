@@ -55,7 +55,12 @@ shared_examples_for 'gherkin runners' do
     end
 
     it "sanitizes dangerous file runner_names" do
-      should_run_with %r{xx\\ x}
+      if ParallelTests::WINDOWS
+        should_run_with %r{"xx x"}
+      else
+        should_run_with %r{xx\\ x}
+      end
+
       call(['xx x'], 1, 22, {})
     end
 
@@ -67,17 +72,32 @@ shared_examples_for 'gherkin runners' do
       end
 
       it "uses parallel profile" do
-        should_run_with %r{script/#{runner_name} .*foo bar --profile parallel xxx}
+        if ParallelTests::WINDOWS
+          should_run_with %r{script/#{runner_name} .*foo bar --profile parallel "xxx"}
+        else
+          should_run_with %r{script/#{runner_name} .*foo bar --profile parallel xxx}
+        end
+
         call(['xxx'], 1, 22, :test_options => 'foo bar')
       end
 
       it "uses given profile via --profile" do
-        should_run_with %r{script/#{runner_name} .*--profile foo xxx$}
+        if ParallelTests::WINDOWS
+          should_run_with %r{script/#{runner_name} .*--profile foo "xxx"$}
+        else
+          should_run_with %r{script/#{runner_name} .*--profile foo xxx$}
+        end
+
         call(['xxx'], 1, 22, :test_options => '--profile foo')
       end
 
       it "uses given profile via -p" do
-        should_run_with %r{script/#{runner_name} .*-p foo xxx$}
+        if ParallelTests::WINDOWS
+          should_run_with %r{script/#{runner_name} .*-p foo "xxx"$}
+        else
+          should_run_with %r{script/#{runner_name} .*-p foo xxx$}
+        end
+
         call(['xxx'], 1, 22, :test_options => '-p foo')
       end
     end
@@ -192,7 +212,12 @@ shared_examples_for 'gherkin runners' do
 
       expect(ParallelTests::Test::Runner).to receive(:execute_command) do |a,b,c,d|
         argv = a.split(" ").last(2)
-        expect(argv).to eq(["features/a.rb:23:44", "features/b.rb:12"])
+
+        if ParallelTests::WINDOWS
+          expect(argv).to eq(['"features/a.rb:23:44"', '"features/b.rb:12"'])
+        else
+          expect(argv).to eq(["features/a.rb:23:44", "features/b.rb:12"])
+        end
       end
 
       call(test_files, 1, 2, { :group_by => :scenarios })

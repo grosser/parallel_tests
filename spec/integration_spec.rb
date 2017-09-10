@@ -4,11 +4,11 @@ require 'spec_helper'
 
 describe 'CLI' do
   before do
-    `rm -rf #{folder}`
+    FileUtils.remove_dir(folder, true)
   end
 
   after do
-    `rm -rf #{folder}`
+    FileUtils.remove_dir(folder, true)
   end
 
   def folder
@@ -31,11 +31,11 @@ describe 'CLI' do
   end
 
   def executable(options={})
-    "#{bin_folder}/parallel_#{options[:type] || 'test'}"
+    "ruby #{bin_folder}/parallel_#{options[:type] || 'test'}"
   end
 
   def ensure_folder(folder)
-    `mkdir -p #{folder}` unless File.exist?(folder)
+    FileUtils.mkpath(folder) unless File.exist?(folder)
   end
 
   def run_tests(test_folder, options={})

@@ -41,8 +41,8 @@ module SpecHelper
     Dir.mktmpdir do |root|
       files.each do |file|
         parent = "#{root}/#{File.dirname(file)}"
-        `mkdir -p #{parent}` unless File.exist?(parent)
-        `touch #{root}/#{file}`
+        FileUtils.mkpath(parent) unless File.exist?(parent)
+        FileUtils.touch(File.join(root, file))
       end
       yield root
     end

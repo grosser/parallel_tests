@@ -7,7 +7,7 @@ describe ParallelTests::Test::RuntimeLogger do
   end
 
   def run_tests
-    sh "#{Bundler.root}/bin/parallel_test test -n 2"
+    sh "ruby #{Bundler.root}/bin/parallel_test test -n 2"
   end
 
   it "writes a correct log on test-unit" do
