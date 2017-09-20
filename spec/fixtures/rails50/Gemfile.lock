@@ -1,7 +1,7 @@
 PATH
-  remote: ../../../
+  remote: ../../..
   specs:
-    parallel_tests (2.7.0)
+    parallel_tests (2.14.3)
       parallel
 
 GEM
@@ -65,7 +65,7 @@ GEM
     nokogiri (1.6.8)
       mini_portile2 (~> 2.1.0)
       pkg-config (~> 1.1.7)
-    parallel (1.9.0)
+    parallel (1.12.0)
     pkg-config (1.1.7)
     rack (2.0.1)
     rack-test (0.6.3)
@@ -115,8 +115,8 @@ PLATFORMS
 
 DEPENDENCIES
   parallel_tests!
-  rails (~> 5.0.0)
+  rails (= 5.0.0)
   sqlite3
 
 BUNDLED WITH
-   1.12.5
+   1.15.4

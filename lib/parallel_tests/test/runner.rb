@@ -73,7 +73,7 @@ module ParallelTests
           env = (options[:env] || {}).merge(
             "TEST_ENV_NUMBER" => test_env_number(process_number, options).to_s,
             "PARALLEL_TEST_GROUPS" => num_processes.to_s,
-            "PARALLEL_PID_FILE" => ParallelTests.pids.file_path,
+            "PARALLEL_PID_FILE" => ParallelTests.pid_file_path,
           )
           cmd = "nice #{cmd}" if options[:nice]
           cmd = "#{cmd} 2>&1" if options[:combine_stderr]

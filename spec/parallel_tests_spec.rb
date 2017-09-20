@@ -72,7 +72,7 @@ describe ParallelTests do
   describe ".wait_for_other_processes_to_finish" do
     before do
       ENV["PARALLEL_PID_FILE"] = ParallelTests.pids.file_path
-      ParallelTests.pids.clear
+      ParallelTests.pids.send(:clear)
     end
     
     def with_running_processes(count, wait=0.2)
@@ -116,7 +116,7 @@ describe ParallelTests do
   describe ".number_of_running_processes" do
     before do
       ENV["PARALLEL_PID_FILE"] = ParallelTests.pids.file_path
-      ParallelTests.pids.clear
+      ParallelTests.pids.send(:clear)
     end
     
     it "is 0 for nothing" do

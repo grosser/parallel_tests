@@ -21,7 +21,15 @@ module ParallelTests
     end
 
     def pids
-      Pids.instance
+      @pids ||= Pids.new(pid_file_path)
+    end
+
+    def pid_file_path
+      ENV['PARALLEL_PID_FILE'] ||= new_pid_file_path
+    end
+
+    def new_pid_file_path
+      @pid_file_path ||= Tempfile.new('pidfile').path
     end
 
     # copied from http://github.com/carlhuda/bundler Bundler::SharedHelpers#find_gemfile
@@ -69,9 +77,8 @@ module ParallelTests
       sleep 1 until number_of_running_processes <= 1
     end
 
-    # Fun fact: this includes the current process if it's run via parallel_tests
     def number_of_running_processes
-      ParallelTests.pids.count_from_file(ENV["PARALLEL_PID_FILE"])
+      ParallelTests.pids.count
     end
 
     # real time even if someone messed with timecop in tests
