@@ -43,18 +43,14 @@ module ParallelTests
 
     def read
       sync do
-        contents = File.open(file_path, 'r').read
+        contents = IO.read(file_path)
         return if contents.empty?
         @pids = JSON.parse(contents)
       end
     end
 
     def save
-      sync do
-        File.open(file_path, 'w+') do |f|
-          f.write(pids.to_json)
-        end
-      end
+      sync { IO.write(file_path, pids.to_json) }
     end
 
     def sync
