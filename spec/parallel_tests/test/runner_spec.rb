@@ -484,10 +484,9 @@ EOF
 
     it "returns command used" do
       run_with_file("puts 123; exit 5") do |path|
-        env_vars = "TEST_ENV_NUMBER=2;export TEST_ENV_NUMBER;PARALLEL_TEST_GROUPS=4;export PARALLEL_TEST_GROUPS;"
         result = call("ruby #{path}", 1, 4, {})
         expect(result).to include({
-          :command => "#{env_vars}ruby #{path}"
+          :command => "ruby #{path}"
         })
       end
     end

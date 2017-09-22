@@ -28,6 +28,7 @@ module ParallelTests
       Tempfile.open 'parallel_tests-lock' do |lock|
         progress_indicator = simulate_output_for_ci if options[:serialize_stdout]
 
+        ParallelTests.pids # setup the class vars here so we dont initialize in the threads
         Parallel.map(items, :in_threads => num_processes) do |item|
           result = yield(item)
           if progress_indicator && progress_indicator.alive?
