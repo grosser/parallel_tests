@@ -10,13 +10,13 @@ module ParallelTests
       @mutex = Mutex.new
     end
 
-    def add(test_num, pid)
-      pids[test_num.to_s] = pid
+    def add(pid)
+      pids << pid.to_i
       save
     end
 
-    def delete(test_num)
-      pids.delete(test_num.to_s)
+    def delete(pid)
+      pids.delete(pid.to_i)
       save
     end
 
@@ -28,16 +28,16 @@ module ParallelTests
     private
 
     def pids
-      @pids ||= {}
+      @pids ||= []
     end
 
     def all
       read
-      pids.values
+      pids
     end
 
     def clear
-      @pids = {}
+      @pids = []
       save
     end
 

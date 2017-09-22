@@ -29,7 +29,7 @@ module ParallelTests
         progress_indicator = simulate_output_for_ci if options[:serialize_stdout]
 
         ParallelTests.pids # setup the class vars here so we dont initialize in the threads
-        Parallel.map(items, :in_threads => num_processes, finish: -> (_, i, _) { ParallelTests.pids.delete(i) }) do |item|
+        Parallel.map(items, :in_threads => num_processes) do |item|
           result = yield(item)
           if progress_indicator && progress_indicator.alive?
             progress_indicator.exit

@@ -81,14 +81,17 @@ module ParallelTests
 
           puts cmd if options[:verbose]
 
-          execute_command_and_capture_output(env, cmd, options[:serialize_stdout], process_number)
+          execute_command_and_capture_output(env, cmd, options[:serialize_stdout])
         end
 
-        def execute_command_and_capture_output(env, cmd, silence, process_number)
+        def execute_command_and_capture_output(env, cmd, silence)
+          pid = nil
           output = IO.popen(env, cmd) do |io|
-            ParallelTests.pids.add(process_number, io.pid)
+            pid = io.pid
+            ParallelTests.pids.add(pid)
             capture_output(io, silence)
           end
+          ParallelTests.pids.delete(pid) if pid
           exitstatus = $?.exitstatus
           seed = output[/seed (\d+)/,1]
 

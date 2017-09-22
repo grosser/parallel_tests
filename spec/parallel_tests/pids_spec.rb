@@ -6,21 +6,21 @@ RSpec.describe ParallelTests::Pids do
 
   before do
     subject.send(:clear)
-    subject.add(1, 123)
-    subject.add(2, 456)
+    subject.add(123)
+    subject.add(456)
   end
 
   describe '#add' do
     specify do
-      subject.add(3, 789)
+      subject.add(789)
       expect(subject.send(:all)).to eq ([123, 456, 789])
     end
   end
   
   describe '#delete' do
     specify do
-      subject.add(3, 101)
-      subject.delete(1)
+      subject.add(101)
+      subject.delete(123)
       expect(subject.send(:all)).to eq ([456, 101])
     end
   end
