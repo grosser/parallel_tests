@@ -25,15 +25,15 @@ module ParallelTests
       pids.count
     end
 
+    def all
+      read
+      pids
+    end
+
     private
 
     def pids
       @pids ||= []
-    end
-
-    def all
-      read
-      pids
     end
 
     def clear

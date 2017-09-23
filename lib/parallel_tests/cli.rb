@@ -6,6 +6,8 @@ require 'shellwords'
 module ParallelTests
   class CLI
     def run(argv)
+      Signal.trap("INT") { Thread.new { ParallelTests.stop_all_processes } }
+
       options = parse_options!(argv)
 
       ENV['DISABLE_SPRING'] ||= '1'
