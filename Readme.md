@@ -282,7 +282,7 @@ TODO
 ====
  - fix tests vs cucumber >= 1.2 `unknown option --format`
  - add unit tests for cucumber runtime formatter
- - make windows compatible
+ - fix windows bugs / get windows CI green
 
 Authors
 ====
