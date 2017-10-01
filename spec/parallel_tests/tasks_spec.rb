@@ -49,22 +49,22 @@ describe ParallelTests::Tasks do
     end
 
     it "runs command in parallel" do
-      expect(ParallelTests::Tasks).to receive(:system).with("#{full_path} --exec 'echo'").and_return true
+      expect(ParallelTests::Tasks).to receive(:system).with("parallel_test --exec 'echo'").and_return true
       ParallelTests::Tasks.run_in_parallel("echo")
     end
 
     it "runs command with :count option" do
-      expect(ParallelTests::Tasks).to receive(:system).with("#{full_path} --exec 'echo' -n 123").and_return true
+      expect(ParallelTests::Tasks).to receive(:system).with("parallel_test --exec 'echo' -n 123").and_return true
       ParallelTests::Tasks.run_in_parallel("echo", :count => 123)
     end
 
     it "runs without -n with blank :count option" do
-      expect(ParallelTests::Tasks).to receive(:system).with("#{full_path} --exec 'echo'").and_return true
+      expect(ParallelTests::Tasks).to receive(:system).with("parallel_test --exec 'echo'").and_return true
       ParallelTests::Tasks.run_in_parallel("echo", :count => "")
     end
 
     it "runs command with :non_parallel option" do
-      expect(ParallelTests::Tasks).to receive(:system).with("#{full_path} --exec 'echo' --non-parallel").and_return true
+      expect(ParallelTests::Tasks).to receive(:system).with("parallel_test --exec 'echo' --non-parallel").and_return true
       ParallelTests::Tasks.run_in_parallel("echo", :non_parallel => true)
     end
 
