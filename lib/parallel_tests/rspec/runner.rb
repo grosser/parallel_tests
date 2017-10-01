@@ -8,7 +8,7 @@ module ParallelTests
 
       class << self
         def run_tests(test_files, process_number, num_processes, options)
-          exe = ParallelTests.with_ruby_binary(executable) # expensive, so we cache
+          exe = executable # expensive, so we cache
           cmd = [exe, options[:test_options], color, spec_opts, *test_files].compact.join(" ")
           execute_command(cmd, process_number, num_processes, options)
         end
@@ -16,7 +16,7 @@ module ParallelTests
         def determine_executable
           cmd = case
           when File.exist?("bin/rspec")
-            "bin/rspec"
+            ParallelTests.with_ruby_binary("bin/rspec")
           when ParallelTests.bundler_enabled?
             cmd = (run("bundle show rspec-core") =~ %r{Could not find gem.*} ? "spec" : "rspec")
             "bundle exec #{cmd}"

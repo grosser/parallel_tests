@@ -15,8 +15,7 @@ module ParallelTests
 
       def run_in_parallel(cmd, options={})
         count = " -n #{options[:count]}" unless options[:count].to_s.empty?
-        executable = File.expand_path("../../../bin/parallel_test", __FILE__)
-        command = "#{ParallelTests.with_ruby_binary(Shellwords.escape(executable))} --exec '#{cmd}'#{count}#{' --non-parallel' if options[:non_parallel]}"
+        command = "#{Shellwords.escape('parallel_test')} --exec '#{cmd}'#{count}#{' --non-parallel' if options[:non_parallel]}"
         abort unless system(command)
       end
 
@@ -157,9 +156,8 @@ namespace :parallel do
       if test_framework == 'spinach'
         type = 'features'
       end
-      executable = File.join(File.dirname(__FILE__), '..', '..', 'bin', 'parallel_test')
 
-      command = "#{ParallelTests.with_ruby_binary(Shellwords.escape(executable))} #{type} --type #{test_framework} " \
+      command = "#{Shellwords.escape('parallel_test')} #{type} --type #{test_framework} " \
         "-n #{count} "                     \
         "--pattern '#{pattern}' "          \
         "--test-options '#{options}'"

@@ -20,7 +20,7 @@ module ParallelTests
           options[:env] = options[:env].merge({'AUTOTEST' => '1'}) if $stdout.tty? # display color when we are in a terminal
 
           cmd = [
-            ParallelTests.with_ruby_binary(executable),
+            executable,
             (runtime_logging if File.directory?(File.dirname(runtime_log))),
             cucumber_opts(options[:test_options]),
             *sanitized_test_files
@@ -100,11 +100,11 @@ module ParallelTests
         def determine_executable
           case
           when File.exist?("bin/#{name}")
-            "bin/#{name}"
+            ParallelTests.with_ruby_binary("bin/#{name}")
           when ParallelTests.bundler_enabled?
             "bundle exec #{name}"
           when File.file?("script/#{name}")
-            "script/#{name}"
+            ParallelTests.with_ruby_binary("script/#{name}")
           else
             "#{name}"
           end

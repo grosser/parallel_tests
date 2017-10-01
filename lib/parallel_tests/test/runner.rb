@@ -26,7 +26,7 @@ module ParallelTests
 
         def run_tests(test_files, process_number, num_processes, options)
           require_list = test_files.map { |file| file.sub(" ", "\\ ") }.join(" ")
-          cmd = "#{ParallelTests.with_ruby_binary(executable)} -Itest -e '%w[#{require_list}].each { |f| require %{./\#{f}} }' -- #{options[:test_options]}"
+          cmd = "#{executable} -Itest -e '%w[#{require_list}].each { |f| require %{./\#{f}} }' -- #{options[:test_options]}"
           execute_command(cmd, process_number, num_processes, options)
         end
 
