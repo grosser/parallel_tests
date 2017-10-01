@@ -100,11 +100,11 @@ module ParallelTests
         def determine_executable
           case
           when File.exist?("bin/#{name}")
-            "bin/#{name}"
+            ParallelTests.with_ruby_binary("bin/#{name}")
           when ParallelTests.bundler_enabled?
             "bundle exec #{name}"
           when File.file?("script/#{name}")
-            "script/#{name}"
+            ParallelTests.with_ruby_binary("script/#{name}")
           else
             "#{name}"
           end

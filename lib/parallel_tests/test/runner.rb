@@ -77,7 +77,6 @@ module ParallelTests
           )
           cmd = "nice #{cmd}" if options[:nice]
           cmd = "#{cmd} 2>&1" if options[:combine_stderr]
-          cmd = ParallelTests.with_ruby_binary(cmd)
 
           puts cmd if options[:verbose]
 

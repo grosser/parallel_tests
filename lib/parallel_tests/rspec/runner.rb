@@ -16,7 +16,7 @@ module ParallelTests
         def determine_executable
           cmd = case
           when File.exist?("bin/rspec")
-            "bin/rspec"
+            ParallelTests.with_ruby_binary("bin/rspec")
           when ParallelTests.bundler_enabled?
             cmd = (run("bundle show rspec-core") =~ %r{Could not find gem.*} ? "spec" : "rspec")
             "bundle exec #{cmd}"

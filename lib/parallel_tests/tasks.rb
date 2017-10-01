@@ -15,9 +15,9 @@ module ParallelTests
 
       def run_in_parallel(cmd, options={})
         count = " -n #{options[:count]}" unless options[:count].to_s.empty?
+        # Using the relative path to find the binary allow to run a specific version of it
         executable = File.expand_path("../../../bin/parallel_test", __FILE__)
-        command = "#{Shellwords.escape executable} --exec '#{cmd}'#{count}#{' --non-parallel' if options[:non_parallel]}"
-        command =  ParallelTests.with_ruby_binary(command)
+        command = "#{ParallelTests.with_ruby_binary(Shellwords.escape(executable))} --exec '#{cmd}'#{count}#{' --non-parallel' if options[:non_parallel]}"
         abort unless system(command)
       end
 
@@ -158,13 +158,13 @@ namespace :parallel do
       if test_framework == 'spinach'
         type = 'features'
       end
+      # Using the relative path to find the binary allow to run a specific version of it
       executable = File.join(File.dirname(__FILE__), '..', '..', 'bin', 'parallel_test')
 
-      command = "#{Shellwords.escape executable} #{type} --type #{test_framework} " \
+      command = "#{ParallelTests.with_ruby_binary(Shellwords.escape(executable))} #{type} --type #{test_framework} " \
         "-n #{count} "                     \
         "--pattern '#{pattern}' "          \
         "--test-options '#{options}'"
-      command =  ParallelTests.with_ruby_binary(command)
       abort unless system(command) # allow to chain tasks e.g. rake parallel:spec parallel:features
     end
   end
