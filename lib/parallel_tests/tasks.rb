@@ -15,7 +15,7 @@ module ParallelTests
 
       def run_in_parallel(cmd, options={})
         count = " -n #{options[:count]}" unless options[:count].to_s.empty?
-        command = "#{Shellwords.escape('parallel_test')} --exec '#{cmd}'#{count}#{' --non-parallel' if options[:non_parallel]}"
+        command = "parallel_test --exec '#{cmd}'#{count}#{' --non-parallel' if options[:non_parallel]}"
         abort unless system(command)
       end
 
@@ -157,7 +157,7 @@ namespace :parallel do
         type = 'features'
       end
 
-      command = "#{Shellwords.escape('parallel_test')} #{type} --type #{test_framework} " \
+      command = "parallel_test #{type} --type #{test_framework} " \
         "-n #{count} "                     \
         "--pattern '#{pattern}' "          \
         "--test-options '#{options}'"
