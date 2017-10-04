@@ -183,6 +183,20 @@ describe ParallelTests do
     end
   end
 
+  describe ".stop_all_processes" do
+    it 'kills the running child process' do
+      ParallelTests.pids.send(:clear)
+      Thread.new do
+        ParallelTests::Test::Runner.execute_command('sleep 3', 1, 1, {})
+      end
+      sleep(0.2)
+      expect(ParallelTests.pids.count).to eq(1)
+      ParallelTests.stop_all_processes
+      sleep(0.2)
+      expect(ParallelTests.pids.count).to eq(0)
+    end
+  end
+
   it "has a version" do
     expect(ParallelTests::VERSION).to match(/^\d+\.\d+\.\d+/)
   end
