@@ -6,7 +6,7 @@ require 'shellwords'
 module ParallelTests
   class CLI
     def run(argv)
-      Signal.trap("INT") { Thread.new { ParallelTests.stop_all_processes } }
+      Signal.trap("INT") { handle_interrupt }
 
       options = parse_options!(argv)
 
@@ -25,6 +25,17 @@ module ParallelTests
     end
 
     private
+
+    def handle_interrupt
+      @graceful_shutdown_attempted ||= false
+      Kernel.exit if @graceful_shutdown_attempted
+
+      # The Pid class's synchronize method can't be called directly from a trap
+      # Using Thread workaround https://github.com/ddollar/foreman/issues/332
+      Thread.new { ParallelTests.stop_all_processes }
+
+      @graceful_shutdown_attempted = true
+    end
 
     def execute_in_parallel(items, num_processes, options)
       Tempfile.open 'parallel_tests-lock' do |lock|

@@ -45,9 +45,9 @@ describe 'CLI' do
     result = ''
     Dir.chdir(folder) do
       env = options[:export] || {}
-      IO.popen(env, command, :err => [:child, :out]) do |io|
+      IO.popen(env, command, err: [:child, :out]) do |io|
         yield(io) if block_given?
-        io.each { |line| result += line }
+        result = io.read
       end
     end
 
@@ -509,11 +509,22 @@ cucumber features/fail1.feature:2 # Scenario: xxx
 
   describe "graceful shutdown" do
     it "passes on int signal to child processes" do
+      write "spec/test_spec.rb", "describe { specify { sleep 2; p 'here is ok' }; specify { p 'Should not get here'} }"
       pid = nil
-      write "spec/test_spec.rb", "describe { specify { sleep 2 }; specify { p 'Should not get here'} }"
-      thread = Thread.new { sleep 1; Process.kill("INT", pid) }
-      result = run_tests("spec", :processes => 2, :type => 'rspec', :fail => true) { |io| pid = io.pid }
+      Thread.new { sleep 1; Process.kill("INT", pid) }
+      result = run_tests("spec", processes: 2, type: 'rspec', fail: true) { |io| pid = io.pid }
+
+      expect(result).to include("here is ok")
       expect(result).to include("RSpec is shutting down")
+      expect(result).to_not include("Should not get here")
+    end
+
+    it "exits immediately if another int signal is received" do
+      write "spec/test_spec.rb", "describe { specify { sleep 2; p 'Should not get here'} }"
+      pid = nil
+      Thread.new { sleep 1; Process.kill("INT", pid) }
+      Thread.new { sleep 1.2; Process.kill("INT", pid) }
+      result = run_tests("spec", processes: 2, type: 'rspec', fail: false) { |io| pid = io.pid }
       expect(result).to_not include("Should not get here")
     end
   end
