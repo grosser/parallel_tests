@@ -28,6 +28,10 @@ module ParallelTests
       ENV['PARALLEL_PID_FILE'] ||= Tempfile.new('parallel-tests-pidfile').path
     end
 
+    def stop_all_processes
+      pids.all.each { |pid| Process.kill(:INT, pid) }
+    end
+
     # copied from http://github.com/carlhuda/bundler Bundler::SharedHelpers#find_gemfile
     def bundler_enabled?
       return true if Object.const_defined?(:Bundler)

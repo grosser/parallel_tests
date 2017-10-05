@@ -41,8 +41,16 @@ describe 'CLI' do
   def run_tests(test_folder, options={})
     ensure_folder folder
     processes = "-n #{options[:processes]||2}" unless options[:processes] == false
-    command = "cd #{folder} && #{options[:export]} #{executable(options)} #{test_folder} #{processes} #{options[:add]} 2>&1"
-    result = `#{command}`
+    command = "#{executable(options)} #{test_folder} #{processes} #{options[:add]}"
+    result = ''
+    Dir.chdir(folder) do
+      env = options[:export] || {}
+      IO.popen(env, command, err: [:child, :out]) do |io|
+        yield(io) if block_given?
+        result = io.read
+      end
+    end
+
     raise "FAILED #{command}\n#{result}" if $?.success? == !!options[:fail]
     result
   end
@@ -95,7 +103,7 @@ describe 'CLI' do
     # this is set. (Otherwise, it defaults to nil and the undefined conversion
     # issue doesn't come up.)
     result = run_tests('test', :fail => true,
-                       :export => 'RUBYOPT=-Eutf-8:utf-8')
+                       :export => { 'RUBYOPT' => 'Eutf-8:utf-8' })
     expect(result).to include('¯\_(ツ)_/¯')
   end
 
@@ -108,7 +116,7 @@ describe 'CLI' do
 
   it "shows command with --verbose" do
     write 'spec/xxx_spec.rb', 'describe("it"){it("should"){puts "TEST1"}}'
-    write 'spec/xxx2_spec.rb', 'describe("it"){it("should"){1.should == 1}}'
+    write 'spec/xxx2_spec.rb', 'describe("it"){it("should"){expect(1).to eq(1)}}'
     result = run_tests "spec --verbose", :type => 'rspec'
     expect(result).to include "bundle exec rspec spec/xxx_spec.rb"
     expect(result).to include "bundle exec rspec spec/xxx2_spec.rb"
@@ -116,7 +124,7 @@ describe 'CLI' do
 
   it "fails when tests fail" do
     write 'spec/xxx_spec.rb', 'describe("it"){it("should"){puts "TEST1"}}'
-    write 'spec/xxx2_spec.rb', 'describe("it"){it("should"){1.should == 2}}'
+    write 'spec/xxx2_spec.rb', 'describe("it"){it("should"){expect(1).to eq(2)}}'
     result = run_tests "spec", :fail => true, :type => 'rspec'
 
     expect(result.scan('1 example, 1 failure').size).to eq(1)
@@ -135,7 +143,7 @@ describe 'CLI' do
 
   it "can show simulated output when serializing stdout" do
     write 'spec/xxx_spec.rb', 'describe("it"){it("should"){sleep 1; puts "TEST1"}}'
-    result = run_tests "spec", :type => 'rspec', :add => "--serialize-stdout", export: 'PARALLEL_TEST_HEARTBEAT_INTERVAL=0.2'
+    result = run_tests "spec", :type => 'rspec', :add => "--serialize-stdout", export: { 'PARALLEL_TEST_HEARTBEAT_INTERVAL' => '0.2' }
 
     expect(result).to match(/\.{5}.*TEST1/m)
   end
@@ -217,7 +225,7 @@ describe 'CLI' do
 
   it "can enable spring" do
     write "spec/xxx_spec.rb", 'puts "SPRING: #{ENV["DISABLE_SPRING"]}"'
-    result = run_tests("spec", processes: 2, type: 'rspec', export: "DISABLE_SPRING=0")
+    result = run_tests("spec", processes: 2, type: 'rspec', export: { "DISABLE_SPRING" => "0" })
     expect(result).to include "SPRING: 0"
   end
 
@@ -262,7 +270,7 @@ describe 'CLI' do
       write "spec/x#{i}_spec.rb", "puts %{ENV-\#{ENV['TEST_ENV_NUMBER']}-}"
     }
     result = run_tests "spec",
-      :export => "PARALLEL_TEST_PROCESSORS=#{processes}",
+      :export => { "PARALLEL_TEST_PROCESSORS" => processes.to_s },
       :processes => processes,
       :type => 'rspec'
     expect(result.scan(/ENV-.?-/)).to match_array(["ENV--", "ENV-2-", "ENV-3-", "ENV-4-", "ENV-5-"])
@@ -497,5 +505,27 @@ cucumber features/fail1.feature:2 # Scenario: xxx
     end
 
     it_fails_without_any_files "spinach"
+  end
+
+  describe "graceful shutdown" do
+    it "passes on int signal to child processes" do
+      write "spec/test_spec.rb", "describe { specify { sleep 2; p 'here is ok' }; specify { p 'Should not get here'} }"
+      pid = nil
+      Thread.new { sleep 1; Process.kill("INT", pid) }
+      result = run_tests("spec", processes: 2, type: 'rspec', fail: true) { |io| pid = io.pid }
+
+      expect(result).to include("here is ok")
+      expect(result).to include("RSpec is shutting down")
+      expect(result).to_not include("Should not get here")
+    end
+
+    it "exits immediately if another int signal is received" do
+      write "spec/test_spec.rb", "describe { specify { sleep 2; p 'Should not get here'} }"
+      pid = nil
+      Thread.new { sleep 1; Process.kill("INT", pid) }
+      Thread.new { sleep 1.2; Process.kill("INT", pid) }
+      result = run_tests("spec", processes: 2, type: 'rspec', fail: false) { |io| pid = io.pid }
+      expect(result).to_not include("Should not get here")
+    end
   end
 end
