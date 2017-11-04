@@ -51,11 +51,12 @@ test:
     rake parallel:test    --> got 4 CPUs? --> 26 seconds
     ...
 
-Test by pattern (e.g. use one integration server per subfolder / see if you broke any 'user'-related tests)
+Test by pattern with Regex (e.g. use one integration server per subfolder / see if you broke any 'user'-related tests)
 
     rake parallel:test[^test/unit] # every test file in test/unit folder
     rake parallel:test[user]  # run users_controller + user_helper + user tests
     rake parallel:test['user|product']  # run user and product related tests
+    rake parallel:spec['spec\/(?!features)'] # run RSpec tests except the tests in spec/features
 
 
 ### Example output
