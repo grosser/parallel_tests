@@ -116,6 +116,11 @@ namespace :parallel do
     ParallelTests::Tasks.run_in_parallel("rake db:migrate RAILS_ENV=#{ParallelTests::Tasks.rails_env}", args)
   end
 
+  desc "Rollback test databases via db:rollback --> parallel:rollback[num_cpus]"
+  task :rollback, :count do |_,args|
+    ParallelTests::Tasks.run_in_parallel("rake db:rollback RAILS_ENV=#{ParallelTests::Tasks.rails_env}", args)
+  end
+
   # just load the schema (good for integration server <-> no development db)
   desc "Load dumped schema for test databases via db:schema:load --> parallel:load_schema[num_cpus]"
   task :load_schema, :count do |_,args|
