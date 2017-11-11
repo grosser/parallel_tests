@@ -45,7 +45,7 @@ describe 'CLI' do
     result = ''
     Dir.chdir(folder) do
       env = options[:export] || {}
-      IO.popen(env, command, err: [:child, :out]) do |io|
+      IO.popen(env, command, err: [:child, :out], encoding: Encoding::UTF_8) do |io|
         yield(io) if block_given?
         result = io.read
       end
@@ -165,7 +165,7 @@ describe 'CLI' do
 
     it "can exec given command non-parallel" do
       result = `#{executable} -e 'ruby -e "sleep(rand(10)/100.0); puts ENV[:TEST_ENV_NUMBER.to_s].inspect"' -n 4 --non-parallel`
-      expect(result.split("\n")).to eq(%w["" "2" "3" "4"])
+      expect(result.split(/\n+/)).to eq(%w["" "2" "3" "4"])
     end
 
     it "can exec given command with a restricted set of groups" do
@@ -190,17 +190,17 @@ describe 'CLI' do
 
   it "runs through parallel_rspec" do
     version = `#{executable} -v`
-    expect(`#{bin_folder}/parallel_rspec -v`).to eq(version)
+    expect(`ruby #{bin_folder}/parallel_rspec -v`).to eq(version)
   end
 
   it "runs through parallel_cucumber" do
     version = `#{executable} -v`
-    expect(`#{bin_folder}/parallel_cucumber -v`).to eq(version)
+    expect(`ruby #{bin_folder}/parallel_cucumber -v`).to eq(version)
   end
 
   it "runs through parallel_spinach" do
     version = `#{executable} -v`
-    expect(`#{bin_folder}/parallel_spinach -v`).to eq(version)
+    expect(`ruby #{bin_folder}/parallel_spinach -v`).to eq(version)
   end
 
   it "runs with --group-by found" do
@@ -288,11 +288,11 @@ describe 'CLI' do
 
   it "can wait_for_other_processes_to_finish" do
     skip if RUBY_PLATFORM == "java" # just too slow ...
-    write "test/a_test.rb", "require 'parallel_tests'; sleep 0.5 ; ParallelTests.wait_for_other_processes_to_finish; puts 'a'"
-    write "test/b_test.rb", "sleep 1; puts 'b'"
-    write "test/c_test.rb", "sleep 1.5; puts 'c'"
-    write "test/d_test.rb", "sleep 2; puts 'd'"
-    expect(run_tests("test", :processes => 4)).to include("b\nc\nd\na\n")
+    write "test/a_test.rb", "require 'parallel_tests'; sleep 0.5 ; ParallelTests.wait_for_other_processes_to_finish; puts 'OutputA'"
+    write "test/b_test.rb", "sleep 1; puts 'OutputB'"
+    write "test/c_test.rb", "sleep 1.5; puts 'OutputC'"
+    write "test/d_test.rb", "sleep 2; puts 'OutputD'"
+    expect(run_tests("test", :processes => 4)).to match(/OutputB\s+OutputC\s+OutputD\s+OutputA/)
   end
 
   it "can run only a single group" do
@@ -443,7 +443,7 @@ cucumber features/fail1.feature:2 # Scenario: xxx
       write "features/good1.feature", "Feature: xxx\n  Scenario: xxx\n    Given I fail"
       result = run_tests "features --verbose", :type => "cucumber", :add => '--test-options "--order random:1234"', :fail => true
       expect(result).to include("Randomized with seed 1234")
-      expect(result).to include("bundle exec cucumber features/good1.feature --order random:1234")
+      expect(result).to match(%r{bundle exec cucumber "?features/good1.feature"? --order random:1234})
     end
   end
 
@@ -508,7 +508,8 @@ cucumber features/fail1.feature:2 # Scenario: xxx
   end
 
   describe "graceful shutdown" do
-    it "passes on int signal to child processes" do
+    # Process.kill on Windows doesn't work as expected. It kills all process group instead of just one process.
+    it "passes on int signal to child processes", unless: Gem.win_platform? do
       write "spec/test_spec.rb", "describe { specify { sleep 2; p 'here is ok' }; specify { p 'Should not get here'} }"
       pid = nil
       Thread.new { sleep 1; Process.kill("INT", pid) }
@@ -519,7 +520,8 @@ cucumber features/fail1.feature:2 # Scenario: xxx
       expect(result).to_not include("Should not get here")
     end
 
-    it "exits immediately if another int signal is received" do
+    # Process.kill on Windows doesn't work as expected. It kills all process group instead of just one process.
+    it "exits immediately if another int signal is received", unless: Gem.win_platform? do
       write "spec/test_spec.rb", "describe { specify { sleep 2; p 'Should not get here'} }"
       pid = nil
       Thread.new { sleep 1; Process.kill("INT", pid) }

@@ -179,6 +179,11 @@ EOF
 EOF
       expect(call(output)).to eq(['10 tests, 20 assertions, 0 failures, 0 errors'])
     end
+
+    it "splits lines with Windows line separators" do
+      output = "10 tests, 20 assertions, 0 failures, 0 errors\r\n15 tests, 25 assertions, 0 failures, 0 errors"
+      expect(call(output)).to eq(["10 tests, 20 assertions, 0 failures, 0 errors", "15 tests, 25 assertions, 0 failures, 0 errors"])
+    end
   end
 
   describe ".find_tests" do
