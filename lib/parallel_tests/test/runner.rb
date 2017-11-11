@@ -98,7 +98,8 @@ module ParallelTests
         end
 
         def find_results(test_output)
-          test_output.lines.map(&:chomp).map do |line|
+          test_output.lines.map do |line|
+            line.chomp!
             line.gsub!(/\e\[\d+m/, '') # remove color coding
             next unless line_is_result?(line)
             line
