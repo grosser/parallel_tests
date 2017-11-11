@@ -177,12 +177,6 @@ describe ParallelTests do
     end
   end
 
-  describe ".parent pid" do
-    it "returns a pid" do
-      expect(ParallelTests.parent_pid).to be > 0
-    end
-  end
-
   describe ".stop_all_processes" do
     # Process.kill on Windows doesn't work as expected. It kills all process group instead of just one process.
     it 'kills the running child process', unless: Gem.win_platform? do

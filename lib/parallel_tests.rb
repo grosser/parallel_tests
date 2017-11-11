@@ -60,14 +60,6 @@ module ParallelTests
       current_process_number == total_processes
     end
 
-    def parent_pid
-      if WINDOWS
-        `wmic process where (processid=#{Process.pid}) get parentprocessid`
-      else
-        `ps -o ppid= -p#{`ps -o ppid= -p#{Process.pid}`}` #the true parent is one layer up.
-      end.to_i
-    end
-
     def with_ruby_binary(command)
       WINDOWS ? "#{RUBY_BINARY} -- #{command}" : command
     end
