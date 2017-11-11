@@ -462,7 +462,7 @@ EOF
       expect(err).to eq("345\n")
     end
 
-    it "uses a lower priority process when the nice option is used" do
+    it "uses a lower priority process when the nice option is used", unless: Gem.win_platform? do
       priority_cmd = "puts Process.getpriority(Process::PRIO_PROCESS, 0)"
       priority_without_nice = run_with_file(priority_cmd){ |cmd| call("ruby #{cmd}", 1, 4, {}) }.first.to_i
       priority_with_nice = run_with_file(priority_cmd){ |cmd| call("ruby #{cmd}", 1, 4, :nice => true) }.first.to_i
