@@ -45,26 +45,26 @@ describe ParallelTests::Tasks do
 
     it "has the executable" do
       expect(File.file?(full_path)).to eq(true)
-      expect(File.executable?(full_path)).to eq(true)
+      expect(File.executable?(full_path)).to eq(true) unless Gem.win_platform?
     end
 
     it "runs command in parallel" do
-      expect(ParallelTests::Tasks).to receive(:system).with("#{full_path} --exec 'echo'").and_return true
+      expect(ParallelTests::Tasks).to receive(:system).with(/#{full_path} --exec 'echo'$/).and_return true
       ParallelTests::Tasks.run_in_parallel("echo")
     end
 
     it "runs command with :count option" do
-      expect(ParallelTests::Tasks).to receive(:system).with("#{full_path} --exec 'echo' -n 123").and_return true
+      expect(ParallelTests::Tasks).to receive(:system).with(/#{full_path} --exec 'echo' -n 123$/).and_return true
       ParallelTests::Tasks.run_in_parallel("echo", :count => 123)
     end
 
     it "runs without -n with blank :count option" do
-      expect(ParallelTests::Tasks).to receive(:system).with("#{full_path} --exec 'echo'").and_return true
+      expect(ParallelTests::Tasks).to receive(:system).with(/#{full_path} --exec 'echo'$/).and_return true
       ParallelTests::Tasks.run_in_parallel("echo", :count => "")
     end
 
     it "runs command with :non_parallel option" do
-      expect(ParallelTests::Tasks).to receive(:system).with("#{full_path} --exec 'echo' --non-parallel").and_return true
+      expect(ParallelTests::Tasks).to receive(:system).with(/#{full_path} --exec 'echo' --non-parallel$/).and_return true
       ParallelTests::Tasks.run_in_parallel("echo", :non_parallel => true)
     end
 
@@ -75,7 +75,7 @@ describe ParallelTests::Tasks do
     end
   end
 
-  describe ".suppress_output" do
+  describe ".suppress_output", unless: Gem.win_platform? do
     def call(command, grep)
       # Explictly run as a parameter to /bin/sh to simulate how
       # the command will be run by parallel_test --exec

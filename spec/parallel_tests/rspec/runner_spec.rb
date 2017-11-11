@@ -55,7 +55,7 @@ describe ParallelTests::RSpec::Runner do
       allow(ParallelTests).to receive(:bundler_enabled?).and_return true
       allow(ParallelTests::RSpec::Runner).to receive(:run).with("bundle show rspec-core").and_return "/foo/bar/rspec-core-2.4.2"
 
-      should_run_with %r{rspec\s+--color --tty -O spec/parallel_spec.opts}
+      should_run_with %r{rspec\s+(--color --tty )?-O spec/parallel_spec.opts}
       call('xxx', 1, 22, {})
     end
 
