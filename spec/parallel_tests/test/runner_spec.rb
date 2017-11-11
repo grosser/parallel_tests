@@ -210,7 +210,7 @@ EOF
     end
 
     it "finds test files but ignores those in symlinked folders" do
-      skip if RUBY_PLATFORM == "java"
+      skip if RUBY_PLATFORM == "java" || Gem.win_platform?
       with_files(['a/a_test.rb','b/b_test.rb']) do |root|
         `ln -s #{root}/a #{root}/b/link`
         expect(call(["#{root}/b"], :symlinks => false).sort).to eq([
@@ -362,40 +362,32 @@ EOF
     it "sets process number to 2 for 1" do
       run_with_file("puts ENV['TEST_ENV_NUMBER']") do |path|
         result = call("ruby #{path}", 1, 4, {})
-        expect(result).to include({
-          :stdout => "2\n",
-          :exit_status => 0
-        })
+        expect(result[:stdout].chomp).to eq '2'
+        expect(result[:exit_status]).to eq 0
       end
     end
 
     it "sets process number to '' for 0" do
       run_with_file("puts ENV['TEST_ENV_NUMBER'].inspect") do |path|
         result = call("ruby #{path}", 0, 4, {})
-        expect(result).to include({
-          :stdout => "\"\"\n",
-          :exit_status => 0
-        })
+        expect(result[:stdout].chomp).to eq '""'
+        expect(result[:exit_status]).to eq 0
       end
     end
 
     it "sets process number to 1 for 0 if requested" do
       run_with_file("puts ENV['TEST_ENV_NUMBER']") do |path|
         result = call("ruby #{path}", 0, 4, first_is_1: true)
-        expect(result).to include({
-          :stdout => "1\n",
-          :exit_status => 0
-        })
+        expect(result[:stdout].chomp).to eq '1'
+        expect(result[:exit_status]).to eq 0
       end
     end
 
     it 'sets PARALLEL_TEST_GROUPS so child processes know that they are being run under parallel_tests' do
       run_with_file("puts ENV['PARALLEL_TEST_GROUPS']") do |path|
         result = call("ruby #{path}", 1, 4, {})
-        expect(result).to include({
-          :stdout => "4\n",
-          :exit_status => 0
-        })
+        expect(result[:stdout].chomp).to eq('4')
+        expect(result[:exit_status]).to eq(0)
       end
     end
 
@@ -413,10 +405,8 @@ EOF
     it "waits for process to finish" do
       run_with_file("sleep 0.5; puts 123; sleep 0.5; puts 345") do |path|
         result = call("ruby #{path}", 1, 4, {})
-        expect(result).to include({
-          :stdout => "123\n345\n",
-          :exit_status => 0
-        })
+        expect(result[:stdout].lines.map(&:chomp)).to eq ['123', '345']
+        expect(result[:exit_status]).to eq 0
       end
     end
 
@@ -430,20 +420,16 @@ EOF
 
         result = call("ruby #{path}", 1, 4, {})
         expect(received).to eq("123345567")
-        expect(result).to include({
-          :stdout => "123\n345567\n",
-          :exit_status => 0
-        })
+        expect(result[:stdout].lines.map(&:chomp)).to eq ['123', '345567']
+        expect(result[:exit_status]).to eq 0
       end
     end
 
     it "works with synced stdout" do
       run_with_file("$stdout.sync = true; puts 123; sleep 0.1; puts 345") do |path|
         result = call("ruby #{path}", 1, 4, {})
-        expect(result).to include({
-          :stdout => "123\n345\n",
-          :exit_status => 0
-        })
+        expect(result[:stdout].lines.map(&:chomp)).to eq ['123', '345']
+        expect(result[:exit_status]).to eq 0
       end
     end
 
@@ -451,20 +437,16 @@ EOF
       run_with_file("puts 123") do |path|
         expect($stdout).not_to receive(:print)
         result = call("ruby #{path}", 1, 4, :serialize_stdout => true)
-        expect(result).to include({
-          :stdout => "123\n",
-          :exit_status => 0
-        })
+        expect(result[:stdout].chomp).to eq '123'
+        expect(result[:exit_status]).to eq 0
       end
     end
 
     it "returns correct exit status" do
       run_with_file("puts 123; exit 5") do |path|
         result = call("ruby #{path}", 1, 4, {})
-        expect(result).to include({
-          :stdout => "123\n",
-          :exit_status => 5
-        })
+        expect(result[:stdout].chomp).to eq '123'
+        expect(result[:exit_status]).to eq 5
       end
     end
 
