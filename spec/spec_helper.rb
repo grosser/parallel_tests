@@ -166,6 +166,20 @@ module SharedExamples
   end
 end
 
+RSpec::Matchers.define :include_exactly_times do |expected, times|
+  match do |actual|
+    actual.scan(expected).size == times
+  end
+
+  failure_message do |actual|
+    "expected the following string:\n" +
+        '""""' + "\n" + actual + "\n" + '""""' + "\n" +
+        (expected.is_a?(String) ? "to contain '#{expected}'" : "to match /#{expected}/") +
+        " #{times} time(s), but it " + (expected.is_a?(String) ? "appears" : "matches") +
+        " #{actual.scan(expected).size} time(s)\n"
+  end
+end
+
 RSpec.configure do |config|
   config.filter_run :focus => true
   config.run_all_when_everything_filtered = true
