@@ -75,7 +75,7 @@ describe 'CLI' do
     # all results present
     expect(result).to include_exactly_times('1 example, 0 failure', 2) # 2 results
     expect(result).to include_exactly_times('2 examples, 0 failures', 1) # 1 summary
-    expect(result).to include_exactly_times(/Finished in \d+\.\d+ seconds/, 2)
+    expect(result).to include_exactly_times(/Finished in \d+(\.\d+)? seconds/, 2)
     expect(result).to include_exactly_times(/Took \d+ seconds/, 1) # parallel summary
 
     # verify empty groups are discarded. if retained then it'd say 4 processes for 2 specs
