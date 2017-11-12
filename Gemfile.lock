@@ -55,6 +55,7 @@ GEM
 PLATFORMS
   java
   ruby
+  x64-mingw32
 
 DEPENDENCIES
   bump
@@ -67,4 +68,4 @@ DEPENDENCIES
   test-unit
 
 BUNDLED WITH
-   1.15.3
+   1.16.0

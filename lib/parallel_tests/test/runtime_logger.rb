@@ -18,18 +18,27 @@ module ParallelTests
         end
 
         def unique_log
-          lock do
+          with_locked_log do |logfile|
             separator = "\n"
-            groups = File.read(logfile).split(separator).map { |line| line.split(":") }.group_by(&:first)
+            groups = logfile.read.split(separator).map { |line| line.split(":") }.group_by(&:first)
             lines = groups.map do |file, times|
               time = "%.2f" % times.map(&:last).map(&:to_f).inject(:+)
               "#{file}:#{time}"
             end
-            File.write(logfile, lines.join(separator) + separator)
+            logfile.rewind
+            logfile.write(lines.join(separator) + separator)
+            logfile.truncate(logfile.pos)
           end
         end
 
         private
+
+        def with_locked_log
+          File.open(logfile, File::RDWR|File::CREAT) do |logfile|
+            logfile.flock(File::LOCK_EX)
+            yield logfile
+          end
+        end
 
         # ensure folder exists + clean out previous log
         # this will happen in multiple processes, but should be roughly at the same time
@@ -43,8 +52,9 @@ module ParallelTests
 
         def log(test, time)
           return unless message = message(test, time)
-          lock do
-            File.open(logfile, 'a') { |f| f.puts message }
+          with_locked_log do |logfile|
+            logfile.seek(0, IO::SEEK_END)
+            logfile.puts message
           end
         end
 
@@ -52,17 +62,6 @@ module ParallelTests
           return unless method = test.public_instance_methods(true).detect { |method| method =~ /^test_/ }
           filename = test.instance_method(method).source_location.first.sub("#{Dir.pwd}/", "")
           "#{filename}:#{delta}"
-        end
-
-        def lock
-          File.open(logfile, 'r') do |f|
-            begin
-              f.flock File::LOCK_EX
-              yield
-            ensure
-              f.flock File::LOCK_UN
-            end
-          end
         end
 
         def logfile

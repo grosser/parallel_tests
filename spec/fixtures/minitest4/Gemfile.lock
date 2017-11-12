@@ -1,7 +1,7 @@
 PATH
   remote: ../../..
   specs:
-    parallel_tests (2.14.3)
+    parallel_tests (2.17.1)
       parallel
 
 GEM
@@ -12,10 +12,11 @@ GEM
 
 PLATFORMS
   ruby
+  x64-mingw32
 
 DEPENDENCIES
   minitest (~> 4.7.5)
   parallel_tests!
 
 BUNDLED WITH
-   1.15.4
+   1.16.0
