@@ -45,7 +45,7 @@ describe 'CLI' do
     result = ''
     Dir.chdir(folder) do
       env = options[:export] || {}
-      IO.popen(env, command, err: [:child, :out], encoding: Encoding::UTF_8) do |io|
+      IO.popen(env, command, err: [:child, :out]) do |io|
         yield(io) if block_given?
         result = io.read
       end
