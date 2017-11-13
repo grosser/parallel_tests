@@ -6,9 +6,9 @@ module ParallelTests
     class FailuresLogger < ::Cucumber::Formatter::Rerun
       include ParallelTests::Gherkin::Io
 
-      def initialize(runtime, path_or_io, options)
+      def initialize(config)
         super
-        @io = prepare_io(path_or_io)
+        @io = prepare_io(config.out_stream)
       end
 
       def done
