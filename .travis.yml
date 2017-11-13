@@ -11,3 +11,4 @@ cache: bundler
 matrix:
   allow_failures:
     - rvm: jruby-head
+bundler_args: "--jobs 4"
