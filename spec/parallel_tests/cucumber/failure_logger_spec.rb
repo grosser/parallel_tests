@@ -7,11 +7,16 @@ describe ParallelTests::Cucumber::FailuresLogger do
   before do
     @output = OutputLogger.new([])
     allow(@output).to receive(:write)
-    config = double('config', out_stream: @output, on_event: :test_run_finished)
-
-    @logger1 = ParallelTests::Cucumber::FailuresLogger.new(config)
-    @logger2 = ParallelTests::Cucumber::FailuresLogger.new(config)
-    @logger3 = ParallelTests::Cucumber::FailuresLogger.new(config)
+    if RUBY_VERSION >= "2.2"
+      config = double('config', out_stream: @output, on_event: :test_run_finished)
+      @logger1 = ParallelTests::Cucumber::FailuresLogger.new(config)
+      @logger2 = ParallelTests::Cucumber::FailuresLogger.new(config)
+      @logger3 = ParallelTests::Cucumber::FailuresLogger.new(config)
+    else
+      @logger1 = ParallelTests::Cucumber::FailuresLogger.new(nil, @output, nil)
+      @logger2 = ParallelTests::Cucumber::FailuresLogger.new(nil, @output, nil)
+      @logger3 = ParallelTests::Cucumber::FailuresLogger.new(nil, @output, nil)
+    end
 
     @feature1 = double('feature', :file => "feature/path/to/feature1.feature")
     @feature2 = double('feature', :file => "feature/path/to/feature2.feature")
