@@ -7,6 +7,11 @@ module ParallelTests
         ENV['RAILS_ENV'] || 'test'
       end
 
+      def load_lib
+        $LOAD_PATH << File.expand_path(File.join(File.dirname(__FILE__), '..'))
+        require "parallel_tests"
+      end
+
       def purge_before_load
         if Gem::Version.new(Rails.version) > Gem::Version.new('4.2.0')
           Rake::Task.task_defined?('db:test:purge') ? 'db:test:purge' : 'app:db:test:purge'
@@ -14,6 +19,7 @@ module ParallelTests
       end
 
       def run_in_parallel(cmd, options={})
+        load_lib
         count = " -n #{options[:count]}" unless options[:count].to_s.empty?
         # Using the relative path to find the binary allow to run a specific version of it
         executable = File.expand_path("../../../bin/parallel_test", __FILE__)
@@ -148,9 +154,7 @@ namespace :parallel do
     desc "Run #{type} in parallel with parallel:#{type}[num_cpus]"
     task type, [:count, :pattern, :options] do |t, args|
       ParallelTests::Tasks.check_for_pending_migrations
-
-      $LOAD_PATH << File.expand_path(File.join(File.dirname(__FILE__), '..'))
-      require "parallel_tests"
+      ParallelTests::Tasks.load_lib
 
       count, pattern, options = ParallelTests::Tasks.parse_args(args)
       test_framework = {
