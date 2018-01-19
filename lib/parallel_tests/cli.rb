@@ -204,6 +204,7 @@ module ParallelTests
           TEXT
           ) { |pattern| options[:suffix] = /#{pattern}/ }
         opts.on("--serialize-stdout", "Serialize stdout output, nothing will be written until everything is done") { options[:serialize_stdout] = true }
+        opts.on("--prefix-output-with-test-env-number", "Prefixes test env number to the output when not using --serialize-stdout") { options[:prefix_output_with_test_env_number] = true }
         opts.on("--combine-stderr", "Combine stderr into stdout, useful in conjunction with --serialize-stdout") { options[:combine_stderr] = true }
         opts.on("--non-parallel", "execute same commands but do not in parallel, needs --exec") { options[:non_parallel] = true }
         opts.on("--no-symlinks", "Do not traverse symbolic links to find test files") { options[:symlinks] = false }

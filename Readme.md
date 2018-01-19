@@ -213,6 +213,8 @@ Options are:
           '_spec.rb$' - matches rspec files
           '_(test|spec).rb$' - matches test or spec files
         --serialize-stdout           Serialize stdout output, nothing will be written until everything is done
+        --prefix-output-with-test-env-number
+                                     Prefixes test env number to the output when not using --serialize-stdout
         --combine-stderr             Combine stderr into stdout, useful in conjunction with --serialize-stdout
         --non-parallel               execute same commands but do not in parallel, needs --exec
         --no-symlinks                Do not traverse symbolic links to find test files
