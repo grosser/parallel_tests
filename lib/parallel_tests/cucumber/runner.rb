@@ -18,20 +18,12 @@ module ParallelTests
         def summarize_results(results)
           output = []
 
-          scenario_groups = results.slice_before(SCENARIOS_RESULTS_BOUNDARY_REGEX)
-
-          failing_scenario_groups, flaky_scenario_groups = scenario_groups.partition { |group| group.first == "Failing Scenarios:" }
-
-          failing_scenarios = failing_scenario_groups.flatten.grep(SCENARIO_REGEX)
-          if failing_scenarios.any?
-            failing_scenarios.unshift("Failing Scenarios:")
-            output << failing_scenarios.join("\n")
-          end
-
-          flaky_scenarios = flaky_scenario_groups.flatten.grep(SCENARIO_REGEX)
-          if flaky_scenarios.any?
-            flaky_scenarios.unshift("Flaky Scenarios:")
-            output << flaky_scenarios.join("\n")
+          scenario_groups = results.slice_before(SCENARIOS_RESULTS_BOUNDARY_REGEX).group_by(&:first)
+          scenario_groups.each do |header, group|
+            scenarios = group.flatten.grep(SCENARIO_REGEX)
+            if scenarios.any?
+              output << ([header] + scenarios).join("\n")
+            end
           end
 
           output << super
