@@ -80,15 +80,15 @@ module ParallelTests
 
           puts cmd if options[:verbose]
 
-          execute_command_and_capture_output(env, cmd, options[:serialize_stdout])
+          execute_command_and_capture_output(env, cmd, options[:serialize_stdout], options[:prefix_output_with_test_env_number])
         end
 
-        def execute_command_and_capture_output(env, cmd, silence)
+        def execute_command_and_capture_output(env, cmd, silence, prefix_output_with_test_env_number)
           pid = nil
           output = IO.popen(env, cmd) do |io|
             pid = io.pid
             ParallelTests.pids.add(pid)
-            capture_output(io, silence)
+            capture_output(io, silence, env, prefix_output_with_test_env_number)
           end
           ParallelTests.pids.delete(pid) if pid
           exitstatus = $?.exitstatus
@@ -145,7 +145,7 @@ module ParallelTests
         end
 
         # read output of the process and print it in chunks
-        def capture_output(out, silence)
+        def capture_output(out, silence, env, prefix_output_with_test_env_number)
           result = ""
           loop do
             begin
@@ -155,7 +155,11 @@ module ParallelTests
               end
               result << read
               unless silence
-                $stdout.print read
+                prefix_message = ''
+                if prefix_output_with_test_env_number
+                  prefix_message = "[TEST GROUP #{env['TEST_ENV_NUMBER']}] "
+                end
+                $stdout.print "#{prefix_message}#{read}"
                 $stdout.flush
               end
             end
