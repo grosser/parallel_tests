@@ -22,6 +22,16 @@ describe ParallelTests::Cucumber::Runner do
         ]
         expect(call(results)).to eq("Failing Scenarios:\ncucumber features/failure:1\ncucumber features/failure:2\ncucumber features/failure:3\ncucumber features/failure:4\ncucumber features/failure:5\ncucumber features/failure:6\n\n")
       end
+
+      it "collates flaky scenarios separately" do
+        results = [
+          "Failing Scenarios:", "cucumber features/failure:1", "cucumber features/failure:2",
+          "Flaky Scenarios:", "cucumber features/failure:3", "cucumber features/failure:4",
+          "Failing Scenarios:", "cucumber features/failure:5", "cucumber features/failure:6",
+          "Flaky Scenarios:", "cucumber features/failure:7", "cucumber features/failure:8",
+        ]
+        expect(call(results)).to eq("Failing Scenarios:\ncucumber features/failure:1\ncucumber features/failure:2\ncucumber features/failure:5\ncucumber features/failure:6\n\nFlaky Scenarios:\ncucumber features/failure:3\ncucumber features/failure:4\ncucumber features/failure:7\ncucumber features/failure:8\n\n")
+      end
     end
   end
 

@@ -44,7 +44,7 @@ module ParallelTests
         # 1 scenario (1 failed)
         # 1 step (1 failed)
         def summarize_results(results)
-          sort_order = %w[scenario step failed undefined skipped pending passed]
+          sort_order = %w[scenario step failed flaky undefined skipped pending passed]
 
           %w[scenario step].map do |group|
             group_results = results.grep(/^\d+ #{group}/)
