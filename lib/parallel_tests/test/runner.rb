@@ -146,7 +146,6 @@ module ParallelTests
 
         # read output of the process and print it in chunks
         def capture_output(out, env, options={})
-          puts "THE OPTIONS: #{options.inspect}"
           result = ""
           loop do
             begin
