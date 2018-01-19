@@ -175,10 +175,11 @@ shared_examples_for 'gherkin runners' do
 
     it "sums up results for scenarios and steps separately from each other" do
       results = [
-        "7 scenarios (3 failed, 4 passed)", "33 steps (3 failed, 2 skipped, 28 passed)", "4 scenarios (4 passed)",
-        "40 steps (40 passed)", "1 scenario (1 passed)", "1 step (1 passed)"
+        "7 scenarios (2 failed, 1 flaky, 4 passed)", "33 steps (3 failed, 2 skipped, 28 passed)",
+        "4 scenarios (4 passed)", "40 steps (40 passed)",
+        "1 scenario (1 passed)", "1 step (1 passed)"
       ]
-      expect(call(results)).to eq("12 scenarios (3 failed, 9 passed)\n74 steps (3 failed, 2 skipped, 69 passed)")
+      expect(call(results)).to eq("12 scenarios (2 failed, 1 flaky, 9 passed)\n74 steps (3 failed, 2 skipped, 69 passed)")
     end
 
     it "adds same results with plurals" do
