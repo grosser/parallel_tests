@@ -442,6 +442,24 @@ EOF
       end
     end
 
+    it "adds test env number to stdout with :prefix_output_with_test_env_number" do
+      run_with_file("puts 123") do |path|
+        expect($stdout).to receive(:print).with("[TEST GROUP 2] 123\n")
+        result = call("ruby #{path}", 1, 4, :prefix_output_with_test_env_number => true)
+        expect(result[:stdout].chomp).to eq '123'
+        expect(result[:exit_status]).to eq 0
+      end
+    end
+
+    it "does not add test env number to stdout without :prefix_output_with_test_env_number" do
+      run_with_file("puts 123") do |path|
+        expect($stdout).to receive(:print).with("123\n")
+        result = call("ruby #{path}", 1, 4, :prefix_output_with_test_env_number => false)
+        expect(result[:stdout].chomp).to eq '123'
+        expect(result[:exit_status]).to eq 0
+      end
+    end
+
     it "returns correct exit status" do
       run_with_file("puts 123; exit 5") do |path|
         result = call("ruby #{path}", 1, 4, {})
