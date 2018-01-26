@@ -368,6 +368,7 @@ inspired by [pivotal labs](https://blog.pivotal.io/labs/labs/parallelize-your-rs
  - [Jerry](https://github.com/boblington)
  - [Aleksei Gusev](https://github.com/hron)
  - [Scott Olsen](https://github.com/scottolsen)
+ - [Andrei Botalov](https://github.com/abotalov)
 
 [Michael Grosser](http://grosser.it)<br/>
 michael@grosser.it<br/>
