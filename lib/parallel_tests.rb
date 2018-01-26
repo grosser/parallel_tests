@@ -23,13 +23,15 @@ module ParallelTests
     def with_pid_file
       Tempfile.open('parallel_tests-pidfile') do |f|
         ENV['PARALLEL_PID_FILE'] = f.path
-        @pids = nil
         # Pids object should be created before threads will start adding pids to it
         # Otherwise we would have to use Mutex to prevent creation of several instances
         @pids = pids
-        ret_value = yield
-        ENV['PARALLEL_PID_FILE'] = nil
-        ret_value
+        begin
+          yield
+        ensure
+          ENV['PARALLEL_PID_FILE'] = nil
+          @pids = nil
+        end
       end
     end
 
