@@ -350,11 +350,13 @@ EOF
     end
 
     def run_with_file(content)
-      capture_output do
-        Tempfile.open("xxx") do |f|
-          f.write(content)
-          f.flush
-          yield f.path
+      ParallelTests.with_pid_file do
+        capture_output do
+          Tempfile.open("xxx") do |f|
+            f.write(content)
+            f.flush
+            yield f.path
+          end
         end
       end
     end

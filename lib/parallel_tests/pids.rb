@@ -1,4 +1,3 @@
-require 'tempfile'
 require 'json'
 
 module ParallelTests

@@ -70,9 +70,10 @@ describe ParallelTests do
   end
 
   describe ".wait_for_other_processes_to_finish" do
-    before do
-      ENV["PARALLEL_PID_FILE"] = ParallelTests.pids.file_path
-      ParallelTests.pids.send(:clear)
+    around do |example|
+      ParallelTests.with_pid_file do
+        example.run
+      end
     end
     
     def with_running_processes(count, wait=0.2)
@@ -114,9 +115,10 @@ describe ParallelTests do
   end
 
   describe ".number_of_running_processes" do
-    before do
-      ENV["PARALLEL_PID_FILE"] = ParallelTests.pids.file_path
-      ParallelTests.pids.send(:clear)
+    around do |example|
+      ParallelTests.with_pid_file do
+        example.run
+      end
     end
     
     it "is 0 for nothing" do
@@ -179,16 +181,17 @@ describe ParallelTests do
 
   describe ".stop_all_processes" do
     # Process.kill on Windows doesn't work as expected. It kills all process group instead of just one process.
-    it 'kills the running child process', unless: Gem.win_platform? do
-      ParallelTests.pids.send(:clear)
-      Thread.new do
-        ParallelTests::Test::Runner.execute_command('sleep 3', 1, 1, {})
+    it 'kills the running child process' do
+      ParallelTests.with_pid_file do
+        Thread.new do
+          ParallelTests::Test::Runner.execute_command('sleep 3', 1, 1, {})
+        end
+        sleep(0.2)
+        expect(ParallelTests.pids.count).to eq(1)
+        ParallelTests.stop_all_processes
+        sleep(0.2)
+        expect(ParallelTests.pids.count).to eq(0)
       end
-      sleep(0.2)
-      expect(ParallelTests.pids.count).to eq(1)
-      ParallelTests.stop_all_processes
-      sleep(0.2)
-      expect(ParallelTests.pids.count).to eq(0)
     end
   end
 
