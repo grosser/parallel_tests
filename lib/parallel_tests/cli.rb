@@ -39,17 +39,18 @@ module ParallelTests
 
     def execute_in_parallel(items, num_processes, options)
       Tempfile.open 'parallel_tests-lock' do |lock|
-        progress_indicator = simulate_output_for_ci if options[:serialize_stdout]
+        ParallelTests.with_pid_file do
+          progress_indicator = simulate_output_for_ci if options[:serialize_stdout]
 
-        ParallelTests.pids # setup the class vars here so we dont initialize in the threads
-        Parallel.map(items, :in_threads => num_processes) do |item|
-          result = yield(item)
-          if progress_indicator && progress_indicator.alive?
-            progress_indicator.exit
-            puts
+          Parallel.map(items, :in_threads => num_processes) do |item|
+            result = yield(item)
+            if progress_indicator && progress_indicator.alive?
+              progress_indicator.exit
+              puts
+            end
+            reprint_output(result, lock.path) if options[:serialize_stdout]
+            result
           end
-          reprint_output(result, lock.path) if options[:serialize_stdout]
-          result
         end
       end
     end
@@ -276,8 +277,10 @@ module ParallelTests
         (0...num_processes).to_a
       end
       results = if options[:non_parallel]
-        runs.map do |i|
-          ParallelTests::Test::Runner.execute_command(command, i, num_processes, options)
+        ParallelTests.with_pid_file do
+          runs.map do |i|
+            ParallelTests::Test::Runner.execute_command(command, i, num_processes, options)
+          end
         end
       else
         execute_in_parallel(runs, runs.size, options) do |i|

@@ -17,11 +17,13 @@ describe ParallelTests::RSpec::Runner do
     end
 
     it "runs command using nice when specifed" do
-      expect(ParallelTests::Test::Runner).to receive(:execute_command_and_capture_output)do |a,b,c|
-        expect(b).to match(%r{^nice rspec})
-      end
+      ParallelTests.with_pid_file do
+        expect(ParallelTests::Test::Runner).to receive(:execute_command_and_capture_output)do |a,b,c|
+          expect(b).to match(%r{^nice rspec})
+        end
 
-      call('xxx', 1, 22, :nice => true)
+        call('xxx', 1, 22, :nice => true)
+      end
     end
 
     it "runs with color when called from cmdline" do
