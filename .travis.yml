@@ -1,8 +1,11 @@
 rvm:
   - 2.0.0
-  - 2.1.9
-  - 2.2.7
-  - 2.3.4
+  - 2.1
+  - 2.2
+  - 2.3
+  - 2.4
+  - 2.5
+  - ruby-head
   - jruby-head
 branches:
   only: [master]
@@ -10,5 +13,6 @@ sudo: false
 cache: bundler
 matrix:
   allow_failures:
+    - rvm: ruby-head
     - rvm: jruby-head
 bundler_args: "--jobs 4"
