@@ -48,7 +48,7 @@ GEM
     globalid (0.3.5)
       activesupport (>= 4.1.0)
     i18n (0.7.0)
-    json (1.8.3)
+    json (1.8.6)
     loofah (2.0.2)
       nokogiri (>= 1.5.9)
     mail (2.6.3)
