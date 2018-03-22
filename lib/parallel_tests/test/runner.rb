@@ -173,7 +173,10 @@ module ParallelTests
           tests.sort!
           tests.map! do |test|
             allowed_missing -= 1 unless time = runtimes[test]
-            raise "Too little runtime info" if allowed_missing < 0
+            if allowed_missing < 0
+              log = options[:runtime_log] || runtime_log
+              raise "Runtime log file '#{log}' does not cointain sufficient data to sort #{tests.size} test files, please update it."
+            end
             [test, time]
           end
 
