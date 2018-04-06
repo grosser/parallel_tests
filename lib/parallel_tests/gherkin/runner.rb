@@ -43,10 +43,10 @@ module ParallelTests
         # cucumber has 2 result lines per test run, that cannot be added
         # 1 scenario (1 failed)
         # 1 step (1 failed)
-        def summarize_results(results)
+        def summarize_results(results, consolidated_results)
           sort_order = %w[scenario step failed flaky undefined skipped pending passed]
 
-          %w[scenario step].map do |group|
+          message = %w[scenario step].map do |group|
             group_results = results.grep(/^\d+ #{group}/)
             next if group_results.empty?
 
@@ -58,6 +58,12 @@ module ParallelTests
             end
             "#{sums[0]} (#{sums[1..-1].join(", ")})"
           end.compact.join("\n")
+
+          consolidated_results[:summary] = {
+            message: message
+          }
+
+          consolidated_results[:summary][:message]
         end
 
         def cucumber_opts(given)

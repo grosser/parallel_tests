@@ -114,9 +114,15 @@ module ParallelTests
           end
         end
 
-        def summarize_results(results)
+        def summarize_results(results, consolidated_results)
           sums = sum_up_results(results)
-          sums.sort.map{|word, number|  "#{number} #{word}#{'s' if number != 1}" }.join(', ')
+          message = sums.sort.map{|word, number|  "#{number} #{word}#{'s' if number != 1}" }.join(', ')
+
+          consolidated_results[:summary] = sums.merge({
+            message: message
+          })
+
+          consolidated_results[:summary][:message]
         end
 
         # remove old seed and add new seed

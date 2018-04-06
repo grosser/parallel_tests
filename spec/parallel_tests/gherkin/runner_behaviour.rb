@@ -179,7 +179,7 @@ shared_examples_for 'gherkin runners' do
         "4 scenarios (4 passed)", "40 steps (40 passed)",
         "1 scenario (1 passed)", "1 step (1 passed)"
       ]
-      expect(call(results)).to eq("12 scenarios (2 failed, 1 flaky, 9 passed)\n74 steps (3 failed, 2 skipped, 69 passed)")
+      expect(call(results, {})).to eq("12 scenarios (2 failed, 1 flaky, 9 passed)\n74 steps (3 failed, 2 skipped, 69 passed)")
     end
 
     it "adds same results with plurals" do
@@ -187,7 +187,7 @@ shared_examples_for 'gherkin runners' do
         "1 scenario (1 passed)", "2 steps (2 passed)",
         "2 scenarios (2 passed)", "7 steps (7 passed)"
       ]
-      expect(call(results)).to eq("3 scenarios (3 passed)\n9 steps (9 passed)")
+      expect(call(results, {})).to eq("3 scenarios (3 passed)\n9 steps (9 passed)")
     end
 
     it "adds non-similar results" do
@@ -195,11 +195,11 @@ shared_examples_for 'gherkin runners' do
         "1 scenario (1 passed)", "1 step (1 passed)",
         "2 scenarios (1 failed, 1 pending)", "2 steps (1 failed, 1 pending)"
       ]
-      expect(call(results)).to eq("3 scenarios (1 failed, 1 pending, 1 passed)\n3 steps (1 failed, 1 pending, 1 passed)")
+      expect(call(results, {})).to eq("3 scenarios (1 failed, 1 pending, 1 passed)\n3 steps (1 failed, 1 pending, 1 passed)")
     end
 
     it "does not pluralize 1" do
-      expect(call(["1 scenario (1 passed)", "1 step (1 passed)"])).to eq("1 scenario (1 passed)\n1 step (1 passed)")
+      expect(call(["1 scenario (1 passed)", "1 step (1 passed)"], {})).to eq("1 scenario (1 passed)\n1 step (1 passed)")
     end
   end
 

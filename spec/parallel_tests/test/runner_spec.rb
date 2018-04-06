@@ -316,23 +316,23 @@ EOF
     end
 
     it "adds results" do
-      expect(call(['1 foo 3 bar','2 foo 5 bar'])).to eq('8 bars, 3 foos')
+      expect(call(['1 foo 3 bar','2 foo 5 bar'], {})).to eq('8 bars, 3 foos')
     end
 
     it "adds results with braces" do
-      expect(call(['1 foo(s) 3 bar(s)','2 foo 5 bar'])).to eq('8 bars, 3 foos')
+      expect(call(['1 foo(s) 3 bar(s)','2 foo 5 bar'], {})).to eq('8 bars, 3 foos')
     end
 
     it "adds same results with plurals" do
-      expect(call(['1 foo 3 bar','2 foos 5 bar'])).to eq('8 bars, 3 foos')
+      expect(call(['1 foo 3 bar','2 foos 5 bar'], {})).to eq('8 bars, 3 foos')
     end
 
     it "adds non-similar results" do
-      expect(call(['1 xxx 2 yyy','1 xxx 2 zzz'])).to eq('2 xxxs, 2 yyys, 2 zzzs')
+      expect(call(['1 xxx 2 yyy','1 xxx 2 zzz'], {})).to eq('2 xxxs, 2 yyys, 2 zzzs')
     end
 
     it "does not pluralize 1" do
-      expect(call(['1 xxx 2 yyy'])).to eq('1 xxx, 2 yyys')
+      expect(call(['1 xxx 2 yyy'], {})).to eq('1 xxx, 2 yyys')
     end
   end
 

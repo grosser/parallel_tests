@@ -57,27 +57,30 @@ module ParallelTests
 
     def run_tests_in_parallel(num_processes, options)
       test_results = nil
+      consolidated_results = {}
 
-      report_time_taken do
+      report_time_taken(consolidated_results) do
         groups = @runner.tests_in_groups(options[:files], num_processes, options)
-        groups.reject! &:empty?
+        groups.reject!(&:empty?)
 
         test_results = if options[:only_group]
           groups_to_run = options[:only_group].collect{|i| groups[i - 1]}.compact
-          report_number_of_tests(groups_to_run)
+          report_number_of_tests(groups_to_run, consolidated_results)
           execute_in_parallel(groups_to_run, groups_to_run.size, options) do |group|
             run_tests(group, groups_to_run.index(group), 1, options)
           end
         else
-          report_number_of_tests(groups)
+          report_number_of_tests(groups, consolidated_results)
 
           execute_in_parallel(groups, groups.size, options) do |group|
             run_tests(group, groups.index(group), num_processes, options)
           end
         end
 
-        report_results(test_results, options)
+        report_results(test_results, consolidated_results, options)
       end
+
+      write_consolidated_results(consolidated_results, options)
 
       abort final_fail_message if any_test_failed?(test_results)
     end
@@ -109,10 +112,12 @@ module ParallelTests
       end
     end
 
-    def report_results(test_results, options)
+    def report_results(test_results, consolidated_results, options)
       results = @runner.find_results(test_results.map { |result| result[:stdout] }*"")
+      @runner.summarize_results(results, consolidated_results)
+
       puts ""
-      puts @runner.summarize_results(results)
+      puts consolidated_results[:summary][:message]
 
       report_failure_rerun_commmand(test_results, options)
     end
@@ -132,12 +137,27 @@ module ParallelTests
       end
     end
 
-    def report_number_of_tests(groups)
+    def report_number_of_tests(groups, consolidated_results)
       name = @runner.test_file_name
       num_processes = groups.size
       num_tests = groups.map(&:size).inject(0, :+)
       tests_per_process = (num_processes == 0 ? 0 : num_tests / num_processes)
-      puts "#{num_processes} processes for #{num_tests} #{name}s, ~ #{tests_per_process} #{name}s per process"
+      message = "#{num_processes} processes for #{num_tests} #{name}s, ~ #{tests_per_process} #{name}s per process"
+      consolidated_results[:tests] = {
+        message: message,
+        tests: num_tests,
+        processes: num_processes,
+        tests_per_process: tests_per_process
+      }
+      puts message
+    end
+
+    def write_consolidated_results(consolidated_results, options)
+      return if options[:consolidated_results].nil? || options[:consolidated_results].empty?
+
+      File.write(options[:consolidated_results], consolidated_results.to_json)
+
+      puts "Wrote consolidated results to #{options[:consolidated_results]}"
     end
 
     #exit with correct status code so rake parallel:test && echo 123 works
@@ -216,6 +236,7 @@ module ParallelTests
         opts.on("--unknown-runtime [FLOAT]", Float, "Use given number as unknown runtime (otherwise use average time)") { |time| options[:unknown_runtime] = time }
         opts.on("--first-is-1", "Use \"1\" as TEST_ENV_NUMBER to not reuse the default test environment") { options[:first_is_1] = true }
         opts.on("--verbose", "Print more output") { options[:verbose] = true }
+        opts.on("--consolidated-results [PATH]", "Location to write consolidated test results") { |path| options[:consolidated_results] = path }
         opts.on("-v", "--version", "Show Version") { puts ParallelTests::VERSION; exit }
         opts.on("-h", "--help", "Show this.") { puts opts; exit }
       end.parse!(argv)
@@ -291,9 +312,14 @@ module ParallelTests
       abort if results.any? { |r| r[:exit_status] != 0 }
     end
 
-    def report_time_taken
+    def report_time_taken(consolidated_results)
       seconds = ParallelTests.delta { yield }.to_i
-      puts "\nTook #{seconds} seconds#{detailed_duration(seconds)}"
+      message = "Took #{seconds} seconds#{detailed_duration(seconds)}"
+      consolidated_results[:time_taken] = {
+        seconds: seconds,
+        message: message
+      }
+      puts "\n#{message}"
     end
 
     def detailed_duration(seconds)
