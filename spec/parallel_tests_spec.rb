@@ -51,18 +51,18 @@ describe ParallelTests do
       end
     end
 
-    it "is true when there is a Gemfile" do
+    it "is true when there is a Gemfile.lock" do
       use_temporary_directory do
-        FileUtils.touch("Gemfile")
+        FileUtils.touch("Gemfile.lock")
         expect(ParallelTests.send(:bundler_enabled?)).to eq(true)
       end
     end
 
-    it "is true when there is a Gemfile in the parent directory" do
+    it "is true when there is a Gemfile.lock in the parent directory" do
       use_temporary_directory do
         FileUtils.mkdir "nested"
         Dir.chdir "nested" do
-          FileUtils.touch(File.join("..", "Gemfile"))
+          FileUtils.touch(File.join("..", "Gemfile.lock"))
           expect(ParallelTests.send(:bundler_enabled?)).to eq(true)
         end
       end
