@@ -63,18 +63,24 @@ module ParallelTests
         groups.reject! &:empty?
 
         test_results = if options[:only_group]
-          groups_to_run = options[:only_group].collect{|i| groups[i - 1]}.compact
-          report_number_of_tests(groups_to_run)
-          execute_in_parallel(groups_to_run, groups_to_run.size, options) do |group|
-            run_tests(group, groups_to_run.index(group), 1, options)
-          end
-        else
-          report_number_of_tests(groups)
-
-          execute_in_parallel(groups, groups.size, options) do |group|
-            run_tests(group, groups.index(group), num_processes, options)
-          end
-        end
+           groups_to_run = options[:only_group].collect{|i| groups[i - 1]}.compact
+           report_number_of_tests(groups_to_run)
+           execute_in_parallel(groups_to_run, groups_to_run.size, options) do |group|
+             run_tests(group, groups_to_run.index(group), 1, options)
+           end
+         else
+           report_number_of_tests(groups)
+           if options[:features_from_process]
+             ran = []
+             for x in 0...num_processes
+               ran << File.expand_path(Dir.pwd) + "/features_from_process_#{x}.txt"
+               File.open(File.expand_path(Dir.pwd) + "/features_from_process_#{x}.txt", 'w+') { |file| groups[x].each{|feature| file.write("\n#{feature}")}}
+             end
+           end
+           execute_in_parallel(groups, groups.size, options) do |group|
+             run_tests(group, groups.index(group), num_processes, options)
+           end
+         end
 
         report_results(test_results, options)
       end
@@ -85,6 +91,8 @@ module ParallelTests
     def run_tests(group, process_number, num_processes, options)
       if group.empty?
         {:stdout => '', :exit_status => 0, :command => '', :seed => nil}
+      elsif options[:features_from_process]
+        @runner.run_tests_from_file(process_number, num_processes, options)
       else
         @runner.run_tests(group, process_number, num_processes, options)
       end
@@ -216,6 +224,7 @@ module ParallelTests
         opts.on("--unknown-runtime [FLOAT]", Float, "Use given number as unknown runtime (otherwise use average time)") { |time| options[:unknown_runtime] = time }
         opts.on("--first-is-1", "Use \"1\" as TEST_ENV_NUMBER to not reuse the default test environment") { options[:first_is_1] = true }
         opts.on("--verbose", "Print more output") { options[:verbose] = true }
+        opts.on("--features_from_process", "Write features to text file") { options[:features_from_process] = true }
         opts.on("-v", "--version", "Show Version") { puts ParallelTests::VERSION; exit }
         opts.on("-h", "--help", "Show this.") { puts opts; exit }
       end.parse!(argv)
@@ -272,21 +281,21 @@ module ParallelTests
 
     def execute_shell_command_in_parallel(command, num_processes, options)
       runs = if options[:only_group]
-        options[:only_group].map{|g| g - 1}
-      else
-        (0...num_processes).to_a
-      end
+               options[:only_group].map{|g| g - 1}
+             else
+               (0...num_processes).to_a
+             end
       results = if options[:non_parallel]
-        ParallelTests.with_pid_file do
-          runs.map do |i|
-            ParallelTests::Test::Runner.execute_command(command, i, num_processes, options)
-          end
-        end
-      else
-        execute_in_parallel(runs, runs.size, options) do |i|
-          ParallelTests::Test::Runner.execute_command(command, i, num_processes, options)
-        end
-      end.flatten
+                  ParallelTests.with_pid_file do
+                    runs.map do |i|
+                      ParallelTests::Test::Runner.execute_command(command, i, num_processes, options)
+                    end
+                  end
+                else
+                  execute_in_parallel(runs, runs.size, options) do |i|
+                    ParallelTests::Test::Runner.execute_command(command, i, num_processes, options)
+                  end
+                end.flatten
 
       abort if results.any? { |r| r[:exit_status] != 0 }
     end

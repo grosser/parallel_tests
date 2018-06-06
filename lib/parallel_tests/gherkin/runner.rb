@@ -28,6 +28,16 @@ module ParallelTests
           execute_command(cmd, process_number, num_processes, options)
         end
 
+        def run_tests_from_file(process_number, num_processes, options)
+          cmd = [
+              executable,
+              (runtime_logging if File.directory?(File.dirname(runtime_log))),
+              cucumber_opts(options[:test_options]),
+              "@features_from_process_#{process_number}.txt"
+          ].compact.reject(&:empty?).join(' ')
+          execute_command(cmd, process_number, num_processes, options)
+        end
+
         def test_file_name
           @test_file_name || 'feature'
         end
