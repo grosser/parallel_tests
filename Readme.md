@@ -279,7 +279,7 @@ TIPS
  - [Sphinx setup](https://github.com/grosser/parallel_tests/wiki)
  - [Capistrano setup](https://github.com/grosser/parallel_tests/wiki/Remotely-with-capistrano) let your tests run on a big box instead of your laptop
 
-Contribute your own gotaches to the [Wiki](https://github.com/grosser/parallel_tests/wiki) or even better open a PR :)
+Contribute your own gotchas to the [Wiki](https://github.com/grosser/parallel_tests/wiki) or even better open a PR :)
 
 TODO
 ====
@@ -369,6 +369,7 @@ inspired by [pivotal labs](https://blog.pivotal.io/labs/labs/parallelize-your-rs
  - [Aleksei Gusev](https://github.com/hron)
  - [Scott Olsen](https://github.com/scottolsen)
  - [Andrei Botalov](https://github.com/abotalov)
+ - [Zachary Attas](https://github.com/snackattas)
 
 [Michael Grosser](http://grosser.it)<br/>
 michael@grosser.it<br/>
