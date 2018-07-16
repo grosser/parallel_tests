@@ -15,7 +15,7 @@ module ParallelTests
           super || line =~ SCENARIO_REGEX || line =~ SCENARIOS_RESULTS_BOUNDARY_REGEX
         end
 
-        def summarize_results(results)
+        def summarize_results(results, consolidated_results)
           output = []
 
           scenario_groups = results.slice_before(SCENARIOS_RESULTS_BOUNDARY_REGEX).group_by(&:first)
@@ -28,7 +28,11 @@ module ParallelTests
 
           output << super
 
-          output.join("\n\n")
+          consolidated_results[:summary] = {
+            message: output.join("\n\n")
+          }
+
+          consolidated_results[:summary][:message]
         end
 
         def command_with_seed(cmd, seed)
