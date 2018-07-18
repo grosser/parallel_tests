@@ -221,11 +221,15 @@ module ParallelTests
         opts.on("--allowed-missing [INT]", Integer, "Allowed percentage of missing runtimes (default = 50)") { |percent| options[:allowed_missing_percent] = percent }
         opts.on("--unknown-runtime [FLOAT]", Float, "Use given number as unknown runtime (otherwise use average time)") { |time| options[:unknown_runtime] = time }
         opts.on("--first-is-1", "Use \"1\" as TEST_ENV_NUMBER to not reuse the default test environment") { options[:first_is_1] = true }
-        opts.on("--verbose", "Print more output (except if quiet)") { options[:verbose] = true }
-        opts.on("--quiet", "Print tests output only") { options[:quiet] = true }
+        opts.on("--verbose", "Print more output (mutually exclusive with quiet)") { options[:verbose] = true }
+        opts.on("--quiet", "Print tests output only (mutually exclusive with verbose)") { options[:quiet] = true }
         opts.on("-v", "--version", "Show Version") { puts ParallelTests::VERSION; exit }
         opts.on("-h", "--help", "Show this.") { puts opts; exit }
       end.parse!(argv)
+
+      if options[:verbose] && options[:quiet]
+        raise "Both options are mutually exclusive: verbose & quiet"
+      end
 
       if options[:count] == 0
         options.delete(:count)
