@@ -46,6 +46,10 @@ describe ParallelTests::CLI do
       expect(call(["test", "--verbose"])).to eq(defaults.merge(:verbose => true))
     end
 
+    it "parses --quiet" do
+      expect(call(["test", "--quiet"])).to eq(defaults.merge(:quiet => true))
+    end
+
     it "parses --suffix" do
       expect(call(["test", "--suffix", "_(test|spec).rb$"])).to eq(defaults.merge(:suffix => /_(test|spec).rb$/))
     end
@@ -229,6 +233,19 @@ describe ParallelTests::CLI do
               {verbose: true}
             )
           }.to output(/my seeded command result --seed 555/).to_stdout
+        end
+      end
+
+      context 'with option quiet' do
+        it "prints nothing even if there are failures" do
+          expect($stdout).not_to receive(:puts)
+
+          subject.send(:report_failure_rerun_commmand,
+            [
+              {exit_status: 1, command: 'foo', seed: nil, output: 'blah'}
+            ],
+            {quiet: true}
+          )
         end
       end
     end

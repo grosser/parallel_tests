@@ -58,25 +58,31 @@ module ParallelTests
     def run_tests_in_parallel(num_processes, options)
       test_results = nil
 
-      report_time_taken do
+      run_tests_proc = -> {
         groups = @runner.tests_in_groups(options[:files], num_processes, options)
         groups.reject! &:empty?
 
         test_results = if options[:only_group]
           groups_to_run = options[:only_group].collect{|i| groups[i - 1]}.compact
-          report_number_of_tests(groups_to_run)
+          report_number_of_tests(groups_to_run) unless options[:quiet]
           execute_in_parallel(groups_to_run, groups_to_run.size, options) do |group|
             run_tests(group, groups_to_run.index(group), 1, options)
           end
         else
-          report_number_of_tests(groups)
+          report_number_of_tests(groups) unless options[:quiet]
 
           execute_in_parallel(groups, groups.size, options) do |group|
             run_tests(group, groups.index(group), num_processes, options)
           end
         end
 
-        report_results(test_results, options)
+        report_results(test_results, options) unless options[:quiet]
+      }
+
+      if options[:quiet]
+        run_tests_proc.call
+      else
+        report_time_taken(&run_tests_proc)
       end
 
       abort final_fail_message if any_test_failed?(test_results)
@@ -215,7 +221,8 @@ module ParallelTests
         opts.on("--allowed-missing [INT]", Integer, "Allowed percentage of missing runtimes (default = 50)") { |percent| options[:allowed_missing_percent] = percent }
         opts.on("--unknown-runtime [FLOAT]", Float, "Use given number as unknown runtime (otherwise use average time)") { |time| options[:unknown_runtime] = time }
         opts.on("--first-is-1", "Use \"1\" as TEST_ENV_NUMBER to not reuse the default test environment") { options[:first_is_1] = true }
-        opts.on("--verbose", "Print more output") { options[:verbose] = true }
+        opts.on("--verbose", "Print more output (except if quiet)") { options[:verbose] = true }
+        opts.on("--quiet", "Print tests output only") { options[:quiet] = true }
         opts.on("-v", "--version", "Show Version") { puts ParallelTests::VERSION; exit }
         opts.on("-h", "--help", "Show this.") { puts opts; exit }
       end.parse!(argv)

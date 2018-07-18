@@ -78,7 +78,7 @@ module ParallelTests
           cmd = "nice #{cmd}" if options[:nice]
           cmd = "#{cmd} 2>&1" if options[:combine_stderr]
 
-          puts cmd if options[:verbose]
+          puts cmd if options[:verbose] && !options[:quiet]
 
           execute_command_and_capture_output(env, cmd, options)
         end
@@ -180,7 +180,7 @@ module ParallelTests
             [test, time]
           end
 
-          if options[:verbose]
+          if options[:verbose] && !options[:quiet]
             puts "Runtime found for #{tests.count(&:last)} of #{tests.size} tests"
           end
 
