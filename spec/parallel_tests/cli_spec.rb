@@ -46,6 +46,14 @@ describe ParallelTests::CLI do
       expect(call(["test", "--verbose"])).to eq(defaults.merge(:verbose => true))
     end
 
+    it "parses --quiet" do
+      expect(call(["test", "--quiet"])).to eq(defaults.merge(:quiet => true))
+    end
+
+    it "fails if both --verbose and --quiet are present" do
+      expect { call(["test", "--verbose", "--quiet"]) }.to raise_error(RuntimeError)
+    end
+
     it "parses --suffix" do
       expect(call(["test", "--suffix", "_(test|spec).rb$"])).to eq(defaults.merge(:suffix => /_(test|spec).rb$/))
     end

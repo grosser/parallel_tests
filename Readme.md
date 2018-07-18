@@ -224,6 +224,7 @@ Options are:
         --allowed-missing            Allowed percentage of missing runtimes (default = 50)
         --unknown-runtime [FLOAT]    Use given number as unknown runtime (otherwise use average time)
         --verbose                    Print more output
+        --quiet                      Do not print anything, appart from test output
     -v, --version                    Show Version
     -h, --help                       Show this.
 
