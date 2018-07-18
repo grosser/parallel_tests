@@ -239,19 +239,6 @@ describe ParallelTests::CLI do
           }.to output(/my seeded command result --seed 555/).to_stdout
         end
       end
-
-      context 'with option quiet' do
-        it "prints nothing even if there are failures" do
-          expect($stdout).not_to receive(:puts)
-
-          subject.send(:report_failure_rerun_commmand,
-            [
-              {exit_status: 1, command: 'foo', seed: nil, output: 'blah'}
-            ],
-            {quiet: true}
-          )
-        end
-      end
     end
   end
 
