@@ -1,5 +1,3 @@
-#encoding: utf-8
-
 require 'spec_helper'
 
 describe 'CLI' do
@@ -91,7 +89,6 @@ describe 'CLI' do
 
   it "respects default encoding when reading child stdout" do
     write 'test/xxx_test.rb', <<-EOF
-      # encoding: utf-8
       require 'test/unit'
       class XTest < Test::Unit::TestCase
         def test_unicode
@@ -256,10 +253,7 @@ describe 'CLI' do
   it "can run with test-options" do
     write "spec/x1_spec.rb", "111"
     write "spec/x2_spec.rb", "111"
-    result = run_tests "spec",
-                       :add => "--test-options ' --version'",
-                       :processes => 2,
-                       :type => 'rspec'
+    result = run_tests "spec", add: "--test-options ' --version'", processes: 2, type: 'rspec'
     expect(result).to match(/\d+\.\d+\.\d+.*\d+\.\d+\.\d+/m) # prints version twice
   end
 
@@ -269,10 +263,9 @@ describe 'CLI' do
     processes.times { |i|
       write "spec/x#{i}_spec.rb", "puts %{ENV-\#{ENV['TEST_ENV_NUMBER']}-}"
     }
-    result = run_tests "spec",
-                       :export => {"PARALLEL_TEST_PROCESSORS" => processes.to_s},
-                       :processes => processes,
-                       :type => 'rspec'
+    result = run_tests(
+      "spec", export: {"PARALLEL_TEST_PROCESSORS" => processes.to_s}, processes: processes, type: 'rspec'
+    )
     expect(result.scan(/ENV-.?-/)).to match_array(["ENV--", "ENV-2-", "ENV-3-", "ENV-4-", "ENV-5-"])
   end
 
@@ -377,10 +370,7 @@ describe 'CLI' do
         write "features/good#{i}.feature", "Feature: xxx\n  Scenario: xxx\n    Given I print TEST_ENV_NUMBER\n    And I sleep a bit"
       }
       run_tests "features", :type => "cucumber"
-      expect(read(log).gsub(/\.\d+/, '').split("\n")).to match_array([
-                                                                         "features/good0.feature:0",
-                                                                         "features/good1.feature:0"
-                                                                     ])
+      expect(read(log).gsub(/\.\d+/, '').split("\n")).to match_array(["features/good0.feature:0", "features/good1.feature:0"])
     end
 
     it "runs each feature once when there are more processes then features (issue #89)" do
@@ -399,32 +389,32 @@ describe 'CLI' do
       write "features/fail2.feature", "Feature: xxx\n  Scenario: xxx\n    Given I fail"
       results = run_tests "features", :processes => 3, :type => "cucumber", :fail => true
 
-      expect(results).to include "" "
-Failing Scenarios:
-cucumber features/fail2.feature:2 # Scenario: xxx
-cucumber features/fail1.feature:2 # Scenario: xxx
+      expect(results).to include <<-EOF.gsub('        ', '')
+        Failing Scenarios:
+        cucumber features/fail2.feature:2 # Scenario: xxx
+        cucumber features/fail1.feature:2 # Scenario: xxx
 
-3 scenarios (2 failed, 1 passed)
-3 steps (2 failed, 1 passed)
-" ""
+        3 scenarios (2 failed, 1 passed)
+        3 steps (2 failed, 1 passed)
+      EOF
     end
 
     it "groups by scenario" do
       write "features/long.feature", <<-EOS
-      Feature: xxx
-        Scenario: xxx
-          Given I print TEST_ENV_NUMBER
+        Feature: xxx
+          Scenario: xxx
+            Given I print TEST_ENV_NUMBER
 
-        Scenario: xxx
-          Given I print TEST_ENV_NUMBER
+          Scenario: xxx
+            Given I print TEST_ENV_NUMBER
 
-        Scenario Outline: xxx
-          Given I print TEST_ENV_NUMBER
+          Scenario Outline: xxx
+            Given I print TEST_ENV_NUMBER
 
-        Examples:
-          | num |
-          | one |
-          | two |
+          Examples:
+            | num |
+            | one |
+            | two |
       EOS
       result = run_tests "features", :type => "cucumber", :add => "--group-by scenarios"
       expect(result).to include("2 processes for 4 scenarios")
@@ -490,10 +480,7 @@ cucumber features/fail1.feature:2 # Scenario: xxx
         write "features/good#{i}.feature", "Feature: A\n  Scenario: xxx\n    Given I print TEST_ENV_NUMBER\n    And I sleep a bit"
       }
       run_tests "features", :type => "spinach"
-      expect(read(log).gsub(/\.\d+/, '').split("\n")).to match_array([
-                                                                         "features/good0.feature:0",
-                                                                         "features/good1.feature:0"
-                                                                     ])
+      expect(read(log).gsub(/\.\d+/, '').split("\n")).to match_array(["features/good0.feature:0", "features/good1.feature:0"])
     end
 
     it "runs each feature once when there are more processes then features (issue #89)" do
@@ -524,8 +511,8 @@ cucumber features/fail1.feature:2 # Scenario: xxx
     it "exits immediately if another int signal is received", unless: Gem.win_platform? do
       write "spec/test_spec.rb", "describe { specify { sleep 2; p 'Should not get here'} }"
       pid = nil
-      Thread.new { sleep 1; Process.kill("INT", pid) }
-      Thread.new { sleep 1.2; Process.kill("INT", pid) }
+      Thread.new { sleep 1.5; Process.kill("INT", pid) }
+      Thread.new { sleep 1.7; Process.kill("INT", pid) }
       result = run_tests("spec", processes: 2, type: 'rspec', fail: false) { |io| pid = io.pid }
       expect(result).to_not include("Should not get here")
     end
