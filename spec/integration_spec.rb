@@ -211,7 +211,7 @@ describe 'CLI' do
 
   it "runs in parallel" do
     2.times do |i|
-      write "spec/xxx#{i}_spec.rb", 'describe("it") { it("should"){ puts "START"; sleep 1; puts "END" } }'
+      write "spec/xxx#{i}_spec.rb", 'STDOUT.sync = true; describe("it") { it("should"){ puts "START"; sleep 1; puts "END" } }'
     end
     result = run_tests("spec", processes: 2, type: 'rspec')
     expect(result.scan(/START|END/)).to eq(["START", "START", "END", "END"])
