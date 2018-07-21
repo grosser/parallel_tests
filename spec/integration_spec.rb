@@ -509,10 +509,11 @@ describe 'CLI' do
 
     # Process.kill on Windows doesn't work as expected. It kills all process group instead of just one process.
     it "exits immediately if another int signal is received", unless: Gem.win_platform? do
-      write "spec/test_spec.rb", "describe { specify { sleep 2; p 'Should not get here'} }"
+      timeout = (ENV["TRAVIS"] ? 4 : 2) # travis is slower so it needs some extra time
+      write "spec/test_spec.rb", "describe { specify { sleep #{timeout}; p 'Should not get here'} }"
       pid = nil
-      Thread.new { sleep 1.5; Process.kill("INT", pid) }
-      Thread.new { sleep 1.7; Process.kill("INT", pid) }
+      Thread.new { sleep timeout - 0.5; Process.kill("INT", pid) }
+      Thread.new { sleep timeout - 0.3; Process.kill("INT", pid) }
       result = run_tests("spec", processes: 2, type: 'rspec', fail: false) { |io| pid = io.pid }
       expect(result).to_not include("Should not get here")
     end
