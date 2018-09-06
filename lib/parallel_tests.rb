@@ -90,11 +90,7 @@ module ParallelTests
 
     # real time even if someone messed with timecop in tests
     def now
-      if Time.respond_to?(:now_without_mock_time) # Timecop
-        Time.now_without_mock_time
-      else
-        Time.now
-      end
+      Process.clock_gettime(Process::CLOCK_MONOTONIC)
     end
 
     def delta

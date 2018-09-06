@@ -34,7 +34,6 @@ class ParallelTests::RSpec::RuntimeLogger < ParallelTests::RSpec::LoggerBase
 
   def start_dump(*args)
     return unless ENV['TEST_ENV_NUMBER'] #only record when running in parallel
-    # TODO: Figure out why sometimes time can be less than 0
     lock_output do
       @example_times.each do |file, time|
         relative_path = file.sub(/^#{Regexp.escape Dir.pwd}\//,'').sub(/^\.\//, "")
