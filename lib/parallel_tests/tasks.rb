@@ -65,10 +65,10 @@ module ParallelTests
         end
       end
 
-      # parallel:spec[:count, :pattern, :options]
+      # parallel:spec[:count, :pattern, :options, :pass_through]
       def parse_args(args)
         # order as given by user
-        args = [args[:count], args[:pattern], args[:options]]
+        args = [args[:count], args[:pattern], args[:options], args[:pass_through]]
 
         # count given or empty ?
         # parallel:spec[2,models,options]
@@ -77,8 +77,9 @@ module ParallelTests
         num_processes = count.to_i unless count.to_s.empty?
         pattern = args.shift
         options = args.shift
+        pass_through = args.shift
 
-        [num_processes, pattern.to_s, options.to_s]
+        [num_processes, pattern.to_s, options.to_s, pass_through.to_s]
       end
     end
   end
@@ -152,11 +153,11 @@ namespace :parallel do
 
   ['test', 'spec', 'features', 'features-spinach'].each do |type|
     desc "Run #{type} in parallel with parallel:#{type}[num_cpus]"
-    task type, [:count, :pattern, :options] do |t, args|
+    task type, [:count, :pattern, :options, :pass_through] do |t, args|
       ParallelTests::Tasks.check_for_pending_migrations
       ParallelTests::Tasks.load_lib
 
-      count, pattern, options = ParallelTests::Tasks.parse_args(args)
+      count, pattern, options, pass_through = ParallelTests::Tasks.parse_args(args)
       test_framework = {
         'spec' => 'rspec',
         'test' => 'test',
@@ -173,7 +174,8 @@ namespace :parallel do
       command = "#{ParallelTests.with_ruby_binary(Shellwords.escape(executable))} #{type} --type #{test_framework} " \
         "-n #{count} "                     \
         "--pattern '#{pattern}' "          \
-        "--test-options '#{options}'"
+        "--test-options '#{options}' "     \
+        "#{pass_through}"
       abort unless system(command) # allow to chain tasks e.g. rake parallel:spec parallel:features
     end
   end

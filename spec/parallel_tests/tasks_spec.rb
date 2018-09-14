@@ -5,27 +5,32 @@ describe ParallelTests::Tasks do
   describe ".parse_args" do
     it "should return the count" do
       args = {:count => 2}
-      expect(ParallelTests::Tasks.parse_args(args)).to eq([2, "", ""])
+      expect(ParallelTests::Tasks.parse_args(args)).to eq([2, "", "", ""])
     end
 
     it "should default to the prefix" do
       args = {:count => "models"}
-      expect(ParallelTests::Tasks.parse_args(args)).to eq([nil, "models", ""])
+      expect(ParallelTests::Tasks.parse_args(args)).to eq([nil, "models", "", ""])
     end
 
     it "should return the count and pattern" do
       args = {:count => 2, :pattern => "models"}
-      expect(ParallelTests::Tasks.parse_args(args)).to eq([2, "models", ""])
+      expect(ParallelTests::Tasks.parse_args(args)).to eq([2, "models", "", ""])
     end
 
     it "should return the count, pattern, and options" do
       args = {:count => 2, :pattern => "plain", :options => "-p default"}
-      expect(ParallelTests::Tasks.parse_args(args)).to eq([2, "plain", "-p default"])
+      expect(ParallelTests::Tasks.parse_args(args)).to eq([2, "plain", "-p default", ""])
     end
 
     it "should return the count, pattern, and options" do
       args = {:count => 2, :pattern => "plain", :options => "-p default --group-by steps"}
-      expect(ParallelTests::Tasks.parse_args(args)).to eq([2, "plain", "-p default --group-by steps"])
+      expect(ParallelTests::Tasks.parse_args(args)).to eq([2, "plain", "-p default --group-by steps", ""])
+    end
+
+    it "should return the count, pattern, test options, and pass-through options" do
+      args = {:count => 2, :pattern => "plain", :options => "-p default --group-by steps", :pass_through => "--runtime-log /path/to/log"}
+      expect(ParallelTests::Tasks.parse_args(args)).to eq([2, "plain", "-p default --group-by steps", "--runtime-log /path/to/log"])
     end
   end
 
