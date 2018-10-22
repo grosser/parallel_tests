@@ -78,7 +78,7 @@ module ParallelTests
           cmd = "nice #{cmd}" if options[:nice]
           cmd = "#{cmd} 2>&1" if options[:combine_stderr]
 
-          puts cmd if options[:verbose]
+          puts cmd if options[:verbose] && !options[:serialize_stdout]
 
           execute_command_and_capture_output(env, cmd, options)
         end
@@ -93,6 +93,8 @@ module ParallelTests
           ParallelTests.pids.delete(pid) if pid
           exitstatus = $?.exitstatus
           seed = output[/seed (\d+)/,1]
+
+          output = [cmd, output].join("\n") if options[:verbose] && options[:serialize_stdout]
 
           {:stdout => output, :exit_status => exitstatus, :command => cmd, :seed => seed}
         end

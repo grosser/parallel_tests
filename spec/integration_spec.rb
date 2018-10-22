@@ -145,6 +145,13 @@ describe 'CLI' do
     expect(result).to match(/\.{5}.*TEST1/m)
   end
 
+  it "can show simulated output preceded by command when serializing stdout with verbose option" do
+    write 'spec/xxx_spec.rb', 'describe("it"){it("should"){sleep 1; puts "TEST1"}}'
+    result = run_tests "spec --verbose", :type => 'rspec', :add => "--serialize-stdout", export: {'PARALLEL_TEST_HEARTBEAT_INTERVAL' => '0.2'}
+
+    expect(result).to match(/\.{5}.*\nbundle exec rspec spec\/xxx_spec\.rb\nTEST1/m)
+  end
+
   it "can serialize stdout and stderr" do
     write 'spec/xxx_spec.rb', '5.times{describe("it"){it("should"){sleep 0.01; $stderr.puts "errTEST1"; puts "TEST1"}}}'
     write 'spec/xxx2_spec.rb', 'sleep 0.01; 5.times{describe("it"){it("should"){sleep 0.01; $stderr.puts "errTEST2"; puts "TEST2"}}}'
