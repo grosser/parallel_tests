@@ -52,7 +52,7 @@ describe ParallelTests::Test::RuntimeLogger do
     skip if RUBY_PLATFORM == "java" # just too slow ...
     Dir.chdir(Bundler.root.join("spec/fixtures/minitest4")) do
       Bundler.with_clean_env do
-        sh "bundle --local --quiet"
+        sh "bundle --quiet"
         run_tests
       end
 
