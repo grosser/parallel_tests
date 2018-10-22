@@ -2,7 +2,6 @@ version: '1.0.{build}'
 
 environment:
   matrix:
-    - RUBY_VERSION: 200-x64
     - RUBY_VERSION: 21-x64
     - RUBY_VERSION: 22-x64
     - RUBY_VERSION: 23-x64
