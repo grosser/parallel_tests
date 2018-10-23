@@ -88,7 +88,6 @@ module ParallelTests
       pids.count
     end
 
-    # real time even if someone messed with timecop in tests
     def now
       Process.clock_gettime(Process::CLOCK_MONOTONIC)
     end
