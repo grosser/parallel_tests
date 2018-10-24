@@ -92,38 +92,4 @@ if defined?(Minitest::Runnable) # Minitest 5
       end
     end)
   end
-elsif defined?(MiniTest::Unit) # Minitest 4
-  MiniTest::Unit.class_eval do
-    alias_method :_run_suite_without_runtime_log, :_run_suite
-    def _run_suite(*args)
-      ParallelTests::Test::RuntimeLogger.log_test_run(args.first) do
-        _run_suite_without_runtime_log(*args)
-      end
-    end
-
-    alias_method :_run_suites_without_runtime_log, :_run_suites
-    def _run_suites(*args)
-      result = _run_suites_without_runtime_log(*args)
-      ParallelTests::Test::RuntimeLogger.unique_log
-      result
-    end
-  end
-else # Test::Unit
-  require 'test/unit/testsuite'
-  class ::Test::Unit::TestSuite
-    alias_method :run_without_timing, :run
-
-    def run(result, &block)
-      test = tests.first
-
-      if test.is_a? ::Test::Unit::TestSuite # all tests ?
-        run_without_timing(result, &block)
-        ParallelTests::Test::RuntimeLogger.unique_log
-      else
-        ParallelTests::Test::RuntimeLogger.log_test_run(test.class) do
-          run_without_timing(result, &block)
-        end
-      end
-    end
-  end
 end
