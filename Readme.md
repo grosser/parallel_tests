@@ -115,7 +115,7 @@ Rspec: Add to your `.rspec_parallel` (or `.rspec`) :
 
 To use a custom logfile location (default: `tmp/parallel_runtime_rspec.log`), use the CLI: `parallel_test spec -t rspec --runtime-log my.log`
 
-### Test::Unit & Minitest 4/5
+### Minitest
 
 Add to your `test_helper.rb`:
 ```ruby

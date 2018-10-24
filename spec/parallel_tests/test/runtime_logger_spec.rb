@@ -10,62 +10,6 @@ describe ParallelTests::Test::RuntimeLogger do
     sh "ruby #{Bundler.root}/bin/parallel_test test -n 2"
   end
 
-  it "writes a correct log on test-unit" do
-    skip if RUBY_PLATFORM == "java" # just too slow ...
-    use_temporary_directory do
-      # setup simple structure
-      FileUtils.mkdir "test"
-      2.times do |i|
-        File.write("test/#{i}_test.rb", <<-RUBY)
-          require 'test/unit'
-          require 'parallel_tests/test/runtime_logger'
-
-          class Foo#{i} < Test::Unit::TestCase
-            def test_foo
-              sleep 0.5
-              assert true
-            end
-          end
-
-          class Bar#{i} < Test::Unit::TestCase
-            def test_foo
-              sleep 0.25
-              assert true
-            end
-          end
-        RUBY
-      end
-
-      run_tests
-
-      # log looking good ?
-      lines = File.read("tmp/parallel_runtime_test.log").split("\n").sort.map { |x|x .sub!(/\d$/, '') }
-      expect(lines).to eq([
-        "test/0_test.rb:0.7",
-        "test/1_test.rb:0.7",
-      ])
-    end
-  end
-
-  # static directory with gems so it's fast on travis
-  it "writes a correct log on minitest-4" do
-    skip if RUBY_PLATFORM == "java" # just too slow ...
-    Dir.chdir(Bundler.root.join("spec/fixtures/minitest4")) do
-      Bundler.with_clean_env do
-        sh "bundle --quiet"
-        run_tests
-      end
-
-      # log looking good ?
-      lines = File.read("tmp/parallel_runtime_test.log").split("\n").sort.map { |x| x.sub(/\d$/, "") }
-      expect(lines).to eq([
-        "test/0_test.rb:0.7",
-        "test/1_test.rb:0.7",
-      ])
-      FileUtils.rm("tmp/parallel_runtime_test.log")
-    end
-  end
-
   it "writes a correct log on minitest-5" do
     skip if RUBY_PLATFORM == "java" # just too slow ...
     use_temporary_directory do
