@@ -341,6 +341,8 @@ EOF
       ParallelTests::Test::Runner.execute_command(*args)
     end
 
+    let(:new_line_char) { Gem.win_platform? ? "\r\n" : "\n" }
+
     def capture_output
       $stdout, $stderr = StringIO.new, StringIO.new
       yield
@@ -446,7 +448,7 @@ EOF
 
     it "adds test env number to stdout with :prefix_output_with_test_env_number" do
       run_with_file("puts 123") do |path|
-        expect($stdout).to receive(:print).with("[TEST GROUP 2] 123\n")
+        expect($stdout).to receive(:print).with("[TEST GROUP 2] 123#{new_line_char}")
         result = call("ruby #{path}", 1, 4, :prefix_output_with_test_env_number => true)
         expect(result[:stdout].chomp).to eq '123'
         expect(result[:exit_status]).to eq 0
@@ -455,7 +457,7 @@ EOF
 
     it "does not add test env number to stdout without :prefix_output_with_test_env_number" do
       run_with_file("puts 123") do |path|
-        expect($stdout).to receive(:print).with("123\n")
+        expect($stdout).to receive(:print).with("123#{new_line_char}")
         result = call("ruby #{path}", 1, 4, :prefix_output_with_test_env_number => false)
         expect(result[:stdout].chomp).to eq '123'
         expect(result[:exit_status]).to eq 0

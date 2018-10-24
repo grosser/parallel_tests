@@ -181,7 +181,7 @@ describe ParallelTests do
 
   describe ".stop_all_processes" do
     # Process.kill on Windows doesn't work as expected. It kills all process group instead of just one process.
-    it 'kills the running child process' do
+    it 'kills the running child process', unless: Gem.win_platform? do
       ParallelTests.with_pid_file do
         Thread.new do
           ParallelTests::Test::Runner.execute_command('sleep 3', 1, 1, {})

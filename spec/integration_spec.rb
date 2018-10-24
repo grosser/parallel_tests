@@ -497,14 +497,15 @@ describe 'CLI' do
   describe "graceful shutdown" do
     # Process.kill on Windows doesn't work as expected. It kills all process group instead of just one process.
     it "passes on int signal to child processes", unless: Gem.win_platform? do
-      write "spec/test_spec.rb", "describe { specify { sleep 2; p 'here is ok' }; specify { p 'Should not get here'} }"
+      timeout = (ENV["TRAVIS"] ? 4 : 2) # travis is slower so it needs some extra time
+      write "spec/test_spec.rb", "sleep #{timeout}; describe { specify { 'Should not get here' }; specify { p 'Should not get here either'} }"
       pid = nil
-      Thread.new { sleep 1; Process.kill("INT", pid) }
+      Thread.new { sleep timeout - 0.5; Process.kill("INT", pid) }
       result = run_tests("spec", processes: 2, type: 'rspec', fail: true) { |io| pid = io.pid }
 
-      expect(result).to include("here is ok")
       expect(result).to include("RSpec is shutting down")
       expect(result).to_not include("Should not get here")
+      expect(result).to_not include("Should not get here either")
     end
 
     # Process.kill on Windows doesn't work as expected. It kills all process group instead of just one process.
