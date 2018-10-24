@@ -1,6 +1,6 @@
 require 'test_helper'
 
-class UserTest < ActiveSupport::TestCase
+class User2Test < ActiveSupport::TestCase
   test "the truth" do
     User.create
   end
