@@ -5,7 +5,7 @@ describe 'rails' do
 
   def sh(command, options={})
     result = ''
-    IO.popen(options.fetch(:environment, {}), command) do |io|
+    IO.popen(options.fetch(:environment, {}), command, err: [:child, :out]) do |io|
       result = io.read
     end
     raise "FAILED #{command}\n#{result}" if $?.success? == !!options[:fail]
