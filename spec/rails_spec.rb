@@ -12,7 +12,7 @@ describe 'rails' do
     result
   end
 
-  %w(rails42 rails50).each do |rails|
+  %w(rails42 rails50 rails51 rails52).each do |rails|
     it "can create and run #{rails}" do
       if RUBY_PLATFORM == "java"
         skip 'rails fixtures are not set up for java'
