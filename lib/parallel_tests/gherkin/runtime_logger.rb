@@ -5,21 +5,19 @@ module ParallelTests
     class RuntimeLogger
       include Io
 
-      def initialize(step_mother, path_or_io, options)
-        @io = prepare_io(path_or_io)
+      def initialize(config)
+        @io = prepare_io(config.out_stream)
         @example_times = Hash.new(0)
-      end
 
-      def before_feature(_)
-        @start_at = ParallelTests.now.to_f
-      end
+        config.on_event :test_case_started do |_|
+          @start_at = ParallelTests.now.to_f
+        end
 
-      def after_feature(feature)
-        @example_times[feature.file] += ParallelTests.now.to_f - @start_at
-      end
+        config.on_event :test_case_finished do |event|
+          @example_times[event.test_case.feature.file] += ParallelTests.now.to_f - @start_at
+        end
 
-      def after_features(*args)
-        lock_output do
+        config.on_event :test_run_finished do |_|
           @io.puts @example_times.map { |file, time| "#{file}:#{time}" }
         end
       end
