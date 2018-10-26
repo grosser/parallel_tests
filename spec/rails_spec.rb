@@ -12,12 +12,10 @@ describe 'rails' do
     result
   end
 
-  %w(rails42 rails50 rails51 rails52).each do |rails|
+  %w(rails51 rails52).each do |rails|
     it "can create and run #{rails}" do
       if RUBY_PLATFORM == "java"
         skip 'rails fixtures are not set up for java'
-      elsif rails == 'rails50' && RUBY_VERSION < '2.3.0'
-        skip 'rails 5.0 does not work on ruby < 2.3.0'
       end
 
       Dir.chdir("spec/fixtures/#{rails}") do
