@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 describe 'rails' do
-  let(:test_timeout) { 360 } # this can take very long on fresh bundle ...
+  let(:test_timeout) { 420 } # this can take very long on fresh bundle ...
 
   def sh(command, options={})
     result = ''
