@@ -1,23 +1,21 @@
 require 'spec_helper'
 
 describe 'rails' do
-  let(:test_timeout) { 300 } # this can take very long on fresh bundle ...
+  let(:test_timeout) { 420 } # this can take very long on fresh bundle ...
 
   def sh(command, options={})
     result = ''
-    IO.popen(options.fetch(:environment, {}), command) do |io|
+    IO.popen(options.fetch(:environment, {}), command, err: [:child, :out]) do |io|
       result = io.read
     end
     raise "FAILED #{command}\n#{result}" if $?.success? == !!options[:fail]
     result
   end
 
-  %w(rails42 rails50).each do |rails|
+  %w(rails51 rails52).each do |rails|
     it "can create and run #{rails}" do
       if RUBY_PLATFORM == "java"
         skip 'rails fixtures are not set up for java'
-      elsif rails == 'rails50' && RUBY_VERSION < '2.3.0'
-        skip 'rails 5.0 does not work on ruby < 2.3.0'
       end
 
       Dir.chdir("spec/fixtures/#{rails}") do
