@@ -371,6 +371,7 @@ inspired by [pivotal labs](https://blog.pivotal.io/labs/labs/parallelize-your-rs
  - [Andrei Botalov](https://github.com/abotalov)
  - [Zachary Attas](https://github.com/snackattas)
  - [David Rodríguez](https://github.com/deivid-rodriguez)
+ - [Justin Doody](https://github.com/justindoody)
 
 [Michael Grosser](http://grosser.it)<br/>
 michael@grosser.it<br/>
