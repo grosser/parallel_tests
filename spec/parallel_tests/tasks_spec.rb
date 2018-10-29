@@ -194,16 +194,16 @@ describe ParallelTests::Tasks do
         stub_const('Rails', double(version: '4.2.8'))
       end
 
-      it "should return db:test:purge when defined" do
-        allow(Rake::Task).to receive(:task_defined?).with('db:test:purge') { true }
+      it "should return db:purge when defined" do
+        allow(Rake::Task).to receive(:task_defined?).with('db:purge') { true }
 
-        expect(ParallelTests::Tasks.purge_before_load).to eq 'db:test:purge'
+        expect(ParallelTests::Tasks.purge_before_load).to eq 'db:purge'
       end
 
-      it "should return app:db:test:purge when db:test:purge is not defined" do
-        allow(Rake::Task).to receive(:task_defined?).with('db:test:purge') { false }
+      it "should return app:db:purge when db:purge is not defined" do
+        allow(Rake::Task).to receive(:task_defined?).with('db:purge') { false }
 
-        expect(ParallelTests::Tasks.purge_before_load).to eq 'app:db:test:purge'
+        expect(ParallelTests::Tasks.purge_before_load).to eq 'app:db:purge'
       end
     end
   end

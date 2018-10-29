@@ -14,7 +14,7 @@ module ParallelTests
 
       def purge_before_load
         if Gem::Version.new(Rails.version) > Gem::Version.new('4.2.0')
-          Rake::Task.task_defined?('db:test:purge') ? 'db:test:purge' : 'app:db:test:purge'
+          Rake::Task.task_defined?('db:purge') ? 'db:purge' : 'app:db:purge'
         end
       end
 
