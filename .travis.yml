@@ -15,4 +15,5 @@ matrix:
   allow_failures:
     - rvm: ruby-head
     - rvm: jruby-head
+  fast_finish: true
 bundler_args: "--jobs 4"
