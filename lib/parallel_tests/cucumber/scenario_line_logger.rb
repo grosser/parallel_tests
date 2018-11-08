@@ -1,4 +1,5 @@
-require 'cucumber/core/gherkin/tag_expression'
+require 'cucumber/tag_expressions/parser'
+# require 'cucumber/core/gherkin/tag_expression'
 
 module ParallelTests
   module Cucumber
@@ -6,13 +7,13 @@ module ParallelTests
       class ScenarioLineLogger
         attr_reader :scenarios
 
-        def initialize(tag_expression = ::Cucumber::Core::Gherkin::TagExpression.new([]))
+        def initialize(tag_expression = ::Cucumber::TagExpressions::Parser.new.parse(''))
           @scenarios = []
           @tag_expression = tag_expression
         end
 
         def visit_feature_element(uri, feature_element, feature_tags, line_numbers: [])
-          scenario_tags = feature_element[:tags].map {|tag| ::Cucumber::Core::Ast::Tag.new(tag[:location], tag[:name])}
+          scenario_tags = feature_element[:tags].map { |tag| tag[:name] }
           scenario_tags = feature_tags + scenario_tags
           if feature_element[:examples].nil? # :Scenario
             test_line = feature_element[:location][:line]
@@ -25,7 +26,7 @@ module ParallelTests
             @scenarios << [uri, feature_element[:location][:line]].join(":")
           else # :ScenarioOutline
             feature_element[:examples].each do |example|
-              example_tags = example[:tags].map {|tag| ::Cucumber::Core::Ast::Tag.new(tag[:location], tag[:name])}
+              example_tags = example[:tags].map { |tag| tag[:name] }
               example_tags = scenario_tags + example_tags
               next unless @tag_expression.evaluate(example_tags)
               rows = example[:tableBody].select { |body| body[:type] == :TableRow }
