@@ -5,7 +5,7 @@ PATH
       parallel
 
 GEM
-  remote: http://rubygems.org/
+  remote: https://rubygems.org/
   specs:
     backports (3.11.4)
     builder (3.2.3)
