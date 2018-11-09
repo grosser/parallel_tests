@@ -83,97 +83,97 @@ describe ParallelTests::Cucumber::Scenarios do
     end
 
     it 'Single Feature Tag: colours' do
-      scenarios = ParallelTests::Cucumber::Scenarios.all([feature_file.path], :test_options => '@colours')
+      scenarios = ParallelTests::Cucumber::Scenarios.all([feature_file.path], :test_options => '-t @colours')
       expect(scenarios.length).to eq 7
     end
 
     it 'Single Scenario Tag: white' do
-      scenarios = ParallelTests::Cucumber::Scenarios.all([feature_file.path], :test_options => '@white')
+      scenarios = ParallelTests::Cucumber::Scenarios.all([feature_file.path], :test_options => '-t @white')
       expect(scenarios.length).to eq 2
     end
 
     it 'Multiple Scenario Tags 1: black && white' do
-      scenarios = ParallelTests::Cucumber::Scenarios.all([feature_file.path], :test_options => '@black and @white')
+      scenarios = ParallelTests::Cucumber::Scenarios.all([feature_file.path], :test_options => '-t @black and @white')
       expect(scenarios.length).to eq 1
     end
 
     it 'Multiple Scenario Tags 2: black || white scenarios' do
-      scenarios = ParallelTests::Cucumber::Scenarios.all([feature_file.path], :test_options => '@black or @white')
+      scenarios = ParallelTests::Cucumber::Scenarios.all([feature_file.path], :test_options => '-t @black or @white')
       expect(scenarios.length).to eq 3
     end
 
     it 'Scenario Outline Tag: red' do
-      scenarios = ParallelTests::Cucumber::Scenarios.all([feature_file.path], :test_options => '@red')
+      scenarios = ParallelTests::Cucumber::Scenarios.all([feature_file.path], :test_options => '-t @red')
       expect(scenarios.length).to eq 4
     end
 
     it 'Example Tag: blue' do
-      scenarios = ParallelTests::Cucumber::Scenarios.all([feature_file.path], :test_options => '@blue')
+      scenarios = ParallelTests::Cucumber::Scenarios.all([feature_file.path], :test_options => '-t @blue')
       expect(scenarios.length).to eq 3
     end
 
     it 'Multiple Example Tags 1: blue && green' do
-      scenarios = ParallelTests::Cucumber::Scenarios.all([feature_file.path], :test_options => '@blue and @green')
+      scenarios = ParallelTests::Cucumber::Scenarios.all([feature_file.path], :test_options => '-t @blue and @green')
       expect(scenarios.length).to eq 1
     end
 
     it 'Multiple Example Tags 2: blue || green' do
-      scenarios = ParallelTests::Cucumber::Scenarios.all([feature_file.path], :test_options => '@blue or @green')
+      scenarios = ParallelTests::Cucumber::Scenarios.all([feature_file.path], :test_options => '-t @blue or @green')
       expect(scenarios.length).to eq 4
     end
 
     it 'Single Negative Feature Tag: !colours' do
-      scenarios = ParallelTests::Cucumber::Scenarios.all([feature_file.path], :test_options => 'not @colours')
+      scenarios = ParallelTests::Cucumber::Scenarios.all([feature_file.path], :test_options => '-t not @colours')
       expect(scenarios.length).to eq 0
     end
 
     it 'Single Negative Scenario Tag: !black' do
-      scenarios = ParallelTests::Cucumber::Scenarios.all([feature_file.path], :test_options => 'not @black')
+      scenarios = ParallelTests::Cucumber::Scenarios.all([feature_file.path], :test_options => '-t not @black')
       expect(scenarios.length).to eq 5
     end
 
     it 'Multiple Negative Scenario Tags And: !(black && white)' do
-      scenarios = ParallelTests::Cucumber::Scenarios.all([feature_file.path], :test_options => 'not (@black and @white)')
+      scenarios = ParallelTests::Cucumber::Scenarios.all([feature_file.path], :test_options => '-t not (@black and @white)')
       expect(scenarios.length).to eq 6
     end
 
     it 'Multiple Negative Scenario Tags Or: !(black || red)' do
-      scenarios = ParallelTests::Cucumber::Scenarios.all([feature_file.path], :test_options => 'not (@black or @red)')
+      scenarios = ParallelTests::Cucumber::Scenarios.all([feature_file.path], :test_options => "-t 'not (@black or @red)'")
       expect(scenarios.length).to eq 1
     end
 
     it 'Negative Scenario Outline Tag: !red' do
-      scenarios = ParallelTests::Cucumber::Scenarios.all([feature_file.path], :test_options => 'not @red')
+      scenarios = ParallelTests::Cucumber::Scenarios.all([feature_file.path], :test_options => '-t not @red')
       expect(scenarios.length).to eq 3
     end
 
     it 'Negative Example Tag: !blue' do
-      scenarios = ParallelTests::Cucumber::Scenarios.all([feature_file.path], :test_options => 'not @blue')
+      scenarios = ParallelTests::Cucumber::Scenarios.all([feature_file.path], :test_options => '-t not @blue')
       expect(scenarios.length).to eq 4
     end
 
     it 'Multiple Negative Example Tags 1: !blue && !green' do
-      scenarios = ParallelTests::Cucumber::Scenarios.all([feature_file.path], :test_options => 'not @blue and not @green')
+      scenarios = ParallelTests::Cucumber::Scenarios.all([feature_file.path], :test_options => "-t 'not @blue and not @green'")
       expect(scenarios.length).to eq 3
     end
 
     it 'Multiple Negative Example Tags 2: !blue || !green) ' do
-      scenarios = ParallelTests::Cucumber::Scenarios.all([feature_file.path], :test_options => 'not @blue or not @green')
+      scenarios = ParallelTests::Cucumber::Scenarios.all([feature_file.path], :test_options => '-t not @blue or not @green')
       expect(scenarios.length).to eq 6
     end
 
     it 'Scenario and Example Mixed Tags: black || green' do
-      scenarios = ParallelTests::Cucumber::Scenarios.all([feature_file.path], :test_options => '@black or @green')
+      scenarios = ParallelTests::Cucumber::Scenarios.all([feature_file.path], :test_options => '-t @black or @green')
       expect(scenarios.length).to eq 4
     end
 
     it 'Positive and Negative Mixed Tags: red && !blue' do
-      scenarios = ParallelTests::Cucumber::Scenarios.all([feature_file.path], :test_options => '@red and not @blue')
+      scenarios = ParallelTests::Cucumber::Scenarios.all([feature_file.path], :test_options => '-t @red and not @blue')
       expect(scenarios.length).to eq 1
     end
 
     it 'Multiple Positive and Negative Mixed Tags: (white && black) || (red && !blue)' do
-      scenarios = ParallelTests::Cucumber::Scenarios.all([feature_file.path], :test_options => '(not @white and @black) or (@red and not @green)')
+      scenarios = ParallelTests::Cucumber::Scenarios.all([feature_file.path], :test_options => "--tags '(not @white and @black) or (@red and not @green)'")
       expect(scenarios.length).to eq 3
     end
 
@@ -203,7 +203,7 @@ describe ParallelTests::Cucumber::Scenarios do
     end
 
     it 'Scenario Mixed tags: black && !blue with Ignore Tag Pattern Multiple Tags: red || white' do
-      scenarios = ParallelTests::Cucumber::Scenarios.all([feature_file.path], :test_options => '@black and not @blue', :ignore_tag_pattern => '@red or @white')
+      scenarios = ParallelTests::Cucumber::Scenarios.all([feature_file.path], :test_options => '-t @black and not @blue', :ignore_tag_pattern => '@red or @white')
       expect(scenarios.length).to eq 1
     end
   end

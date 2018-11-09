@@ -12,7 +12,7 @@ module ParallelTests
       class << self
         def all(files, options={})
           # Combine and generate a tag expression for given test options and ignore tag pattern. Refer here to understand how new tag expression syntax works - https://github.com/cucumber/cucumber/tree/master/tag-expressions
-          tags = [options[:test_options]]
+          tags = options[:test_options].to_s.scan(/(?:-t|--tags) ([^"]*)/).flatten.map { |tag| tag.delete("'")}
           if ignore = options[:ignore_tag_pattern]
             tags << "not (#{ignore})"
           end
