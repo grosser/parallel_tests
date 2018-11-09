@@ -27,12 +27,9 @@ module ParallelTests
 
           # Create the tag expression instance from cucumber tag expressions parser, this is needed to know if the scenario matches with the tags invoked by the request
           # Create the ScenarioLineLogger which will filter the scenario we want
-          if tags.empty?
-            scenario_line_logger = ParallelTests::Cucumber::Formatters::ScenarioLineLogger.new
-          else
-            tag_expression = ::Cucumber::TagExpressions::Parser.new.parse(tags)
-            scenario_line_logger = ParallelTests::Cucumber::Formatters::ScenarioLineLogger.new(tag_expression)
-          end
+          args = []
+          args << ::Cucumber::TagExpressions::Parser.new.parse(tags) unless tags.empty?
+          scenario_line_logger = ParallelTests::Cucumber::Formatters::ScenarioLineLogger.new(*args)
 
           # here we loop on the files map, each file will contain one or more scenario
           features ||= files.map do |path|
