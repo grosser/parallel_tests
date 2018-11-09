@@ -1,31 +1,38 @@
+require 'cucumber/tag_expressions/parser'
 require 'cucumber/core/gherkin/tag_expression'
 require 'cucumber/runtime'
 require 'cucumber'
 require 'parallel_tests/cucumber/scenario_line_logger'
 require 'parallel_tests/gherkin/listener'
 require 'gherkin/errors'
+require 'shellwords'
 
 module ParallelTests
   module Cucumber
     class Scenarios
       class << self
         def all(files, options={})
+          # Parse tag expression from given test options and ignore tag pattern. Refer here to understand how new tag expression syntax works - https://github.com/cucumber/cucumber/tree/master/tag-expressions
           tags = []
-          tags.concat options[:ignore_tag_pattern].to_s.split(/\s*,\s*/).map {|tag| "~#{tag}" }
-          tags.concat options[:test_options].to_s.scan(/(?:-t|--tags) (~?@[\w,~@]+)/).flatten
+          words = options[:test_options].to_s.shellsplit
+          words.each_with_index { |w,i| tags << words[i+1] if ["-t", "--tags"].include?(w) }
+          if ignore = options[:ignore_tag_pattern]
+            tags << "not (#{ignore})"
+          end
+          tags_exp = tags.compact.join(" and ")
 
-          split_into_scenarios files, tags.uniq
+          split_into_scenarios files, tags_exp
         end
 
         private
 
-        def split_into_scenarios(files, tags=[])
+        def split_into_scenarios(files, tags='')
 
-          # Create the tag expression instance from gherkin, this is needed to know if the scenario matches with the tags invoked by the request
-          tag_expression = ::Cucumber::Core::Gherkin::TagExpression.new(tags)
-
+          # Create the tag expression instance from cucumber tag expressions parser, this is needed to know if the scenario matches with the tags invoked by the request
           # Create the ScenarioLineLogger which will filter the scenario we want
-          scenario_line_logger = ParallelTests::Cucumber::Formatters::ScenarioLineLogger.new(tag_expression)
+          args = []
+          args << ::Cucumber::TagExpressions::Parser.new.parse(tags) unless tags.empty?
+          scenario_line_logger = ParallelTests::Cucumber::Formatters::ScenarioLineLogger.new(*args)
 
           # here we loop on the files map, each file will contain one or more scenario
           features ||= files.map do |path|
@@ -45,7 +52,7 @@ module ParallelTests
             begin
               # We make an attempt to parse the gherkin document, this could be failed if the document is not well formatted
               result = parser.parse(scanner)
-              feature_tags = result[:feature][:tags].map { |tag| ::Cucumber::Core::Ast::Tag.new(tag[:location], tag[:name]) }
+              feature_tags = result[:feature][:tags].map { |tag| tag[:name] }
 
               # We loop on each children of the feature
               result[:feature][:children].each do |feature_element|
