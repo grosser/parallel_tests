@@ -65,7 +65,7 @@ PLATFORMS
 
 DEPENDENCIES
   bump
-  cucumber (~> 3.1)
+  cucumber (~> 3.0)
   minitest (~> 5.5.0)
   parallel_tests!
   rake
