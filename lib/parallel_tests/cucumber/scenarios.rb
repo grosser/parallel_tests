@@ -1,4 +1,5 @@
 require 'cucumber/tag_expressions/parser'
+require 'cucumber/core/gherkin/tag_expression'
 require 'cucumber/runtime'
 require 'cucumber'
 require 'parallel_tests/cucumber/scenario_line_logger'
@@ -10,16 +11,11 @@ module ParallelTests
     class Scenarios
       class << self
         def all(files, options={})
+          # Combine and generate a tag expression for given test options and ignore tag pattern. Refer here to understand how new tag expression syntax works - https://github.com/cucumber/cucumber/tree/master/tag-expressions
           tags = ''
-          tags << options[:ignore_tag_pattern].to_s.split(/\s*(or|,)\s*/).map {|tag| "not #{tag} " }.join unless options[:ignore_tag_pattern].nil?
           tags << options[:test_options].to_s unless options[:test_options].nil?
-
-          # tags.concat options[:ignore_tag_pattern].to_s.gsub(' or ',',').split(/\s*,\s*/).map {|tag| "~#{tag}" } unless options[:ignore_tag_pattern].nil?
-          # unless options[:test_options].nil?
-          #   interpret_tags = { ' or ' => ',', 'and' => '-t', 'not ' => '~' }
-          #   interpret_tags.each { |k,v| options[:test_options].to_s.gsub!(k,v) }
-          #   tags.concat options[:test_options].to_s.scan(/(?:-t|--tags) (~?@[\w,~@]+)/).flatten
-          # end
+          tags << " and " if !options[:ignore_tag_pattern].nil? && !options[:test_options].nil? # only add an 'and' operator if both test options and ignore tag pattern is passed
+          tags << "not (#{options[:ignore_tag_pattern].to_s})" unless options[:ignore_tag_pattern].nil?
 
           split_into_scenarios files, tags
         end
@@ -28,11 +24,14 @@ module ParallelTests
 
         def split_into_scenarios(files, tags='')
 
-          # Create the tag expression instance from gherkin, this is needed to know if the scenario matches with the tags invoked by the request
-          tag_expression = ::Cucumber::TagExpressions::Parser.new.parse(tags)
-
+          # Create the tag expression instance from cucumber tag expressions parser, this is needed to know if the scenario matches with the tags invoked by the request
           # Create the ScenarioLineLogger which will filter the scenario we want
-          scenario_line_logger = ParallelTests::Cucumber::Formatters::ScenarioLineLogger.new(tag_expression)
+          if tags.empty?
+            scenario_line_logger = ParallelTests::Cucumber::Formatters::ScenarioLineLogger.new
+          else
+            tag_expression = ::Cucumber::TagExpressions::Parser.new.parse(tags)
+            scenario_line_logger = ParallelTests::Cucumber::Formatters::ScenarioLineLogger.new(tag_expression)
+          end
 
           # here we loop on the files map, each file will contain one or more scenario
           features ||= files.map do |path|

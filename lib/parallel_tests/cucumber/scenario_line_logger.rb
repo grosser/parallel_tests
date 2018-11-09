@@ -1,5 +1,5 @@
 require 'cucumber/tag_expressions/parser'
-# require 'cucumber/core/gherkin/tag_expression'
+require 'cucumber/core/gherkin/tag_expression'
 
 module ParallelTests
   module Cucumber
@@ -7,7 +7,7 @@ module ParallelTests
       class ScenarioLineLogger
         attr_reader :scenarios
 
-        def initialize(tag_expression = ::Cucumber::TagExpressions::Parser.new.parse(''))
+        def initialize(tag_expression = ::Cucumber::Core::Gherkin::TagExpression.new([]))
           @scenarios = []
           @tag_expression = tag_expression
         end
