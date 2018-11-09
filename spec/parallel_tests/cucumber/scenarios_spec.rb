@@ -82,7 +82,7 @@ describe ParallelTests::Cucumber::Scenarios do
       end
     end
 
-    it 'Singe Feature Tag: colours' do
+    it 'Single Feature Tag: colours' do
       scenarios = ParallelTests::Cucumber::Scenarios.all([feature_file.path], :test_options => '@colours')
       expect(scenarios.length).to eq 7
     end
