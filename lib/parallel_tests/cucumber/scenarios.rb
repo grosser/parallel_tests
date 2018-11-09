@@ -5,14 +5,17 @@ require 'cucumber'
 require 'parallel_tests/cucumber/scenario_line_logger'
 require 'parallel_tests/gherkin/listener'
 require 'gherkin/errors'
+require 'shellwords'
 
 module ParallelTests
   module Cucumber
     class Scenarios
       class << self
         def all(files, options={})
-          # Combine and generate a tag expression for given test options and ignore tag pattern. Refer here to understand how new tag expression syntax works - https://github.com/cucumber/cucumber/tree/master/tag-expressions
-          tags = options[:test_options].to_s.scan(/(?:-t|--tags) ([^"]*)/).flatten.map { |tag| tag.delete("'")}
+          # Parse tag expression from given test options and ignore tag pattern. Refer here to understand how new tag expression syntax works - https://github.com/cucumber/cucumber/tree/master/tag-expressions
+          tags = []
+          words = options[:test_options].to_s.shellsplit
+          words.each_with_index { |w,i| tags << words[i+1] if ["-t", "--tags"].include?(w) }
           if ignore = options[:ignore_tag_pattern]
             tags << "not (#{ignore})"
           end
