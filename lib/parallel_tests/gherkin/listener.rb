@@ -1,5 +1,3 @@
-require 'gherkin/parser'
-
 module ParallelTests
   module Gherkin
     class Listener

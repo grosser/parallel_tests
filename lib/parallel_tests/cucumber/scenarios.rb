@@ -4,6 +4,7 @@ require 'cucumber'
 require 'parallel_tests/cucumber/scenario_line_logger'
 require 'parallel_tests/gherkin/listener'
 require 'shellwords'
+require 'cuke_modeler'
 
 module ParallelTests
   module Cucumber
@@ -38,26 +39,17 @@ module ParallelTests
             path, *test_lines = path.split(/:(?=\d+)/)
             test_lines.map!(&:to_i)
 
-            # We encode the file and get the content of it
-            source = ::Cucumber::Runtime::NormalisedEncodingFile.read(path)
             # We create a Gherkin document, this will be used to decode the details of each scenario
-            document = ::Cucumber::Core::Gherkin::Document.new(path, source)
-
-            # We create a parser for the gherkin document
-            parser  = ::Gherkin::Parser.new()
-            scanner = ::Gherkin::TokenScanner.new(document.body)
+            document = ::CukeModeler::FeatureFile.new(path)
+            feature = document.feature
 
             # We make an attempt to parse the gherkin document, this could be failed if the document is not well formatted
-            result = parser.parse(scanner)
-            feature_tags = result[:feature][:tags].map { |tag| tag[:name] }
+            feature_tags = feature.tags.map(&:name)
 
             # We loop on each children of the feature
-            result[:feature][:children].each do |feature_element|
-              # If the type of the child is not a scenario or scenario outline, we continue, we are only interested by the name of the scenario here
-              next unless /Scenario/.match(feature_element[:type])
-
+            feature.tests.each do |test|
               # It's a scenario, we add it to the scenario_line_logger
-              scenario_line_logger.visit_feature_element(document.uri, feature_element, feature_tags, line_numbers: test_lines)
+              scenario_line_logger.visit_feature_element(document.path, test, feature_tags, line_numbers: test_lines)
             end
           end
 

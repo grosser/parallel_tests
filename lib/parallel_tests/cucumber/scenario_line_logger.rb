@@ -10,25 +10,24 @@ module ParallelTests
         end
 
         def visit_feature_element(uri, feature_element, feature_tags, line_numbers: [])
-          scenario_tags = feature_element[:tags].map { |tag| tag[:name] }
+          scenario_tags = feature_element.tags.map { |tag| tag.name }
           scenario_tags = feature_tags + scenario_tags
-          if feature_element[:examples].nil? # :Scenario
-            test_line = feature_element[:location][:line]
+          if feature_element.is_a?(CukeModeler::Scenario) # :Scenario
+            test_line = feature_element.source_line
 
             # We don't accept the feature_element if the current tags are not valid
             return unless matches_tags?(scenario_tags)
             # or if it is not at the correct location
             return if line_numbers.any? && !line_numbers.include?(test_line)
 
-            @scenarios << [uri, feature_element[:location][:line]].join(":")
+            @scenarios << [uri, feature_element.source_line].join(":")
           else # :ScenarioOutline
-            feature_element[:examples].each do |example|
-              example_tags = example[:tags].map { |tag| tag[:name] }
+            feature_element.examples.each do |example|
+              example_tags = example.tags.map(&:name)
               example_tags = scenario_tags + example_tags
               next unless matches_tags?(example_tags)
-              rows = example[:tableBody].select { |body| body[:type] == :TableRow }
-              rows.each do |row|
-                test_line = row[:location][:line]
+              example.rows[1..-1].each do |row|
+                test_line = row.source_line
                 next if line_numbers.any? && !line_numbers.include?(test_line)
 
                 @scenarios << [uri, test_line].join(':')
