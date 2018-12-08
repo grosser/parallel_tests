@@ -14,7 +14,7 @@ module ParallelTests
         end
 
         config.on_event :test_case_finished do |event|
-          @example_times[event.test_case.feature.file] += ParallelTests.now.to_f - @start_at
+          @example_times[event.test_case.location.file] += ParallelTests.now.to_f - @start_at
         end
 
         config.on_event :test_run_finished do |_|
