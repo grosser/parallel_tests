@@ -3,7 +3,6 @@ require 'cucumber/runtime'
 require 'cucumber'
 require 'parallel_tests/cucumber/scenario_line_logger'
 require 'parallel_tests/gherkin/listener'
-require 'gherkin/errors'
 require 'shellwords'
 
 module ParallelTests
@@ -48,23 +47,17 @@ module ParallelTests
             parser  = ::Gherkin::Parser.new()
             scanner = ::Gherkin::TokenScanner.new(document.body)
 
-            begin
-              # We make an attempt to parse the gherkin document, this could be failed if the document is not well formatted
-              result = parser.parse(scanner)
-              feature_tags = result[:feature][:tags].map { |tag| tag[:name] }
+            # We make an attempt to parse the gherkin document, this could be failed if the document is not well formatted
+            result = parser.parse(scanner)
+            feature_tags = result[:feature][:tags].map { |tag| tag[:name] }
 
-              # We loop on each children of the feature
-              result[:feature][:children].each do |feature_element|
-                # If the type of the child is not a scenario or scenario outline, we continue, we are only interested by the name of the scenario here
-                next unless /Scenario/.match(feature_element[:type])
+            # We loop on each children of the feature
+            result[:feature][:children].each do |feature_element|
+              # If the type of the child is not a scenario or scenario outline, we continue, we are only interested by the name of the scenario here
+              next unless /Scenario/.match(feature_element[:type])
 
-                # It's a scenario, we add it to the scenario_line_logger
-                scenario_line_logger.visit_feature_element(document.uri, feature_element, feature_tags, line_numbers: test_lines)
-              end
-
-            rescue StandardError => e
-              # Exception if the document is no well formated or error in the tags
-              raise ::Cucumber::Core::Gherkin::ParseError.new("#{document.uri}: #{e.message}")
+              # It's a scenario, we add it to the scenario_line_logger
+              scenario_line_logger.visit_feature_element(document.uri, feature_element, feature_tags, line_numbers: test_lines)
             end
           end
 
