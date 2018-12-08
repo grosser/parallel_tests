@@ -1,5 +1,4 @@
 require 'cucumber/tag_expressions/parser'
-require 'cucumber/core/gherkin/tag_expression'
 require 'cucumber/runtime'
 require 'cucumber'
 require 'parallel_tests/cucumber/scenario_line_logger'

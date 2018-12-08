@@ -1,12 +1,10 @@
-require 'cucumber/core/gherkin/tag_expression'
-
 module ParallelTests
   module Cucumber
     module Formatters
       class ScenarioLineLogger
         attr_reader :scenarios
 
-        def initialize(tag_expression = ::Cucumber::Core::Gherkin::TagExpression.new([]))
+        def initialize(tag_expression = nil)
           @scenarios = []
           @tag_expression = tag_expression
         end
@@ -45,7 +43,7 @@ module ParallelTests
         private
 
         def matches_tags?(tags)
-          @tag_expression.evaluate(tags)
+          @tag_expression.nil? || @tag_expression.evaluate(tags)
         end
       end
     end
