@@ -143,7 +143,7 @@ describe 'CLI' do
     write 'spec/xxx2_spec.rb', 'describe("it"){it("should"){sleep 2; puts "TEST2"}}'
     result = run_tests "spec", :type => 'rspec', :add => "--serialize-stdout", export: {'PARALLEL_TEST_HEARTBEAT_INTERVAL' => '0.2'}
 
-    expect(result).to match(/\.{5}.*TEST1.*\.{5}TEST2/m)
+    expect(result).to match(/\.{5}.*TEST1.*\.{5}.*TEST2/m)
   end
 
   it "can show simulated output preceded by command when serializing stdout with verbose option" do
