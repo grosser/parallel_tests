@@ -42,12 +42,14 @@ module ParallelTests
         ParallelTests.with_pid_file do
           progress_indicator = simulate_output_for_ci if options[:serialize_stdout]
 
-          Parallel.map(items, :in_threads => num_processes) do |item|
+          test_results = Parallel.map(items, :in_threads => num_processes) do |item|
             result = yield(item)
             puts if progress_indicator && progress_indicator.alive?
             reprint_output(result, lock.path) if options[:serialize_stdout]
             result
           end
+          progress_indicator.exit if progress_indicator && progress_indicator.alive?
+          test_results
         end
       end
     end
