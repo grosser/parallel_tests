@@ -44,9 +44,7 @@ module ParallelTests
 
           Parallel.map(items, :in_threads => num_processes) do |item|
             result = yield(item)
-            if progress_indicator && progress_indicator.alive?
-              puts
-            end
+            puts if progress_indicator && progress_indicator.alive?
             reprint_output(result, lock.path) if options[:serialize_stdout]
             result
           end
