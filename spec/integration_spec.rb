@@ -139,9 +139,9 @@ describe 'CLI' do
   end
 
   it "can show simulated output when serializing stdout" do
-    write 'spec/xxx_spec.rb', 'describe("it"){it("should"){sleep 1; puts "TEST1"}}'
-    write 'spec/xxx2_spec.rb', 'describe("it"){it("should"){sleep 2; puts "TEST2"}}'
-    result = run_tests "spec", :type => 'rspec', :add => "--serialize-stdout", export: {'PARALLEL_TEST_HEARTBEAT_INTERVAL' => '0.2'}
+    write 'spec/xxx_spec.rb', 'describe("it"){it("should"){sleep 0.5; puts "TEST1"}}'
+    write 'spec/xxx2_spec.rb', 'describe("it"){it("should"){sleep 1; puts "TEST2"}}'
+    result = run_tests "spec", :type => 'rspec', :add => "--serialize-stdout", export: {'PARALLEL_TEST_HEARTBEAT_INTERVAL' => '0.1'}
 
     expect(result).to match(/\.{5}.*TEST1.*\.{5}.*TEST2/m)
   end
