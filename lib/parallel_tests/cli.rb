@@ -44,7 +44,6 @@ module ParallelTests
 
           test_results = Parallel.map(items, :in_threads => num_processes) do |item|
             result = yield(item)
-            puts if progress_indicator && progress_indicator.alive?
             reprint_output(result, lock.path) if options[:serialize_stdout]
             result
           end
@@ -97,6 +96,7 @@ module ParallelTests
 
     def reprint_output(result, lockfile)
       lock(lockfile) do
+        $stdout.puts
         $stdout.puts result[:stdout]
         $stdout.flush
       end
