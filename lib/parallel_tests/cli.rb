@@ -40,7 +40,7 @@ module ParallelTests
     def execute_in_parallel(items, num_processes, options)
       Tempfile.open 'parallel_tests-lock' do |lock|
         ParallelTests.with_pid_file do
-          simulate_output_for_ci(options) do
+          simulate_output_for_ci options[:serialize_stdout] do
             Parallel.map(items, :in_threads => num_processes) do |item|
               result = yield(item)
               reprint_output(result, lock.path) if options[:serialize_stdout]
@@ -328,10 +328,10 @@ module ParallelTests
     end
 
     # CI systems often fail when there is no output for a long time, so simulate some output
-    def simulate_output_for_ci(options)
-      if options[:serialize_stdout]
+    def simulate_output_for_ci(simulate)
+      if simulate
         progress_indicator = Thread.new do
-          interval = ENV.fetch('PARALLEL_TEST_HEARTBEAT_INTERVAL', 60).to_f
+          interval = Float(ENV.fetch('PARALLEL_TEST_HEARTBEAT_INTERVAL', 60))
           loop do
             sleep interval
             print '.'
