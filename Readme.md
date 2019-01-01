@@ -373,6 +373,7 @@ inspired by [pivotal labs](https://blog.pivotal.io/labs/labs/parallelize-your-rs
  - [David Rodríguez](https://github.com/deivid-rodriguez)
  - [Justin Doody](https://github.com/justindoody)
  - [Sandeep Singh](https://github.com/sandeepnagra)
+ - [Calaway](https://github.com/calaway)
 
 [Michael Grosser](http://grosser.it)<br/>
 michael@grosser.it<br/>
