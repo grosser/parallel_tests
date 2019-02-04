@@ -195,6 +195,7 @@ Options are:
 
     -n [PROCESSES]                   How many processes to use, default: available CPUs
     -p, --pattern [PATTERN]          run tests matching this regex pattern
+        --exclude-pattern [PATTERN]  exclude tests matching this regex pattern
         --group-by [TYPE]            group tests by:
           found - order of finding files
           steps - number of cucumber/spinach steps

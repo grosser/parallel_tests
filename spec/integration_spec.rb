@@ -287,6 +287,16 @@ describe 'CLI' do
     expect(result).to include('ZZZ')
   end
 
+  it "excludes test by given pattern and relative paths" do
+    write "spec/x_spec.rb", "puts 'XXX'"
+    write "spec/acceptance/y_spec.rb", "puts 'YYY'"
+    write "spec/integration/z_spec.rb", "puts 'ZZZ'"
+    result = run_tests "spec", :add => "--exclude-pattern 'spec/(integration|acceptance)'", :type => "rspec"
+    expect(result).to include('XXX')
+    expect(result).not_to include('YYY')
+    expect(result).not_to include('ZZZ')
+  end
+
   it "can wait_for_other_processes_to_finish" do
     skip if RUBY_PLATFORM == "java" # just too slow ...
     write "test/a_test.rb", "require 'parallel_tests'; sleep 0.5 ; ParallelTests.wait_for_other_processes_to_finish; puts 'OutputA'"

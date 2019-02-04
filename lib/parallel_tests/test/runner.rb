@@ -209,14 +209,23 @@ module ParallelTests
         end
 
         def find_tests(tests, options = {})
-          (tests || []).map do |file_or_folder|
+          files_list = (tests || []).map do |file_or_folder|
             if File.directory?(file_or_folder)
               files = files_in_folder(file_or_folder, options)
-              files.grep(options[:suffix]||test_suffix).grep(options[:pattern]||//)
+              files.grep(options[:suffix] || test_suffix)
+                .grep(options[:pattern] || //)
             else
               file_or_folder
             end
-          end.flatten.uniq
+          end
+
+          flat_files_list = files_list.uniq.flat_map { |i| i }
+
+          if regex = options[:exclude_pattern]
+            flat_files_list.reject! { |file| file =~ regex }
+          end
+
+          flat_files_list
         end
 
         def files_in_folder(folder, options={})

@@ -21,6 +21,10 @@ describe ParallelTests::CLI do
       expect(call(["--exec", "echo"])).to eq(execute: "echo")
     end
 
+    it "parses excludes pattern" do
+      expect(call(["test", "--exclude-pattern", "spec/"])).to eq(defaults.merge(:exclude_pattern => /spec\//))
+    end
+
     it "parses regular count" do
       expect(call(["test", "-n3"])).to eq(defaults.merge(:count => 3))
     end
