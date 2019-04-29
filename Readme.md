@@ -283,11 +283,6 @@ TIPS
 
 Contribute your own gotchas to the [Wiki](https://github.com/grosser/parallel_tests/wiki) or even better open a PR :)
 
-TODO
-====
- - fix tests vs cucumber >= 1.2 `unknown option --format`
- - add unit tests for cucumber runtime formatter
-
 Authors
 ====
 inspired by [pivotal labs](https://blog.pivotal.io/labs/labs/parallelize-your-rspec-suite)
