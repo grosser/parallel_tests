@@ -50,6 +50,18 @@ describe ParallelTests::CLI do
       expect(call(["test", "--verbose"])).to eq(defaults.merge(:verbose => true))
     end
 
+    it "parses --verbose-process-command" do
+      expect(call(['test', '--verbose-process-command'])).to eq(
+        defaults.merge(verbose_process_command: true)
+      )
+    end
+
+    it "parses --verbose-rerun-command" do
+      expect(call(['test', '--verbose-rerun-command'])).to eq(
+        defaults.merge(verbose_rerun_command: true)
+      )
+    end
+
     it "parses --quiet" do
       expect(call(["test", "--quiet"])).to eq(defaults.merge(:quiet => true))
     end
@@ -155,6 +167,21 @@ describe ParallelTests::CLI do
   end
 
   describe ".report_failure_rerun_commmand" do
+    let(:single_failure_message) do
+      "\n\nTests have failed for a parallel_test group. Use the " \
+      "following command to run the group again:\n\nfoo\n"
+    end
+    let(:single_failure_args) do
+      { exit_status: 1, command: 'foo', seed: nil, output: 'blah' }
+    end
+    let(:multiple_failure_args) do
+      [
+        single_failure_args,
+        { exit_status: 1, command: 'bar', seed: nil, output: 'blah' },
+        { exit_status: 1, command: 'baz', seed: nil, output: 'blah' }
+      ]
+    end
+
     it "prints nothing if there are no failures" do
       expect($stdout).not_to receive(:puts)
 
@@ -168,14 +195,61 @@ describe ParallelTests::CLI do
 
     shared_examples :not_verbose_rerun do |options|
       it 'prints nothing about rerun commands' do
-          expect {
-            subject.send(:report_failure_rerun_commmand,
-              [
-                {exit_status: 1, command: 'foo', seed: nil, output: 'blah'}
-              ],
-              options
-            )
-          }.to_not output(/Use the following command to run the group again/).to_stdout
+        expect {
+          subject.send(:report_failure_rerun_commmand,
+            [
+              {exit_status: 1, command: 'foo', seed: nil, output: 'blah'}
+            ],
+            options
+          )
+        }.to_not output(/Use the following command to run the group again/).to_stdout
+      end
+    end
+
+    shared_examples :verbose_rerun do |options|
+      it "prints a message and the command if there is a failure" do
+        expect {
+          subject.send(
+            :report_failure_rerun_commmand, [single_failure_args], options
+          )
+        }.to output(single_failure_message).to_stdout
+      end
+
+      it "prints multiple commands if there are multiple failures" do
+        expect {
+          subject.send(
+            :report_failure_rerun_commmand, multiple_failure_args, options
+          )
+        }.to output(/foo\nbar\nbaz/).to_stdout
+      end
+
+      it "only includes failures" do
+        expect {
+          subject.send(:report_failure_rerun_commmand,
+            [
+              {exit_status: 1, command: 'foo --color', seed: nil, output: 'blah'},
+              {exit_status: 0, command: 'bar', seed: nil, output: 'blah'},
+              {exit_status: 1, command: 'baz', seed: nil, output: 'blah'},
+            ],
+            options
+          )
+        }.to output(/foo --color\nbaz/).to_stdout
+      end
+
+      it "prints the command with the seed added by the runner" do
+        seed = 555
+        command = 'rspec --color spec/foo_spec.rb'
+        seed_message = "my seeded command result --seed #{seed}"
+
+        subject.instance_variable_set(:@runner, ParallelTests::Test::Runner)
+        expect(ParallelTests::Test::Runner).to receive(:command_with_seed).with(command, seed).
+          and_return(seed_message)
+        expect {
+          subject.send(
+            :report_failure_rerun_commmand,
+            [{ exit_status: 1, command: command, seed: seed, output: 'blah' }], options
+          )
+        }.to output(/#{seed_message}/).to_stdout
       end
     end
 
@@ -185,62 +259,22 @@ describe ParallelTests::CLI do
       end
 
       context 'with option !verbose' do
-        include_examples :not_verbose_rerun, {verbose: false}
+        context 'without option verbose_rerun_command' do
+          include_examples :not_verbose_rerun, { verbose: false }
+        end
+
+        context 'with option verbose_rerun_command' do
+          include_examples :verbose_rerun, { verbose_rerun_command: true, verbose: false }
+        end
       end
 
       context 'with option verbose' do
-        it "prints a message and the command if there is a failure" do
-          expect {
-            subject.send(:report_failure_rerun_commmand,
-              [
-                {exit_status: 1, command: 'foo', seed: nil, output: 'blah'}
-              ],
-              {verbose: true}
-            )
-          }.to output("\n\nTests have failed for a parallel_test group. Use the following command to run the group again:\n\nfoo\n").to_stdout
+        context 'without option verbose_rerun_command' do
+          include_examples :verbose_rerun, { verbose: true }
         end
 
-        it "prints multiple commands if there are multiple failures" do
-          expect {
-            subject.send(:report_failure_rerun_commmand,
-              [
-                {exit_status: 1, command: 'foo', seed: nil, output: 'blah'},
-                {exit_status: 1, command: 'bar', seed: nil, output: 'blah'},
-                {exit_status: 1, command: 'baz', seed: nil, output: 'blah'},
-              ],
-              {verbose: true}
-            )
-          }.to output(/foo\nbar\nbaz/).to_stdout
-        end
-
-        it "only includes failures" do
-          expect {
-            subject.send(:report_failure_rerun_commmand,
-              [
-                {exit_status: 1, command: 'foo --color', seed: nil, output: 'blah'},
-                {exit_status: 0, command: 'bar', seed: nil, output: 'blah'},
-                {exit_status: 1, command: 'baz', seed: nil, output: 'blah'},
-              ],
-              {verbose: true}
-            )
-          }.to output(/foo --color\nbaz/).to_stdout
-        end
-
-        it "prints the command with the seed added by the runner" do
-          command = 'rspec --color spec/foo_spec.rb'
-          seed = 555
-
-          subject.instance_variable_set(:@runner, ParallelTests::Test::Runner)
-          expect(ParallelTests::Test::Runner).to receive(:command_with_seed).with(command, seed).
-            and_return("my seeded command result --seed #{seed}")
-          expect {
-            subject.send(:report_failure_rerun_commmand,
-              [
-                {exit_status: 1, command: command, seed: 555, output: 'blah'},
-              ],
-              {verbose: true}
-            )
-          }.to output(/my seeded command result --seed 555/).to_stdout
+        context 'with option verbose_rerun_command' do
+          include_examples :verbose_rerun, { verbose_rerun_command: true, verbose: true }
         end
       end
     end

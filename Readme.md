@@ -225,6 +225,8 @@ Options are:
         --allowed-missing            Allowed percentage of missing runtimes (default = 50)
         --unknown-runtime [FLOAT]    Use given number as unknown runtime (otherwise use average time)
         --verbose                    Print more output
+        --verbose-process-command    Print the command that will be executed by each process before it begins, even if --verbose is not set, or if --quiet is set.
+        --verbose-rerun-command      After a process fails, print the command executed by that process, even if --verbose is not set, or if --quiet is set.
         --quiet                      Do not print anything, apart from test output
     -v, --version                    Show Version
     -h, --help                       Show this.

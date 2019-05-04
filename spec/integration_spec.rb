@@ -111,12 +111,63 @@ describe 'CLI' do
     expect(result).to include('Took')
   end
 
-  it "shows command with --verbose" do
-    write 'spec/xxx_spec.rb', 'describe("it"){it("should"){puts "TEST1"}}'
-    write 'spec/xxx2_spec.rb', 'describe("it"){it("should"){expect(1).to eq(1)}}'
-    result = run_tests "spec --verbose", :type => 'rspec'
-    expect(result).to include "bundle exec rspec spec/xxx_spec.rb"
-    expect(result).to include "bundle exec rspec spec/xxx2_spec.rb"
+  # TODO: The integration test feels like the wrong place to test all these
+  # cases. Maybe they could be tested using unit tests like with the
+  # describe ".report_failure_rerun_commmand" block in
+  # parallel_tests/cli_spec.rb, with a minimal integration test to ensure
+  # things are hooked up correctly.
+  context 'process command output' do
+    let(:spec_1_command) { 'bundle exec rspec spec/xxx_spec.rb' }
+    let(:spec_2_command) { 'bundle exec rspec spec/xxx2_spec.rb' }
+
+    shared_examples :not_verbose_command do
+      it 'does not output the command to be executed' do
+        expect(result).not_to include spec_1_command
+        expect(result).not_to include spec_2_command
+      end
+    end
+
+    shared_examples :verbose_command do
+      it 'outputs the command to be executed' do
+        expect(result).to include spec_1_command
+        expect(result).to include spec_2_command
+      end
+    end
+
+    before do
+      write 'spec/xxx_spec.rb', 'describe("it"){it("should"){puts "TEST1"}}'
+      write 'spec/xxx2_spec.rb', 'describe("it"){it("should"){expect(1).to eq(1)}}'
+    end
+
+    let(:result) { run_tests('spec', add: flags, type: 'rspec') }
+
+    context 'without --verbose' do
+      context 'without --verbose-process-command' do
+        let(:flags) { '' }
+
+        include_examples :not_verbose_command
+      end
+
+      context 'with --verbose-process-command' do
+        let(:flags) { '--verbose-process-command' }
+
+        include_examples :verbose_command
+      end
+    end
+
+    context 'with --verbose' do
+      context 'without --verbose-process-command' do
+        let(:flags) { '--verbose' }
+
+        include_examples :verbose_command
+      end
+
+      context 'with --verbose-process-command' do
+        let(:flags) { '--verbose --verbose-process-command' }
+
+        include_examples :verbose_command
+      end
+    end
   end
 
   it "fails when tests fail" do
@@ -323,12 +374,88 @@ describe 'CLI' do
   context "RSpec" do
     it_fails_without_any_files "rspec"
 
-    it "captures seed with random failures with --verbose" do
-      write 'spec/xxx_spec.rb', 'describe("it"){it("should"){puts "TEST1"}}'
-      write 'spec/xxx2_spec.rb', 'describe("it"){it("should"){1.should == 2}}'
-      result = run_tests "spec --verbose", :add => "--test-options '--seed 1234'", :fail => true, :type => 'rspec'
-      expect(result).to include("Randomized with seed 1234")
-      expect(result).to include("bundle exec rspec spec/xxx2_spec.rb --seed 1234")
+    context 'with rspec files' do
+      before do
+        write 'spec/xxx_spec.rb', 'describe("it"){it("should"){puts "TEST1"}}'
+        write 'spec/xxx2_spec.rb', 'describe("it"){it("should"){expect(1).to eq(2)}}'
+      end
+
+      it "outputs seed with random failures" do
+        result = run_tests(
+          "spec", add: "--test-options '--seed 1234'", fail: true, type: 'rspec'
+        )
+
+        expect(result).to include("Randomized with seed 1234")
+      end
+
+      let(:cmd_output_regexp) do
+        # The check for TEST1 is to distinguish the executed command output
+        # from the rerun command output.
+        %r{bundle exec rspec --seed 1234 spec/xxx2_spec.*TEST1}m
+      end
+
+      shared_examples :not_verbose_command do
+        it 'does not output the command to be executed' do
+          expect(result).not_to match(cmd_output_regexp)
+        end
+      end
+
+      shared_examples :verbose_command do
+        it 'outputs the command to be executed' do
+          expect(result).to match(cmd_output_regexp)
+        end
+      end
+
+      let(:result) do
+        run_tests(
+          'spec',
+          add: "#{flags} --test-options '--seed 1234'",
+          fail: true,
+          type: 'rspec'
+        )
+      end
+
+      context 'without --verbose or --quiet' do
+        context 'without --verbose-process-command' do
+          let(:flags) { '' }
+
+          include_examples :not_verbose_command
+        end
+
+        context 'with --verbose-process-command' do
+          let(:flags) { '--verbose-process-command' }
+
+          include_examples :verbose_command
+        end
+      end
+
+      context 'with --quiet' do
+        context 'without --verbose-process-command' do
+          let(:flags) { '--quiet' }
+
+          include_examples :not_verbose_command
+        end
+
+        context 'with --verbose-process-command' do
+          let(:flags) { '--quiet --verbose-process-command' }
+
+          include_examples :verbose_command
+        end
+      end
+
+      context 'with --verbose' do
+        context 'without --verbose-process-command' do
+          let(:flags) { '--verbose' }
+
+          include_examples :verbose_command
+        end
+
+        context 'with --verbose-process-command' do
+          let(:flags) { '--verbose --verbose-process-command' }
+
+          include_examples :verbose_command
+        end
+      end
     end
   end
 
@@ -453,11 +580,72 @@ describe 'CLI' do
       expect(result).to include("2 processes for 2 features")
     end
 
-    it "captures seed with random failures with --verbose" do
-      write "features/good1.feature", "Feature: xxx\n  Scenario: xxx\n    Given I fail"
-      result = run_tests "features --verbose", :type => "cucumber", :add => '--test-options "--order random:1234"', :fail => true
+    it 'outputs seed with random failures' do
+      write 'features/good1.feature', "Feature: xxx\n  Scenario: xxx\n    Given I fail"
+
+      result = run_tests(
+        'features',
+        add: %q(--test-options "--order random:1234"),
+        fail: true,
+        type: 'cucumber'
+      )
       expect(result).to include("Randomized with seed 1234")
-      expect(result).to match(%r{bundle exec cucumber "?features/good1.feature"? --order random:1234})
+    end
+
+    context 'process command output' do
+      let(:cmd_output_regexp) do
+        # The check for Feature: xxx is to distinguish the executed command output
+        # from the rerun command output.
+        %r{bundle exec cucumber "?features/good1.feature"?\nFeature: xxx}
+      end
+
+      shared_examples :not_verbose_command do
+        it 'does not output the command to be executed' do
+          expect(result).not_to match(cmd_output_regexp)
+        end
+      end
+
+      shared_examples :verbose_command do
+        it 'outputs the command to be executed' do
+          expect(result).to match(cmd_output_regexp)
+        end
+      end
+
+      before do
+        write 'features/good1.feature', "Feature: xxx\n  Scenario: xxx\n    Given I fail"
+      end
+
+      let(:result) do
+        run_tests('features', add: flags, fail: true, type: 'cucumber')
+      end
+
+      context 'without --verbose' do
+        context 'without --verbose-process-command' do
+          let(:flags) { '' }
+
+          include_examples :not_verbose_command
+        end
+
+        context 'with --verbose-process-command' do
+          let(:flags) { '--verbose-process-command' }
+
+          include_examples :verbose_command
+        end
+      end
+
+      context 'with --verbose' do
+        context 'without --verbose-process-command' do
+          let(:flags) { '--verbose' }
+
+          include_examples :verbose_command
+        end
+
+        context 'with --verbose-process-command' do
+          let(:flags) { '--verbose --verbose-process-command' }
+
+          include_examples :verbose_command
+        end
+      end
     end
   end
 
