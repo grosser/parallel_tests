@@ -224,8 +224,10 @@ Options are:
         --runtime-log [PATH]         Location of previously recorded test runtimes
         --allowed-missing            Allowed percentage of missing runtimes (default = 50)
         --unknown-runtime [FLOAT]    Use given number as unknown runtime (otherwise use average time)
-        --verbose                    Print more output
-        --quiet                      Do not print anything, apart from test output
+        --verbose                    Print debug output
+        --verbose-process-command    Print the command that will be executed by each process before it begins
+        --verbose-rerun-command      After a process fails, print the command executed by that process
+        --quiet                      Print only test output
     -v, --version                    Show Version
     -h, --help                       Show this.
 

@@ -124,7 +124,7 @@ module ParallelTests
       failing_sets = test_results.reject { |r| r[:exit_status] == 0 }
       return if failing_sets.none?
 
-      if options[:verbose]
+      if options[:verbose] || options[:verbose_rerun_command]
         puts "\n\nTests have failed for a parallel_test group. Use the following command to run the group again:\n\n"
         failing_sets.each do |failing_set|
           command = failing_set[:command]
@@ -219,8 +219,10 @@ module ParallelTests
         opts.on("--allowed-missing [INT]", Integer, "Allowed percentage of missing runtimes (default = 50)") { |percent| options[:allowed_missing_percent] = percent }
         opts.on("--unknown-runtime [FLOAT]", Float, "Use given number as unknown runtime (otherwise use average time)") { |time| options[:unknown_runtime] = time }
         opts.on("--first-is-1", "Use \"1\" as TEST_ENV_NUMBER to not reuse the default test environment") { options[:first_is_1] = true }
-        opts.on("--verbose", "Print more output (mutually exclusive with quiet)") { options[:verbose] = true }
-        opts.on("--quiet", "Print tests output only (mutually exclusive with verbose)") { options[:quiet] = true }
+        opts.on("--verbose", "Print debug output") { options[:verbose] = true }
+        opts.on("--verbose-process-command", "Displays only the command that will be executed by each process") { options[:verbose_process_command] = true }
+        opts.on("--verbose-rerun-command", "When there are failures, displays the command executed by each process that failed") { options[:verbose_rerun_command] = true }
+        opts.on("--quiet", "Print only tests output") { options[:quiet] = true }
         opts.on("-v", "--version", "Show Version") { puts ParallelTests::VERSION; exit }
         opts.on("-h", "--help", "Show this.") { puts opts; exit }
       end.parse!(argv)

@@ -78,7 +78,7 @@ module ParallelTests
           cmd = "nice #{cmd}" if options[:nice]
           cmd = "#{cmd} 2>&1" if options[:combine_stderr]
 
-          puts cmd if options[:verbose] && !options[:serialize_stdout]
+          puts cmd if report_process_command?(options) && !options[:serialize_stdout]
 
           execute_command_and_capture_output(env, cmd, options)
         end
@@ -94,7 +94,9 @@ module ParallelTests
           exitstatus = $?.exitstatus
           seed = output[/seed (\d+)/,1]
 
-          output = [cmd, output].join("\n") if options[:verbose] && options[:serialize_stdout]
+          if report_process_command?(options) && options[:serialize_stdout]
+            output = [cmd, output].join("\n")
+          end
 
           {:stdout => output, :exit_status => exitstatus, :command => cmd, :seed => seed}
         end
@@ -234,6 +236,12 @@ module ParallelTests
             "**{,/*/**}/*"
           end
           Dir[File.join(folder, pattern)].uniq
+        end
+
+        private
+
+        def report_process_command?(options)
+          options[:verbose] || options[:verbose_process_command]
         end
       end
     end
