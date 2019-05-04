@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    parallel_tests (2.28.0)
+    parallel_tests (2.29.0)
       parallel
 
 GEM
@@ -35,7 +35,7 @@ GEM
     minitest (5.5.1)
     multi_json (1.13.1)
     multi_test (0.1.2)
-    parallel (1.13.0)
+    parallel (1.17.0)
     power_assert (0.4.1)
     rake (12.0.0)
     rspec (3.5.0)
