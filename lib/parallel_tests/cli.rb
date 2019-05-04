@@ -124,7 +124,7 @@ module ParallelTests
       failing_sets = test_results.reject { |r| r[:exit_status] == 0 }
       return if failing_sets.none?
 
-      if options[:verbose]
+      if options[:report_rerun_command] || (options[:verbose] && options[:report_rerun_command] != false)
         puts "\n\nTests have failed for a parallel_test group. Use the following command to run the group again:\n\n"
         failing_sets.each do |failing_set|
           command = failing_set[:command]
@@ -221,12 +221,30 @@ module ParallelTests
         opts.on("--first-is-1", "Use \"1\" as TEST_ENV_NUMBER to not reuse the default test environment") { options[:first_is_1] = true }
         opts.on("--verbose", "Print more output (mutually exclusive with quiet)") { options[:verbose] = true }
         opts.on("--quiet", "Print tests output only (mutually exclusive with verbose)") { options[:quiet] = true }
+        opts.on("--report-executed-command", "Displays the command that will be executed by each process, even if --verbose is not set, or --quiet is set") { options[:report_executed_command] = true }
+        opts.on("--no-report-executed-command", "If --verbose is set, does not display the command that will be executed by each process") { options[:no_report_executed_command] = true }
+        opts.on("--report-rerun-command", "When there are failures, displays the command executed by each process that failed, even if --verbose is not set, or --quiet is set") { options[:report_rerun_command] = true }
+        opts.on("--no-report-rerun-command", "If --verbose is set, does not display the command executed by each process that failed") { options[:no_report_rerun_command] = true }
         opts.on("-v", "--version", "Show Version") { puts ParallelTests::VERSION; exit }
         opts.on("-h", "--help", "Show this.") { puts opts; exit }
       end.parse!(argv)
 
-      if options[:verbose] && options[:quiet]
-        raise "Both options are mutually exclusive: verbose & quiet"
+      [
+        %i[verbose quiet],
+        %i[report_executed_command no_report_executed_command],
+        %i[report_rerun_command no_report_rerun_command]
+      ].each do |option_1, option_2|
+        if options[option_1] && options[option_2]
+          raise "Both options are mutually exclusive: #{option_1.to_s.tr('_', '-')} & #{option_2.to_s.tr('_', '-')}"
+        end
+      end
+
+      if options.delete(:no_report_rerun_command)
+        options[:report_rerun_command] = false
+      end
+
+      if options.delete(:no_report_executed_command)
+        options[:report_executed_command] = false
       end
 
       if options[:count] == 0

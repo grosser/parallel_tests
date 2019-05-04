@@ -226,6 +226,10 @@ Options are:
         --unknown-runtime [FLOAT]    Use given number as unknown runtime (otherwise use average time)
         --verbose                    Print more output
         --quiet                      Do not print anything, apart from test output
+        --report-executed-command    Displays the command that will be executed by each process, even if --verbose is not set, or --quiet is set
+        --no-report-executed-command If --verbose is set, does not display the command that will be executed by each process
+        --report-rerun-command       When there are failures, displays the command executed by each process that failed, even if --verbose is not set, or --quiet is set
+        --no-report-rerun-command    If --verbose is set, does not display the command executed by each process that failed
     -v, --version                    Show Version
     -h, --help                       Show this.
 

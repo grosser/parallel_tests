@@ -78,9 +78,17 @@ module ParallelTests
           cmd = "nice #{cmd}" if options[:nice]
           cmd = "#{cmd} 2>&1" if options[:combine_stderr]
 
-          puts cmd if options[:verbose] && !options[:serialize_stdout]
+          puts cmd if report_executed_command?(options) && !options[:serialize_stdout]
 
           execute_command_and_capture_output(env, cmd, options)
+        end
+
+        private def report_executed_command?(options)
+          options[:report_executed_command] || (
+            # check for false explicitly because it should report if the
+            # option is unset
+            options[:verbose] && options[:report_executed_command] != false
+          )
         end
 
         def execute_command_and_capture_output(env, cmd, options)
@@ -94,7 +102,7 @@ module ParallelTests
           exitstatus = $?.exitstatus
           seed = output[/seed (\d+)/,1]
 
-          output = [cmd, output].join("\n") if options[:verbose] && options[:serialize_stdout]
+          output = [cmd, output].join("\n") if report_executed_command?(options) && options[:serialize_stdout]
 
           {:stdout => output, :exit_status => exitstatus, :command => cmd, :seed => seed}
         end
