@@ -17,3 +17,8 @@ matrix:
     - rvm: jruby-head
   fast_finish: true
 bundler_args: "--jobs 4"
+# See: https://docs.travis-ci.com/user/languages/ruby/#bundler-20
+# and https://travis-ci.org/grosser/parallel_tests/jobs/528217778
+before_install:
+  - gem uninstall -v '>= 2' -i $(rvm gemdir)@global -ax bundler || true
+  - gem install bundler -v '< 2'
