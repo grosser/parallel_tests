@@ -1,4 +1,5 @@
 require 'rake'
+require 'shellwords'
 
 module ParallelTests
   module Tasks
