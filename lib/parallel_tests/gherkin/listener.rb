@@ -10,6 +10,7 @@ module ParallelTests
       def initialize
         @steps, @uris = [], []
         @collect = {}
+        @feature, @ignore_tag_pattern = nil
         reset_counters!
       end
 
