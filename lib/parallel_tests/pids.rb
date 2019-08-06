@@ -2,7 +2,7 @@ require 'json'
 
 module ParallelTests
   class Pids
-    attr_reader :pids, :file_path, :mutex
+    attr_reader :file_path, :mutex
 
     def initialize(file_path)
       @file_path = file_path

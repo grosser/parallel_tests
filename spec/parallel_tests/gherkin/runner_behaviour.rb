@@ -15,7 +15,7 @@ shared_examples_for 'gherkin runners' do
 
     it "allows to override runner executable via PARALLEL_TESTS_EXECUTABLE" do
       ENV['PARALLEL_TESTS_EXECUTABLE'] = 'script/custom_rspec'
-      should_run_with /script\/custom_rspec/
+      should_run_with(/script\/custom_rspec/)
       call(['xxx'], 1, 22, {})
     end
 

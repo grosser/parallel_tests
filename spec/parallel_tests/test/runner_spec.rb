@@ -475,7 +475,7 @@ EOF
 
     it "prints each stream to the correct stream" do
       skip "open3"
-      out, err = run_with_file("puts 123 ; $stderr.puts 345 ; exit 5") do |path|
+      _out, err = run_with_file("puts 123 ; $stderr.puts 345 ; exit 5") do |path|
         result = call("ruby #{path}", 1, 4, {})
         expect(result).to include({
           :stdout => "123\n",
