@@ -8,6 +8,20 @@ module ParallelTests
         ENV['RAILS_ENV'] || 'test'
       end
 
+      def task_for(task_name, skip_not_defined: false)
+        task = check_task_name(task_name, raise_not_defined: !skip_not_defined)
+        return if task.nil?
+        Rake::Task[task]
+      end
+
+      def check_task_name(task_name, raise_not_defined: false)
+        return task_name if Rake::Task.task_defined?(task_name)
+        namespaced_task_name = "app:#{task_name}"
+        return namespaced_task_name if Rake::Task.task_defined?(namespaced_task_name)
+        raise StandardError, "Neither #{task_name} nor #{namespaced_task_name} rake task is defined" if raise_not_defined
+        nil
+      end
+
       def load_lib
         $LOAD_PATH << File.expand_path(File.join(File.dirname(__FILE__), '..'))
         require "parallel_tests"
@@ -15,7 +29,7 @@ module ParallelTests
 
       def purge_before_load
         if Gem::Version.new(Rails.version) > Gem::Version.new('4.2.0')
-          Rake::Task.task_defined?('db:purge') ? 'db:purge' : 'app:db:purge'
+          check_task_name('db:purge')
         end
       end
 
@@ -58,12 +72,8 @@ module ParallelTests
       end
 
       def check_for_pending_migrations
-        ["db:abort_if_pending_migrations", "app:db:abort_if_pending_migrations"].each do |abort_migrations|
-          if Rake::Task.task_defined?(abort_migrations)
-            Rake::Task[abort_migrations].invoke
-            break
-          end
-        end
+        task = task_for('db:abort_if_pending_migrations', skip_not_defined: true)
+        task && task.invoke
       end
 
       # parallel:spec[:count, :pattern, :options, :pass_through]
@@ -108,12 +118,12 @@ namespace :parallel do
     ParallelTests::Tasks.check_for_pending_migrations
     if defined?(ActiveRecord) && ActiveRecord::Base.schema_format == :ruby
       # dump then load in parallel
-      Rake::Task['db:schema:dump'].invoke
-      Rake::Task['parallel:load_schema'].invoke(args[:count])
+      ParallelTests::Tasks.task_for('db:schema:dump').invoke
+      ParallelTests::Tasks.task_for('parallel:load_schema').invoke(args[:count])
     else
       # there is no separate dump / load for schema_format :sql -> do it safe and slow
       args = args.to_hash.merge(:non_parallel => true) # normal merge returns nil
-      taskname = Rake::Task.task_defined?('db:test:prepare') ? 'db:test:prepare' : 'app:db:test:prepare'
+      taskname = ParallelTests::Tasks.task_for('db:test:prepare')
       ParallelTests::Tasks.run_in_parallel("rake #{taskname}", args)
     end
   end
@@ -121,30 +131,35 @@ namespace :parallel do
   # when dumping/resetting takes too long
   desc "Update test databases via db:migrate --> parallel:migrate[num_cpus]"
   task :migrate, :count do |_,args|
-    ParallelTests::Tasks.run_in_parallel("rake db:migrate RAILS_ENV=#{ParallelTests::Tasks.rails_env}", args)
+    task_name = ParallelTests::Tasks.check_task_name('db:migrate', raise_not_defined: true)
+    ParallelTests::Tasks.run_in_parallel("rake #{task_name} RAILS_ENV=#{ParallelTests::Tasks.rails_env}", args)
   end
 
   desc "Rollback test databases via db:rollback --> parallel:rollback[num_cpus]"
   task :rollback, :count do |_,args|
-    ParallelTests::Tasks.run_in_parallel("rake db:rollback RAILS_ENV=#{ParallelTests::Tasks.rails_env}", args)
+    task_name = ParallelTests::Tasks.check_task_name('db:rollback', raise_not_defined: true)
+    ParallelTests::Tasks.run_in_parallel("rake #{task_name} RAILS_ENV=#{ParallelTests::Tasks.rails_env}", args)
   end
 
   # just load the schema (good for integration server <-> no development db)
   desc "Load dumped schema for test databases via db:schema:load --> parallel:load_schema[num_cpus]"
   task :load_schema, :count do |_,args|
-    command = "rake #{ParallelTests::Tasks.purge_before_load} db:schema:load RAILS_ENV=#{ParallelTests::Tasks.rails_env} DISABLE_DATABASE_ENVIRONMENT_CHECK=1"
+    task_name = ParallelTests::Tasks.check_task_name('db:schema:load', raise_not_defined: true)
+    command = "rake #{ParallelTests::Tasks.purge_before_load} #{task_name} RAILS_ENV=#{ParallelTests::Tasks.rails_env} DISABLE_DATABASE_ENVIRONMENT_CHECK=1"
     ParallelTests::Tasks.run_in_parallel(ParallelTests::Tasks.suppress_schema_load_output(command), args)
   end
 
   # load the structure from the structure.sql file
   desc "Load structure for test databases via db:structure:load --> parallel:load_structure[num_cpus]"
   task :load_structure, :count do |_,args|
-    ParallelTests::Tasks.run_in_parallel("rake #{ParallelTests::Tasks.purge_before_load} db:structure:load RAILS_ENV=#{ParallelTests::Tasks.rails_env} DISABLE_DATABASE_ENVIRONMENT_CHECK=1", args)
+    task_name = ParallelTests::Tasks.check_task_name('db:structure:load', raise_not_defined: true)
+    ParallelTests::Tasks.run_in_parallel("rake #{ParallelTests::Tasks.purge_before_load} #{task_name} RAILS_ENV=#{ParallelTests::Tasks.rails_env} DISABLE_DATABASE_ENVIRONMENT_CHECK=1", args)
   end
 
   desc "Load the seed data from db/seeds.rb via db:seed --> parallel:seed[num_cpus]"
   task :seed, :count do |_,args|
-    ParallelTests::Tasks.run_in_parallel("rake db:seed RAILS_ENV=#{ParallelTests::Tasks.rails_env}", args)
+    task_name = ParallelTests::Tasks.check_task_name('db:seed', raise_not_defined: true)
+    ParallelTests::Tasks.run_in_parallel("rake #{task_name} RAILS_ENV=#{ParallelTests::Tasks.rails_env}", args)
   end
 
   desc "Launch given rake command in parallel"
