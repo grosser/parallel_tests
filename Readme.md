@@ -97,7 +97,19 @@ at_exit do
     undo_something
   end
 end
+```
 
+Check if tests are being run in parallel
+========================================
+
+`parallel_tests` sets the `PARALLEL_TESTS` environment variable to `1`, so you can tell when tests are being run in parallel.
+
+```Ruby
+config.before(:suite) do
+  if ENV['PARALLEL_TESTS']
+    # Only do something when running tests in parallel
+  end
+end
 ```
 
 Even test group run-times

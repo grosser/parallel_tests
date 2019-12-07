@@ -10,6 +10,7 @@ module ParallelTests
 
       options = parse_options!(argv)
 
+      ENV['PARALLEL_TESTS'] = '1'
       ENV['DISABLE_SPRING'] ||= '1'
 
       num_processes = ParallelTests.determine_number_of_processes(options[:count])
