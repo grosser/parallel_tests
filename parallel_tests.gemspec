@@ -1,5 +1,5 @@
 name = "parallel_tests"
-require "./lib/#{name}/version"
+require_relative "lib/#{name}/version"
 
 Gem::Specification.new name, ParallelTests::VERSION do |s|
   s.summary = "Run Test::Unit / RSpec / Cucumber / Spinach in parallel"
