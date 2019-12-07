@@ -6,8 +6,8 @@ rvm:
   - 2.4
   - 2.5
   - 2.6
-  - ruby-head
-  - jruby-head
+  # - ruby-head
+  # - jruby-head
 branches:
   only: [master]
 sudo: false
@@ -17,9 +17,9 @@ cache:
   - spec/fixtures/rails51/vendor/bundle
   - spec/fixtures/rails52/vendor/bundle
 matrix:
-  allow_failures:
-    - rvm: ruby-head
-    - rvm: jruby-head
+  # allow_failures:
+  #   - rvm: ruby-head
+  #   - rvm: jruby-head
   fast_finish: true
 bundler_args: "--jobs 4"
 before_install: ruby -e "Dir['{,spec/**/}Gemfile.lock'].each { |f| File.write(f, File.read(f).split('BUNDLED WITH').first)}"
