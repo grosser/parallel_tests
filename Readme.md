@@ -373,6 +373,7 @@ inspired by [pivotal labs](https://blog.pivotal.io/labs/labs/parallelize-your-rs
  - [Sandeep Singh](https://github.com/sandeepnagra)
  - [Calaway](https://github.com/calaway)
  - [alboyadjian](https://github.com/alboyadjian)
+ - [Nathan Broadbent](https://github.com/ndbroadbent)
 
 [Michael Grosser](http://grosser.it)<br/>
 michael@grosser.it<br/>
