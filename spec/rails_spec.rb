@@ -1,8 +1,6 @@
 require 'spec_helper'
 
 describe 'rails' do
-  let(:test_timeout) { 420 } # this can take very long on fresh bundle ...
-
   def sh(command, options={})
     result = ''
     IO.popen(options.fetch(:environment, {}), command, err: [:child, :out]) do |io|

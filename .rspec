@@ -1,3 +1,4 @@
+--format documentation
 --color
 --order random
 --exclude-pattern spec/fixtures/**/*
