@@ -188,12 +188,6 @@ RSpec.configure do |config|
 
   config.raise_errors_for_deprecations!
 
-  # sometimes stuff hangs -> do not hang everything
-  config.include(Module.new {def test_timeout;30;end })
-  config.around do |example|
-    Timeout.timeout(test_timeout, &example)
-  end
-
   config.after do
     ENV.delete "PARALLEL_TEST_GROUPS"
     ENV.delete "PARALLEL_TEST_PROCESSORS"
