@@ -229,7 +229,7 @@ describe 'CLI' do
 
   it "runs with --group-by found" do
     # it only tests that it does not blow up, as it did before fixing...
-    write "spec/x1_spec.rb", "puts '111'"
+    write "spec/x1_spec.rb", "puts 'TEST111'"
     run_tests "spec", :type => 'rspec', :add => '--group-by found'
   end
 
@@ -254,27 +254,27 @@ describe 'CLI' do
   end
 
   it "runs with files that have spaces" do
-    write "test/xxx _test.rb", 'puts "YES"'
+    write "test/xxx _test.rb", 'puts "TEST_SUCCESS"'
     result = run_tests("test", processes: 2, type: 'test')
-    expect(result).to include "YES"
+    expect(result).to include "TEST_SUCCESS"
   end
 
   it "uses relative paths for easy copying" do
-    write "test/xxx_test.rb", 'puts "YES"'
+    write "test/xxx_test.rb", 'puts "Test output: YES"'
     result = run_tests("test", processes: 2, type: 'test', add: '--verbose')
-    expect(result).to include "YES"
+    expect(result).to include "Test output: YES"
     expect(result).to include "[test/xxx_test.rb]"
     expect(result).not_to include Dir.pwd
   end
 
   it "can run with given files" do
-    write "spec/x1_spec.rb", "puts '111'"
-    write "spec/x2_spec.rb", "puts '222'"
-    write "spec/x3_spec.rb", "puts '333'"
+    write "spec/x1_spec.rb", "puts 'TEST111'"
+    write "spec/x2_spec.rb", "puts 'TEST222'"
+    write "spec/x3_spec.rb", "puts 'TEST333'"
     result = run_tests "spec/x1_spec.rb spec/x3_spec.rb", :type => 'rspec'
-    expect(result).to include('111')
-    expect(result).to include('333')
-    expect(result).not_to include('222')
+    expect(result).to include('TEST111')
+    expect(result).to include('TEST333')
+    expect(result).not_to include('TEST222')
   end
 
   it "can run with test-options" do
@@ -297,23 +297,23 @@ describe 'CLI' do
   end
 
   it "filters test by given pattern and relative paths" do
-    write "spec/x_spec.rb", "puts 'XXX'"
-    write "spec/y_spec.rb", "puts 'YYY'"
-    write "spec/z_spec.rb", "puts 'ZZZ'"
+    write "spec/x_spec.rb", "puts 'TESTXXX'"
+    write "spec/y_spec.rb", "puts 'TESTYYY'"
+    write "spec/z_spec.rb", "puts 'TESTZZZ'"
     result = run_tests "spec", :add => "-p '^spec/(x|z)'", :type => "rspec"
-    expect(result).to include('XXX')
-    expect(result).not_to include('YYY')
-    expect(result).to include('ZZZ')
+    expect(result).to include('TESTXXX')
+    expect(result).not_to include('TESTYYY')
+    expect(result).to include('TESTZZZ')
   end
 
   it "excludes test by given pattern and relative paths" do
-    write "spec/x_spec.rb", "puts 'XXX'"
-    write "spec/acceptance/y_spec.rb", "puts 'YYY'"
-    write "spec/integration/z_spec.rb", "puts 'ZZZ'"
+    write "spec/x_spec.rb", "puts 'TESTXXX'"
+    write "spec/acceptance/y_spec.rb", "puts 'TESTYYY'"
+    write "spec/integration/z_spec.rb", "puts 'TESTZZZ'"
     result = run_tests "spec", :add => "--exclude-pattern 'spec/(integration|acceptance)'", :type => "rspec"
-    expect(result).to include('XXX')
-    expect(result).not_to include('YYY')
-    expect(result).not_to include('ZZZ')
+    expect(result).to include('TESTXXX')
+    expect(result).not_to include('TESTYYY')
+    expect(result).not_to include('TESTZZZ')
   end
 
   it "can wait_for_other_processes_to_finish" do
