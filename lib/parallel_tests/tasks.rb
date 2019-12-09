@@ -117,21 +117,22 @@ namespace :parallel do
   desc "Update test databases by dumping and loading --> parallel:prepare[num_cpus]"
   task(:prepare, [:count]) do |_,args|
     ParallelTests::Tasks.check_for_pending_migrations
-    # dump schema/structure then load in parallel
-    unless defined?(ActiveRecord::Base)
+    if defined?(ActiveRecord::Base) && [:ruby, :sql].include?(ActiveRecord::Base.schema_format)
+      # fast: dump once, load in parallel
+      type = (ActiveRecord::Base.schema_format == :ruby ? "schema" : "structure")
+      Rake::Task["db:#{type}:dump"].invoke
+
+      # remove database connection to prevent "database is being accessed by other users"
+      ActiveRecord::Base.remove_connection if ActiveRecord::Base.configurations.any?
+
+      Rake::Task["parallel:load_#{type}"].invoke(args[:count])
+    else
+      # slow: dump and load in in serial
       args = args.to_hash.merge(:non_parallel => true) # normal merge returns nil
-      taskname = Rake::Task.task_defined?('db:test:prepare') ? 'db:test:prepare' : 'app:db:test:prepare'
-      ParallelTests::Tasks.run_in_parallel("#{ParallelTests::Tasks.rake_bin} #{taskname}", args)
+      task_name = Rake::Task.task_defined?('db:test:prepare') ? 'db:test:prepare' : 'app:db:test:prepare'
+      ParallelTests::Tasks.run_in_parallel("#{ParallelTests::Tasks.rake_bin} #{task_name}", args)
       next
     end
-
-    task_name = ActiveRecord::Base.schema_format == :ruby ? :schema : :structure
-    Rake::Task["db:#{task_name}:dump"].invoke
-    if defined?(ActiveRecord::Base) && ActiveRecord::Base.configurations.any?
-      # Must remove database connection to prevent "database is being accessed by other users"
-      ActiveRecord::Base.remove_connection
-    end
-    Rake::Task["parallel:load_#{task_name}"].invoke(args[:count])
   end
 
   # when dumping/resetting takes too long
