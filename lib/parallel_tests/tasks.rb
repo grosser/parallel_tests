@@ -117,16 +117,21 @@ namespace :parallel do
   desc "Update test databases by dumping and loading --> parallel:prepare[num_cpus]"
   task(:prepare, [:count]) do |_,args|
     ParallelTests::Tasks.check_for_pending_migrations
-    if defined?(ActiveRecord) && ActiveRecord::Base.schema_format == :ruby
-      # dump then load in parallel
-      Rake::Task['db:schema:dump'].invoke
-      Rake::Task['parallel:load_schema'].invoke(args[:count])
-    else
-      # there is no separate dump / load for schema_format :sql -> do it safe and slow
+    # dump schema/structure then load in parallel
+    unless defined?(ActiveRecord::Base)
       args = args.to_hash.merge(:non_parallel => true) # normal merge returns nil
       taskname = Rake::Task.task_defined?('db:test:prepare') ? 'db:test:prepare' : 'app:db:test:prepare'
       ParallelTests::Tasks.run_in_parallel("#{ParallelTests::Tasks.rake_bin} #{taskname}", args)
+      next
     end
+
+    task_name = ActiveRecord::Base.schema_format == :ruby ? :schema : :structure
+    Rake::Task["db:#{task_name}:dump"].invoke
+    if defined?(ActiveRecord::Base) && ActiveRecord::Base.configurations.any?
+      # Must remove database connection to prevent "database is being accessed by other users"
+      ActiveRecord::Base.remove_connection
+    end
+    Rake::Task["parallel:load_#{task_name}"].invoke(args[:count])
   end
 
   # when dumping/resetting takes too long
