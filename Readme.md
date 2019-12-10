@@ -266,7 +266,6 @@ TIPS
    - Builds a HTML report from JSON with support for debug msgs & embedded Base64 images.
 
 ### General
- - [SQL schema format] use [the `:sql` schema format](https://guides.rubyonrails.org/active_record_migrations.html#types-of-schema-dumps) to get faster parallel:prepare`
  - [ZSH] use quotes to use rake arguments `rake "parallel:prepare[3]"`
  - [Memcached] use different namespaces<br/>
    e.g. `config.cache_store = ..., namespace: "test_#{ENV['TEST_ENV_NUMBER']}"`
