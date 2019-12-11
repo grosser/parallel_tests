@@ -5,7 +5,7 @@ Gem::Specification.new name, ParallelTests::VERSION do |s|
   s.summary = "Run Test::Unit / RSpec / Cucumber / Spinach in parallel"
   s.authors = ["Michael Grosser"]
   s.email = "michael@grosser.it"
-  s.homepage = "http://github.com/grosser/#{name}"
+  s.homepage = "https://github.com/grosser/#{name}"
   s.metadata = {
     "bug_tracker_uri"   => "https://github.com/grosser/#{name}/issues",
     "documentation_uri" => "https://github.com/grosser/#{name}/blob/v#{s.version}/Readme.md",
