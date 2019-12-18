@@ -1,6 +1,8 @@
 require 'spec_helper'
 
 describe 'rails' do
+  let(:test_timeout) { 600 } # this can take very long on fresh bundle ...
+
   def sh(command, options={})
     result = ''
     IO.popen(options.fetch(:environment, {}), command, err: [:child, :out]) do |io|
@@ -10,6 +12,7 @@ describe 'rails' do
     result
   end
 
+  # TODO: rails 6
   %w(rails51 rails52).each do |rails|
     it "can create and run #{rails}" do
       if RUBY_PLATFORM == "java"

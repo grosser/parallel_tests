@@ -180,6 +180,8 @@ RSpec::Matchers.define :include_exactly_times do |expected, times|
   end
 end
 
+TestTookTooLong = Class.new(Timeout::Error)
+
 RSpec.configure do |config|
   config.filter_run :focus => true
   config.run_all_when_everything_filtered = true
@@ -187,6 +189,13 @@ RSpec.configure do |config|
   config.extend SharedExamples
 
   config.raise_errors_for_deprecations!
+
+  # sometimes stuff hangs -> do not hang everything
+  # NOTE: the timeout error can sometimes swallow errors, comment it out if you run into trouble
+  config.include(Module.new {def test_timeout;30;end })
+  config.around do |example|
+    Timeout.timeout(test_timeout, TestTookTooLong, &example)
+  end
 
   config.after do
     ENV.delete "PARALLEL_TEST_GROUPS"
