@@ -11,7 +11,11 @@ rvm:
 branches:
   only: [master]
 sudo: false
-cache: bundler
+cache:
+  bundler: true
+  directories:
+  - spec/fixtures/rails51/vendor/bundle
+  - spec/fixtures/rails52/vendor/bundle
 matrix:
   allow_failures:
     - rvm: ruby-head

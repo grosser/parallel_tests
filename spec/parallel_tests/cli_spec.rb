@@ -315,8 +315,8 @@ describe ParallelTests::CLI do
       it "run twice with multiple groups" do
         skip "fails on jruby" if RUBY_PLATFORM == "java"
         options = common_options.merge(count: 3, only_group: [2,3])
-        expect(subject).to receive(:run_tests).once.ordered.with(['ccc', 'ddd'], 0, 1, options).and_return(results)
-        expect(subject).to receive(:run_tests).once.ordered.with(['eee', 'fff'], 1, 1, options).and_return(results)
+        expect(subject).to receive(:run_tests).once.with(['ccc', 'ddd'], 0, 1, options).and_return(results)
+        expect(subject).to receive(:run_tests).once.with(['eee', 'fff'], 1, 1, options).and_return(results)
         subject.run(['test', '-n', '3', '--only-group', '2,3', '-t', 'my_test_runner'])
       end
     end
