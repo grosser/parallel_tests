@@ -2,6 +2,7 @@ require 'optparse'
 require 'tempfile'
 require 'parallel_tests'
 require 'shellwords'
+require 'pathname'
 
 module ParallelTests
   class CLI
@@ -239,7 +240,7 @@ module ParallelTests
       files, remaining = extract_file_paths(argv)
       unless options[:execute]
         abort "Pass files or folders to run" unless files.any?
-        options[:files] = files
+        options[:files] = files.map { |file_path| Pathname.new(file_path).cleanpath.to_s }
       end
 
       append_test_options(options, remaining)

@@ -17,6 +17,10 @@ describe ParallelTests::CLI do
       call(["-n3"])
     end
 
+    it "cleanups file paths" do
+      expect(call(["./test"])).to eq(defaults)
+    end
+
     it "parses execute" do
       expect(call(["--exec", "echo"])).to eq(execute: "echo")
     end
@@ -106,10 +110,10 @@ describe ParallelTests::CLI do
     context "when the -- option separator is used" do
       it "interprets arguments as files/directories" do
         expect(call(%w(-- test))).to eq( files: %w(test))
+        expect(call(%w(-- ./test))).to eq( files: %w(test))
         expect(call(%w(-- test test2))).to eq( files: %w(test test2))
         expect(call(%w(-- --foo test))).to eq( files: %w(--foo test))
         expect(call(%w(-- test --foo test2))).to eq( files: %w(test --foo test2))
-
       end
 
       it "corectly handles arguments with spaces" do
