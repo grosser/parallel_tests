@@ -256,7 +256,8 @@ TIPS
  - Instantly see failures (instead of just a red F) with [rspec-instafail](https://github.com/grosser/rspec-instafail)
  - Use [rspec-retry](https://github.com/NoRedInk/rspec-retry) (not rspec-rerun) to rerun failed tests.
  - [JUnit formatter configuration](https://github.com/grosser/parallel_tests/wiki#with-rspec_junit_formatter----by-jgarber)
-
+ - Use [parallel_split_test](https://github.com/grosser/parallel_split_test) to run multiple scenarios in a single spec file, concurrently. (`parallel_tests` [works at the file-level and intends to stay that way](https://github.com/grosser/parallel_tests/issues/747#issuecomment-580216980))
+ 
 ### Cucumber
 
  - Add a `parallel: foo` profile to your `config/cucumber.yml` and it will be used to run parallel tests
