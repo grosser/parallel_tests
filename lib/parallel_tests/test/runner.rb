@@ -188,11 +188,7 @@ module ParallelTests
             puts "Runtime found for #{tests.count(&:last)} of #{tests.size} tests"
           end
 
-          # fill gaps with unknown-runtime if given, average otherwise
-          known, unknown = tests.partition(&:last)
-          average = (known.any? ? known.map!(&:last).inject(:+) / known.size : 1)
-          unknown_runtime = options[:unknown_runtime] || average
-          unknown.each { |set| set[1] = unknown_runtime }
+          set_unknown_runtime tests, options
         end
 
         def runtimes(tests, options)
@@ -239,6 +235,16 @@ module ParallelTests
         end
 
         private
+
+        # fill gaps with unknown-runtime if given, average otherwise
+        # NOTE: an optimization could be doing runtime by average runtime per file size, but would need file checks
+        def set_unknown_runtime(tests, options)
+          known, unknown = tests.partition(&:last)
+          return if unknown.empty?
+          unknown_runtime = options[:unknown_runtime] ||
+            (known.empty? ? 1 : known.map!(&:last).inject(:+) / known.size) # average
+          unknown.each { |set| set[1] = unknown_runtime }
+        end
 
         def report_process_command?(options)
           options[:verbose] || options[:verbose_process_command]
