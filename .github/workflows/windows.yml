@@ -1,0 +1,32 @@
+name: windows
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: windows-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        ruby: [2.7, 2.6, 2.5, 2.4, 2.3, 2.2]
+    steps:
+    - uses: actions/checkout@master
+    - name: Set up Ruby
+      uses: ruby/setup-ruby@v1
+      with:
+        ruby-version: ${{ matrix.ruby }}
+    - name: Update MSYS2
+      uses: MSP-Greg/msys2-action@master
+      with:
+        base: update
+        mingw: sqlite3
+    - name: Install dependencies
+      run: |
+        ruby -e "Dir['{,spec/**/}Gemfile.lock'].each { |f| File.write(f, File.read(f).split('BUNDLED WITH').first)}"
+        bundle install
+    - name: Change TMPDIR to something non symlinked
+      run: |
+        echo "::set-env name=TMPDIR::$HOME/tmp"
+        mkdir $HOME/tmp
+    - name: Run test
+      run: bundle exec rake
