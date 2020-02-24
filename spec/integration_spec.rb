@@ -320,7 +320,9 @@ describe 'CLI' do
     write "test/b_test.rb", "sleep 1; puts 'OutputB'"
     write "test/c_test.rb", "sleep 1.5; puts 'OutputC'"
     write "test/d_test.rb", "sleep 2; puts 'OutputD'"
-    expect(run_tests("test", :processes => 4)).to match(/OutputB\s+OutputC\s+OutputD\s+OutputA/)
+    actual = run_tests("test", :processes => 4).scan(/Output[ABCD]/)
+    actual_sorted = [*actual[0..2].sort, actual[3]]
+    expect(actual_sorted).to match(["OutputB", "OutputC", "OutputD", "OutputA"])
   end
 
   it "can run only a single group" do
@@ -424,7 +426,7 @@ describe 'CLI' do
       write "features/fail2.feature", "Feature: xxx\n  Scenario: xxx\n    Given I fail"
       results = run_tests "features", :processes => 3, :type => "cucumber", :fail => true
 
-      failing_scenarios = if Gem.win_platform? && RUBY_VERSION.start_with?("2.4")
+      failing_scenarios = if Gem.win_platform? && Gem::Version.new(RUBY_VERSION) >= Gem::Version.new("2.4")
         ["cucumber features/fail1.feature:2 # Scenario: xxx", "cucumber features/fail2.feature:2 # Scenario: xxx"]
       else
         ["cucumber features/fail2.feature:2 # Scenario: xxx", "cucumber features/fail1.feature:2 # Scenario: xxx"]

@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 describe 'rails' do
-  let(:test_timeout) { 600 } # this can take very long on fresh bundle ...
+  let(:test_timeout) { 800 } # this can take very long on fresh bundle ...
 
   def sh(command, options={})
     result = ''
@@ -26,6 +26,7 @@ describe 'rails' do
           ENV.delete("RACK_ENV")
 
           sh "bundle config --local path vendor/bundle"
+          sh "bundle config --local force_ruby_platform true"
           sh "bundle install"
           sh "rm -rf db/*.sqlite3"
           sh "bundle exec rake db:setup parallel:create --trace 2>&1"
