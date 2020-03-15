@@ -14,17 +14,14 @@ module ParallelTests
         end
 
         def determine_executable
-          cmd = case
+          case
           when File.exist?("bin/rspec")
             ParallelTests.with_ruby_binary("bin/rspec")
           when ParallelTests.bundler_enabled?
-            cmd = (run("bundle info rspec-core") =~ %r{Could not find gem.*} ? "spec" : "rspec")
-            "bundle exec #{cmd}"
+            "bundle exec rspec"
           else
-            %w[spec rspec].detect{|cmd| system "#{cmd} --version > #{DEV_NULL} 2>&1" }
+            "rspec"
           end
-
-          cmd or raise("Can't find executables rspec or spec")
         end
 
         def runtime_log
