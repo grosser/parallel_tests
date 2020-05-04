@@ -4,9 +4,12 @@ module ParallelTests
   module RSpec
     class Runner < ParallelTests::Test::Runner
       DEV_NULL = (WINDOWS ? "NUL" : "/dev/null")
-      NAME = 'RSpec'
 
       class << self
+        def name
+          'Spec'
+        end
+
         def run_tests(test_files, process_number, num_processes, options)
           exe = executable # expensive, so we cache
           cmd = [exe, options[:test_options], color, spec_opts, *test_files].compact.join(" ")

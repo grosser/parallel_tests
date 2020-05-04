@@ -4,6 +4,10 @@ require "parallel_tests/rspec/runner"
 describe ParallelTests::RSpec::Runner do
   test_tests_in_groups(ParallelTests::RSpec::Runner, '_spec.rb')
 
+  describe '.name' do
+    it { expect(ParallelTests::RSpec::Runner.name).to eq("Spec") }
+  end
+
   describe '.run_tests' do
     before do
       allow(File).to receive(:file?).with('spec/spec.opts').and_return false

@@ -5,6 +5,10 @@ describe ParallelTests::Test::Runner do
   test_tests_in_groups(ParallelTests::Test::Runner, '_test.rb')
   test_tests_in_groups(ParallelTests::Test::Runner, '_spec.rb')
 
+  describe ".name" do
+    it { expect(ParallelTests::Test::Runner.name).to eq("Test") }
+  end
+
   describe ".run_tests" do
     def call(*args)
       ParallelTests::Test::Runner.run_tests(*args)

@@ -3,13 +3,11 @@ require 'parallel_tests'
 module ParallelTests
   module Test
     class Runner
-      NAME = 'Test'
-
       class << self
         # --- usually overwritten by other runners
 
         def name
-          NAME
+          'Test'
         end
 
         def runtime_log
