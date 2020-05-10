@@ -3,14 +3,8 @@ require 'parallel_tests'
 module ParallelTests
   module Test
     class Runner
-      NAME = 'Test'
-
       class << self
         # --- usually overwritten by other runners
-
-        def name
-          NAME
-        end
 
         def runtime_log
           'tmp/parallel_runtime_test.log'

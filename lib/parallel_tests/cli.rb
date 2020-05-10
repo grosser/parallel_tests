@@ -316,9 +316,8 @@ module ParallelTests
     end
 
     def final_fail_message
-      fail_message = "#{@runner.name}s Failed"
+      fail_message = "Tests Failed"
       fail_message = "\e[31m#{fail_message}\e[0m" if use_colors?
-
       fail_message
     end
 
