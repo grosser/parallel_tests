@@ -426,7 +426,7 @@ describe 'CLI' do
       write "features/fail2.feature", "Feature: xxx\n  Scenario: xxx\n    Given I fail"
       results = run_tests "features", :processes => 3, :type => "cucumber", :fail => true
 
-      failing_scenarios = if Gem.win_platform? && Gem::Version.new(RUBY_VERSION) >= Gem::Version.new("2.4")
+      failing_scenarios = if Gem.win_platform?
         ["cucumber features/fail1.feature:2 # Scenario: xxx", "cucumber features/fail2.feature:2 # Scenario: xxx"]
       else
         ["cucumber features/fail2.feature:2 # Scenario: xxx", "cucumber features/fail1.feature:2 # Scenario: xxx"]
