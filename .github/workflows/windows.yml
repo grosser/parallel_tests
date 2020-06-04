@@ -15,11 +15,6 @@ jobs:
       uses: ruby/setup-ruby@v1
       with:
         ruby-version: ${{ matrix.ruby }}
-    - name: Update MSYS2
-      uses: MSP-Greg/msys2-action@master
-      with:
-        base: update
-        mingw: sqlite3
     - name: Install dependencies
       run: |
         ruby -e "Dir['{,spec/**/}Gemfile.lock'].each { |f| File.write(f, File.read(f).split('BUNDLED WITH').first)}"
