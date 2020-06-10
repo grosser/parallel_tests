@@ -18,7 +18,7 @@ module ParallelTests
             test_line = feature_element[:location][:line]
 
             # We don't accept the feature_element if the current tags are not valid
-            return unless @tag_expression.evaluate(scenario_tags)
+            return unless matches_tags?(scenario_tags)
             # or if it is not at the correct location
             return if line_numbers.any? && !line_numbers.include?(test_line)
 
@@ -27,7 +27,7 @@ module ParallelTests
             feature_element[:examples].each do |example|
               example_tags = example[:tags].map { |tag| tag[:name] }
               example_tags = scenario_tags + example_tags
-              next unless @tag_expression.evaluate(example_tags)
+              next unless matches_tags?(example_tags)
               rows = example[:tableBody].select { |body| body[:type] == :TableRow }
               rows.each do |row|
                 test_line = row[:location][:line]
@@ -40,6 +40,12 @@ module ParallelTests
         end
 
         def method_missing(*args)
+        end
+
+        private
+
+        def matches_tags?(tags)
+          @tag_expression.evaluate(tags)
         end
       end
     end
