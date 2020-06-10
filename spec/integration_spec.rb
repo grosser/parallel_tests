@@ -540,7 +540,7 @@ describe 'CLI' do
   describe "graceful shutdown" do
     # Process.kill on Windows doesn't work as expected. It kills all process group instead of just one process.
     it "passes on int signal to child processes", unless: Gem.win_platform? do
-      timeout = (ENV["TRAVIS"] ? 4 : 2) # travis is slower so it needs some extra time
+      timeout = 2
       write "spec/test_spec.rb", "sleep #{timeout}; describe { specify { 'Should not get here' }; specify { p 'Should not get here either'} }"
       pid = nil
       Thread.new { sleep timeout - 0.5; Process.kill("INT", pid) }
@@ -553,7 +553,7 @@ describe 'CLI' do
 
     # Process.kill on Windows doesn't work as expected. It kills all process group instead of just one process.
     it "exits immediately if another int signal is received", unless: Gem.win_platform? do
-      timeout = (ENV["TRAVIS"] ? 4 : 2) # travis is slower so it needs some extra time
+      timeout = 2
       write "spec/test_spec.rb", "describe { specify { sleep #{timeout}; p 'Should not get here'} }"
       pid = nil
       Thread.new { sleep timeout - 0.5; Process.kill("INT", pid) }
