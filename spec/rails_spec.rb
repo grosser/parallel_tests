@@ -20,7 +20,7 @@ describe 'rails' do
       end
 
       Dir.chdir("spec/fixtures/#{rails}") do
-        Bundler.with_clean_env do
+        Bundler.with_unbundled_env do
           # unset travis things
           ENV.delete("RAILS_ENV")
           ENV.delete("RACK_ENV")
