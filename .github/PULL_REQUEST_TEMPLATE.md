@@ -5,5 +5,3 @@ Thank you for your contribution!
 - [ ] Added tests.
 - [ ] Added an entry to the [Changelog](../blob/master/CHANGELOG.md) if the new 
   code introduces user-observable changes.
-
-[1]: http://chris.beams.io/posts/git-commit/
