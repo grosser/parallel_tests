@@ -37,5 +37,3 @@
 ## Previous versions
 
 No docs yet. Contributions welcome!
-
-[1] https://semver.org/#what-should-i-do-if-i-update-my-own-dependencies-without-changing-the-public-api
