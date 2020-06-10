@@ -2,7 +2,7 @@ module ParallelTests
   class Grouper
     class << self
       def by_steps(tests, num_groups, options)
-        features_with_steps = build_features_with_steps(tests, options)
+        features_with_steps = group_by_features_with_steps(tests, options)
         in_even_groups_by_size(features_with_steps, num_groups)
       end
 
@@ -41,23 +41,9 @@ module ParallelTests
         group[:size] += size
       end
 
-      def build_features_with_steps(tests, options)
-        require 'gherkin/parser'
-        ignore_tag_pattern = options[:ignore_tag_pattern].nil? ? nil : Regexp.compile(options[:ignore_tag_pattern])
-        parser = ::Gherkin::Parser.new
-        # format of hash will be FILENAME => NUM_STEPS
-        steps_per_file = tests.each_with_object({}) do |file,steps|
-          feature = parser.parse(File.read(file)).fetch(:feature)
-
-          # skip feature if it matches tag regex
-          next if feature[:tags].grep(ignore_tag_pattern).any?
-
-          # count the number of steps in the file
-          # will only include a feature if the regex does not match
-          all_steps = feature[:children].map{|a| a[:steps].count if a[:tags].grep(ignore_tag_pattern).empty? }.compact
-          steps[file] = all_steps.inject(0,:+)
-        end
-        steps_per_file.sort_by { |_, value| -value }
+      def group_by_features_with_steps(tests, options)
+        require 'parallel_tests/cucumber/features_with_steps'
+        ParallelTests::Cucumber::FeaturesWithSteps.all(tests, options)
       end
 
       def group_by_scenarios(tests, options={})
