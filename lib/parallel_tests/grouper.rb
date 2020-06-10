@@ -2,7 +2,7 @@ module ParallelTests
   class Grouper
     class << self
       def by_steps(tests, num_groups, options)
-        features_with_steps = build_features_with_steps(tests, options)
+        features_with_steps = group_by_features_with_steps(tests, options)
         in_even_groups_by_size(features_with_steps, num_groups)
       end
 
@@ -41,8 +41,9 @@ module ParallelTests
         group[:size] += size
       end
 
-      def build_features_with_steps(tests, options)
+      def group_by_features_with_steps(tests, options)
         require 'cuke_modeler'
+
         ignore_tag_pattern = options[:ignore_tag_pattern].nil? ? nil : Regexp.compile(options[:ignore_tag_pattern])
         # format of hash will be FILENAME => NUM_STEPS
         steps_per_file = tests.each_with_object({}) do |file,steps|
