@@ -42,11 +42,7 @@ are [not necessarily considered breaking][1].
 - Drop ruby 2.3 support (#760)
 - Drop ruby 2.2 support (#759)
 
-## 2.0.0 - 2015-11-19 
-
-No docs yet. Contributions welcome!
-
-## 1.0.0 - 2014-06-07
+## Previous versions
 
 No docs yet. Contributions welcome!
 
