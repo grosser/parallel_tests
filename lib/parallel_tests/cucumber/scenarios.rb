@@ -4,7 +4,13 @@ require 'cucumber'
 require 'parallel_tests/cucumber/scenario_line_logger'
 require 'parallel_tests/gherkin/listener'
 require 'shellwords'
-require 'cuke_modeler'
+
+begin
+  gem "cuke_modeler", "~> 3.0"
+  require 'cuke_modeler'
+rescue LoadError
+  raise 'Grouping by individual cucumber scenarios requires the `cuke_modeler` modeler gem with requirement `~> 3.0`.  Add `gem "cuke_modeler", "~> 3.0"` to your `Gemfile`, run `bundle install` and try again.'
+end
 
 module ParallelTests
   module Cucumber

@@ -1,4 +1,9 @@
-require 'cuke_modeler'
+begin
+  gem "cuke_modeler", "~> 3.0"
+  require 'cuke_modeler'
+rescue LoadError
+  raise 'Grouping by number of cucumber steps requires the `cuke_modeler` modeler gem with requirement `~> 3.0`. Add `gem "cuke_modeler", "~> 3.0"` to your `Gemfile`, run `bundle install` and try again.'
+end
 
 module ParallelTests
   module Cucumber
