@@ -26,7 +26,7 @@ are [not necessarily considered breaking][1].
 
 ### Breaking Changes
 
-- None
+- Cucumber 3 support removed (#762)
 
 ### Added
 
