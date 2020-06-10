@@ -4,6 +4,7 @@ rvm:
   - 2.4
   - 2.5
   - 2.6
+  - 2.7
   - ruby-head
   - jruby-head
 branches:
