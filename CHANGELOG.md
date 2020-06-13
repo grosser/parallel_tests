@@ -18,7 +18,7 @@
 
 ### Breaking Changes
 
-- Cucumber 3 support removed (#762)
+- The `--group-by` flag with value `steps` and `features` now requires end users to add the `cuke_modeler` gem to their Gemfile (#762).
 
 ### Added
 
