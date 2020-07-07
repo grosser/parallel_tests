@@ -87,11 +87,11 @@ describe 'CLI' do
     # add extra specs to verify they won't be executed
     # Fail the suite at the first step, and add sleep so the tests were less flaky
     write 'spec/xxx1_spec.rb', 'describe("it"){it("should"){sleep 1; expect(1).to eq(2)}}'
-    write 'spec/xxx2_spec.rb', 'describe("it"){it("should"){sleep 1; puts "TEST2"}}'
-    write 'spec/xxx3_spec.rb', 'describe("it"){it("should"){sleep 1; puts "TEST3"}}'
-    write 'spec/xxx4_spec.rb', 'describe("it"){it("should"){sleep 1; puts "TEST4"}}'
-    write 'spec/xxx5_spec.rb', 'describe("it"){it("should"){sleep 1; puts "TEST5"}}'
-    write 'spec/xxx6_spec.rb', 'describe("it"){it("should"){sleep 1; puts "TEST6"}}'
+    write 'spec/xxx2_spec.rb', 'describe("it"){it("should"){sleep 1; puts "TESTS"}}'
+    write 'spec/xxx3_spec.rb', 'describe("it"){it("should"){sleep 1; puts "TESTS"}}'
+    write 'spec/xxx4_spec.rb', 'describe("it"){it("should"){sleep 1; puts "TESTS"}}'
+    write 'spec/xxx5_spec.rb', 'describe("it"){it("should"){sleep 1; puts "TESTS"}}'
+    write 'spec/xxx6_spec.rb', 'describe("it"){it("should"){sleep 1; puts "TESTS"}}'
     # Use 2 processes so it was possible to check that all threads stop
     # Use --fail-fast option for parallel tests and pass the same option to the rspec
     # Use group-by found so the order of the executed specs was the same from test to test
@@ -102,8 +102,7 @@ describe 'CLI' do
                        add: "--group-by found --fail-fast --test-options '--fail-fast'"
 
     # test ran and gave their puts
-    expect(result).to include('TEST4')
-    expect(result).to include('TEST5')
+    expect(result).to include_exactly_times('TESTS', 2)
 
     # all results present
     expect(result).to include_exactly_times('1 example, 1 failure', 1) # results
