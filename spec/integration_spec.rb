@@ -83,14 +83,18 @@ describe 'CLI' do
     expect(result).to include '2 processes for 2 specs, ~ 1 specs per process'
   end
 
-  it "fast fail in parallel" do
+  it "fast fail in parallel (enabled)" do
+    # add extra specs to verify they won't be executed
+    # Fail the suite at the first step, and add sleep so the tests were less flaky
     write 'spec/xxx1_spec.rb', 'describe("it"){it("should"){sleep 1; expect(1).to eq(2)}}'
     write 'spec/xxx2_spec.rb', 'describe("it"){it("should"){sleep 1; puts "TEST2"}}'
     write 'spec/xxx3_spec.rb', 'describe("it"){it("should"){sleep 1; puts "TEST3"}}'
     write 'spec/xxx4_spec.rb', 'describe("it"){it("should"){sleep 1; puts "TEST4"}}'
     write 'spec/xxx5_spec.rb', 'describe("it"){it("should"){sleep 1; puts "TEST5"}}'
     write 'spec/xxx6_spec.rb', 'describe("it"){it("should"){sleep 1; puts "TEST6"}}'
-    # set processes to false so we verify empty groups are discarded by default
+    # Use 2 processes so it was possible to check that all threads stop
+    # Use --fail-fast option for parallel tests and pass the same option to the rspec
+    # Use group-by found so the order of the executed specs was the same from test to test
     result = run_tests "spec",
                        fail: true,
                        type: 'rspec',
@@ -98,18 +102,47 @@ describe 'CLI' do
                        add: "--group-by found --fail-fast --test-options '--fail-fast'"
 
     # test ran and gave their puts
-    expect(result).to include('TEST2')
     expect(result).to include('TEST4')
+    expect(result).to include('TEST5')
 
     # all results present
     expect(result).to include_exactly_times('1 example, 1 failure', 1) # results
     expect(result).to include_exactly_times('2 examples, 0 failure', 1) # results
-    expect(result).to include_exactly_times('3 examples, 1 failure', 1) # 1 summary
+    expect(result).to include_exactly_times('3 examples, 1 failure', 1) # 1 summary, verify only 3 specs were executed
     expect(result).to include_exactly_times(/Finished in \d+(\.\d+)? seconds/, 2)
     expect(result).to include_exactly_times(/Took \d+ seconds/, 1) # parallel summary
 
-    # verify empty groups are discarded. if retained then it'd say 4 processes for 2 specs
+    # verify that successful run would have 6 specs
     expect(result).to include '2 processes for 6 specs, ~ 3 specs per process'
+  end
+
+  it "fast fail in parallel (disabled)" do
+    write 'spec/xxx1_spec.rb', 'describe("it"){it("should"){expect(1).to eq(2)}}'
+    write 'spec/xxx2_spec.rb', 'describe("it"){it("should"){puts "TEST2"}}'
+    write 'spec/xxx3_spec.rb', 'describe("it"){it("should"){puts "TEST3"}}'
+    write 'spec/xxx4_spec.rb', 'describe("it"){it("should"){puts "TEST4"}}'
+    write 'spec/xxx5_spec.rb', 'describe("it"){it("should"){puts "TEST5"}}'
+    write 'spec/xxx6_spec.rb', 'describe("it"){it("should"){puts "TEST6"}}'
+
+    result = run_tests "spec",
+                       fail: true,
+                       type: 'rspec',
+                       processes: 2,
+                       add: "--group-by found"
+
+    # test ran and gave their puts
+    expect(result).to include('TEST2')
+    expect(result).to include('TEST3')
+    expect(result).to include('TEST4')
+    expect(result).to include('TEST5')
+    expect(result).to include('TEST6')
+
+    # all results present
+    expect(result).to include_exactly_times('3 examples, 1 failure', 1) # results
+    expect(result).to include_exactly_times('3 examples, 0 failure', 1) # results
+    expect(result).to include_exactly_times('6 examples, 1 failure', 1) # 1 summary, verify all specs were executed
+    expect(result).to include_exactly_times(/Finished in \d+(\.\d+)? seconds/, 2)
+    expect(result).to include_exactly_times(/Took \d+ seconds/, 1) # parallel summary
   end
 
   it "runs tests which outputs accented characters" do
