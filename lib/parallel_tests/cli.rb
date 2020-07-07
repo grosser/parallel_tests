@@ -44,6 +44,7 @@ module ParallelTests
           simulate_output_for_ci options[:serialize_stdout] do
             Parallel.map(items, :in_threads => num_processes) do |item|
               result = yield(item)
+              ParallelTests.stop_all_processes if result[:exit_status] != 0 && options[:fail_fast]
               reprint_output(result, lock.path) if options[:serialize_stdout]
               result
             end
@@ -220,6 +221,7 @@ module ParallelTests
         opts.on("--allowed-missing [INT]", Integer, "Allowed percentage of missing runtimes (default = 50)") { |percent| options[:allowed_missing_percent] = percent }
         opts.on("--unknown-runtime [FLOAT]", Float, "Use given number as unknown runtime (otherwise use average time)") { |time| options[:unknown_runtime] = time }
         opts.on("--first-is-1", "Use \"1\" as TEST_ENV_NUMBER to not reuse the default test environment") { options[:first_is_1] = true }
+        opts.on("--fail-fast", "Stop running the test suite on the first failed test") { options[:fail_fast] = true }
         opts.on("--verbose", "Print debug output") { options[:verbose] = true }
         opts.on("--verbose-process-command", "Displays only the command that will be executed by each process") { options[:verbose_process_command] = true }
         opts.on("--verbose-rerun-command", "When there are failures, displays the command executed by each process that failed") { options[:verbose_rerun_command] = true }
