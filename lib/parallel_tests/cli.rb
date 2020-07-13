@@ -44,8 +44,8 @@ module ParallelTests
           simulate_output_for_ci options[:serialize_stdout] do
             Parallel.map(items, :in_threads => num_processes) do |item|
               result = yield(item)
-              ParallelTests.stop_all_processes if result[:exit_status] != 0 && options[:fail_fast]
               reprint_output(result, lock.path) if options[:serialize_stdout]
+              ParallelTests.stop_all_processes if result[:exit_status] != 0 && options[:fail_fast]
               result
             end
           end
