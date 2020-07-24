@@ -83,65 +83,54 @@ describe 'CLI' do
     expect(result).to include '2 processes for 2 specs, ~ 1 specs per process'
   end
 
-  it "fast fail in parallel (enabled)" do
-    # add extra specs to verify they won't be executed
-    # Fail the suite at the first step, and add sleep so the tests were less flaky
-    write 'spec/xxx1_spec.rb', 'describe("it"){it("should"){sleep 1; expect(1).to eq(2)}}'
-    write 'spec/xxx2_spec.rb', 'describe("it"){it("should"){sleep 1; puts "TESTS"}}'
-    write 'spec/xxx3_spec.rb', 'describe("it"){it("should"){sleep 1; puts "TESTS"}}'
-    write 'spec/xxx4_spec.rb', 'describe("it"){it("should"){sleep 1; puts "TESTS"}}'
-    write 'spec/xxx5_spec.rb', 'describe("it"){it("should"){sleep 1; puts "TESTS"}}'
-    write 'spec/xxx6_spec.rb', 'describe("it"){it("should"){sleep 1; puts "TESTS"}}'
-    # Use 2 processes so it was possible to check that all threads stop
-    # Use --fail-fast option for parallel tests and pass the same option to the rspec
-    # Use group-by found so the order of the executed specs was the same from test to test
-    result = run_tests "spec",
-                       fail: true,
-                       type: 'rspec',
-                       processes: 2,
-                       add: "--group-by found --fail-fast --test-options '--fail-fast'"
+  describe "--fail-fast" do
+    def run_tests(test_option: nil)
+      super(
+        "spec",
+        fail: true,
+        type: 'rspec',
+        processes: 2,
+        # group-by + order for stable execution ... doc and verbose to ease debugging
+        add: "--group-by found --verbose --fail-fast --test-options '--format doc --order defined #{test_option}'"
+      )
+    end
 
-    # test ran and gave their puts
-    expect(result).to include_exactly_times('TESTS', 2)
+    before do
+      write 'spec/xxx1_spec.rb', 'describe("T1"){it("E1"){puts "YE" + "S"; sleep 0.5; expect(1).to eq(2)}}' # group 1 executed
+      write 'spec/xxx2_spec.rb', 'describe("T2"){it("E2"){sleep 1; puts "OK"}}'  # group 2 executed
+      write 'spec/xxx3_spec.rb', 'describe("T3"){it("E3"){puts "NO3"}}' # group 1 skipped
+      write 'spec/xxx4_spec.rb', 'describe("T4"){it("E4"){puts "NO4"}}' # group 2 skipped
+      write 'spec/xxx5_spec.rb', 'describe("T5"){it("E5"){puts "NO5"}}' # group 1 skipped
+      write 'spec/xxx6_spec.rb', 'describe("T6"){it("E6"){puts "NO6"}}' # group 2 skipped
+    end
 
-    # all results present
-    expect(result).to include_exactly_times('1 example, 1 failure', 1) # results
-    expect(result).to include_exactly_times('2 examples, 0 failure', 1) # results
-    expect(result).to include_exactly_times('3 examples, 1 failure', 1) # 1 summary, verify only 3 specs were executed
-    expect(result).to include_exactly_times(/Finished in \d+(\.\d+)? seconds/, 2)
-    expect(result).to include_exactly_times(/Took \d+ seconds/, 1) # parallel summary
+    it "can fail fast on a single test" do
+      result = run_tests(test_option: "--fail-fast")
 
-    # verify that successful run would have 6 specs
-    expect(result).to include '2 processes for 6 specs, ~ 3 specs per process'
-  end
+      expect(result).to include_exactly_times("YES", 1)
+      expect(result).to include_exactly_times("OK", 1) # is allowed to finish but no new test is started after
+      expect(result).to_not include("NO")
 
-  it "fast fail in parallel (disabled)" do
-    write 'spec/xxx1_spec.rb', 'describe("it"){it("should"){expect(1).to eq(2)}}'
-    write 'spec/xxx2_spec.rb', 'describe("it"){it("should"){puts "TEST2"}}'
-    write 'spec/xxx3_spec.rb', 'describe("it"){it("should"){puts "TEST3"}}'
-    write 'spec/xxx4_spec.rb', 'describe("it"){it("should"){puts "TEST4"}}'
-    write 'spec/xxx5_spec.rb', 'describe("it"){it("should"){puts "TEST5"}}'
-    write 'spec/xxx6_spec.rb', 'describe("it"){it("should"){puts "TEST6"}}'
+      expect(result).to include_exactly_times('1 example, 1 failure', 1) # rspec group 1
+      expect(result).to include_exactly_times('1 example, 0 failure', 1) # rspec group 2
+      expect(result).to include_exactly_times('2 examples, 1 failure', 1) # parallel_rspec summary
 
-    result = run_tests "spec",
-                       fail: true,
-                       type: 'rspec',
-                       processes: 2,
-                       add: "--group-by found"
+      expect(result).to include '2 processes for 6 specs, ~ 3 specs per process'
+    end
 
-    # test ran and gave their puts
-    expect(result).to include('TEST2')
-    expect(result).to include('TEST3')
-    expect(result).to include('TEST4')
-    expect(result).to include('TEST5')
-    expect(result).to include('TEST6')
+    it "can fail fast on a single group" do
+      result = run_tests
 
-    # all results present
-    expect(result).to include_exactly_times('3 examples, 1 failure', 1) # results
-    expect(result).to include_exactly_times('3 examples, 0 failure', 1) # results
-    expect(result).to include_exactly_times('6 examples, 1 failure', 1) # 1 summary, verify all specs were executed
-    expect(result).to include_exactly_times(/Finished in \d+(\.\d+)? seconds/, 2)
-    expect(result).to include_exactly_times(/Took \d+ seconds/, 1) # parallel summary
+      expect(result).to include_exactly_times("YES", 1)
+      expect(result).to include_exactly_times("OK", 1) # is allowed to finish but no new test is started after
+      expect(result).to include_exactly_times("NO", 2)
+
+      expect(result).to include_exactly_times('3 examples, 1 failure', 1) # rspec group 1
+      expect(result).to include_exactly_times('1 example, 0 failure', 1) # rspec group 2
+      expect(result).to include_exactly_times('4 examples, 1 failure', 1) # parallel_rspec summary
+
+      expect(result).to include '2 processes for 6 specs, ~ 3 specs per process'
+    end
   end
 
   it "runs tests which outputs accented characters" do
@@ -160,11 +149,11 @@ describe 'CLI' do
         end
       end
     EOF
+
     # Need to tell Ruby to default to utf-8 to simulate environments where
     # this is set. (Otherwise, it defaults to nil and the undefined conversion
     # issue doesn't come up.)
-    result = run_tests('test', fail: true,
-                       export: {'RUBYOPT' => 'Eutf-8:utf-8'})
+    result = run_tests('test', fail: true, export: {'RUBYOPT' => 'Eutf-8:utf-8'})
     expect(result).to include('¯\_(ツ)_/¯')
   end
 
@@ -346,11 +335,11 @@ describe 'CLI' do
   it "runs with PARALLEL_TEST_PROCESSORS processes" do
     skip if RUBY_PLATFORM == "java" # execution expired issue on JRuby
     processes = 5
-    processes.times { |i|
+    processes.times do |i|
       write "spec/x#{i}_spec.rb", "puts %{ENV-\#{ENV['TEST_ENV_NUMBER']}-}"
-    }
+    end
     result = run_tests(
-        "spec", export: {"PARALLEL_TEST_PROCESSORS" => processes.to_s}, processes: processes, type: 'rspec'
+      "spec", export: {"PARALLEL_TEST_PROCESSORS" => processes.to_s}, processes: processes, type: 'rspec'
     )
     expect(result.scan(/ENV-.?-/)).to match_array(["ENV--", "ENV-2-", "ENV-3-", "ENV-4-", "ENV-5-"])
   end

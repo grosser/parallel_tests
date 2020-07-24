@@ -8,7 +8,7 @@
 
 ### Added
 
-- `--fail-fast` options which stops all threads if one of them return not zero exit code. Which add possibility to stop whole suite if one test failed. Works if the option `--fail-fast` enabled for the rspec (passed to the test_options: `--test-options '--fail-fast'` or enabled at the .rspec_parallel file).  
+- `--fail-fast` stops all groups if one group fails. Can be used to stop all groups if one test failed by using `fail-fast` in the test-framework too (for example rspec via `--test-options '--fail-fast'` or in `.rspec_parallel`).  
 
 ### Fixed
 

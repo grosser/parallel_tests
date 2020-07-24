@@ -192,7 +192,6 @@ Setup for non-rails
 
 Options are:
 <!-- copy output from bundle exec ./bin/parallel_test -h -->
-
     -n [PROCESSES]                   How many processes to use, default: available CPUs
     -p, --pattern [PATTERN]          run tests matching this regex pattern
         --exclude-pattern [PATTERN]  exclude tests matching this regex pattern
@@ -222,12 +221,14 @@ Options are:
         --ignore-tags [PATTERN]      When counting steps ignore scenarios with tags that match this pattern
         --nice                       execute test commands with low priority.
         --runtime-log [PATH]         Location of previously recorded test runtimes
-        --allowed-missing            Allowed percentage of missing runtimes (default = 50)
+        --allowed-missing [INT]      Allowed percentage of missing runtimes (default = 50)
         --unknown-runtime [FLOAT]    Use given number as unknown runtime (otherwise use average time)
+        --first-is-1                 Use "1" as TEST_ENV_NUMBER to not reuse the default test environment
+        --fail-fast                  Stop all groups when one group fails (best used with --test-options '--fail-fast' if supported
         --verbose                    Print debug output
-        --verbose-process-command    Print the command that will be executed by each process before it begins
-        --verbose-rerun-command      After a process fails, print the command executed by that process
-        --quiet                      Print only test output
+        --verbose-process-command    Displays only the command that will be executed by each process
+        --verbose-rerun-command      When there are failures, displays the command executed by each process that failed
+        --quiet                      Print only tests output
     -v, --version                    Show Version
     -h, --help                       Show this.
 
