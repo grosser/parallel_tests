@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    parallel_tests (3.0.0)
+    parallel_tests (3.1.0)
       parallel
 
 GEM
@@ -54,7 +54,7 @@ GEM
     middleware (0.1.0)
     minitest (5.5.1)
     multi_test (0.1.2)
-    parallel (1.19.1)
+    parallel (1.19.2)
     power_assert (1.2.0)
     protobuf-cucumber (3.10.8)
       activesupport (>= 3.2)
