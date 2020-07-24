@@ -8,11 +8,17 @@
 
 ### Added
 
-- `--fail-fast` stops all groups if one group fails. Can be used to stop all groups if one test failed by using `fail-fast` in the test-framework too (for example rspec via `--test-options '--fail-fast'` or in `.rspec_parallel`).  
+- None
 
 ### Fixed
 
 - None
+
+## 3.1.0 - 2020-07-23
+
+### Added
+
+- `--fail-fast` stops all groups if one group fails. Can be used to stop all groups if one test failed by using `fail-fast` in the test-framework too (for example rspec via `--test-options '--fail-fast'` or in `.rspec_parallel`).
 
 ## 3.0.0 - 2020-06-10
 
