@@ -8,7 +8,7 @@
 
 ### Added
 
-- None
+- `--fail-fast` stops all groups if one group fails. Can be used to stop all groups if one test failed by using `fail-fast` in the test-framework too (for example rspec via `--test-options '--fail-fast'` or in `.rspec_parallel`).  
 
 ### Fixed
 
