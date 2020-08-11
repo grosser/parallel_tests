@@ -97,8 +97,9 @@ at_exit do
     undo_something
   end
 end
-
 ```
+
+_note:_ when using the standalone runners (`parallel_rspec`, `parallel_test`, ...) then the `ParallelTests` module isn't available.
 
 Even test group run-times
 =========================
