@@ -4,6 +4,20 @@
 
 ### Breaking Changes
 
+- None
+
+### Added
+
+- None
+
+### Fixed
+
+- None
+
+## 3.2.0 - 2020-08-27
+
+### Breaking Changes
+
 - RAILS_ENV cannot be specified for rake tasks (#776).
 
 ### Added
