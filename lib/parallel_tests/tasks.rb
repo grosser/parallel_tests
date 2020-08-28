@@ -5,7 +5,7 @@ module ParallelTests
   module Tasks
     class << self
       def rails_env
-        ENV['RAILS_ENV'] || 'test'
+        'test'
       end
 
       def rake_bin

@@ -4,7 +4,7 @@
 
 ### Breaking Changes
 
-- None
+- RAILS_ENV cannot be specified for rake tasks (#776).
 
 ### Added
 
@@ -12,7 +12,7 @@
 
 ### Fixed
 
-- None
+- Rake tasks will no longer run against development environment when using a Spring-ified rake binstub (#776).
 
 ## 3.1.0 - 2020-07-23
 
