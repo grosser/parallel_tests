@@ -12,8 +12,6 @@ module ParallelTests
       end
 
       def in_even_groups_by_size(items, num_groups, options= {})
-        all_items = items
-
         groups = Array.new(num_groups) { {:items => [], :size => 0} }
 
         # add all files that should run in a single process to one group
@@ -26,14 +24,14 @@ module ParallelTests
         isolated_count = options[:isolate] ? (options[:isolated_count] || 1) : 0
 
         if isolated_count >= 1
-          isolated_groups, other_groups = groups[0..(isolated_count - 1)], groups[isolated_count..-1]
-
           # add all files that should run in a multiple isolated processes to their own groups
-          group_features_by_size(items_to_group(single_items), isolated_groups)
-          group_features_by_size(items_to_group(items), other_groups)
+          group_features_by_size(items_to_group(single_items), groups[0..(isolated_count - 1)])
+          # group the non-isolated by size
+          group_features_by_size(items_to_group(items), groups[isolated_count..-1])
         else
           # add all files that should run in a single non-isolated process to first group
           single_items.each { |item, size| add_to_group(groups.first, item, size) }
+          # group all by size
           group_features_by_size(items_to_group(items), groups)
         end
 
