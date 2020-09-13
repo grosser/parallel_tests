@@ -193,8 +193,8 @@ module ParallelTests
         end
 
         opts.on("--isolate-n [PROCESSES]",
-                Integer,
-                "How many processes to reserve for isolated singles. By default it's one.") do |n|
+          Integer,
+          "Number of processes to use for isolated singles, default: 1") do |n|
           options[:isolated_count] = n
         end
 
