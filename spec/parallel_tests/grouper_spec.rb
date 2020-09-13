@@ -54,6 +54,10 @@ describe ParallelTests::Grouper do
       expect(call(2, :single_process => [/1|2|3|4/])).to eq([["1", "2", "3", "4"], ["5"]])
     end
 
+    it "groups single items into specified isolation groups" do
+      expect(call(3, :single_process => [/1|2|3|4/], :isolate => true, :isolated_count => 2)).to eq([["1", "4"], ["2", "3"], ["5"]])
+    end
+
     it "groups single items with others if there are too few" do
       expect(call(2, :single_process => [/1/])).to eq([["1", "3", "4"], ["2", "5"]])
     end

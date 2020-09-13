@@ -1,7 +1,7 @@
 PATH
   remote: ../../..
   specs:
-    parallel_tests (2.32.0)
+    parallel_tests (3.2.0)
       parallel
 
 GEM
@@ -72,7 +72,7 @@ GEM
     nio4r (2.3.1)
     nokogiri (1.8.5)
       mini_portile2 (~> 2.3.0)
-    parallel (1.19.1)
+    parallel (1.19.2)
     rack (2.0.5)
     rack-test (1.1.0)
       rack (>= 1.0, < 3)

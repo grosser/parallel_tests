@@ -192,6 +192,12 @@ module ParallelTests
           options[:isolate] = true
         end
 
+        opts.on("--isolate-n [PROCESSES]",
+                Integer,
+                "How many processes to reserve for isolated singles. By default it's one.") do |n|
+          options[:isolated_count] = n
+        end
+
         opts.on("--only-group INT[, INT]", Array) { |groups| options[:only_group] = groups.map(&:to_i) }
 
         opts.on("-e", "--exec [COMMAND]", "execute this code parallel and with ENV['TEST_ENV_NUMBER']") { |path| options[:execute] = path }
@@ -253,6 +259,14 @@ module ParallelTests
       allowed = [:filesize, :runtime, :found]
       if !allowed.include?(options[:group_by]) && options[:only_group]
         raise "--group-by #{allowed.join(" or ")} is required for --only-group"
+      end
+
+      if options[:isolate]
+        if options[:isolated_count].to_i > 0
+          raise "--isolate-n must be less than n" if options[:isolated_count] >= options[:count]
+        else 
+          options[:isolated_count] = 1
+        end
       end
 
       options
