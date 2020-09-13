@@ -117,7 +117,7 @@ describe ParallelTests::CLI do
       end
 
       it "isolate should set isolate_count defaults" do
-        expect(call(["test", "--single", '1', "--isolate"])).to eq(defaults.merge(single_process: [/1/], isolate: true, isolate_count: 1))
+        expect(call(["test", "--single", '1', "--isolate"])).to eq(defaults.merge(single_process: [/1/], isolate: true))
       end
 
       it "isolate_n should set isolate_count" do
