@@ -151,7 +151,7 @@ describe ParallelTests::Test::Runner do
         skip if RUBY_PLATFORM == "java"
         expect(ParallelTests::Test::Runner).to receive(:runtimes).
           and_return({"aaa1" => 1, "aaa2" => 3, "aaa3" => 2, "bbb" => 3, "ccc" => 1, "ddd" => 2})
-        result = call(["aaa1", "aaa2", "aaa3", "bbb", "ccc", "ddd", "eee"], 4, isolate: true, isolate_count: 2, single_process: [/^aaa/], group_by: :runtime)
+        result = call(["aaa1", "aaa2", "aaa3", "bbb", "ccc", "ddd", "eee"], 4, isolate_count: 2, single_process: [/^aaa/], group_by: :runtime)
 
         isolated_1, isolated_2, *groups = result
         expect(isolated_1).to eq(["aaa2"])

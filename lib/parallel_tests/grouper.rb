@@ -21,9 +21,9 @@ module ParallelTests
           single_process_patterns.any? { |pattern| item =~ pattern }
         end
 
-        if options[:isolate]
-          isolate_count = options[:isolate_count] || 1
+        isolate_count = isolate_count(options)
 
+        if isolate_count >= 1
           # add all files that should run in a multiple isolated processes to their own groups
           group_features_by_size(items_to_group(single_items), groups[0..(isolate_count - 1)])
           # group the non-isolated by size
@@ -40,6 +40,16 @@ module ParallelTests
       end
 
       private
+
+      def isolate_count(options)
+        if options[:isolate_count] && options[:isolate_count] > 1
+          options[:isolate_count]
+        elsif options[:isolate]
+          1
+        else
+          0
+        end
+      end
 
       def largest_first(files)
         files.sort_by{|_item, size| size }.reverse

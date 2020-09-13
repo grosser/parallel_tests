@@ -194,7 +194,7 @@ module ParallelTests
 
         opts.on("--isolate-n [PROCESSES]",
           Integer,
-          "Number of processes to use for isolated singles, default: 1. Do not set this without setting --isolate.") do |n|
+          "Number of processes to use for isolated singles, default: 1. Setting any positive value turns on 'isolate'.") do |n|
           options[:isolate_count] = n
         end
 
@@ -261,12 +261,8 @@ module ParallelTests
         raise "--group-by #{allowed.join(" or ")} is required for --only-group"
       end
 
-      if options[:isolate]
-        if options[:isolate_count] && options[:isolate_count] >= ParallelTests.determine_number_of_processes(options[:count])
-          abort 'Number of isolated processes must be less than total the number of processes'
-        end
-      elsif options[:isolate_count]
-        abort "Don't use isolate-n without isolate"
+      if options[:isolate_count] && options[:isolate_count] >= ParallelTests.determine_number_of_processes(options[:count])
+        abort 'Number of isolated processes must be less than total the number of processes'
       end
 
       options

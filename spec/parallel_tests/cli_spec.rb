@@ -120,22 +120,16 @@ describe ParallelTests::CLI do
         expect(call(["test", "--single", '1', "--isolate"])).to eq(defaults.merge(single_process: [/1/], isolate: true))
       end
 
-      it "isolate_n should set isolate_count" do
-        expect(call(["test", "-n", "3", "--single", '1', "--isolate", "--isolate-n", "2"])).to eq(
-          defaults.merge(count: 3, single_process: [/1/], isolate: true, isolate_count: 2)
+      it "isolate_n should set isolate_count and turn on isolate" do
+        expect(call(["test", "-n", "3", "--single", '1', "--isolate-n", "2"])).to eq(
+          defaults.merge(count: 3, single_process: [/1/], isolate_count: 2)
         )
-      end
-
-      it "isolate_n should not be set without isolate" do
-        expect(subject).to receive(:abort).with("Don't use isolate-n without isolate")
-
-        call(["test", "-n", "3", "--single", '1', "--isolate-n", "2"])
       end
 
       it "isolate_n must be within limits" do
         expect(subject).to receive(:abort).with("Number of isolated processes must be less than total the number of processes")
 
-        call(["test", "-n", "3", "--single", '1', "--isolate", "--isolate-n", "3"])
+        call(["test", "-n", "3", "--single", '1', "--isolate-n", "3"])
       end
     end
 
