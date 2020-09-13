@@ -107,6 +107,38 @@ describe ParallelTests::CLI do
       end
     end
 
+    context "single and isolate" do
+      it "single_process should be an array of patterns" do
+        expect(call(["test", "--single", '1'])).to eq(defaults.merge(single_process: [/1/]))
+      end
+
+      it "single_process should be an array of patterns" do
+        expect(call(["test", "--single", '1', "--single", '2'])).to eq(defaults.merge(single_process: [/1/, /2/]))
+      end
+
+      it "isolate should set isolate_count defaults" do
+        expect(call(["test", "--single", '1', "--isolate"])).to eq(defaults.merge(single_process: [/1/], isolate: true, isolate_count: 1))
+      end
+
+      it "isolate_n should set isolate_count" do
+        expect(call(["test", "-n", "3", "--single", '1', "--isolate", "--isolate-n", "2"])).to eq(
+          defaults.merge(count: 3, single_process: [/1/], isolate: true, isolate_count: 2)
+        )
+      end
+
+      it "isolate_n should not be set without isolate" do
+        expect(subject).to receive(:abort).with("Don't use isolate-n without isolate")
+
+        call(["test", "-n", "3", "--single", '1', "--isolate-n", "2"])
+      end
+
+      it "isolate_n must be within limits" do
+        expect(subject).to receive(:abort).with("Number of isolated processes must be less than total the number of processes")
+
+        call(["test", "-n", "3", "--single", '1', "--isolate", "--isolate-n", "3"])
+      end
+    end
+
     context "when the -- option separator is used" do
       it "interprets arguments as files/directories" do
         expect(call(%w(-- test))).to eq( files: %w(test))

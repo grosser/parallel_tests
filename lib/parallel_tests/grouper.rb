@@ -21,16 +21,17 @@ module ParallelTests
           single_process_patterns.any? { |pattern| item =~ pattern }
         end
 
-        isolated_count = options[:isolate] ? (options[:isolated_count] || 1) : 0
+        if options[:isolate]
+          isolate_count = options[:isolate_count] || 1
 
-        if isolated_count >= 1
           # add all files that should run in a multiple isolated processes to their own groups
-          group_features_by_size(items_to_group(single_items), groups[0..(isolated_count - 1)])
+          group_features_by_size(items_to_group(single_items), groups[0..(isolate_count - 1)])
           # group the non-isolated by size
-          group_features_by_size(items_to_group(items), groups[isolated_count..-1])
+          group_features_by_size(items_to_group(items), groups[isolate_count..-1])
         else
           # add all files that should run in a single non-isolated process to first group
           single_items.each { |item, size| add_to_group(groups.first, item, size) }
+
           # group all by size
           group_features_by_size(items_to_group(items), groups)
         end

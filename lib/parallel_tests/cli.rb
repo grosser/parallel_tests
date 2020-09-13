@@ -190,12 +190,20 @@ module ParallelTests
           "Do not run any other tests in the group used by --single(-s)") do |pattern|
 
           options[:isolate] = true
+          options[:isolate_count] = 1
         end
 
         opts.on("--isolate-n [PROCESSES]",
           Integer,
-          "Number of processes to use for isolated singles, default: 1") do |n|
-          options[:isolated_count] = n
+          "Number of processes to use for isolated singles, default: 1. Do not set this without setting --isolate.") do |n|
+
+          # isolate_count is dependent on isolate being set.
+          abort "Don't use isolate-n without isolate" unless options[:isolate]
+          if  n >= ParallelTests.determine_number_of_processes(options[:count])
+            abort 'Number of isolated processes must be less than total the number of processes'
+          end
+
+          options[:isolate_count] = n
         end
 
         opts.on("--only-group INT[, INT]", Array) { |groups| options[:only_group] = groups.map(&:to_i) }
@@ -259,14 +267,6 @@ module ParallelTests
       allowed = [:filesize, :runtime, :found]
       if !allowed.include?(options[:group_by]) && options[:only_group]
         raise "--group-by #{allowed.join(" or ")} is required for --only-group"
-      end
-
-      if options[:isolate]
-        if options[:isolated_count].to_i > 0
-          raise "--isolate-n must be less than n" if options[:isolated_count] >= options[:count]
-        else
-          options[:isolated_count] = 1
-        end
       end
 
       options
