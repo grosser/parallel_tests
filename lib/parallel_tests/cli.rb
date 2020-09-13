@@ -264,7 +264,7 @@ module ParallelTests
       if options[:isolate]
         if options[:isolated_count].to_i > 0
           raise "--isolate-n must be less than n" if options[:isolated_count] >= options[:count]
-        else 
+        else
           options[:isolated_count] = 1
         end
       end
