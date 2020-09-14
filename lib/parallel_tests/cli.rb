@@ -194,7 +194,7 @@ module ParallelTests
 
         opts.on("--isolate-n [PROCESSES]",
           Integer,
-          "Number of processes to use for isolated singles, default: 1. Setting any positive value turns on 'isolate'.") do |n|
+          "Use 'isolate'  singles with number of processes, default: 1.") do |n|
           options[:isolate_count] = n
         end
 
