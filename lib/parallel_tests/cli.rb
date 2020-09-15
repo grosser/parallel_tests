@@ -261,10 +261,6 @@ module ParallelTests
         raise "--group-by #{allowed.join(" or ")} is required for --only-group"
       end
 
-      if options[:isolate_count] && options[:isolate_count] >= ParallelTests.determine_number_of_processes(options[:count])
-        abort 'Number of isolated processes must be less than total the number of processes'
-      end
-
       options
     end
 

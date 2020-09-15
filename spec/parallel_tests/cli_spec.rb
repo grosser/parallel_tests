@@ -125,12 +125,6 @@ describe ParallelTests::CLI do
           defaults.merge(count: 3, single_process: [/1/], isolate_count: 2)
         )
       end
-
-      it "isolate_n must be within limits" do
-        expect(subject).to receive(:abort).with("Number of isolated processes must be less than total the number of processes")
-
-        call(["test", "-n", "3", "--single", '1', "--isolate-n", "3"])
-      end
     end
 
     context "when the -- option separator is used" do
