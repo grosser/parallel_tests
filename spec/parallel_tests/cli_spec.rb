@@ -107,6 +107,26 @@ describe ParallelTests::CLI do
       end
     end
 
+    context "single and isolate" do
+      it "single_process should be an array of patterns" do
+        expect(call(["test", "--single", '1'])).to eq(defaults.merge(single_process: [/1/]))
+      end
+
+      it "single_process should be an array of patterns" do
+        expect(call(["test", "--single", '1', "--single", '2'])).to eq(defaults.merge(single_process: [/1/, /2/]))
+      end
+
+      it "isolate should set isolate_count defaults" do
+        expect(call(["test", "--single", '1', "--isolate"])).to eq(defaults.merge(single_process: [/1/], isolate: true))
+      end
+
+      it "isolate_n should set isolate_count and turn on isolate" do
+        expect(call(["test", "-n", "3", "--single", '1', "--isolate-n", "2"])).to eq(
+          defaults.merge(count: 3, single_process: [/1/], isolate_count: 2)
+        )
+      end
+    end
+
     context "when the -- option separator is used" do
       it "interprets arguments as files/directories" do
         expect(call(%w(-- test))).to eq( files: %w(test))

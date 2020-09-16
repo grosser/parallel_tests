@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Added support for multiple isolated processes.
+
 ### Breaking Changes
 
 - None

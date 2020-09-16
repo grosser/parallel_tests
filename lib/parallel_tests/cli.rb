@@ -192,6 +192,12 @@ module ParallelTests
           options[:isolate] = true
         end
 
+        opts.on("--isolate-n [PROCESSES]",
+          Integer,
+          "Use 'isolate'  singles with number of processes, default: 1.") do |n|
+          options[:isolate_count] = n
+        end
+
         opts.on("--only-group INT[, INT]", Array) { |groups| options[:only_group] = groups.map(&:to_i) }
 
         opts.on("-e", "--exec [COMMAND]", "execute this code parallel and with ENV['TEST_ENV_NUMBER']") { |path| options[:execute] = path }

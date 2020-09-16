@@ -54,9 +54,22 @@ describe ParallelTests::Grouper do
       expect(call(2, :single_process => [/1|2|3|4/])).to eq([["1", "2", "3", "4"], ["5"]])
     end
 
+    it "groups single items into specified isolation groups" do
+      expect(call(3, :single_process => [/1|2|3|4/], :isolate_count => 2)).to eq([["1", "4"], ["2", "3"], ["5"]])
+    end
+
     it "groups single items with others if there are too few" do
       expect(call(2, :single_process => [/1/])).to eq([["1", "3", "4"], ["2", "5"]])
     end
+
+    it "groups must abort when isolate_count is out of bounds" do
+      expect {
+        call(3, :single_process => [/1/], :isolate_count => 3)
+      }.to raise_error(
+        "Number of isolated processes must be less than total the number of processes"
+      )
+    end
+
   end
 
   describe '.by_scenarios' do
