@@ -63,9 +63,11 @@ describe ParallelTests::Grouper do
     end
 
     it "groups must abort when isolate_count is out of bounds" do
-      expect(subject).to receive(:abort).with("Number of isolated processes must be less than total the number of processes")
-
-      call(3, :single_process => [/1/], :isolate_count => 3)
+      expect {
+        call(3, :single_process => [/1/], :isolate_count => 3)
+      }.to raise_error(
+        "Number of isolated processes must be less than total the number of processes"
+      )
     end
 
   end

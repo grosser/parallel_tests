@@ -24,7 +24,7 @@ module ParallelTests
         isolate_count = isolate_count(options)
 
         if isolate_count >= num_groups
-          abort 'Number of isolated processes must be less than total the number of processes'
+          raise 'Number of isolated processes must be less than total the number of processes'
         end
 
         if isolate_count >= 1
