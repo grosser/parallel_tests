@@ -205,9 +205,9 @@ Options are:
           default - runtime when runtime log is filled otherwise filesize
     -m, --multiply-processes [FLOAT] use given number as a multiplier of processes to run
     -s, --single [PATTERN]           Run all matching files in the same process
-    -i, --isolate                    Do not run any other tests in the group used by --single(-s). 
+    -i, --isolate                    Do not run any other tests in the group used by --single(-s).
                                      Automatically turned on if --isolate-n is set above 0.
-        --isolate-n                  Number of processes for isolated groups. Default to 1 when --isolate is on. 
+        --isolate-n                  Number of processes for isolated groups. Default to 1 when --isolate is on.
         --only-group INT[, INT]
     -e, --exec [COMMAND]             execute this code parallel and with ENV['TEST_ENV_NUMBER']
     -o, --test-options '[OPTIONS]'   execute test commands with those options
@@ -378,6 +378,7 @@ inspired by [pivotal labs](https://blog.pivotal.io/labs/labs/parallelize-your-rs
  - [Calaway](https://github.com/calaway)
  - [alboyadjian](https://github.com/alboyadjian)
  - [Nathan Broadbent](https://github.com/ndbroadbent)
+ - [Vikram B Kumar](https://github.com/v-kumar)
 
 [Michael Grosser](http://grosser.it)<br/>
 michael@grosser.it<br/>

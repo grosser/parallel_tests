@@ -2,7 +2,7 @@
 
 ## Unreleased
 
-- Added support for multiple isolated processes.
+Add changes here in your PR
 
 ### Breaking Changes
 
@@ -15,6 +15,12 @@
 ### Fixed
 
 - None
+
+## 3.3.0 - 2020-09-16
+
+### Added
+
+- Added support for multiple isolated processes.
 
 ## 3.2.0 - 2020-08-27
 
