@@ -153,6 +153,8 @@ Add the following to your `.rspec_parallel` (or `.rspec`) :
     --format progress
     --format ParallelTests::RSpec::FailuresLogger --out tmp/failing_specs.log
 
+To rerun failures see [this Gist example](https://gist.github.com/mattheworiordan/6440162)
+
 Cucumber: FailuresLogger
 -----------------------
 
