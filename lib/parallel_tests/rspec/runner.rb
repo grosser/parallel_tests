@@ -48,6 +48,22 @@ module ParallelTests
           "#{clean} --seed #{seed}"
         end
 
+        # Summarize results from threads and colorize results based on failure and pending counts.
+        #
+        def summarize_results(results)
+          sums = sum_up_results(results)
+          text = super
+          return text unless $stdout.tty?
+          color =
+            if sums['failure'].positive?
+              31 # red
+            elsif sums['pending'].positive?
+              33 # yellow
+            else
+              32 # green
+            end
+          "\e[#{color}m#{text}\e[0m"
+        end
 
         private
 

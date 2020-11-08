@@ -128,6 +128,57 @@ describe ParallelTests::RSpec::Runner do
     end
   end
 
+  describe '.summarize_results' do
+
+    context 'not on TTY device' do
+      before { allow($stdout).to receive(:tty?).and_return false }
+
+      it 'is not colourized' do
+        results = ParallelTests::RSpec::Runner.send(:summarize_results, ['1 example, 0 failures, 0 pendings'])
+
+        expect(results).to eq('1 example, 0 failures, 0 pendings')
+      end
+    end
+
+    context 'on TTY device' do
+      before { allow($stdout).to receive(:tty?).and_return true }
+
+      subject(:colorized_results) { ParallelTests::RSpec::Runner.send(:summarize_results, [result_string]) }
+
+      context 'when there are no pending or failed tests' do
+        let(:result_string) { '1 example, 0 failures, 0 pendings' }
+
+        it 'is green' do
+          expect(colorized_results).to eq("\e[32m#{result_string}\e[0m") # 32 is green
+        end
+      end
+
+      context 'when there is a pending test and no failed tests' do
+        let(:result_string) { '1 example, 0 failures, 1 pending' }
+
+        it 'is yellow' do
+          expect(colorized_results).to eq("\e[33m#{result_string}\e[0m") # 33 is yellow
+        end
+      end
+
+      context 'when there is a pending test and a failed test' do
+        let(:result_string) { '1 example, 1 failure, 1 pending' }
+
+        it 'is red' do
+          expect(colorized_results).to eq("\e[31m#{result_string}\e[0m") # 31 is red
+        end
+      end
+
+      context 'when there is no pending tests and a failed test' do
+        let(:result_string) { '1 example, 1 failure, 0 pendings' }
+
+        it 'is red' do
+          expect(colorized_results).to eq("\e[31m#{result_string}\e[0m") # 31 is red
+        end
+      end
+    end
+  end
+
   describe ".command_with_seed" do
     def call(args)
       base = "ruby -Ilib:test test/minitest/test_minitest_unit.rb"
