@@ -26,9 +26,7 @@ jobs:
       with:
         ruby-version: ${{ matrix.ruby }}
         apt-get:  libsqlite3-dev
-    - name: Install dependencies
-      run: |
-        bundle install
+        bundler-cache: true
     - name: Run test
       run: bundle exec rake
       # TODO: this will always show green, fix once https://github.com/actions/toolkit/issues/399 is resolved
