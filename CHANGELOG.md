@@ -10,7 +10,7 @@ Add changes here in your PR
 
 ### Added
 
-- None
+- Colorize summarized RSpec results.([#787](https://github.com/grosser/parallel_tests/pull/787)).
 
 ### Fixed
 
