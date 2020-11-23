@@ -129,7 +129,6 @@ describe ParallelTests::RSpec::Runner do
   end
 
   describe '.summarize_results' do
-
     context 'not on TTY device' do
       before { allow($stdout).to receive(:tty?).and_return false }
 

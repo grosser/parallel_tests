@@ -51,9 +51,9 @@ module ParallelTests
         # Summarize results from threads and colorize results based on failure and pending counts.
         #
         def summarize_results(results)
-          sums = sum_up_results(results)
           text = super
           return text unless $stdout.tty?
+          sums = sum_up_results(results)
           color =
             if sums['failure'].positive?
               31 # red
