@@ -142,16 +142,18 @@ Add the following to your `.rspec_parallel` (or `.rspec`) :
 RSpec: FailuresLogger
 -----------------------
 
-Produce pasteable command-line snippets for each failed example.
+Produce pastable command-line snippets for each failed example. For example:
 
-E.g.
+```bash
+rspec /path/to/my_spec.rb:123 # should do something
+```
 
-    rspec /path/to/my_spec.rb:123 # should do something
-
-Add the following to your `.rspec_parallel` (or `.rspec`) :
+Add to `.rspec_parallel` or use as CLI flag:
 
     --format progress
     --format ParallelTests::RSpec::FailuresLogger --out tmp/failing_specs.log
+
+(Not needed to retry failures, for that pass [--only-failures](https://relishapp.com/rspec/rspec-core/docs/command-line/only-failures) to rspec)
 
 Cucumber: FailuresLogger
 -----------------------
