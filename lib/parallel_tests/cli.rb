@@ -142,7 +142,17 @@ module ParallelTests
       num_processes = groups.size
       num_tests = groups.map(&:size).inject(0, :+)
       tests_per_process = (num_processes == 0 ? 0 : num_tests / num_processes)
-      puts "#{num_processes} processes for #{num_tests} #{name}s, ~ #{tests_per_process} #{name}s per process"
+      puts "#{pluralize(num_processes, 'process')} for #{pluralize(num_tests, name)}, ~ #{pluralize(tests_per_process, name)} per process"
+    end
+
+    def pluralize(n, singular)
+      if n == 1
+        "1 #{singular}"
+      elsif singular.end_with?('s', 'sh', 'ch', 'x', 'z')
+        "#{n} #{singular}es"
+      else
+        "#{n} #{singular}s"
+      end
     end
 
     #exit with correct status code so rake parallel:test && echo 123 works

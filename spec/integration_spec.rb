@@ -60,7 +60,7 @@ describe 'CLI' do
     end
   end
 
-  let(:printed_commands) { "specs per process\nbundle exec rspec" }
+  let(:printed_commands) { /specs? per process\nbundle exec rspec/ }
   let(:printed_rerun) { "run the group again:\n\nbundle exec rspec" }
 
   it "runs tests in parallel" do
@@ -80,7 +80,7 @@ describe 'CLI' do
     expect(result).to include_exactly_times(/Took \d+ seconds/, 1) # parallel summary
 
     # verify empty groups are discarded. if retained then it'd say 4 processes for 2 specs
-    expect(result).to include '2 processes for 2 specs, ~ 1 specs per process'
+    expect(result).to include '2 processes for 2 specs, ~ 1 spec per process'
   end
 
   describe "--fail-fast" do
@@ -168,7 +168,7 @@ describe 'CLI' do
     write 'spec/xxx_spec.rb', 'describe("it"){it("should"){puts "TEST1"}}'
     write 'spec/xxx2_spec.rb', 'describe("it"){it("should"){expect(1).to eq(2)}}'
     result = run_tests "spec --verbose", type: 'rspec', fail: true
-    expect(result).to include printed_commands
+    expect(result).to match printed_commands
     expect(result).to include printed_rerun
     expect(result).to include "bundle exec rspec spec/xxx_spec.rb"
     expect(result).to include "bundle exec rspec spec/xxx2_spec.rb"
@@ -178,14 +178,14 @@ describe 'CLI' do
     write 'spec/xxx_spec.rb', 'describe("it"){it("should"){expect(1).to eq(2)}}'
     result = run_tests "spec --verbose-rerun-command", type: 'rspec', fail: true
     expect(result).to include printed_rerun
-    expect(result).to_not include printed_commands
+    expect(result).to_not match printed_commands
   end
 
   it "shows only process with --verbose-process-command" do
     write 'spec/xxx_spec.rb', 'describe("it"){it("should"){expect(1).to eq(2)}}'
     result = run_tests "spec --verbose-process-command", type: 'rspec', fail: true
     expect(result).to_not include printed_rerun
-    expect(result).to include printed_commands
+    expect(result).to match printed_commands
   end
 
   it "fails when tests fail" do
