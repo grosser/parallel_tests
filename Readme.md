@@ -210,7 +210,7 @@ Options are:
     -i, --isolate                    Do not run any other tests in the group used by --single(-s).
                                      Automatically turned on if --isolate-n is set above 0.
         --isolate-n                  Number of processes for isolated groups. Default to 1 when --isolate is on.
-        --only-group INT[, INT]
+        --only-group INT[,INT]
     -e, --exec [COMMAND]             execute this code parallel and with ENV['TEST_ENV_NUMBER']
     -o, --test-options '[OPTIONS]'   execute test commands with those options
     -t, --type [TYPE]                test(default) / rspec / cucumber / spinach
