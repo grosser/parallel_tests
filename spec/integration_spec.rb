@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require 'spec_helper'
 
 describe 'CLI' do
@@ -96,8 +97,8 @@ describe 'CLI' do
     end
 
     before do
-      write 'spec/xxx1_spec.rb', 'describe("T1"){it("E1"){puts "YE" + "S"; sleep 1; expect(1).to eq(2)}}' # group 1 executed
-      write 'spec/xxx2_spec.rb', 'describe("T2"){it("E2"){sleep 1.5; puts "OK"}}' # group 2 executed
+      write 'spec/xxx1_spec.rb', 'describe("T1"){it("E1"){puts "YE" + "S"; sleep 0.5; expect(1).to eq(2)}}' # group 1 executed
+      write 'spec/xxx2_spec.rb', 'describe("T2"){it("E2"){sleep 1; puts "OK"}}' # group 2 executed
       write 'spec/xxx3_spec.rb', 'describe("T3"){it("E3"){puts "NO3"}}' # group 1 skipped
       write 'spec/xxx4_spec.rb', 'describe("T4"){it("E4"){puts "NO4"}}' # group 2 skipped
       write 'spec/xxx5_spec.rb', 'describe("T5"){it("E5"){puts "NO5"}}' # group 1 skipped
@@ -217,7 +218,7 @@ describe 'CLI' do
   it "can show simulated output preceded by command when serializing stdout with verbose option" do
     write 'spec/xxx_spec.rb', 'describe("it"){it("should"){sleep 1.5; puts "TEST1"}}'
     result = run_tests "spec --verbose", type: 'rspec', add: "--serialize-stdout", export: { 'PARALLEL_TEST_HEARTBEAT_INTERVAL' => '0.02' }
-    expect(result).to match(/\.{5}.*\nbundle exec rspec spec\/xxx_spec\.rb\n.*\nTEST1/m)
+    expect(result).to match(/\.{5}.*\nbundle exec rspec spec\/xxx_spec\.rb\n.*^TEST1/m)
   end
 
   it "can serialize stdout and stderr" do

@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require 'tempfile'
 require 'parallel_tests/cucumber/scenarios'
 

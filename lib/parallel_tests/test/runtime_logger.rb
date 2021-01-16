@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require 'parallel_tests'
 require 'parallel_tests/test/runner'
 

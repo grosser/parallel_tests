@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require 'bundler/setup'
 require 'tempfile'
 require 'tmpdir'
@@ -127,7 +128,7 @@ module SharedExamples
 
       it 'partitions from custom runtime-data location' do
         allow(klass).to receive(:puts)
-        log.replace('tmp/custom_runtime.log')
+        allow_any_instance_of(klass).to receive(:runtime_log).and_return('tmp/custom_runtime.log')
         setup_runtime_log
 
         groups = klass.tests_in_groups([test_root], 2, runtime_log: log)

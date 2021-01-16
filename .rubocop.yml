@@ -4,6 +4,7 @@ AllCops:
   SuggestExtensions: false
   Exclude:
   - '**/vendor/bundle/**/*'
+  - 'spec/fixtures/*/db/schema.rb'
 
 Style/StringLiterals:
   Enabled: false
@@ -63,10 +64,6 @@ Style/WordArray:
 
 Style/SymbolArray:
   EnforcedStyle: brackets
-
-# TODO: enable
-Style/FrozenStringLiteralComment:
-  Enabled: false
 
 Style/DoubleNegation:
   Enabled: false

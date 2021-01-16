@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require "parallel_tests/test/runner"
 
 module ParallelTests
@@ -22,7 +23,7 @@ module ParallelTests
         end
 
         def runtime_log
-          'tmp/parallel_runtime_rspec.log'
+          "tmp/parallel_runtime_rspec.log"
         end
 
         def test_file_name

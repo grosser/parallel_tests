@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require "parallel"
 require "parallel_tests/railtie" if defined? Rails::Railtie
 require "rbconfig"

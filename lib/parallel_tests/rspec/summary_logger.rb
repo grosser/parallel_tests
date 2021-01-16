@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require 'parallel_tests/rspec/failures_logger'
 
 class ParallelTests::RSpec::SummaryLogger < ParallelTests::RSpec::LoggerBase

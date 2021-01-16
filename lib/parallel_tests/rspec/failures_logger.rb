@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require 'parallel_tests/rspec/logger_base'
 require 'parallel_tests/rspec/runner'
 

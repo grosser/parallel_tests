@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require 'parallel_tests'
 
 module ParallelTests
@@ -148,7 +149,7 @@ module ParallelTests
 
         # read output of the process and print it in chunks
         def capture_output(out, env, options = {})
-          result = ""
+          result = +""
           begin
             loop do
               read = out.readpartial(1000000) # read whatever chunk we can get
@@ -229,7 +230,7 @@ module ParallelTests
             # http://stackoverflow.com/questions/357754/can-i-traverse-symlinked-directories-in-ruby-with-a-glob
             "**{,/*/**}/*"
           end
-          Dir[File.join(folder, pattern)].uniq
+          Dir[File.join(folder, pattern)].uniq.sort
         end
 
         private

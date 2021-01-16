@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require 'spec_helper'
 require 'parallel_tests/gherkin/io'
 require 'parallel_tests/cucumber/failures_logger'

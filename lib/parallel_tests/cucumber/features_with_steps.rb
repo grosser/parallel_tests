@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 begin
   gem "cuke_modeler", "~> 3.0"
   require 'cuke_modeler'

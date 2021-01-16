@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 name = "parallel_tests"
 require_relative "lib/#{name}/version"
 

@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require "spec_helper"
 require "parallel_tests/test/runner"
 
@@ -476,7 +477,7 @@ describe ParallelTests::Test::Runner do
     it "prints output while running" do
       skip "too slow" if RUBY_PLATFORM == " java"
       run_with_file("$stdout.sync = true; puts 123; sleep 0.1; print 345; sleep 0.1; puts 567") do |path|
-        received = ""
+        received = +""
         allow($stdout).to receive(:print) do |x|
           received << x.strip
         end
