@@ -75,8 +75,8 @@ describe ParallelTests do
         example.run
       end
     end
-    
-    def with_running_processes(count, wait=0.2)
+
+    def with_running_processes(count, wait = 0.2)
       count.times { |x| ParallelTests.pids.add(x) }
       sleep 0.1
       yield
@@ -102,7 +102,7 @@ describe ParallelTests do
       ENV["TEST_ENV_NUMBER"] = "2"
       counter = 0
       allow(ParallelTests).to receive(:sleep) do
-        sleep 0.1;
+        sleep 0.1
         ParallelTests.pids.delete(1) if counter > 3
         counter += 1
       end
@@ -120,14 +120,14 @@ describe ParallelTests do
         example.run
       end
     end
-    
+
     it "is 0 for nothing" do
       expect(ParallelTests.number_of_running_processes).to eq(0)
     end
 
     it "is 2 when 2 are running" do
       wait = 0.2
-      2.times { |x| ParallelTests.pids.add(123) }
+      2.times { |_x| ParallelTests.pids.add(123) }
       sleep wait / 2
       expect(ParallelTests.number_of_running_processes).to eq(2)
       sleep wait

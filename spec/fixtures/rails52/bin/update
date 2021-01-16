@@ -1,6 +1,6 @@
 #!/usr/bin/env ruby
 require 'fileutils'
-include FileUtils
+include FileUtils # rubocop:disable Style/MixinUsage
 
 # path to your application root.
 APP_ROOT = File.expand_path('..', __dir__)

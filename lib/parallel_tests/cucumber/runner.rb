@@ -3,8 +3,8 @@ require "parallel_tests/gherkin/runner"
 module ParallelTests
   module Cucumber
     class Runner < ParallelTests::Gherkin::Runner
-      SCENARIOS_RESULTS_BOUNDARY_REGEX = /^(Failing|Flaky) Scenarios:$/
-      SCENARIO_REGEX = /^cucumber features\/.+:\d+/
+      SCENARIOS_RESULTS_BOUNDARY_REGEX = /^(Failing|Flaky) Scenarios:$/.freeze
+      SCENARIO_REGEX = %r{^cucumber features/.+:\d+}.freeze
 
       class << self
         def name
@@ -21,9 +21,7 @@ module ParallelTests
           scenario_groups = results.slice_before(SCENARIOS_RESULTS_BOUNDARY_REGEX).group_by(&:first)
           scenario_groups.each do |header, group|
             scenarios = group.flatten.grep(SCENARIO_REGEX)
-            if scenarios.any?
-              output << ([header] + scenarios).join("\n")
-            end
+            output << ([header] + scenarios).join("\n") if scenarios.any?
           end
 
           output << super

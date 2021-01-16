@@ -12,22 +12,22 @@ describe ParallelTests::Test::Runner do
 
     it "allows to override runner executable via PARALLEL_TESTS_EXECUTABLE" do
       ENV['PARALLEL_TESTS_EXECUTABLE'] = 'script/custom_rspec'
-      expect(ParallelTests::Test::Runner).to receive(:execute_command) do |a,b,c,d|
+      expect(ParallelTests::Test::Runner).to receive(:execute_command) do |a, _, _, _d|
         expect(a).to include("script/custom_rspec")
       end
       call(['xxx'], 1, 22, {})
     end
 
     it "uses options" do
-      expect(ParallelTests::Test::Runner).to receive(:execute_command) do |a,b,c,d|
-        expect(a).to match(%r{ruby -Itest .* -- -v})
+      expect(ParallelTests::Test::Runner).to receive(:execute_command) do |a, _, _, _d|
+        expect(a).to match(/ruby -Itest .* -- -v/)
       end
-      call(['xxx'], 1, 22, :test_options => '-v')
+      call(['xxx'], 1, 22, test_options: '-v')
     end
 
     it "returns the output" do
-      expect(ParallelTests::Test::Runner).to receive(:execute_command).and_return({:x => 1})
-      expect(call(['xxx'], 1, 22, {})).to eq({:x => 1})
+      expect(ParallelTests::Test::Runner).to receive(:execute_command).and_return(x: 1)
+      expect(call(['xxx'], 1, 22, {})).to eq({ x: 1 })
     end
   end
 
@@ -55,7 +55,7 @@ describe ParallelTests::Test::Runner do
 
       it "sorts by runtime when runtime is available" do
         expect(ParallelTests::Test::Runner).to receive(:puts).with("Using recorded test runtime")
-        expect(ParallelTests::Test::Runner).to receive(:runtimes).and_return({"a" => 1, "b" => 1, "c" => 3})
+        expect(ParallelTests::Test::Runner).to receive(:runtimes).and_return("a" => 1, "b" => 1, "c" => 3)
         expect(call(["a", "b", "c"], 2)).to eq([["c"], ["a", "b"]])
       end
 
@@ -103,7 +103,12 @@ describe ParallelTests::Test::Runner do
 
       it "groups when test name contains colons" do
         File.write("tmp/parallel_runtime_test.log", "ccc[1:2:3]:1\nbbb[1:2:3]:2\naaa[1:2:3]:3")
-        expect(call(["aaa[1:2:3]", "bbb[1:2:3]", "ccc[1:2:3]"], 2, group_by: :runtime)).to match_array([["aaa[1:2:3]"], ["bbb[1:2:3]", "ccc[1:2:3]"]])
+        expect(
+          call(
+            ["aaa[1:2:3]", "bbb[1:2:3]", "ccc[1:2:3]"], 2,
+            group_by: :runtime
+          )
+        ).to match_array([["aaa[1:2:3]"], ["bbb[1:2:3]", "ccc[1:2:3]"]])
       end
 
       it "groups when not even statistic" do
@@ -118,21 +123,25 @@ describe ParallelTests::Test::Runner do
 
       it "groups with unknown-runtime for missing" do
         File.write("tmp/parallel_runtime_test.log", "xxx:123\nbbb:10\nccc:1")
-        expect(call(["aaa", "bbb", "ccc", "ddd"], 2, group_by: :runtime, unknown_runtime: 0.0)).to eq([["bbb"], ["aaa", "ccc", "ddd"]])
+        expect(
+          call(["aaa", "bbb", "ccc", "ddd"], 2, group_by: :runtime, unknown_runtime: 0.0)
+        ).to eq([["bbb"], ["aaa", "ccc", "ddd"]])
       end
 
       it "groups by single_process pattern and then via size" do
-        expect(ParallelTests::Test::Runner).to receive(:runtimes).
-          and_return({"aaa" => 5, "bbb" => 2, "ccc" => 1, "ddd" => 1})
+        expect(ParallelTests::Test::Runner).to receive(:runtimes)
+          .and_return({ "aaa" => 5, "bbb" => 2, "ccc" => 1, "ddd" => 1 })
         result = call(["aaa", "aaa2", "bbb", "ccc", "ddd"], 3, single_process: [/^a.a/], group_by: :runtime)
         expect(result).to eq([["aaa", "aaa2"], ["bbb"], ["ccc", "ddd"]])
       end
 
       it "groups by size and adds isolated separately" do
         skip if RUBY_PLATFORM == "java"
-        expect(ParallelTests::Test::Runner).to receive(:runtimes).
-          and_return({"aaa" => 0, "bbb" => 3, "ccc" => 1, "ddd" => 2})
-        result = call(["aaa", "bbb", "ccc", "ddd", "eee"], 3, isolate: true, single_process: [/^aaa/], group_by: :runtime)
+        expect(ParallelTests::Test::Runner).to receive(:runtimes)
+          .and_return({ "aaa" => 0, "bbb" => 3, "ccc" => 1, "ddd" => 2 })
+        result = call(
+          ["aaa", "bbb", "ccc", "ddd", "eee"], 3, isolate: true, single_process: [/^aaa/], group_by: :runtime
+        )
 
         isolated, *groups = result
         expect(isolated).to eq(["aaa"])
@@ -149,9 +158,11 @@ describe ParallelTests::Test::Runner do
 
       it "groups by size and use specified number of isolation groups" do
         skip if RUBY_PLATFORM == "java"
-        expect(ParallelTests::Test::Runner).to receive(:runtimes).
-          and_return({"aaa1" => 1, "aaa2" => 3, "aaa3" => 2, "bbb" => 3, "ccc" => 1, "ddd" => 2})
-        result = call(["aaa1", "aaa2", "aaa3", "bbb", "ccc", "ddd", "eee"], 4, isolate_count: 2, single_process: [/^aaa/], group_by: :runtime)
+        expect(ParallelTests::Test::Runner).to receive(:runtimes)
+          .and_return({ "aaa1" => 1, "aaa2" => 3, "aaa3" => 2, "bbb" => 3, "ccc" => 1, "ddd" => 2 })
+        result = call(
+          ["aaa1", "aaa2", "aaa3", "bbb", "ccc", "ddd", "eee"], 4, isolate_count: 2, single_process: [/^aaa/], group_by: :runtime
+        )
 
         isolated_1, isolated_2, *groups = result
         expect(isolated_1).to eq(["aaa2"])
@@ -175,35 +186,44 @@ describe ParallelTests::Test::Runner do
     end
 
     it "finds multiple results in test output" do
-      output = <<EOF
-Loaded suite /opt/ruby-enterprise/lib/ruby/gems/1.8/gems/rake-0.8.4/lib/rake/rake_test_loader
-Started
-..............
-Finished in 0.145069 seconds.
+      output = <<~OUT
+        Loaded suite /opt/ruby-enterprise/lib/ruby/gems/1.8/gems/rake-0.8.4/lib/rake/rake_test_loader
+        Started
+        ..............
+        Finished in 0.145069 seconds.
 
-10 tests, 20 assertions, 0 failures, 0 errors
-Loaded suite /opt/ruby-enterprise/lib/ruby/gems/1.8/gems/rake-0.8.4/lib/rake/rake_test_loader
-Started
-..............
-Finished in 0.145069 seconds.
+        10 tests, 20 assertions, 0 failures, 0 errors
+        Loaded suite /opt/ruby-enterprise/lib/ruby/gems/1.8/gems/rake-0.8.4/lib/rake/rake_test_loader
+        Started
+        ..............
+        Finished in 0.145069 seconds.
 
-14 tests, 20 assertions, 0 failures, 0 errors
+        14 tests, 20 assertions, 0 failures, 0 errors
+      OUT
 
-EOF
-
-      expect(call(output)).to eq(['10 tests, 20 assertions, 0 failures, 0 errors','14 tests, 20 assertions, 0 failures, 0 errors'])
+      expect(call(output)).to eq(
+        [
+          '10 tests, 20 assertions, 0 failures, 0 errors',
+          '14 tests, 20 assertions, 0 failures, 0 errors'
+        ]
+      )
     end
 
     it "ignores color-codes" do
-      output = <<EOF
-10 tests, 20 assertions, 0 \e[31mfailures, 0 errors
-EOF
+      output = <<~EOF
+        10 tests, 20 assertions, 0 \e[31mfailures, 0 errors
+      EOF
       expect(call(output)).to eq(['10 tests, 20 assertions, 0 failures, 0 errors'])
     end
 
     it "splits lines with Windows line separators" do
       output = "10 tests, 20 assertions, 0 failures, 0 errors\r\n15 tests, 25 assertions, 0 failures, 0 errors"
-      expect(call(output)).to eq(["10 tests, 20 assertions, 0 failures, 0 errors", "15 tests, 25 assertions, 0 failures, 0 errors"])
+      expect(call(output)).to eq(
+        [
+          "10 tests, 20 assertions, 0 failures, 0 errors",
+          "15 tests, 25 assertions, 0 failures, 0 errors"
+        ]
+      )
     end
   end
 
@@ -214,103 +234,117 @@ EOF
 
     it "finds test in folders with appended /" do
       with_files(['b/a_test.rb']) do |root|
-        expect(call(["#{root}/"]).sort).to eq([
-          "#{root}/b/a_test.rb",
-        ])
+        expect(call(["#{root}/"]).sort).to eq(["#{root}/b/a_test.rb"])
       end
     end
 
     it "finds test files nested in symlinked folders" do
-      with_files(['a/a_test.rb','b/b_test.rb']) do |root|
+      with_files(['a/a_test.rb', 'b/b_test.rb']) do |root|
         `ln -s #{root}/a #{root}/b/link`
-        expect(call(["#{root}/b"]).sort).to eq([
-          "#{root}/b/b_test.rb",
-          "#{root}/b/link/a_test.rb",
-        ])
+        expect(call(["#{root}/b"]).sort).to eq(
+          [
+            "#{root}/b/b_test.rb",
+            "#{root}/b/link/a_test.rb"
+          ]
+        )
       end
     end
 
     it "finds test files but ignores those in symlinked folders" do
       skip if RUBY_PLATFORM == "java" || Gem.win_platform?
-      with_files(['a/a_test.rb','b/b_test.rb']) do |root|
+      with_files(['a/a_test.rb', 'b/b_test.rb']) do |root|
         `ln -s #{root}/a #{root}/b/link`
-        expect(call(["#{root}/b"], :symlinks => false).sort).to eq([
-          "#{root}/b/b_test.rb",
-        ])
+        expect(call(["#{root}/b"], symlinks: false).sort).to eq(["#{root}/b/b_test.rb"])
       end
     end
 
     it "finds test files nested in different folders" do
-      with_files(['a/a_test.rb','b/b_test.rb', 'c/c_test.rb']) do |root|
-        expect(call(["#{root}/a", "#{root}/b"]).sort).to eq([
-          "#{root}/a/a_test.rb",
-          "#{root}/b/b_test.rb",
-        ])
+      with_files(['a/a_test.rb', 'b/b_test.rb', 'c/c_test.rb']) do |root|
+        expect(call(["#{root}/a", "#{root}/b"]).sort).to eq(
+          [
+            "#{root}/a/a_test.rb",
+            "#{root}/b/b_test.rb"
+          ]
+        )
       end
     end
 
     it "only finds tests in folders" do
       with_files(['a/a_test.rb', 'a/test.rb', 'a/test_helper.rb']) do |root|
-        expect(call(["#{root}/a"]).sort).to eq([
-          "#{root}/a/a_test.rb"
-        ])
+        expect(call(["#{root}/a"]).sort).to eq(
+          [
+            "#{root}/a/a_test.rb"
+          ]
+        )
       end
     end
 
     it "finds tests in nested folders" do
       with_files(['a/b/c/d/a_test.rb']) do |root|
-        expect(call(["#{root}/a"]).sort).to eq([
-          "#{root}/a/b/c/d/a_test.rb"
-        ])
+        expect(call(["#{root}/a"]).sort).to eq(
+          [
+            "#{root}/a/b/c/d/a_test.rb"
+          ]
+        )
       end
     end
 
     it "does not expand paths" do
       with_files(['a/x_test.rb']) do |root|
         Dir.chdir root do
-          expect(call(['a']).sort).to eq([
-            "a/x_test.rb"
-          ])
+          expect(call(['a']).sort).to eq(
+            [
+              "a/x_test.rb"
+            ]
+          )
         end
       end
     end
 
     it "finds test files in folders by pattern" do
-      with_files(['a/x_test.rb','a/y_test.rb','a/z_test.rb']) do |root|
+      with_files(['a/x_test.rb', 'a/y_test.rb', 'a/z_test.rb']) do |root|
         Dir.chdir root do
-          expect(call(["a"], :pattern => /^a\/(y|z)_test/).sort).to eq([
-            "a/y_test.rb",
-            "a/z_test.rb",
-          ])
+          expect(call(["a"], pattern: %r{^a/(y|z)_test}).sort).to eq(
+            [
+              "a/y_test.rb",
+              "a/z_test.rb"
+            ]
+          )
         end
       end
     end
 
     it "finds test files in folders using suffix and overriding built in suffix" do
-      with_files(['a/x_test.rb','a/y_test.rb','a/z_other.rb','a/x_different.rb']) do |root|
+      with_files(['a/x_test.rb', 'a/y_test.rb', 'a/z_other.rb', 'a/x_different.rb']) do |root|
         Dir.chdir root do
-          expect(call(["a"], :suffix => /_(test|other)\.rb$/).sort).to eq([
-            "a/x_test.rb",
-            "a/y_test.rb",
-            "a/z_other.rb",
-          ])
+          expect(call(["a"], suffix: /_(test|other)\.rb$/).sort).to eq(
+            [
+              "a/x_test.rb",
+              "a/y_test.rb",
+              "a/z_other.rb"
+            ]
+          )
         end
       end
     end
 
     it "doesn't find bakup files with the same name as test files" do
-      with_files(['a/x_test.rb','a/x_test.rb.bak']) do |root|
-        expect(call(["#{root}/"])).to eq([
-          "#{root}/a/x_test.rb",
-        ])
+      with_files(['a/x_test.rb', 'a/x_test.rb.bak']) do |root|
+        expect(call(["#{root}/"])).to eq(
+          [
+            "#{root}/a/x_test.rb"
+          ]
+        )
       end
     end
 
     it "finds minispec files" do
       with_files(['a/x_spec.rb']) do |root|
-        expect(call(["#{root}/"])).to eq([
-          "#{root}/a/x_spec.rb",
-        ])
+        expect(call(["#{root}/"])).to eq(
+          [
+            "#{root}/a/x_spec.rb"
+          ]
+        )
       end
     end
 
@@ -327,7 +361,7 @@ EOF
     end
 
     it "discards duplicates" do
-      expect(call(['baz','baz'])).to eq(['baz'])
+      expect(call(['baz', 'baz'])).to eq(['baz'])
     end
   end
 
@@ -337,19 +371,19 @@ EOF
     end
 
     it "adds results" do
-      expect(call(['1 foo 3 bar','2 foo 5 bar'])).to eq('8 bars, 3 foos')
+      expect(call(['1 foo 3 bar', '2 foo 5 bar'])).to eq('8 bars, 3 foos')
     end
 
     it "adds results with braces" do
-      expect(call(['1 foo(s) 3 bar(s)','2 foo 5 bar'])).to eq('8 bars, 3 foos')
+      expect(call(['1 foo(s) 3 bar(s)', '2 foo 5 bar'])).to eq('8 bars, 3 foos')
     end
 
     it "adds same results with plurals" do
-      expect(call(['1 foo 3 bar','2 foos 5 bar'])).to eq('8 bars, 3 foos')
+      expect(call(['1 foo 3 bar', '2 foos 5 bar'])).to eq('8 bars, 3 foos')
     end
 
     it "adds non-similar results" do
-      expect(call(['1 xxx 2 yyy','1 xxx 2 zzz'])).to eq('2 xxxs, 2 yyys, 2 zzzs')
+      expect(call(['1 xxx 2 yyy', '1 xxx 2 zzz'])).to eq('2 xxxs, 2 yyys, 2 zzzs')
     end
 
     it "does not pluralize 1" do
@@ -365,11 +399,13 @@ EOF
     let(:new_line_char) { Gem.win_platform? ? "\r\n" : "\n" }
 
     def capture_output
-      $stdout, $stderr = StringIO.new, StringIO.new
+      $stdout = StringIO.new
+      $stderr = StringIO.new
       yield
       [$stdout.string, $stderr.string]
     ensure
-      $stdout, $stderr = STDOUT, STDERR
+      $stdout = STDOUT
+      $stderr = STDERR
     end
 
     def run_with_file(content)
@@ -420,10 +456,12 @@ EOF
       skip "hangs on normal ruby, works on jruby" unless RUBY_PLATFORM == "java"
       run_with_file("$stdin.read; puts 123") do |path|
         result = call("ruby #{path}", 1, 2, {})
-        expect(result).to include({
-          :stdout => "123\n",
-          :exit_status => 0
-        })
+        expect(result).to include(
+          {
+            stdout: "123\n",
+            exit_status: 0
+          }
+        )
       end
     end
 
@@ -461,7 +499,7 @@ EOF
     it "does not print to stdout with :serialize_stdout" do
       run_with_file("puts 123") do |path|
         expect($stdout).not_to receive(:print)
-        result = call("ruby #{path}", 1, 4, :serialize_stdout => true)
+        result = call("ruby #{path}", 1, 4, serialize_stdout: true)
         expect(result[:stdout].chomp).to eq '123'
         expect(result[:exit_status]).to eq 0
       end
@@ -470,7 +508,7 @@ EOF
     it "adds test env number to stdout with :prefix_output_with_test_env_number" do
       run_with_file("puts 123") do |path|
         expect($stdout).to receive(:print).with("[TEST GROUP 2] 123#{new_line_char}")
-        result = call("ruby #{path}", 1, 4, :prefix_output_with_test_env_number => true)
+        result = call("ruby #{path}", 1, 4, prefix_output_with_test_env_number: true)
         expect(result[:stdout].chomp).to eq '123'
         expect(result[:exit_status]).to eq 0
       end
@@ -479,7 +517,7 @@ EOF
     it "does not add test env number to stdout without :prefix_output_with_test_env_number" do
       run_with_file("puts 123") do |path|
         expect($stdout).to receive(:print).with("123#{new_line_char}")
-        result = call("ruby #{path}", 1, 4, :prefix_output_with_test_env_number => false)
+        result = call("ruby #{path}", 1, 4, prefix_output_with_test_env_number: false)
         expect(result[:stdout].chomp).to eq '123'
         expect(result[:exit_status]).to eq 0
       end
@@ -497,27 +535,25 @@ EOF
       skip "open3"
       _out, err = run_with_file("puts 123 ; $stderr.puts 345 ; exit 5") do |path|
         result = call("ruby #{path}", 1, 4, {})
-        expect(result).to include({
-          :stdout => "123\n",
-          :exit_status => 5
-        })
+        expect(result).to include(
+          stdout: "123\n",
+          exit_status: 5
+        )
       end
       expect(err).to eq("345\n")
     end
 
     it "uses a lower priority process when the nice option is used", unless: Gem.win_platform? do
       priority_cmd = "puts Process.getpriority(Process::PRIO_PROCESS, 0)"
-      priority_without_nice = run_with_file(priority_cmd){ |cmd| call("ruby #{cmd}", 1, 4, {}) }.first.to_i
-      priority_with_nice = run_with_file(priority_cmd){ |cmd| call("ruby #{cmd}", 1, 4, :nice => true) }.first.to_i
+      priority_without_nice = run_with_file(priority_cmd) { |cmd| call("ruby #{cmd}", 1, 4, {}) }.first.to_i
+      priority_with_nice = run_with_file(priority_cmd) { |cmd| call("ruby #{cmd}", 1, 4, nice: true) }.first.to_i
       expect(priority_without_nice).to be < priority_with_nice
     end
 
     it "returns command used" do
       run_with_file("puts 123; exit 5") do |path|
         result = call("ruby #{path}", 1, 4, {})
-        expect(result).to include({
-          :command => "ruby #{path}"
-        })
+        expect(result).to include(command: "ruby #{path}")
       end
     end
 
@@ -525,18 +561,14 @@ EOF
       it "includes seed when provided" do
         run_with_file("puts 'Run options: --seed 555'") do |path|
           result = call("ruby #{path}", 1, 4, {})
-          expect(result).to include({
-            :seed => "555"
-          })
+          expect(result).to include(seed: "555")
         end
       end
 
       it "seed is nil when not provided" do
         run_with_file("puts 555") do |path|
           result = call("ruby #{path}", 1, 4, {})
-          expect(result).to include({
-            :seed => nil
-          })
+          expect(result).to include(seed: nil)
         end
       end
     end

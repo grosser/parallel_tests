@@ -6,7 +6,7 @@ require 'tmpdir'
 describe ParallelTests::Grouper do
   describe '.by_steps' do
     def write(file, content)
-      File.open(file,'w'){|f| f.write content }
+      File.open(file, 'w') { |f| f.write content }
     end
 
     it "sorts features by steps" do
@@ -14,23 +14,28 @@ describe ParallelTests::Grouper do
       result = Dir.mktmpdir do |dir|
         tmpdir = dir
         write("#{dir}/a.feature", "Feature: xxx\n  Scenario: xxx\n    Given something")
-        write("#{dir}/b.feature", "Feature: xxx\n  Scenario: xxx\n    Given something\n  Scenario: yyy\n    Given something")
+        write(
+          "#{dir}/b.feature",
+          "Feature: xxx\n  Scenario: xxx\n    Given something\n  Scenario: yyy\n    Given something"
+        )
         write("#{dir}/c.feature", "Feature: xxx\n  Scenario: xxx\n    Given something")
         ParallelTests::Grouper.by_steps(["#{dir}/a.feature", "#{dir}/b.feature", "#{dir}/c.feature"], 2, {})
       end
 
       # testing inside mktmpdir is always green
-      expect(result).to match_array([
-        ["#{tmpdir}/a.feature", "#{tmpdir}/c.feature"],
-        ["#{tmpdir}/b.feature"]
-      ])
+      expect(result).to match_array(
+        [
+          ["#{tmpdir}/a.feature", "#{tmpdir}/c.feature"],
+          ["#{tmpdir}/b.feature"]
+        ]
+      )
     end
   end
 
   describe '.in_even_groups_by_size' do
-    let(:files_with_size){ {"1" => 1, "2" => 2, "3" => 3, "4" => 4, "5" => 5} }
+    let(:files_with_size) { { "1" => 1, "2" => 2, "3" => 3, "4" => 4, "5" => 5 } }
 
-    def call(num_groups, options={})
+    def call(num_groups, options = {})
       ParallelTests::Grouper.in_even_groups_by_size(files_with_size, num_groups, options)
     end
 
@@ -51,25 +56,24 @@ describe ParallelTests::Grouper do
     end
 
     it "groups single items into first group" do
-      expect(call(2, :single_process => [/1|2|3|4/])).to eq([["1", "2", "3", "4"], ["5"]])
+      expect(call(2, single_process: [/1|2|3|4/])).to eq([["1", "2", "3", "4"], ["5"]])
     end
 
     it "groups single items into specified isolation groups" do
-      expect(call(3, :single_process => [/1|2|3|4/], :isolate_count => 2)).to eq([["1", "4"], ["2", "3"], ["5"]])
+      expect(call(3, single_process: [/1|2|3|4/], isolate_count: 2)).to eq([["1", "4"], ["2", "3"], ["5"]])
     end
 
     it "groups single items with others if there are too few" do
-      expect(call(2, :single_process => [/1/])).to eq([["1", "3", "4"], ["2", "5"]])
+      expect(call(2, single_process: [/1/])).to eq([["1", "3", "4"], ["2", "5"]])
     end
 
     it "groups must abort when isolate_count is out of bounds" do
-      expect {
-        call(3, :single_process => [/1/], :isolate_count => 3)
-      }.to raise_error(
+      expect do
+        call(3, single_process: [/1/], isolate_count: 3)
+      end.to raise_error(
         "Number of isolated processes must be less than total the number of processes"
       )
     end
-
   end
 
   describe '.by_scenarios' do

@@ -3,8 +3,7 @@ require 'parallel_tests/rspec/runner'
 
 class ParallelTests::RSpec::FailuresLogger < ParallelTests::RSpec::LoggerBase
   if RSPEC_2
-    def dump_failures(*args)
-    end
+    def dump_failures(*args); end
   else
     RSpec::Core::Formatters.register self, :dump_summary
   end

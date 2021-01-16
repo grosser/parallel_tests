@@ -21,7 +21,6 @@ module ParallelTests
           end
         end
       end
-
     end
   end
 end

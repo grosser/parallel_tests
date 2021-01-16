@@ -17,7 +17,7 @@ module ParallelTests
         count,
         ENV["PARALLEL_TEST_PROCESSORS"],
         Parallel.processor_count
-      ].detect{|c| not c.to_s.strip.empty? }.to_i
+      ].detect { |c| !c.to_s.strip.empty? }.to_i
     end
 
     def with_pid_file
@@ -57,7 +57,8 @@ module ParallelTests
       until !File.directory?(current) || current == previous
         filename = File.join(current, "Gemfile")
         return true if File.exist?(filename)
-        current, previous = File.expand_path("..", current), current
+        previous = current
+        current = File.expand_path("..", current)
       end
 
       false

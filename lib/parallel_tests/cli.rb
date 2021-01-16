@@ -14,7 +14,7 @@ module ParallelTests
       ENV['DISABLE_SPRING'] ||= '1'
 
       num_processes = ParallelTests.determine_number_of_processes(options[:count])
-      num_processes = num_processes * (options[:multiply] || 1)
+      num_processes *= (options[:multiply] || 1)
 
       options[:first_is_1] ||= first_is_1?
 
@@ -56,12 +56,12 @@ module ParallelTests
     def run_tests_in_parallel(num_processes, options)
       test_results = nil
 
-      run_tests_proc = -> {
+      run_tests_proc = -> do
         groups = @runner.tests_in_groups(options[:files], num_processes, options)
-        groups.reject! &:empty?
+        groups.reject!(&:empty?)
 
         test_results = if options[:only_group]
-          groups_to_run = options[:only_group].collect{|i| groups[i - 1]}.compact
+          groups_to_run = options[:only_group].map { |i| groups[i - 1] }.compact
           report_number_of_tests(groups_to_run) unless options[:quiet]
           execute_in_parallel(groups_to_run, groups_to_run.size, options) do |group|
             run_tests(group, groups_to_run.index(group), 1, options)
@@ -75,7 +75,7 @@ module ParallelTests
         end
 
         report_results(test_results, options) unless options[:quiet]
-      }
+      end
 
       if options[:quiet]
         run_tests_proc.call
@@ -88,7 +88,7 @@ module ParallelTests
 
     def run_tests(group, process_number, num_processes, options)
       if group.empty?
-        {:stdout => '', :exit_status => 0, :command => '', :seed => nil}
+        { stdout: '', exit_status: 0, command: '', seed: nil }
       else
         @runner.run_tests(group, process_number, num_processes, options)
       end
@@ -115,7 +115,7 @@ module ParallelTests
     end
 
     def report_results(test_results, options)
-      results = @runner.find_results(test_results.map { |result| result[:stdout] }*"")
+      results = @runner.find_results(test_results.map { |result| result[:stdout] } * "")
       puts ""
       puts @runner.summarize_results(results)
 
@@ -140,7 +140,7 @@ module ParallelTests
     def report_number_of_tests(groups)
       name = @runner.test_file_name
       num_processes = groups.size
-      num_tests = groups.map(&:size).inject(0, :+)
+      num_tests = groups.map(&:size).sum
       tests_per_process = (num_processes == 0 ? 0 : num_tests / num_processes)
       puts "#{pluralize(num_processes, 'process')} for #{pluralize(num_tests, name)}, ~ #{pluralize(tests_per_process, name)} per process"
     end
@@ -155,7 +155,7 @@ module ParallelTests
       end
     end
 
-    #exit with correct status code so rake parallel:test && echo 123 works
+    # exit with correct status code so rake parallel:test && echo 123 works
     def any_test_failed?(test_results)
       test_results.any? { |result| result[:exit_status] != 0 }
     end
@@ -163,7 +163,7 @@ module ParallelTests
     def parse_options!(argv)
       options = {}
       OptionParser.new do |opts|
-        opts.banner = <<-BANNER.gsub(/^          /, '')
+        opts.banner = <<~BANNER
           Run all tests in parallel, giving each process ENV['TEST_ENV_NUMBER'] ('', '2', '3', ...)
 
           [optional] Only selected files & folders:
@@ -177,36 +177,35 @@ module ParallelTests
         opts.on("-n [PROCESSES]", Integer, "How many processes to use, default: available CPUs") { |n| options[:count] = n }
         opts.on("-p", "--pattern [PATTERN]", "run tests matching this regex pattern") { |pattern| options[:pattern] = /#{pattern}/ }
         opts.on("--exclude-pattern", "--exclude-pattern [PATTERN]", "exclude tests matching this regex pattern") { |pattern| options[:exclude_pattern] = /#{pattern}/ }
-        opts.on("--group-by [TYPE]", <<-TEXT.gsub(/^          /, '')
-          group tests by:
-                    found - order of finding files
-                    steps - number of cucumber/spinach steps
-                    scenarios - individual cucumber scenarios
-                    filesize - by size of the file
-                    runtime - info from runtime log
-                    default - runtime when runtime log is filled otherwise filesize
+        opts.on(
+          "--group-by [TYPE]",
+          <<~TEXT
+            group tests by:
+                      found - order of finding files
+                      steps - number of cucumber/spinach steps
+                      scenarios - individual cucumber scenarios
+                      filesize - by size of the file
+                      runtime - info from runtime log
+                      default - runtime when runtime log is filled otherwise filesize
           TEXT
-          ) { |type| options[:group_by] = type.to_sym }
-        opts.on("-m [FLOAT]", "--multiply-processes [FLOAT]", Float, "use given number as a multiplier of processes to run") { |multiply| options[:multiply] = multiply }
-
-        opts.on("-s [PATTERN]", "--single [PATTERN]",
-          "Run all matching files in the same process") do |pattern|
-
-          options[:single_process] ||= []
-          options[:single_process] << /#{pattern}/
+        ) { |type| options[:group_by] = type.to_sym }
+        opts.on("-m [FLOAT]", "--multiply-processes [FLOAT]", Float, "use given number as a multiplier of processes to run") do |multiply|
+          options[:multiply] = multiply
         end
 
-        opts.on("-i", "--isolate",
-          "Do not run any other tests in the group used by --single(-s)") do |pattern|
+        opts.on("-s [PATTERN]", "--single [PATTERN]", "Run all matching files in the same process") do |pattern|
+          (options[:single_process] ||= []) << /#{pattern}/
+        end
 
+        opts.on("-i", "--isolate", "Do not run any other tests in the group used by --single(-s)") do
           options[:isolate] = true
         end
 
-        opts.on("--isolate-n [PROCESSES]",
+        opts.on(
+          "--isolate-n [PROCESSES]",
           Integer,
-          "Use 'isolate'  singles with number of processes, default: 1.") do |n|
-          options[:isolate_count] = n
-        end
+          "Use 'isolate'  singles with number of processes, default: 1."
+        ) { |n| options[:isolate_count] = n }
 
         opts.on("--only-group INT[,INT]", Array) { |groups| options[:only_group] = groups.map(&:to_i) }
 
@@ -220,18 +219,20 @@ module ParallelTests
             abort
           end
         end
-        opts.on("--suffix [PATTERN]", <<-TEXT.gsub(/^          /, '')
-          override built in test file pattern (should match suffix):
-                    '_spec\.rb$' - matches rspec files
-                    '_(test|spec).rb$' - matches test or spec files
+        opts.on(
+          "--suffix [PATTERN]",
+          <<~TEXT
+            override built in test file pattern (should match suffix):
+                      '_spec\.rb$' - matches rspec files
+                      '_(test|spec).rb$' - matches test or spec files
           TEXT
-          ) { |pattern| options[:suffix] = /#{pattern}/ }
+        ) { |pattern| options[:suffix] = /#{pattern}/ }
         opts.on("--serialize-stdout", "Serialize stdout output, nothing will be written until everything is done") { options[:serialize_stdout] = true }
         opts.on("--prefix-output-with-test-env-number", "Prefixes test env number to the output when not using --serialize-stdout") { options[:prefix_output_with_test_env_number] = true }
         opts.on("--combine-stderr", "Combine stderr into stdout, useful in conjunction with --serialize-stdout") { options[:combine_stderr] = true }
         opts.on("--non-parallel", "execute same commands but do not in parallel, needs --exec") { options[:non_parallel] = true }
         opts.on("--no-symlinks", "Do not traverse symbolic links to find test files") { options[:symlinks] = false }
-        opts.on('--ignore-tags [PATTERN]', 'When counting steps ignore scenarios with tags that match this pattern')  { |arg| options[:ignore_tag_pattern] = arg }
+        opts.on('--ignore-tags [PATTERN]', 'When counting steps ignore scenarios with tags that match this pattern') { |arg| options[:ignore_tag_pattern] = arg }
         opts.on("--nice", "execute test commands with low priority.") { options[:nice] = true }
         opts.on("--runtime-log [PATH]", "Location of previously recorded test runtimes") { |path| options[:runtime_log] = path }
         opts.on("--allowed-missing [INT]", Integer, "Allowed percentage of missing runtimes (default = 50)") { |percent| options[:allowed_missing_percent] = percent }
@@ -242,13 +243,17 @@ module ParallelTests
         opts.on("--verbose-process-command", "Displays only the command that will be executed by each process") { options[:verbose_process_command] = true }
         opts.on("--verbose-rerun-command", "When there are failures, displays the command executed by each process that failed") { options[:verbose_rerun_command] = true }
         opts.on("--quiet", "Print only tests output") { options[:quiet] = true }
-        opts.on("-v", "--version", "Show Version") { puts ParallelTests::VERSION; exit }
-        opts.on("-h", "--help", "Show this.") { puts opts; exit }
+        opts.on("-v", "--version", "Show Version") do
+          puts ParallelTests::VERSION
+          exit 0
+        end
+        opts.on("-h", "--help", "Show this.") do
+          puts opts
+          exit 0
+        end
       end.parse!(argv)
 
-      if options[:verbose] && options[:quiet]
-        raise "Both options are mutually exclusive: verbose & quiet"
-      end
+      raise "Both options are mutually exclusive: verbose & quiet" if options[:verbose] && options[:quiet]
 
       if options[:count] == 0
         options.delete(:count)
@@ -265,7 +270,9 @@ module ParallelTests
 
       options[:group_by] ||= :filesize if options[:only_group]
 
-      raise "--group-by found and --single-process are not supported" if options[:group_by] == :found and options[:single_process]
+      if options[:group_by] == :found && options[:single_process]
+        raise "--group-by found and --single-process are not supported"
+      end
       allowed = [:filesize, :runtime, :found]
       if !allowed.include?(options[:group_by]) && options[:only_group]
         raise "--group-by #{allowed.join(" or ")} is required for --only-group"
@@ -282,7 +289,7 @@ module ParallelTests
 
     def extract_test_options(argv)
       dash_index = argv.index("--") || -1
-      argv[dash_index+1..-1]
+      argv[dash_index + 1..-1]
     end
 
     def append_test_options(options, argv)
@@ -302,7 +309,7 @@ module ParallelTests
 
     def execute_shell_command_in_parallel(command, num_processes, options)
       runs = if options[:only_group]
-        options[:only_group].map{|g| g - 1}
+        options[:only_group].map { |g| g - 1 }
       else
         (0...num_processes).to_a
       end
@@ -321,13 +328,13 @@ module ParallelTests
       abort if results.any? { |r| r[:exit_status] != 0 }
     end
 
-    def report_time_taken
-      seconds = ParallelTests.delta { yield }.to_i
+    def report_time_taken(&block)
+      seconds = ParallelTests.delta(&block).to_i
       puts "\nTook #{seconds} seconds#{detailed_duration(seconds)}"
     end
 
     def detailed_duration(seconds)
-      parts = [ seconds / 3600, seconds % 3600 / 60, seconds % 60 ].drop_while(&:zero?)
+      parts = [seconds / 3600, seconds % 3600 / 60, seconds % 60].drop_while(&:zero?)
       return if parts.size < 2
       parts = parts.map { |i| "%02d" % i }.join(':').sub(/^0/, '')
       " (#{parts})"

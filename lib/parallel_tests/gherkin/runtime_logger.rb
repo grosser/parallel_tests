@@ -19,7 +19,7 @@ module ParallelTests
 
         config.on_event :test_run_finished do |_|
           lock_output do
-            @io.puts @example_times.map { |file, time| "#{file}:#{time}" }
+            @io.puts(@example_times.map { |file, time| "#{file}:#{time}" })
           end
         end
       end

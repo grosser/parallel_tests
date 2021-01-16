@@ -6,13 +6,13 @@ module ParallelTests
         in_even_groups_by_size(features_with_steps, num_groups)
       end
 
-      def by_scenarios(tests, num_groups, options={})
+      def by_scenarios(tests, num_groups, options = {})
         scenarios = group_by_scenarios(tests, options)
         in_even_groups_by_size(scenarios, num_groups)
       end
 
-      def in_even_groups_by_size(items, num_groups, options= {})
-        groups = Array.new(num_groups) { {:items => [], :size => 0} }
+      def in_even_groups_by_size(items, num_groups, options = {})
+        groups = Array.new(num_groups) { { items: [], size: 0 } }
 
         # add all files that should run in a single process to one group
         single_process_patterns = options[:single_process] || []
@@ -56,7 +56,7 @@ module ParallelTests
       end
 
       def largest_first(files)
-        files.sort_by{|_item, size| size }.reverse
+        files.sort_by { |_item, size| size }.reverse
       end
 
       def smallest_group(groups)
@@ -73,7 +73,7 @@ module ParallelTests
         ParallelTests::Cucumber::FeaturesWithSteps.all(tests, options)
       end
 
-      def group_by_scenarios(tests, options={})
+      def group_by_scenarios(tests, options = {})
         require 'parallel_tests/cucumber/scenarios'
         ParallelTests::Cucumber::Scenarios.all(tests, options)
       end

@@ -3,7 +3,6 @@ require 'parallel_tests'
 module ParallelTests
   module Gherkin
     module Io
-
       def prepare_io(path_or_io)
         if path_or_io.respond_to?(:write)
           path_or_io
@@ -24,7 +23,7 @@ module ParallelTests
 
       # do not let multiple processes get in each others way
       def lock_output
-        if File === @io
+        if @io.is_a?(File)
           begin
             @io.flock File::LOCK_EX
             yield
@@ -35,7 +34,6 @@ module ParallelTests
           yield
         end
       end
-
     end
   end
 end

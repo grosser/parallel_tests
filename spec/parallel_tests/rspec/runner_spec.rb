@@ -18,22 +18,22 @@ describe ParallelTests::RSpec::Runner do
 
     it "runs command using nice when specifed" do
       ParallelTests.with_pid_file do
-        expect(ParallelTests::Test::Runner).to receive(:execute_command_and_capture_output)do |a,b,c|
-          expect(b).to match(%r{^nice rspec})
+        expect(ParallelTests::Test::Runner).to receive(:execute_command_and_capture_output) do |_a, b, _c|
+          expect(b).to match(/^nice rspec/)
         end
 
-        call('xxx', 1, 22, :nice => true)
+        call('xxx', 1, 22, nice: true)
       end
     end
 
     it "runs with color when called from cmdline" do
-      should_run_with %r{ --tty}
+      should_run_with(/ --tty/)
       expect($stdout).to receive(:tty?).and_return true
       call('xxx', 1, 22, {})
     end
 
     it "runs without color when not called from cmdline" do
-      should_not_run_with %r{ --tty}
+      should_not_run_with(/ --tty/)
       expect($stdout).to receive(:tty?).and_return false
       call('xxx', 1, 22, {})
     end
@@ -51,7 +51,7 @@ describe ParallelTests::RSpec::Runner do
     end
 
     it "uses -O spec/parallel_spec.opts with rspec2" do
-      skip if RUBY_PLATFORM == "java" # FIXME not sure why, but fails on travis
+      skip if RUBY_PLATFORM == "java" # FIXME: not sure why, but fails on travis
       expect(File).to receive(:file?).with('spec/parallel_spec.opts').and_return true
 
       allow(ParallelTests).to receive(:bundler_enabled?).and_return true
@@ -62,13 +62,13 @@ describe ParallelTests::RSpec::Runner do
     end
 
     it "uses options passed in" do
-      should_run_with %r{rspec -f n}
-      call('xxx', 1, 22, :test_options => '-f n')
+      should_run_with /rspec -f n/
+      call('xxx', 1, 22, test_options: '-f n')
     end
 
     it "returns the output" do
-      expect(ParallelTests::RSpec::Runner).to receive(:execute_command).and_return :x => 1
-      expect(call('xxx', 1, 22, {})).to eq({:x => 1})
+      expect(ParallelTests::RSpec::Runner).to receive(:execute_command).and_return x: 1
+      expect(call('xxx', 1, 22, {})).to eq({ x: 1 })
     end
   end
 
@@ -89,7 +89,7 @@ describe ParallelTests::RSpec::Runner do
         1 example, 1 failure, 1 pending
       OUT
 
-      expect(call(output)).to eq(['0 examples, 0 failures, 0 pending','1 example, 1 failure, 1 pending'])
+      expect(call(output)).to eq(['0 examples, 0 failures, 0 pending', '1 example, 1 failure, 1 pending'])
     end
 
     it "does not mistakenly count 'pending' failures as real failures" do
@@ -120,10 +120,8 @@ describe ParallelTests::RSpec::Runner do
     end
 
     it "doesn't find bakup files with the same name as test files" do
-      with_files(['a/x_spec.rb','a/x_spec.rb.bak']) do |root|
-        expect(call(["#{root}/"])).to eq([
-          "#{root}/a/x_spec.rb",
-        ])
+      with_files(['a/x_spec.rb', 'a/x_spec.rb.bak']) do |root|
+        expect(call(["#{root}/"])).to eq(["#{root}/a/x_spec.rb"])
       end
     end
   end

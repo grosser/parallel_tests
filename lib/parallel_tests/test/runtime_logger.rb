@@ -22,7 +22,7 @@ module ParallelTests
             separator = "\n"
             groups = logfile.read.split(separator).map { |line| line.split(":") }.group_by(&:first)
             lines = groups.map do |file, times|
-              time = "%.2f" % times.map(&:last).map(&:to_f).inject(:+)
+              time = "%.2f" % times.map(&:last).map(&:to_f).sum
               "#{file}:#{time}"
             end
             logfile.rewind
@@ -34,7 +34,7 @@ module ParallelTests
         private
 
         def with_locked_log
-          File.open(logfile, File::RDWR|File::CREAT) do |logfile|
+          File.open(logfile, File::RDWR | File::CREAT) do |logfile|
             logfile.flock(File::LOCK_EX)
             yield logfile
           end
@@ -59,7 +59,7 @@ module ParallelTests
         end
 
         def message(test, delta)
-          return unless method = test.public_instance_methods(true).detect { |method| method =~ /^test_/ }
+          return unless method = test.public_instance_methods(true).detect { |m| m =~ /^test_/ }
           filename = test.instance_method(method).source_location.first.sub("#{Dir.pwd}/", "")
           "#{filename}:#{delta}"
         end
@@ -74,22 +74,26 @@ end
 
 if defined?(Minitest::Runnable) # Minitest 5
   class << Minitest::Runnable
-    prepend(Module.new do
-      def run(*)
-        ParallelTests::Test::RuntimeLogger.log_test_run(self) do
-          super
+    prepend(
+      Module.new do
+        def run(*)
+          ParallelTests::Test::RuntimeLogger.log_test_run(self) do
+            super
+          end
         end
       end
-    end)
+    )
   end
 
   class << Minitest
-    prepend(Module.new do
-      def run(*args)
-        result = super
-        ParallelTests::Test::RuntimeLogger.unique_log
-        result
+    prepend(
+      Module.new do
+        def run(*args)
+          result = super
+          ParallelTests::Test::RuntimeLogger.unique_log
+          result
+        end
       end
-    end)
+    )
   end
 end

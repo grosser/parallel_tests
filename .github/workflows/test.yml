@@ -13,8 +13,13 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        ruby: [2.7, 2.6, 2.5, 2.4, head, jruby-head]
+        ruby: ['2.7', '2.6', '2.5', '2.4', head, jruby-head]
         os: [ubuntu-latest, windows-latest]
+        task: [default]
+        include:
+        - ruby: '2.4' # lowest supported version
+          os: ubuntu-latest
+          task: rubocop
     env:
       RUBYOPT: -W0
       # avoid warnings from https://github.blog/changelog/2020-10-01-github-actions-deprecating-set-env-and-add-path-commands/
@@ -27,9 +32,9 @@ jobs:
         ruby-version: ${{ matrix.ruby }}
         apt-get:  libsqlite3-dev
     - name: Install dependencies
-      run: |
-        bundle install
-    - name: Run test
-      run: bundle exec rake
+      run: bundle install --jobs 4
+    - name: rake ${{ matrix.task }}
+      run: bundle exec rake ${{ matrix.task }}
+      # allow ruby/jruby-head to fail since they are moving targets
       # TODO: this will always show green, fix once https://github.com/actions/toolkit/issues/399 is resolved
       continue-on-error: ${{ endsWith(matrix.ruby, 'head') }}

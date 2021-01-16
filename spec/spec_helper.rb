@@ -16,11 +16,13 @@ end
 
 OutputLogger = Struct.new(:output) do
   attr_reader :flock, :flush
-  def puts(s=nil)
-    self.output << "#{s}\n"
+
+  def puts(s = nil)
+    output << "#{s}\n"
   end
-  def print(s=nil)
-    self.output << "#{s}"
+
+  def print(s = nil)
+    output << s.to_s
   end
 end
 
@@ -49,13 +51,13 @@ module SpecHelper
   end
 
   def should_run_with(regex)
-    expect(ParallelTests::Test::Runner).to receive(:execute_command) do |a, b, c, d|
+    expect(ParallelTests::Test::Runner).to receive(:execute_command) do |a, _b, _c, _d|
       expect(a).to match(regex)
     end
   end
 
   def should_not_run_with(regex)
-    expect(ParallelTests::Test::Runner).to receive(:execute_command) do |a, b, c, d|
+    expect(ParallelTests::Test::Runner).to receive(:execute_command) do |a, _b, _c, _d|
       expect(a).to_not match(regex)
     end
   end
@@ -71,14 +73,14 @@ module SharedExamples
 
       before do
         FileUtils.mkdir test_root
-        @files = [0,1,2,3,4,5,6,7].map { |i| "#{test_root}/x#{i}#{suffix}" }
+        @files = [0, 1, 2, 3, 4, 5, 6, 7].map { |i| "#{test_root}/x#{i}#{suffix}" }
         @files.each { |file| File.write(file, 'x' * 100) }
         FileUtils.mkdir_p File.dirname(log)
       end
 
-      def setup_runtime_log
-        File.open(log,'w') do |f|
-          @files[1..-1].each{|file| f.puts "#{file}:#{@files.index(file)}"}
+      def setup_runtime_log # rubocop:disable Lint/NestedMethodDefinition
+        File.open(log, 'w') do |f|
+          @files[1..-1].each { |file| f.puts "#{file}:#{@files.index(file)}" }
           f.puts "#{@files[0]}:10"
         end
       end
@@ -87,12 +89,12 @@ module SharedExamples
         list_of_files = Dir["#{test_root}/**/*#{suffix}"]
         result = list_of_files.dup
         klass.send(:sort_by_filesize, result)
-        expect(result).to match_array(list_of_files.map{ |file| [file, File.stat(file).size]})
+        expect(result).to match_array(list_of_files.map { |file| [file, File.stat(file).size] })
       end
 
       it "finds all tests" do
         found = klass.tests_in_groups([test_root], 1)
-        all = [ Dir["#{test_root}/**/*#{suffix}"] ]
+        all = [Dir["#{test_root}/**/*#{suffix}"]]
         expect(found.flatten - all.flatten).to eq([])
       end
 
@@ -108,7 +110,7 @@ module SharedExamples
 
       it 'should partition correctly with an uneven group size' do
         groups = klass.tests_in_groups([test_root], 3)
-        expect(groups.map {|g| size_of(g) }).to match_array([300, 300, 200])
+        expect(groups.map { |g| size_of(g) }).to match_array([300, 300, 200])
       end
 
       it "partitions by runtime when runtime-data is available" do
@@ -118,9 +120,9 @@ module SharedExamples
         groups = klass.tests_in_groups([test_root], 2)
         expect(groups.size).to eq(2)
         # 10 + 1 + 3 + 5 = 19
-        expect(groups[0]).to eq([@files[0],@files[1],@files[3],@files[5]])
+        expect(groups[0]).to eq([@files[0], @files[1], @files[3], @files[5]])
         # 2 + 4 + 6 + 7 = 19
-        expect(groups[1]).to eq([@files[2],@files[4],@files[6],@files[7]])
+        expect(groups[1]).to eq([@files[2], @files[4], @files[6], @files[7]])
       end
 
       it 'partitions from custom runtime-data location' do
@@ -131,9 +133,9 @@ module SharedExamples
         groups = klass.tests_in_groups([test_root], 2, runtime_log: log)
         expect(groups.size).to eq(2)
         # 10 + 1 + 3 + 5 = 19
-        expect(groups[0]).to eq([@files[0],@files[1],@files[3],@files[5]])
+        expect(groups[0]).to eq([@files[0], @files[1], @files[3], @files[5]])
         # 2 + 4 + 6 + 7 = 19
-        expect(groups[1]).to eq([@files[2],@files[4],@files[6],@files[7]])
+        expect(groups[1]).to eq([@files[2], @files[4], @files[6], @files[7]])
       end
 
       it "alpha-sorts partitions when runtime-data is available" do
@@ -150,15 +152,15 @@ module SharedExamples
       it "partitions by round-robin when not sorting" do
         files = ["file1.rb", "file2.rb", "file3.rb", "file4.rb"]
         expect(klass).to receive(:find_tests).and_return(files)
-        groups = klass.tests_in_groups(files, 2, :group_by => :found).sort
+        groups = klass.tests_in_groups(files, 2, group_by: :found).sort
         expect(groups[0]).to eq(["file1.rb", "file3.rb"])
         expect(groups[1]).to eq(["file2.rb", "file4.rb"])
       end
 
       it "alpha-sorts partitions when not sorting by runtime" do
-        files = %w[q w e r t y u i o p a s d f g h j k l z x c v b n m]
+        files = ['q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p', 'a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l', 'z', 'x', 'c', 'v', 'b', 'n', 'm']
         expect(klass).to receive(:find_tests).and_return(files)
-        groups = klass.tests_in_groups(files, 2, :group_by => :found).sort
+        groups = klass.tests_in_groups(files, 2, group_by: :found).sort
         expect(groups[0]).to eq(groups[0].sort)
         expect(groups[1]).to eq(groups[1].sort)
       end
@@ -172,18 +174,22 @@ RSpec::Matchers.define :include_exactly_times do |expected, times|
   end
 
   failure_message do |actual|
-    "expected the following string:\n" +
-        '""""' + "\n" + actual + "\n" + '""""' + "\n" +
-        (expected.is_a?(String) ? "to contain '#{expected}'" : "to match /#{expected}/") +
-        " #{times} time(s), but it " + (expected.is_a?(String) ? "appears" : "matches") +
-        " #{actual.scan(expected).size} time(s)\n"
+    action = (expected.is_a?(String) ? "to contain '#{expected}'" : "to match /#{expected}/")
+    outcome = (expected.is_a?(String) ? "appears" : "matches")
+    <<~FAILURE
+      expected the following string:
+      """"
+      #{actual}
+      """"
+      #{action} #{times} time(s), but it #{outcome} #{actual.scan(expected).size} time(s)
+    FAILURE
   end
 end
 
 TestTookTooLong = Class.new(Timeout::Error)
 
 RSpec.configure do |config|
-  config.filter_run :focus => true
+  config.filter_run focus: true
   config.run_all_when_everything_filtered = true
   config.include SpecHelper
   config.extend SharedExamples
@@ -192,7 +198,13 @@ RSpec.configure do |config|
 
   # sometimes stuff hangs -> do not hang everything
   # NOTE: the timeout error can sometimes swallow errors, comment it out if you run into trouble
-  config.include(Module.new {def test_timeout;30;end })
+  config.include(
+    Module.new do
+      def test_timeout
+        30
+      end
+    end
+  )
   config.around do |example|
     Timeout.timeout(test_timeout, TestTookTooLong, &example)
   end

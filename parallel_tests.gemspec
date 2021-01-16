@@ -7,10 +7,10 @@ Gem::Specification.new name, ParallelTests::VERSION do |s|
   s.email = "michael@grosser.it"
   s.homepage = "https://github.com/grosser/#{name}"
   s.metadata = {
-    "bug_tracker_uri"   => "https://github.com/grosser/#{name}/issues",
+    "bug_tracker_uri" => "https://github.com/grosser/#{name}/issues",
     "documentation_uri" => "https://github.com/grosser/#{name}/blob/v#{s.version}/Readme.md",
-    "source_code_uri"   => "https://github.com/grosser/#{name}/tree/v#{s.version}",
-    "wiki_uri"          => "https://github.com/grosser/#{name}/wiki",
+    "source_code_uri" => "https://github.com/grosser/#{name}/tree/v#{s.version}",
+    "wiki_uri" => "https://github.com/grosser/#{name}/wiki"
   }
   s.files = Dir["{lib,bin}/**/*"] + ["Readme.md"]
   s.license = "MIT"

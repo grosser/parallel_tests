@@ -3,7 +3,7 @@ require 'spec_helper'
 describe 'rails' do
   let(:test_timeout) { 800 } # this can take very long on fresh bundle ...
 
-  def sh(command, options={})
+  def sh(command, options = {})
     result = ''
     IO.popen(options.fetch(:environment, {}), command, err: [:child, :out]) do |io|
       result = io.read
@@ -13,11 +13,9 @@ describe 'rails' do
   end
 
   # TODO: rails 6
-  %w(rails51 rails52).each do |rails|
+  ['rails51', 'rails52'].each do |rails|
     it "can create and run #{rails}" do
-      if RUBY_PLATFORM == "java"
-        skip 'rails fixtures are not set up for java'
-      end
+      skip 'rails fixtures are not set up for java' if RUBY_PLATFORM == "java"
 
       Dir.chdir("spec/fixtures/#{rails}") do
         Bundler.with_unbundled_env do
@@ -33,7 +31,7 @@ describe 'rails' do
           # Also test the case where the DBs need to be dropped
           sh "bundle exec rake parallel:drop parallel:create"
           sh "bundle exec rake parallel:prepare"
-          sh "bundle exec rails runner User.create", environment: {'RAILS_ENV' => 'test'} # pollute the db
+          sh "bundle exec rails runner User.create", environment: { 'RAILS_ENV' => 'test' } # pollute the db
           out = sh "bundle exec rake parallel:prepare parallel:test"
           expect(out).to match(/ 2 (tests|runs)/)
         end

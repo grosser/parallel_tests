@@ -9,3 +9,4 @@ gem 'cucumber', "~> 4.0"
 gem 'cuke_modeler', '~> 3.0'
 gem 'spinach'
 gem 'rake'
+gem 'rubocop'

@@ -16,11 +16,11 @@ module ParallelTests
   module Cucumber
     class Scenarios
       class << self
-        def all(files, options={})
+        def all(files, options = {})
           # Parse tag expression from given test options and ignore tag pattern. Refer here to understand how new tag expression syntax works - https://github.com/cucumber/cucumber/tree/master/tag-expressions
           tags = []
           words = options[:test_options].to_s.shellsplit
-          words.each_with_index { |w,i| tags << words[i+1] if ["-t", "--tags"].include?(w) }
+          words.each_with_index { |w, i| tags << words[i + 1] if ["-t", "--tags"].include?(w) }
           if ignore = options[:ignore_tag_pattern]
             tags << "not (#{ignore})"
           end
@@ -31,8 +31,7 @@ module ParallelTests
 
         private
 
-        def split_into_scenarios(files, tags='')
-
+        def split_into_scenarios(files, tags = '')
           # Create the tag expression instance from cucumber tag expressions parser, this is needed to know if the scenario matches with the tags invoked by the request
           # Create the ScenarioLineLogger which will filter the scenario we want
           args = []
@@ -40,7 +39,7 @@ module ParallelTests
           scenario_line_logger = ParallelTests::Cucumber::Formatters::ScenarioLineLogger.new(*args)
 
           # here we loop on the files map, each file will contain one or more scenario
-          features ||= files.map do |path|
+          files.each do |path|
             # Gather up any line numbers attached to the file path
             path, *test_lines = path.split(/:(?=\d+)/)
             test_lines.map!(&:to_i)

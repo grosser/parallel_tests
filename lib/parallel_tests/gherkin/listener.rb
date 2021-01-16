@@ -6,7 +6,8 @@ module ParallelTests
       attr_writer :ignore_tag_pattern
 
       def initialize
-        @steps, @uris = [], []
+        @steps = []
+        @uris = []
         @collect = {}
         @feature, @ignore_tag_pattern = nil
         reset_counters!
@@ -16,7 +17,7 @@ module ParallelTests
         @feature = feature
       end
 
-      def background(*args)
+      def background(*)
         @background = 1
       end
 
@@ -31,7 +32,7 @@ module ParallelTests
         @outline = 1
       end
 
-      def step(*args)
+      def step(*)
         return if @ignoring
         if @background == 1
           @background_steps += 1
@@ -51,12 +52,10 @@ module ParallelTests
       # @param  [Gherkin::Formatter::Model::Examples]  examples
       #
       def examples(examples)
-        if examples.rows.size > 0
-          @collect[@uri] += (@outline_steps * examples.rows.size)
-        end
+        @collect[@uri] += (@outline_steps * examples.rows.size) unless examples.rows.empty?
       end
 
-      def eof(*args)
+      def eof(*)
         @collect[@uri] += (@background_steps * @scenarios)
         reset_counters!
       end
@@ -67,8 +66,7 @@ module ParallelTests
       end
 
       # ignore lots of other possible callbacks ...
-      def method_missing(*args)
-      end
+      def method_missing(*); end # rubocop:disable Style/MissingRespondToMissing
 
       private
 
@@ -79,7 +77,7 @@ module ParallelTests
 
       # Set @ignoring if we should ignore this scenario/outline based on its tags
       def should_ignore(scenario)
-        @ignoring = @ignore_tag_pattern && all_tags(scenario).find{ |tag| @ignore_tag_pattern === tag.name }
+        @ignoring = @ignore_tag_pattern && all_tags(scenario).find { |tag| @ignore_tag_pattern === tag.name }
       end
     end
   end

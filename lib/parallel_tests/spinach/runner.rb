@@ -9,10 +9,9 @@ module ParallelTests
         end
 
         def runtime_logging
-          #Not Yet Supported
+          # Not Yet Supported
           ""
         end
-
       end
     end
   end
