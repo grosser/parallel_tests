@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require "parallel_tests/gherkin/runner"
 
 module ParallelTests
@@ -9,10 +10,9 @@ module ParallelTests
         end
 
         def runtime_logging
-          #Not Yet Supported
+          # Not Yet Supported
           ""
         end
-
       end
     end
   end

@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require 'json'
 
 module ParallelTests
@@ -52,8 +53,8 @@ module ParallelTests
       sync { IO.write(file_path, pids.to_json) }
     end
 
-    def sync
-      mutex.synchronize { yield }
+    def sync(&block)
+      mutex.synchronize(&block)
     end
   end
 end

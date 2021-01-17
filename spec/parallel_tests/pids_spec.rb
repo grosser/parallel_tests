@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require 'spec_helper'
 
 RSpec.describe ParallelTests::Pids do
@@ -13,15 +14,15 @@ RSpec.describe ParallelTests::Pids do
   describe '#add' do
     specify do
       subject.add(789)
-      expect(subject.all).to eq ([123, 456, 789])
+      expect(subject.all).to eq([123, 456, 789])
     end
   end
-  
+
   describe '#delete' do
     specify do
       subject.add(101)
       subject.delete(123)
-      expect(subject.all).to eq ([456, 101])
+      expect(subject.all).to eq([456, 101])
     end
   end
 

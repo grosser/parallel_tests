@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require 'cucumber/formatter/rerun'
 require 'parallel_tests/gherkin/io'
 
@@ -21,7 +22,6 @@ module ParallelTests
           end
         end
       end
-
     end
   end
 end

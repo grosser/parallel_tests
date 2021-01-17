@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require "spec_helper"
 require "parallel_tests/gherkin/runner"
 
@@ -10,25 +11,25 @@ shared_examples_for 'gherkin runners' do
     end
 
     def call(*args)
-      runner_class().run_tests(*args)
+      runner_class.run_tests(*args)
     end
 
     it "allows to override runner executable via PARALLEL_TESTS_EXECUTABLE" do
       ENV['PARALLEL_TESTS_EXECUTABLE'] = 'script/custom_rspec'
-      should_run_with(/script\/custom_rspec/)
+      should_run_with(%r{script/custom_rspec})
       call(['xxx'], 1, 22, {})
     end
 
     it "permits setting env options" do
-      expect(ParallelTests::Test::Runner).to receive(:execute_command) do |a, b, c, options|
+      expect(ParallelTests::Test::Runner).to receive(:execute_command) do |_, _, _, options|
         expect(options[:env]["TEST"]).to eq("ME")
       end
-      call(['xxx'], 1, 22, {:env => {'TEST' => 'ME'}})
+      call(['xxx'], 1, 22, { env: { 'TEST' => 'ME' } })
     end
 
     it "runs bundle exec {runner_name} when on bundler 0.9" do
       allow(ParallelTests).to receive(:bundler_enabled?).and_return true
-      should_run_with %r{bundle exec #{runner_name}}
+      should_run_with /bundle exec #{runner_name}/
       call(['xxx'], 1, 22, {})
     end
 
@@ -39,7 +40,7 @@ shared_examples_for 'gherkin runners' do
 
     it "runs {runner_name} by default" do
       allow(File).to receive(:file?).with("script/#{runner_name}").and_return false
-      should_run_with %r{^#{runner_name}}
+      should_run_with /^#{runner_name}/
       call(['xxx'], 1, 22, {})
     end
 
@@ -51,14 +52,14 @@ shared_examples_for 'gherkin runners' do
 
     it "uses options passed in" do
       should_run_with %r{script/#{runner_name} .*-p default}
-      call(['xxx'], 1, 22, :test_options => '-p default')
+      call(['xxx'], 1, 22, test_options: '-p default')
     end
 
     it "sanitizes dangerous file runner_names" do
       if ParallelTests::WINDOWS
-        should_run_with %r{"xx x"}
+        should_run_with /"xx x"/
       else
-        should_run_with %r{xx\\ x}
+        should_run_with /xx\\ x/
       end
 
       call(['xx x'], 1, 22, {})
@@ -78,7 +79,7 @@ shared_examples_for 'gherkin runners' do
           should_run_with %r{script/#{runner_name} .*foo bar --profile parallel xxx}
         end
 
-        call(['xxx'], 1, 22, :test_options => 'foo bar')
+        call(['xxx'], 1, 22, test_options: 'foo bar')
       end
 
       it "uses given profile via --profile" do
@@ -88,7 +89,7 @@ shared_examples_for 'gherkin runners' do
           should_run_with %r{script/#{runner_name} .*--profile foo xxx$}
         end
 
-        call(['xxx'], 1, 22, :test_options => '--profile foo')
+        call(['xxx'], 1, 22, test_options: '--profile foo')
       end
 
       it "uses given profile via -p" do
@@ -98,7 +99,7 @@ shared_examples_for 'gherkin runners' do
           should_run_with %r{script/#{runner_name} .*-p foo xxx$}
         end
 
-        call(['xxx'], 1, 22, :test_options => '-p foo')
+        call(['xxx'], 1, 22, test_options: '-p foo')
       end
     end
 
@@ -107,11 +108,11 @@ shared_examples_for 'gherkin runners' do
       should_run_with %r{script/#{runner_name} .*foo bar}
       expect(Dir).to receive(:glob).and_return ["config/#{runner_name}.yml"]
       expect(File).to receive(:read).with("config/#{runner_name}.yml").and_return file_contents
-      call(['xxx'], 1, 22, :test_options => 'foo bar')
+      call(['xxx'], 1, 22, test_options: 'foo bar')
     end
 
     it "does not use the parallel profile if config/{runner_name}.yml does not exist" do
-      should_run_with %r{script/#{runner_name}} # TODO this test looks useless...
+      should_run_with %r{script/#{runner_name}} # TODO: this test looks useless...
       expect(Dir).to receive(:glob).and_return []
       call(['xxx'], 1, 22, {})
     end
@@ -120,33 +121,33 @@ shared_examples_for 'gherkin runners' do
   describe :line_is_result? do
     it "should match lines with only one scenario" do
       line = "1 scenario (1 failed)"
-      expect(runner_class().line_is_result?(line)).to be_truthy
+      expect(runner_class.line_is_result?(line)).to be_truthy
     end
 
     it "should match lines with multiple scenarios" do
       line = "2 scenarios (1 failed, 1 passed)"
-      expect(runner_class().line_is_result?(line)).to be_truthy
+      expect(runner_class.line_is_result?(line)).to be_truthy
     end
 
     it "should match lines with only one step" do
       line = "1 step (1 failed)"
-      expect(runner_class().line_is_result?(line)).to be_truthy
+      expect(runner_class.line_is_result?(line)).to be_truthy
     end
 
     it "should match lines with multiple steps" do
       line = "5 steps (1 failed, 4 passed)"
-      expect(runner_class().line_is_result?(line)).to be_truthy
+      expect(runner_class.line_is_result?(line)).to be_truthy
     end
 
     it "should not match other lines" do
       line = '    And I should have "2" emails                                # features/step_definitions/user_steps.rb:25'
-      expect(runner_class().line_is_result?(line)).to be_falsey
+      expect(runner_class.line_is_result?(line)).to be_falsey
     end
   end
 
   describe :find_results do
     it "finds multiple results in test output" do
-      output = <<-EOF.gsub(/^        /, "")
+      output = <<~EOF
         And I should not see "/en/"                                       # features/step_definitions/webrat_steps.rb:87
 
         7 scenarios (3 failed, 4 passed)
@@ -164,18 +165,27 @@ shared_examples_for 'gherkin runners' do
         1 scenario (1 passed)
         1 step (1 passed)
       EOF
-      expect(runner_class.find_results(output)).to eq(["7 scenarios (3 failed, 4 passed)", "33 steps (3 failed, 2 skipped, 28 passed)", "4 scenarios (4 passed)", "40 steps (40 passed)", "1 scenario (1 passed)", "1 step (1 passed)"])
+      expect(runner_class.find_results(output)).to eq(
+        [
+          "7 scenarios (3 failed, 4 passed)",
+          "33 steps (3 failed, 2 skipped, 28 passed)",
+          "4 scenarios (4 passed)",
+          "40 steps (40 passed)",
+          "1 scenario (1 passed)", "1 step (1 passed)"
+        ]
+      )
     end
   end
 
   describe :summarize_results do
     def call(*args)
-      runner_class().summarize_results(*args)
+      runner_class.summarize_results(*args)
     end
 
     it "sums up results for scenarios and steps separately from each other" do
       results = [
-        "7 scenarios (2 failed, 1 flaky, 4 passed)", "33 steps (3 failed, 2 skipped, 28 passed)",
+        "7 scenarios (2 failed, 1 flaky, 4 passed)",
+        "33 steps (3 failed, 2 skipped, 28 passed)",
         "4 scenarios (4 passed)", "40 steps (40 passed)",
         "1 scenario (1 passed)", "1 step (1 passed)"
       ]
@@ -205,14 +215,14 @@ shared_examples_for 'gherkin runners' do
 
   describe 'grouping by scenarios for cucumber' do
     def call(*args)
-      runner_class().send(:run_tests, *args)
+      runner_class.send(:run_tests, *args)
     end
 
     it 'groups cucumber invocation by feature files to achieve correct cucumber hook behaviour' do
-      test_files = %w(features/a.rb:23 features/a.rb:44 features/b.rb:12)
+      test_files = ['features/a.rb:23', 'features/a.rb:44', 'features/b.rb:12']
 
-      expect(ParallelTests::Test::Runner).to receive(:execute_command) do |a,b,c,d|
-        argv = a.split(" ").last(2)
+      expect(ParallelTests::Test::Runner).to receive(:execute_command) do |a, _b, _c, _d|
+        argv = a.split.last(2)
 
         if ParallelTests::WINDOWS
           expect(argv).to eq(['"features/a.rb:23:44"', '"features/b.rb:12"'])
@@ -221,7 +231,7 @@ shared_examples_for 'gherkin runners' do
         end
       end
 
-      call(test_files, 1, 2, { :group_by => :scenarios })
+      call(test_files, 1, 2, { group_by: :scenarios })
     end
   end
 
@@ -231,10 +241,12 @@ shared_examples_for 'gherkin runners' do
     end
 
     it "doesn't find bakup files with the same name as test files" do
-      with_files(['a/x.feature','a/x.feature.bak']) do |root|
-        expect(call(["#{root}/"])).to eq([
-          "#{root}/a/x.feature",
-        ])
+      with_files(['a/x.feature', 'a/x.feature.bak']) do |root|
+        expect(call(["#{root}/"])).to eq(
+          [
+            "#{root}/a/x.feature"
+          ]
+        )
       end
     end
   end

@@ -1,36 +1,43 @@
+# frozen_string_literal: true
 require 'spec_helper'
 require 'parallel_tests/tasks'
 
 describe ParallelTests::Tasks do
   describe ".parse_args" do
     it "should return the count" do
-      args = {:count => 2}
+      args = { count: 2 }
       expect(ParallelTests::Tasks.parse_args(args)).to eq([2, "", "", ""])
     end
 
     it "should default to the prefix" do
-      args = {:count => "models"}
+      args = { count: "models" }
       expect(ParallelTests::Tasks.parse_args(args)).to eq([nil, "models", "", ""])
     end
 
     it "should return the count and pattern" do
-      args = {:count => 2, :pattern => "models"}
+      args = { count: 2, pattern: "models" }
       expect(ParallelTests::Tasks.parse_args(args)).to eq([2, "models", "", ""])
     end
 
     it "should return the count, pattern, and options" do
-      args = {:count => 2, :pattern => "plain", :options => "-p default"}
+      args = { count: 2, pattern: "plain", options: "-p default" }
       expect(ParallelTests::Tasks.parse_args(args)).to eq([2, "plain", "-p default", ""])
     end
 
     it "should return the count, pattern, and options" do
-      args = {:count => 2, :pattern => "plain", :options => "-p default --group-by steps"}
+      args = { count: 2, pattern: "plain", options: "-p default --group-by steps" }
       expect(ParallelTests::Tasks.parse_args(args)).to eq([2, "plain", "-p default --group-by steps", ""])
     end
 
     it "should return the count, pattern, test options, and pass-through options" do
-      args = {:count => 2, :pattern => "plain", :options => "-p default --group-by steps", :pass_through => "--runtime-log /path/to/log"}
-      expect(ParallelTests::Tasks.parse_args(args)).to eq([2, "plain", "-p default --group-by steps", "--runtime-log /path/to/log"])
+      args = {
+        count: 2, pattern: "plain", options: "-p default --group-by steps",
+        pass_through: "--runtime-log /path/to/log"
+      }
+      expect(ParallelTests::Tasks.parse_args(args)).to eq(
+        [2, "plain", "-p default --group-by steps",
+         "--runtime-log /path/to/log"]
+      )
     end
   end
 
@@ -46,7 +53,7 @@ describe ParallelTests::Tasks do
   end
 
   describe ".run_in_parallel" do
-    let(:full_path){ File.expand_path("../../../bin/parallel_test", __FILE__) }
+    let(:full_path) { File.expand_path('../../bin/parallel_test', __dir__) }
 
     it "has the executable" do
       expect(File.file?(full_path)).to eq(true)
@@ -60,17 +67,17 @@ describe ParallelTests::Tasks do
 
     it "runs command with :count option" do
       expect(ParallelTests::Tasks).to receive(:system).with(/#{full_path} --exec 'echo' -n 123$/).and_return true
-      ParallelTests::Tasks.run_in_parallel("echo", :count => 123)
+      ParallelTests::Tasks.run_in_parallel("echo", count: 123)
     end
 
     it "runs without -n with blank :count option" do
       expect(ParallelTests::Tasks).to receive(:system).with(/#{full_path} --exec 'echo'$/).and_return true
-      ParallelTests::Tasks.run_in_parallel("echo", :count => "")
+      ParallelTests::Tasks.run_in_parallel("echo", count: "")
     end
 
     it "runs command with :non_parallel option" do
       expect(ParallelTests::Tasks).to receive(:system).with(/#{full_path} --exec 'echo' --non-parallel$/).and_return true
-      ParallelTests::Tasks.run_in_parallel("echo", :non_parallel => true)
+      ParallelTests::Tasks.run_in_parallel("echo", non_parallel: true)
     end
 
     it "runs aborts if the command fails" do
@@ -91,7 +98,7 @@ describe ParallelTests::Tasks do
 
     context "with pipefail supported" do
       before :all do
-        if not system("/bin/bash", "-c", "set -o pipefail 2>/dev/null && test 1")
+        unless system("/bin/bash", "-c", "set -o pipefail 2>/dev/null && test 1")
           skip "pipefail is not supported on your system"
         end
       end
@@ -115,7 +122,10 @@ describe ParallelTests::Tasks do
 
     context "without pipefail supported" do
       before do
-        expect(ParallelTests::Tasks).to receive(:system).with('/bin/bash', '-c', 'set -o pipefail 2>/dev/null && test 1').and_return false
+        expect(ParallelTests::Tasks).to receive(:system).with(
+          '/bin/bash', '-c',
+          'set -o pipefail 2>/dev/null && test 1'
+        ).and_return false
       end
 
       it "should not filter and succeed" do

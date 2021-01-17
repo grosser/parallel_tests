@@ -12,6 +12,7 @@ GEM
       i18n (>= 0.7, < 2)
       minitest (~> 5.1)
       tzinfo (~> 1.1)
+    ast (2.4.1)
     builder (3.2.4)
     bump (0.9.0)
     colorize (0.8.1)
@@ -55,13 +56,18 @@ GEM
     minitest (5.5.1)
     multi_test (0.1.2)
     parallel (1.20.1)
+    parser (3.0.0.0)
+      ast (~> 2.4.1)
     power_assert (1.2.0)
     protobuf-cucumber (3.10.8)
       activesupport (>= 3.2)
       middleware
       thor
       thread_safe
+    rainbow (3.0.0)
     rake (13.0.1)
+    regexp_parser (2.0.3)
+    rexml (3.2.4)
     rspec (3.9.0)
       rspec-core (~> 3.9.0)
       rspec-expectations (~> 3.9.0)
@@ -75,6 +81,20 @@ GEM
       diff-lcs (>= 1.2.0, < 2.0)
       rspec-support (~> 3.9.0)
     rspec-support (3.9.3)
+    rubocop (1.8.1)
+      parallel (~> 1.10)
+      parser (>= 3.0.0.0)
+      rainbow (>= 2.2.2, < 4.0)
+      regexp_parser (>= 1.8, < 3.0)
+      rexml
+      rubocop-ast (>= 1.2.0, < 2.0)
+      ruby-progressbar (~> 1.7)
+      unicode-display_width (>= 1.4.0, < 3.0)
+    rubocop-ast (1.4.0)
+      parser (>= 2.7.1.5)
+    rubocop-rake (0.5.1)
+      rubocop
+    ruby-progressbar (1.11.0)
     spinach (0.11.0)
       colorize
       gherkin-ruby (>= 0.3.2)
@@ -87,6 +107,7 @@ GEM
     thread_safe (0.3.6)
     tzinfo (1.2.7)
       thread_safe (~> 0.1)
+    unicode-display_width (2.0.0)
 
 PLATFORMS
   ruby
@@ -99,6 +120,8 @@ DEPENDENCIES
   parallel_tests!
   rake
   rspec (~> 3.3)
+  rubocop
+  rubocop-rake
   spinach
   test-unit
 

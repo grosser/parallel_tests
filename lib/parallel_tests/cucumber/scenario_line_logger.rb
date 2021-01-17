@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 module ParallelTests
   module Cucumber
     module Formatters
@@ -10,7 +11,7 @@ module ParallelTests
         end
 
         def visit_feature_element(uri, feature_element, feature_tags, line_numbers: [])
-          scenario_tags = feature_element.tags.map { |tag| tag.name }
+          scenario_tags = feature_element.tags.map(&:name)
           scenario_tags = feature_tags + scenario_tags
           if feature_element.is_a?(CukeModeler::Scenario) # :Scenario
             test_line = feature_element.source_line
@@ -36,8 +37,7 @@ module ParallelTests
           end
         end
 
-        def method_missing(*args)
-        end
+        def method_missing(*); end # # rubocop:disable Style/MissingRespondToMissing
 
         private
 

@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 source 'https://rubygems.org'
 gemspec
 
@@ -9,3 +10,4 @@ gem 'cucumber', "~> 4.0"
 gem 'cuke_modeler', '~> 3.0'
 gem 'spinach'
 gem 'rake'
+gem 'rubocop'

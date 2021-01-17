@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require 'spec_helper'
 
 describe 'CLI' do
@@ -25,7 +26,7 @@ describe 'CLI' do
   end
 
   def bin_folder
-    "#{File.expand_path(File.dirname(__FILE__))}/../bin"
+    "#{__dir__}/../bin"
   end
 
   def executable(options = {})
@@ -97,7 +98,7 @@ describe 'CLI' do
 
     before do
       write 'spec/xxx1_spec.rb', 'describe("T1"){it("E1"){puts "YE" + "S"; sleep 0.5; expect(1).to eq(2)}}' # group 1 executed
-      write 'spec/xxx2_spec.rb', 'describe("T2"){it("E2"){sleep 1; puts "OK"}}'  # group 2 executed
+      write 'spec/xxx2_spec.rb', 'describe("T2"){it("E2"){sleep 1; puts "OK"}}' # group 2 executed
       write 'spec/xxx3_spec.rb', 'describe("T3"){it("E3"){puts "NO3"}}' # group 1 skipped
       write 'spec/xxx4_spec.rb', 'describe("T4"){it("E4"){puts "NO4"}}' # group 2 skipped
       write 'spec/xxx5_spec.rb', 'describe("T5"){it("E5"){puts "NO5"}}' # group 1 skipped
@@ -153,7 +154,7 @@ describe 'CLI' do
     # Need to tell Ruby to default to utf-8 to simulate environments where
     # this is set. (Otherwise, it defaults to nil and the undefined conversion
     # issue doesn't come up.)
-    result = run_tests('test', fail: true, export: {'RUBYOPT' => 'Eutf-8:utf-8'})
+    result = run_tests('test', fail: true, export: { 'RUBYOPT' => 'Eutf-8:utf-8' })
     expect(result).to include('¯\_(ツ)_/¯')
   end
 
@@ -210,14 +211,14 @@ describe 'CLI' do
   it "can show simulated output when serializing stdout" do
     write 'spec/xxx_spec.rb', 'describe("it"){it("should"){sleep 0.5; puts "TEST1"}}'
     write 'spec/xxx2_spec.rb', 'describe("it"){it("should"){sleep 1; puts "TEST2"}}'
-    result = run_tests "spec", type: 'rspec', add: "--serialize-stdout", export: {'PARALLEL_TEST_HEARTBEAT_INTERVAL' => '0.01'}
+    result = run_tests "spec", type: 'rspec', add: "--serialize-stdout", export: { 'PARALLEL_TEST_HEARTBEAT_INTERVAL' => '0.01' }
     expect(result).to match(/\.{4}.*TEST1.*\.{4}.*TEST2/m)
   end
 
   it "can show simulated output preceded by command when serializing stdout with verbose option" do
-    write 'spec/xxx_spec.rb', 'describe("it"){it("should"){sleep 1; puts "TEST1"}}'
-    result = run_tests "spec --verbose", type: 'rspec', add: "--serialize-stdout", export: {'PARALLEL_TEST_HEARTBEAT_INTERVAL' => '0.02'}
-    expect(result).to match(/\.{5}.*\nbundle exec rspec spec\/xxx_spec\.rb\nTEST1/m)
+    write 'spec/xxx_spec.rb', 'describe("it"){it("should"){sleep 1.5; puts "TEST1"}}'
+    result = run_tests "spec --verbose", type: 'rspec', add: "--serialize-stdout", export: { 'PARALLEL_TEST_HEARTBEAT_INTERVAL' => '0.02' }
+    expect(result).to match(/\.{5}.*\nbundle exec rspec spec\/xxx_spec\.rb\n.*^TEST1/m)
   end
 
   it "can serialize stdout and stderr" do
@@ -232,17 +233,17 @@ describe 'CLI' do
   context "with given commands" do
     it "can exec given commands with ENV['TEST_ENV_NUMBER']" do
       result = `#{executable} -e 'ruby -e "print ENV[:TEST_ENV_NUMBER.to_s].to_i"' -n 4`
-      expect(result.gsub('"', '').split('').sort).to eq(%w[0 2 3 4])
+      expect(result.gsub('"', '').split('').sort).to eq(['0', '2', '3', '4'])
     end
 
     it "can exec given command non-parallel" do
       result = `#{executable} -e 'ruby -e "sleep(rand(10)/100.0); puts ENV[:TEST_ENV_NUMBER.to_s].inspect"' -n 4 --non-parallel`
-      expect(result.split(/\n+/)).to eq(%w["" "2" "3" "4"])
+      expect(result.split(/\n+/)).to eq(['""', '"2"', '"3"', '"4"'])
     end
 
     it "can exec given command with a restricted set of groups" do
       result = `#{executable} -e 'ruby -e "print ENV[:TEST_ENV_NUMBER.to_s].to_i"' -n 4 --only-group 1,3`
-      expect(result.gsub('"', '').split('').sort).to eq(%w[0 3])
+      expect(result.gsub('"', '').split('').sort).to eq(['0', '3'])
     end
 
     it "can serialize stdout" do
@@ -297,7 +298,7 @@ describe 'CLI' do
 
   it "can enable spring" do
     write "spec/xxx_spec.rb", 'puts "SPRING: #{ENV["DISABLE_SPRING"]}"'
-    result = run_tests("spec", processes: 2, type: 'rspec', export: {"DISABLE_SPRING" => "0"})
+    result = run_tests("spec", processes: 2, type: 'rspec', export: { "DISABLE_SPRING" => "0" })
     expect(result).to include "SPRING: 0"
   end
 
@@ -339,7 +340,7 @@ describe 'CLI' do
       write "spec/x#{i}_spec.rb", "puts %{ENV-\#{ENV['TEST_ENV_NUMBER']}-}"
     end
     result = run_tests(
-      "spec", export: {"PARALLEL_TEST_PROCESSORS" => processes.to_s}, processes: processes, type: 'rspec'
+      "spec", export: { "PARALLEL_TEST_PROCESSORS" => processes.to_s }, processes: processes, type: 'rspec'
     )
     expect(result.scan(/ENV-.?-/)).to match_array(["ENV--", "ENV-2-", "ENV-3-", "ENV-4-", "ENV-5-"])
   end
@@ -452,18 +453,18 @@ describe 'CLI' do
 
       log = "tmp/parallel_runtime_cucumber.log"
       write(log, "x")
-      2.times { |i|
+      2.times do |i|
         # needs sleep so that runtime loggers dont overwrite each other initially
         write "features/good#{i}.feature", "Feature: xxx\n  Scenario: xxx\n    Given I print TEST_ENV_NUMBER\n    And I sleep a bit"
-      }
+      end
       run_tests "features", type: "cucumber"
       expect(read(log).gsub(/\.\d+/, '').split("\n")).to match_array(["features/good0.feature:0", "features/good1.feature:0"])
     end
 
     it "runs each feature once when there are more processes then features (issue #89)" do
-      2.times { |i|
+      2.times do |i|
         write "features/good#{i}.feature", "Feature: xxx\n  Scenario: xxx\n    Given I print TEST_ENV_NUMBER"
-      }
+      end
       result = run_tests "features", type: "cucumber", add: '-n 3'
       expect(result.scan(/YOUR TEST ENV IS \d?!/).sort).to eq(["YOUR TEST ENV IS !", "YOUR TEST ENV IS 2!"])
     end
@@ -547,14 +548,14 @@ describe 'CLI' do
     it "runs tests which outputs accented characters" do
       write "features/good1.feature", "Feature: a\n  Scenario: xxx\n    Given I print accented characters"
       write "features/steps/a.rb", "#encoding: utf-8\nclass A < Spinach::FeatureSteps\nGiven 'I print accented characters' do\n  puts \"I tu też\" \n  end\nend"
-      result = run_tests "features", type: "spinach", add: 'features/good1.feature' #, :add => '--pattern good'
+      result = run_tests "features", type: "spinach", add: 'features/good1.feature' # , :add => '--pattern good'
       expect(result).to include('I tu też')
     end
 
     it "passes TEST_ENV_NUMBER when running with pattern (issue #86)" do
       write "features/good1.feature", "Feature: a\n  Scenario: xxx\n    Given I print TEST_ENV_NUMBER"
       write "features/good2.feature", "Feature: a\n  Scenario: xxx\n    Given I print TEST_ENV_NUMBER"
-      write "features/b.feature", "Feature: b\n  Scenario: xxx\n    Given I FAIL" #Expect this not to be run
+      write "features/b.feature", "Feature: b\n  Scenario: xxx\n    Given I FAIL" # Expect this not to be run
 
       result = run_tests "features", type: "spinach", add: '--pattern good'
 
@@ -568,18 +569,18 @@ describe 'CLI' do
       log = "tmp/parallel_runtime_spinach.log"
       write(log, "x")
 
-      2.times { |i|
+      2.times do |i|
         # needs sleep so that runtime loggers dont overwrite each other initially
         write "features/good#{i}.feature", "Feature: A\n  Scenario: xxx\n    Given I print TEST_ENV_NUMBER\n    And I sleep a bit"
-      }
+      end
       run_tests "features", type: "spinach"
       expect(read(log).gsub(/\.\d+/, '').split("\n")).to match_array(["features/good0.feature:0", "features/good1.feature:0"])
     end
 
     it "runs each feature once when there are more processes then features (issue #89)" do
-      2.times { |i|
+      2.times do |i|
         write "features/good#{i}.feature", "Feature: A\n  Scenario: xxx\n    Given I print TEST_ENV_NUMBER\n"
-      }
+      end
       result = run_tests "features", type: "spinach", add: '-n 3'
       expect(result.scan(/YOUR TEST ENV IS \d?!/).sort).to eq(["YOUR TEST ENV IS !", "YOUR TEST ENV IS 2!"])
     end

@@ -1,23 +1,25 @@
+# frozen_string_literal: true
 require "parallel_tests/test/runner"
 require 'shellwords'
 
 module ParallelTests
   module Gherkin
     class Runner < ParallelTests::Test::Runner
-
       class << self
         def run_tests(test_files, process_number, num_processes, options)
           combined_scenarios = test_files
 
           if options[:group_by] == :scenarios
             grouped = test_files.map { |t| t.split(':') }.group_by(&:first)
-            combined_scenarios = grouped.map {|file,files_and_lines| "#{file}:#{files_and_lines.map(&:last).join(':')}" }
+            combined_scenarios = grouped.map do |file, files_and_lines|
+              "#{file}:#{files_and_lines.map(&:last).join(':')}"
+            end
           end
 
           sanitized_test_files = combined_scenarios.map { |val| WINDOWS ? "\"#{val}\"" : Shellwords.escape(val) }
 
           options[:env] ||= {}
-          options[:env] = options[:env].merge({'AUTOTEST' => '1'}) if $stdout.tty? # display color when we are in a terminal
+          options[:env] = options[:env].merge({ 'AUTOTEST' => '1' }) if $stdout.tty?
 
           cmd = [
             executable,
@@ -44,16 +46,16 @@ module ParallelTests
         # 1 scenario (1 failed)
         # 1 step (1 failed)
         def summarize_results(results)
-          sort_order = %w[scenario step failed flaky undefined skipped pending passed]
+          sort_order = ['scenario', 'step', 'failed', 'flaky', 'undefined', 'skipped', 'pending', 'passed']
 
-          %w[scenario step].map do |group|
+          ['scenario', 'step'].map do |group|
             group_results = results.grep(/^\d+ #{group}/)
             next if group_results.empty?
 
             sums = sum_up_results(group_results)
             sums = sums.sort_by { |word, _| sort_order.index(word) || 999 }
             sums.map! do |word, number|
-              plural = "s" if word == group and number != 1
+              plural = "s" if (word == group) && (number != 1)
               "#{number} #{word}#{plural}"
             end
             "#{sums[0]} (#{sums[1..-1].join(", ")})"
@@ -61,7 +63,7 @@ module ParallelTests
         end
 
         def cucumber_opts(given)
-          if given =~ /--profile/ or given =~ /(^|\s)-p /
+          if given =~ (/--profile/) || given =~ (/(^|\s)-p /)
             given
           else
             [given, profile_from_config].compact.join(" ")
@@ -71,15 +73,11 @@ module ParallelTests
         def profile_from_config
           # copied from https://github.com/cucumber/cucumber/blob/master/lib/cucumber/cli/profile_loader.rb#L85
           config = Dir.glob("{,.config/,config/}#{name}{.yml,.yaml}").first
-          if config && File.read(config) =~ /^parallel:/
-            "--profile parallel"
-          end
+          "--profile parallel" if config && File.read(config) =~ /^parallel:/
         end
 
-        def tests_in_groups(tests, num_groups, options={})
-          if options[:group_by] == :scenarios
-            @test_file_name = "scenario"
-          end
+        def tests_in_groups(tests, num_groups, options = {})
+          @test_file_name = "scenario" if options[:group_by] == :scenarios
           method = "by_#{options[:group_by]}"
           if Grouper.respond_to?(method)
             Grouper.send(method, find_tests(tests, options), num_groups, options)
@@ -87,7 +85,6 @@ module ParallelTests
             super
           end
         end
-
 
         def runtime_logging
           "--format ParallelTests::Gherkin::RuntimeLogger --out #{runtime_log}"
@@ -98,18 +95,16 @@ module ParallelTests
         end
 
         def determine_executable
-          case
-          when File.exist?("bin/#{name}")
+          if File.exist?("bin/#{name}")
             ParallelTests.with_ruby_binary("bin/#{name}")
-          when ParallelTests.bundler_enabled?
+          elsif ParallelTests.bundler_enabled?
             "bundle exec #{name}"
-          when File.file?("script/#{name}")
+          elsif File.file?("script/#{name}")
             ParallelTests.with_ruby_binary("script/#{name}")
           else
-            "#{name}"
+            name.to_s
           end
         end
-
       end
     end
   end

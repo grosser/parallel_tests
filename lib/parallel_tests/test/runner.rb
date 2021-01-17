@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require 'parallel_tests'
 
 module ParallelTests
@@ -32,7 +33,7 @@ module ParallelTests
         # --- usually used by other runners
 
         # finds all tests and partitions them into groups
-        def tests_in_groups(tests, num_groups, options={})
+        def tests_in_groups(tests, num_groups, options = {})
           tests = tests_with_size(tests, options)
           Grouper.in_even_groups_by_size(tests, num_groups, options)
         end
@@ -46,10 +47,17 @@ module ParallelTests
           when :filesize
             sort_by_filesize(tests)
           when :runtime
-            sort_by_runtime(tests, runtimes(tests, options), options.merge(allowed_missing: (options[:allowed_missing_percent] || 50) / 100.0))
+            sort_by_runtime(
+              tests, runtimes(tests, options),
+              options.merge(allowed_missing: (options[:allowed_missing_percent] || 50) / 100.0)
+            )
           when nil
             # use recorded test runtime if we got enough data
-            runtimes = runtimes(tests, options) rescue []
+            runtimes = begin
+              runtimes(tests, options)
+            rescue StandardError
+              []
+            end
             if runtimes.size * 1.5 > tests.size
               puts "Using recorded test runtime"
               sort_by_runtime(tests, runtimes)
@@ -67,7 +75,7 @@ module ParallelTests
           env = (options[:env] || {}).merge(
             "TEST_ENV_NUMBER" => test_env_number(process_number, options).to_s,
             "PARALLEL_TEST_GROUPS" => num_processes.to_s,
-            "PARALLEL_PID_FILE" => ParallelTests.pid_file_path,
+            "PARALLEL_PID_FILE" => ParallelTests.pid_file_path
           )
           cmd = "nice #{cmd}" if options[:nice]
           cmd = "#{cmd} 2>&1" if options[:combine_stderr]
@@ -86,13 +94,11 @@ module ParallelTests
           end
           ParallelTests.pids.delete(pid) if pid
           exitstatus = $?.exitstatus
-          seed = output[/seed (\d+)/,1]
+          seed = output[/seed (\d+)/, 1]
 
-          if report_process_command?(options) && options[:serialize_stdout]
-            output = [cmd, output].join("\n")
-          end
+          output = [cmd, output].join("\n") if report_process_command?(options) && options[:serialize_stdout]
 
-          {:stdout => output, :exit_status => exitstatus, :command => cmd, :seed => seed}
+          { stdout: output, exit_status: exitstatus, command: cmd, seed: seed }
         end
 
         def find_results(test_output)
@@ -104,7 +110,7 @@ module ParallelTests
           end.compact
         end
 
-        def test_env_number(process_number, options={})
+        def test_env_number(process_number, options = {})
           if process_number == 0 && !options[:first_is_1]
             ''
           else
@@ -114,7 +120,7 @@ module ParallelTests
 
         def summarize_results(results)
           sums = sum_up_results(results)
-          sums.sort.map{|word, number|  "#{number} #{word}#{'s' if number != 1}" }.join(', ')
+          sums.sort.map { |word, number| "#{number} #{word}#{'s' if number != 1}" }.join(', ')
         end
 
         # remove old seed and add new seed
@@ -134,19 +140,18 @@ module ParallelTests
         end
 
         def sum_up_results(results)
-          results = results.join(' ').gsub(/s\b/,'') # combine and singularize results
+          results = results.join(' ').gsub(/s\b/, '') # combine and singularize results
           counts = results.scan(/(\d+) (\w+)/)
-          counts.inject(Hash.new(0)) do |sum, (number, word)|
+          counts.each_with_object(Hash.new(0)) do |(number, word), sum|
             sum[word] += number.to_i
-            sum
           end
         end
 
         # read output of the process and print it in chunks
-        def capture_output(out, env, options={})
-          result = ""
-          loop do
-            begin
+        def capture_output(out, env, options = {})
+          result = +""
+          begin
+            loop do
               read = out.readpartial(1000000) # read whatever chunk we can get
               if Encoding.default_internal
                 read = read.force_encoding(Encoding.default_internal)
@@ -159,11 +164,13 @@ module ParallelTests
                 $stdout.flush
               end
             end
-          end rescue EOFError
+          rescue EOFError
+            nil
+          end
           result
         end
 
-        def sort_by_runtime(tests, runtimes, options={})
+        def sort_by_runtime(tests, runtimes, options = {})
           allowed_missing = options[:allowed_missing] || 1.0
           allowed_missing = tests.size * allowed_missing
 
@@ -178,9 +185,7 @@ module ParallelTests
             [test, time]
           end
 
-          if options[:verbose]
-            puts "Runtime found for #{tests.count(&:last)} of #{tests.size} tests"
-          end
+          puts "Runtime found for #{tests.count(&:last)} of #{tests.size} tests" if options[:verbose]
 
           set_unknown_runtime tests, options
         end
@@ -190,7 +195,7 @@ module ParallelTests
           lines = File.read(log).split("\n")
           lines.each_with_object({}) do |line, times|
             test, _, time = line.rpartition(':')
-            next unless test and time
+            next unless test && time
             times[test] = time.to_f if tests.include?(test)
           end
         end
@@ -217,7 +222,7 @@ module ParallelTests
           end.uniq
         end
 
-        def files_in_folder(folder, options={})
+        def files_in_folder(folder, options = {})
           pattern = if options[:symlinks] == false # not nil or true
             "**/*"
           else
@@ -225,7 +230,7 @@ module ParallelTests
             # http://stackoverflow.com/questions/357754/can-i-traverse-symlinked-directories-in-ruby-with-a-glob
             "**{,/*/**}/*"
           end
-          Dir[File.join(folder, pattern)].uniq
+          Dir[File.join(folder, pattern)].uniq.sort
         end
 
         private
@@ -236,7 +241,7 @@ module ParallelTests
           known, unknown = tests.partition(&:last)
           return if unknown.empty?
           unknown_runtime = options[:unknown_runtime] ||
-            (known.empty? ? 1 : known.map!(&:last).inject(:+) / known.size) # average
+            (known.empty? ? 1 : known.map!(&:last).sum / known.size) # average
           unknown.each { |set| set[1] = unknown_runtime }
         end
 

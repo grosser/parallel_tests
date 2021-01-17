@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 module ParallelTests
   module RSpec
   end
@@ -13,26 +14,27 @@ class ParallelTests::RSpec::LoggerBase < RSpec::Core::Formatters::BaseTextFormat
 
     @output ||= args[0]
 
-    if String === @output # a path ?
+    case @output
+    when String # a path ?
       FileUtils.mkdir_p(File.dirname(@output))
-      File.open(@output, 'w'){} # overwrite previous results
+      File.open(@output, 'w') {} # overwrite previous results
       @output = File.open(@output, 'a')
-    elsif File === @output # close and restart in append mode
+    when File # close and restart in append mode
       @output.close
       @output = File.open(@output.path, 'a')
     end
   end
 
-  #stolen from Rspec
-  def close(*args)
-    @output.close  if (IO === @output) & (@output != $stdout)
+  # stolen from Rspec
+  def close(*)
+    @output.close if (IO === @output) & (@output != $stdout)
   end
 
   protected
 
   # do not let multiple processes get in each others way
   def lock_output
-    if File === @output
+    if @output.is_a?(File)
       begin
         @output.flock File::LOCK_EX
         yield

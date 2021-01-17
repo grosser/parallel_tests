@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require "parallel_tests/test/runner"
 
 module ParallelTests
@@ -12,10 +13,9 @@ module ParallelTests
         end
 
         def determine_executable
-          case
-          when File.exist?("bin/rspec")
+          if File.exist?("bin/rspec")
             ParallelTests.with_ruby_binary("bin/rspec")
-          when ParallelTests.bundler_enabled?
+          elsif ParallelTests.bundler_enabled?
             "bundle exec rspec"
           else
             "rspec"
@@ -23,7 +23,7 @@ module ParallelTests
         end
 
         def runtime_log
-          'tmp/parallel_runtime_rspec.log'
+          "tmp/parallel_runtime_rspec.log"
         end
 
         def test_file_name
@@ -55,9 +55,9 @@ module ParallelTests
           return text unless $stdout.tty?
           sums = sum_up_results(results)
           color =
-            if sums['failure'].positive?
+            if sums['failure'] > 0
               31 # red
-            elsif sums['pending'].positive?
+            elsif sums['pending'] > 0
               33 # yellow
             else
               32 # green
@@ -77,7 +77,7 @@ module ParallelTests
         end
 
         def spec_opts
-          options_file = ['.rspec_parallel', 'spec/parallel_spec.opts', 'spec/spec.opts'].detect{|f| File.file?(f) }
+          options_file = ['.rspec_parallel', 'spec/parallel_spec.opts', 'spec/spec.opts'].detect { |f| File.file?(f) }
           return unless options_file
           "-O #{options_file}"
         end

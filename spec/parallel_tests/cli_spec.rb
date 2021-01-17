@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require "spec_helper"
 require "parallel_tests/cli"
 require "parallel_tests/rspec/runner"
@@ -6,7 +7,7 @@ describe ParallelTests::CLI do
   subject { ParallelTests::CLI.new }
 
   describe "#parse_options" do
-    let(:defaults){ {:files => ["test"]} }
+    let(:defaults) { { files: ["test"] } }
 
     def call(*args)
       subject.send(:parse_options!, *args)
@@ -26,19 +27,19 @@ describe ParallelTests::CLI do
     end
 
     it "parses excludes pattern" do
-      expect(call(["test", "--exclude-pattern", "spec/"])).to eq(defaults.merge(:exclude_pattern => /spec\//))
+      expect(call(["test", "--exclude-pattern", "spec/"])).to eq(defaults.merge(exclude_pattern: /spec\//))
     end
 
     it "parses regular count" do
-      expect(call(["test", "-n3"])).to eq(defaults.merge(:count => 3))
+      expect(call(["test", "-n3"])).to eq(defaults.merge(count: 3))
     end
 
     it "parses count 0 as non-parallel" do
-      expect(call(["test", "-n0"])).to eq(defaults.merge(:non_parallel => true))
+      expect(call(["test", "-n0"])).to eq(defaults.merge(non_parallel: true))
     end
 
     it "parses non-parallel as non-parallel" do
-      expect(call(["test", "--non-parallel"])).to eq(defaults.merge(:non_parallel => true))
+      expect(call(["test", "--non-parallel"])).to eq(defaults.merge(non_parallel: true))
     end
 
     it "finds the correct type when multiple are given" do
@@ -47,11 +48,11 @@ describe ParallelTests::CLI do
     end
 
     it "parses nice as nice" do
-      expect(call(["test", "--nice"])).to eq(defaults.merge(:nice => true))
+      expect(call(["test", "--nice"])).to eq(defaults.merge(nice: true))
     end
 
     it "parses --verbose" do
-      expect(call(["test", "--verbose"])).to eq(defaults.merge(:verbose => true))
+      expect(call(["test", "--verbose"])).to eq(defaults.merge(verbose: true))
     end
 
     it "parses --verbose-process-command" do
@@ -67,7 +68,7 @@ describe ParallelTests::CLI do
     end
 
     it "parses --quiet" do
-      expect(call(["test", "--quiet"])).to eq(defaults.merge(:quiet => true))
+      expect(call(["test", "--quiet"])).to eq(defaults.merge(quiet: true))
     end
 
     it "fails if both --verbose and --quiet are present" do
@@ -75,12 +76,12 @@ describe ParallelTests::CLI do
     end
 
     it "parses --suffix" do
-      expect(call(["test", "--suffix", "_(test|spec).rb$"])).to eq(defaults.merge(:suffix => /_(test|spec).rb$/))
+      expect(call(["test", "--suffix", "_(test|spec).rb$"])).to eq(defaults.merge(suffix: /_(test|spec).rb$/))
     end
 
     it "parses --first-is-1" do
-      expect(call(["test", "--first-is-1"])).
-        to eq(defaults.merge(:first_is_1 => true))
+      expect(call(["test", "--first-is-1"]))
+        .to eq(defaults.merge(first_is_1: true))
     end
 
     context "parse only-group" do
@@ -93,17 +94,17 @@ describe ParallelTests::CLI do
       end
 
       it "raise error when group_by isn't filesize" do
-        expect{
+        expect  do
           call(["test", "--only-group", '1', '--group-by', 'steps'])
-        }.to raise_error(RuntimeError)
+        end.to raise_error(RuntimeError)
       end
 
       it "with multiple groups" do
-        expect(call(["test", "--only-group", '4,5'])).to eq(defaults.merge(only_group: [4,5], group_by: :filesize))
+        expect(call(["test", "--only-group", '4,5'])).to eq(defaults.merge(only_group: [4, 5], group_by: :filesize))
       end
 
       it "with a single group" do
-        expect(call(["test", "--only-group", '4'])).to eq(defaults.merge(:only_group => [4], group_by: :filesize))
+        expect(call(["test", "--only-group", '4'])).to eq(defaults.merge(only_group: [4], group_by: :filesize))
       end
     end
 
@@ -129,38 +130,38 @@ describe ParallelTests::CLI do
 
     context "when the -- option separator is used" do
       it "interprets arguments as files/directories" do
-        expect(call(%w(-- test))).to eq( files: %w(test))
-        expect(call(%w(-- ./test))).to eq( files: %w(test))
-        expect(call(%w(-- test test2))).to eq( files: %w(test test2))
-        expect(call(%w(-- --foo test))).to eq( files: %w(--foo test))
-        expect(call(%w(-- test --foo test2))).to eq( files: %w(test --foo test2))
+        expect(call(['--', 'test'])).to eq(files: ['test'])
+        expect(call(['--', './test'])).to eq(files: ['test'])
+        expect(call(['--', 'test', 'test2'])).to eq(files: ['test', 'test2'])
+        expect(call(['--', '--foo', 'test'])).to eq(files: ['--foo', 'test'])
+        expect(call(['--', 'test', '--foo', 'test2'])).to eq(files: ['test', '--foo', 'test2'])
       end
 
       it "corectly handles arguments with spaces" do
-        expect(call(['--', 'file name with space'])).to eq( files: ['file name with space'])
+        expect(call(['--', 'file name with space'])).to eq(files: ['file name with space'])
       end
 
       context "when the -o options has also been given" do
         it "merges the options together" do
-          expect(call(%w(-o '-f' -- test --foo test2))).to eq( files: %w(test --foo test2), test_options: "'-f'")
+          expect(call(['-o', "'-f'", '--', 'test', '--foo', 'test2'])).to eq(files: ['test', '--foo', 'test2'], test_options: "'-f'")
         end
       end
 
       context "when a second -- option separator is used" do
         it "interprets the first set as test_options" do
-          expect(call(%w(-- -r foo -- test))).to eq( files: %w(test), test_options: '-r foo')
-          expect(call(%w(-- -r foo -- test test2))).to eq( files: %w(test test2), test_options: '-r foo')
-          expect(call(%w(-- -r foo -o out.log -- test test2))).to eq( files: %w(test test2), test_options: '-r foo -o out.log')
+          expect(call(['--', '-r', 'foo', '--', 'test'])).to eq(files: ['test'], test_options: '-r foo')
+          expect(call(['--', '-r', 'foo', '--', 'test', 'test2'])).to eq(files: ['test', 'test2'], test_options: '-r foo')
+          expect(call(['--', '-r', 'foo', '-o', 'out.log', '--', 'test', 'test2'])).to eq(files: ['test', 'test2'], test_options: '-r foo -o out.log')
         end
 
         context "when existing test_options have previously been given" do
           it "appends the new options" do
-            expect(call(%w(-o '-f' -- -r foo.rb -- test))).to eq( files: %w(test), test_options: "'-f' -r foo.rb")
+            expect(call(['-o', "'-f'", '--', '-r', 'foo.rb', '--', 'test'])).to eq(files: ['test'], test_options: "'-f' -r foo.rb")
           end
           it "corectly handles argument values with spaces" do
             argv = ["-o 'path with spaces1'", '--', '--out', 'path with spaces2', '--', 'foo']
             expected_test_options = "'path with spaces1' --out path\\ with\\ spaces2"
-            expect(call(argv)).to eq( files: %w(foo), test_options: expected_test_options)
+            expect(call(argv)).to eq(files: ['foo'], test_options: expected_test_options)
           end
         end
       end
@@ -184,31 +185,32 @@ describe ParallelTests::CLI do
     end
 
     it "fails to load unfindable runner" do
-      expect{
+      expect  do
         expect(subject.send(:load_runner, "foo")).to eq(ParallelTests::RSpec::Runner)
-      }.to raise_error(LoadError)
+      end.to raise_error(LoadError)
     end
   end
 
   describe ".report_failure_rerun_commmand" do
-    let(:single_failed_command) { [{exit_status: 1, command: 'foo', seed: nil, output: 'blah'}] }
+    let(:single_failed_command) { [{ exit_status: 1, command: 'foo', seed: nil, output: 'blah' }] }
 
     it "prints nothing if there are no failures" do
       expect($stdout).not_to receive(:puts)
 
-      subject.send(:report_failure_rerun_commmand,
+      subject.send(
+        :report_failure_rerun_commmand,
         [
-          {exit_status: 0, command: 'foo', seed: nil, output: 'blah'}
+          { exit_status: 0, command: 'foo', seed: nil, output: 'blah' }
         ],
-        {verbose: true}
+        { verbose: true }
       )
     end
 
     def self.it_prints_nothing_about_rerun_commands(options)
       it 'prints nothing about rerun commands' do
-        expect {
+        expect do
           subject.send(:report_failure_rerun_commmand, single_failed_command, options)
-        }.to_not output(/Use the following command to run the group again/).to_stdout
+        end.to_not output(/Use the following command to run the group again/).to_stdout
       end
     end
 
@@ -223,43 +225,45 @@ describe ParallelTests::CLI do
 
       context "with verbose rerun" do
         it "prints command if there is a failure" do
-          expect {
+          expect do
             subject.send(:report_failure_rerun_commmand, single_failed_command, verbose_rerun_command: true)
-          }.to output("\n\nTests have failed for a parallel_test group. Use the following command to run the group again:\n\nfoo\n").to_stdout
+          end.to output("\n\nTests have failed for a parallel_test group. Use the following command to run the group again:\n\nfoo\n").to_stdout
         end
       end
 
       context 'with verbose' do
         it "prints a message and the command if there is a failure" do
-          expect {
+          expect do
             subject.send(:report_failure_rerun_commmand, single_failed_command, verbose: true)
-          }.to output("\n\nTests have failed for a parallel_test group. Use the following command to run the group again:\n\nfoo\n").to_stdout
+          end.to output("\n\nTests have failed for a parallel_test group. Use the following command to run the group again:\n\nfoo\n").to_stdout
         end
 
         it "prints multiple commands if there are multiple failures" do
-          expect {
-            subject.send(:report_failure_rerun_commmand,
+          expect do
+            subject.send(
+              :report_failure_rerun_commmand,
               [
-                {exit_status: 1, command: 'foo', seed: nil, output: 'blah'},
-                {exit_status: 1, command: 'bar', seed: nil, output: 'blah'},
-                {exit_status: 1, command: 'baz', seed: nil, output: 'blah'},
+                { exit_status: 1, command: 'foo', seed: nil, output: 'blah' },
+                { exit_status: 1, command: 'bar', seed: nil, output: 'blah' },
+                { exit_status: 1, command: 'baz', seed: nil, output: 'blah' }
               ],
-              {verbose: true}
+              { verbose: true }
             )
-          }.to output(/foo\nbar\nbaz/).to_stdout
+          end.to output(/foo\nbar\nbaz/).to_stdout
         end
 
         it "only includes failures" do
-          expect {
-            subject.send(:report_failure_rerun_commmand,
+          expect do
+            subject.send(
+              :report_failure_rerun_commmand,
               [
-                {exit_status: 1, command: 'foo --color', seed: nil, output: 'blah'},
-                {exit_status: 0, command: 'bar', seed: nil, output: 'blah'},
-                {exit_status: 1, command: 'baz', seed: nil, output: 'blah'},
+                { exit_status: 1, command: 'foo --color', seed: nil, output: 'blah' },
+                { exit_status: 0, command: 'bar', seed: nil, output: 'blah' },
+                { exit_status: 1, command: 'baz', seed: nil, output: 'blah' }
               ],
-              {verbose: true}
+              { verbose: true }
             )
-          }.to output(/foo --color\nbaz/).to_stdout
+          end.to output(/foo --color\nbaz/).to_stdout
         end
 
         it "prints the command with the seed added by the runner" do
@@ -267,13 +271,13 @@ describe ParallelTests::CLI do
           seed = 555
 
           subject.instance_variable_set(:@runner, ParallelTests::Test::Runner)
-          expect(ParallelTests::Test::Runner).to receive(:command_with_seed).with(command, seed).
-            and_return("my seeded command result --seed #{seed}")
+          expect(ParallelTests::Test::Runner).to receive(:command_with_seed).with(command, seed)
+            .and_return("my seeded command result --seed #{seed}")
           single_failed_command[0].merge!(seed: seed, command: command)
 
-          expect {
+          expect do
             subject.send(:report_failure_rerun_commmand, single_failed_command, verbose: true)
-          }.to output(/my seeded command result --seed 555/).to_stdout
+          end.to output(/my seeded command result --seed 555/).to_stdout
         end
       end
     end
@@ -297,19 +301,21 @@ describe ParallelTests::CLI do
 
   describe "#run_tests_in_parallel" do
     context "specific groups to run" do
-      let(:results){ {:stdout => "", :exit_status => 0} }
-      let(:common_options) {
+      let(:results) { { stdout: "", exit_status: 0 } }
+      let(:common_options) do
         { files: ["test"], group_by: :filesize, first_is_1: false }
-      }
+      end
       before do
         allow(subject).to receive(:puts)
         expect(subject).to receive(:load_runner).with("my_test_runner").and_return(ParallelTests::MyTestRunner::Runner)
         allow(ParallelTests::MyTestRunner::Runner).to receive(:test_file_name).and_return("test")
-        expect(ParallelTests::MyTestRunner::Runner).to receive(:tests_in_groups).and_return([
-          ['aaa','bbb'],
-          ['ccc', 'ddd'],
-          ['eee', 'fff']
-        ])
+        expect(ParallelTests::MyTestRunner::Runner).to receive(:tests_in_groups).and_return(
+          [
+            ['aaa', 'bbb'],
+            ['ccc', 'ddd'],
+            ['eee', 'fff']
+          ]
+        )
         expect(subject).to receive(:report_results).and_return(nil)
       end
 
@@ -338,7 +344,7 @@ describe ParallelTests::CLI do
 
       it "run twice with multiple groups" do
         skip "fails on jruby" if RUBY_PLATFORM == "java"
-        options = common_options.merge(count: 3, only_group: [2,3])
+        options = common_options.merge(count: 3, only_group: [2, 3])
         expect(subject).to receive(:run_tests).once.with(['ccc', 'ddd'], 0, 1, options).and_return(results)
         expect(subject).to receive(:run_tests).once.with(['eee', 'fff'], 1, 1, options).and_return(results)
         subject.run(['test', '-n', '3', '--only-group', '2,3', '-t', 'my_test_runner'])

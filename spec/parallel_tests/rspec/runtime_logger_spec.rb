@@ -1,33 +1,32 @@
+# frozen_string_literal: true
 require 'spec_helper'
 
 describe ParallelTests::RSpec::RuntimeLogger do
   before do
     # pretend we run in parallel or the logger will log nothing
     ENV['TEST_ENV_NUMBER'] = ''
-    @clean_output = %r{^spec/foo.rb:[-\.e\d]+$}m
+    @clean_output = %r{^spec/foo.rb:[-.e\d]+$}m
   end
 
-  def log_for_a_file(options={})
+  def log_for_a_file(_options = {})
     Tempfile.open('xxx') do |temp|
       temp.close
-      f = File.open(temp.path,'w')
+      f = File.open(temp.path, 'w')
       logger = if block_given?
         yield(f)
       else
         ParallelTests::RSpec::RuntimeLogger.new(f)
       end
 
-      example = double(:file_path => "#{Dir.pwd}/spec/foo.rb")
-      unless ParallelTests::RSpec::RuntimeLogger::RSPEC_2
-        example = double(:group => example)
-      end
+      example = double(file_path: "#{Dir.pwd}/spec/foo.rb")
+      example = double(group: example) unless ParallelTests::RSpec::RuntimeLogger::RSPEC_2
 
       logger.example_group_started example
       logger.example_group_finished example
 
       logger.start_dump
 
-      #f.close
+      # f.close
       return File.read(f.path)
     end
   end
@@ -89,7 +88,10 @@ describe ParallelTests::RSpec::RuntimeLogger do
         RUBY
       end
 
-      system({'TEST_ENV_NUMBER' => '1'}, "rspec spec -I #{Bundler.root.join("lib")} --format ParallelTests::RSpec::RuntimeLogger --out runtime.log 2>&1") || raise("nope")
+      system(
+        { 'TEST_ENV_NUMBER' => '1' },
+        "rspec spec -I #{Bundler.root.join("lib")} --format ParallelTests::RSpec::RuntimeLogger --out runtime.log 2>&1"
+      ) || raise("nope")
 
       result = File.read("runtime.log")
       expect(result).to match(%r{^spec/a_spec.rb:0.5})
@@ -118,7 +120,10 @@ describe ParallelTests::RSpec::RuntimeLogger do
         end
       RUBY
 
-      system({'TEST_ENV_NUMBER' => '1'}, "rspec spec -I #{Bundler.root.join("lib")} --format ParallelTests::RSpec::RuntimeLogger --out runtime.log 2>&1") || raise("nope")
+      system(
+        { 'TEST_ENV_NUMBER' => '1' },
+        "rspec spec -I #{Bundler.root.join("lib")} --format ParallelTests::RSpec::RuntimeLogger --out runtime.log 2>&1"
+      ) || raise("nope")
 
       result = File.read("runtime.log")
       expect(result).to include "a_spec.rb:1.5"

@@ -1,0 +1,127 @@
+AllCops:
+  NewCops: enable
+  TargetRubyVersion: 2.4
+  SuggestExtensions: false
+  Exclude:
+  - '**/vendor/bundle/**/*'
+  - 'spec/fixtures/*/db/schema.rb'
+
+Style/StringLiterals:
+  Enabled: false
+
+Style/StringLiteralsInInterpolation:
+  Enabled: false
+
+Lint/AmbiguousRegexpLiteral:
+  Enabled: false
+
+Bundler/OrderedGems:
+  Enabled: false
+
+Metrics:
+  Enabled: false
+
+Style/Documentation:
+  Enabled: false
+
+Layout/EmptyLineAfterMagicComment:
+  Enabled: false
+
+Layout/EndAlignment:
+  EnforcedStyleAlignWith: variable
+
+Layout/MultilineOperationIndentation:
+  Enabled: false
+
+Layout/MultilineMethodCallIndentation:
+  EnforcedStyle: indented
+
+Style/NumericPredicate:
+  EnforcedStyle: comparison
+
+Layout/EmptyLineAfterGuardClause:
+  Enabled: false
+
+Layout/FirstHashElementLineBreak:
+  Enabled: true # Opt-in
+
+# Opt-in
+Layout/FirstMethodArgumentLineBreak:
+  Enabled: true # Opt-in
+
+Layout/FirstMethodParameterLineBreak:
+  Enabled: true # Opt-in
+
+# https://github.com/rubocop-hq/rubocop/issues/5891
+Style/SpecialGlobalVars:
+  Enabled: false
+
+Style/GlobalStdStream:
+  Enabled: false
+
+Style/WordArray:
+  EnforcedStyle: brackets
+
+Style/SymbolArray:
+  EnforcedStyle: brackets
+
+Style/DoubleNegation:
+  Enabled: false
+
+Style/NumericLiterals:
+  Enabled: false
+
+Layout/LineLength:
+  Enabled: false
+  Max: 120
+
+Style/RegexpLiteral:
+  Enabled: false
+
+Style/Lambda:
+  EnforcedStyle: literal
+
+Style/IfUnlessModifier:
+  Enabled: false
+
+Style/FormatString:
+  Enabled: false
+
+Naming/VariableNumber:
+  Enabled: false
+
+Naming/MethodParameterName:
+  Enabled: false
+
+Style/GuardClause:
+  Enabled: false
+
+Lint/AssignmentInCondition:
+  Enabled: false
+
+Style/Next:
+  Enabled: false
+
+Naming/HeredocDelimiterNaming:
+  Enabled: false
+
+Style/Semicolon:
+  Enabled: false
+
+Lint/InterpolationCheck:
+  Enabled: false
+
+Style/ClassAndModuleChildren:
+  Enabled: false
+
+Style/TrivialAccessors:
+  Enabled: false
+
+Style/ClassVars:
+  Enabled: false
+
+Style/CaseEquality:
+  Enabled: false
+
+Lint/EmptyClass:
+  Enabled: false

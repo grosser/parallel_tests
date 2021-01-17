@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require 'parallel_tests'
 require 'parallel_tests/rspec/logger_base'
 
@@ -8,9 +9,7 @@ class ParallelTests::RSpec::RuntimeLogger < ParallelTests::RSpec::LoggerBase
     @group_nesting = 0
   end
 
-  unless RSPEC_2
-    RSpec::Core::Formatters.register self, :example_group_started, :example_group_finished, :start_dump
-  end
+  RSpec::Core::Formatters.register self, :example_group_started, :example_group_finished, :start_dump unless RSPEC_2
 
   def example_group_started(example_group)
     @time = ParallelTests.now if @group_nesting == 0
@@ -27,16 +26,19 @@ class ParallelTests::RSpec::RuntimeLogger < ParallelTests::RSpec::LoggerBase
     super if defined?(super)
   end
 
-  def dump_summary(*args);end
-  def dump_failures(*args);end
-  def dump_failure(*args);end
-  def dump_pending(*args);end
+  def dump_summary(*); end
 
-  def start_dump(*args)
-    return unless ENV['TEST_ENV_NUMBER'] #only record when running in parallel
+  def dump_failures(*); end
+
+  def dump_failure(*); end
+
+  def dump_pending(*); end
+
+  def start_dump(*)
+    return unless ENV['TEST_ENV_NUMBER'] # only record when running in parallel
     lock_output do
       @example_times.each do |file, time|
-        relative_path = file.sub(/^#{Regexp.escape Dir.pwd}\//,'').sub(/^\.\//, "")
+        relative_path = file.sub(%r{^#{Regexp.escape Dir.pwd}/}, '').sub(%r{^\./}, "")
         @output.puts "#{relative_path}:#{time > 0 ? time : 0}"
       end
     end
