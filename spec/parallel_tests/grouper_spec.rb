@@ -75,6 +75,46 @@ describe ParallelTests::Grouper do
         "Number of isolated processes must be less than total the number of processes"
       )
     end
+
+    it "groups specify_groups as specified when specify_groups is just one spec" do
+      expect(call(3, specify_groups: '1')).to eq([["1"], ["2", "5"], ["3", "4"]])
+    end
+
+    it "groups specify_groups as specified when specify_groups is just multiple specs in one process" do
+      expect(call(3, specify_groups: '3,1')).to eq([["3", "1"], ["5"], ["2", "4"]])
+    end
+
+    it "groups specify_groups as specified when specify_groups is multiple specs" do
+      expect(call(3, specify_groups: '1,2|4')).to eq([["1", "2"], ["4"], ["3", "5"]])
+    end
+
+    it "specify_groups aborts when number of specs separated by pipe is out of bounds" do
+      expect do
+        call(3, specify_groups: '1|2|3|4')
+      end.to raise_error(
+        "Number of processes separated by pipe must be less than or equal to the total number of processes"
+      )
+    end
+
+    it "specify_groups aborts when spec passed in doesnt match existing specs" do
+      expect do
+        call(3, specify_groups: '1|2|6')
+      end.to raise_error(
+        "Could not find all specs from --specify-spec-processes in main selected files & folders"
+      )
+    end
+
+    it "specify_groups aborts when spec passed in doesnt match existing specs again" do
+      expect do
+        call(3, specify_groups: '1,6|2')
+      end.to raise_error(
+        "Could not find all specs from --specify-spec-processes in main selected files & folders"
+      )
+    end
+
+    it "specify_groups does not abort when number of specs is equal to number passed in " do
+      expect(call(3, specify_groups: '1|2|3')).to eq([["1"], ["2"], ["3"]])
+    end
   end
 
   describe '.by_scenarios' do

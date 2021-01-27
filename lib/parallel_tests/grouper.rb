@@ -28,7 +28,31 @@ module ParallelTests
           raise 'Number of isolated processes must be less than total the number of processes'
         end
 
-        if isolate_count >= 1
+        if options[:specify_groups]
+          specify_spec_processes = options[:specify_groups].split('|')
+          specified_specs = options[:specify_groups].split(/[,|]/)
+          if specify_spec_processes.count > num_groups
+            raise 'Number of processes separated by pipe must be less than or equal to the total number of processes'
+          end
+
+          specified_items, items = items.partition do |item, _size|
+            specified_specs.any? { |pattern| item =~ /#{pattern}/ }
+          end
+
+          if (specified_specs - specified_items.map(&:first)).any?
+            raise 'Could not find all specs from --specify-spec-processes in main selected files & folders'
+          end
+
+          specify_spec_processes.each_with_index do |specify_spec_process, i|
+            groups[i] = specify_spec_process.split(',')
+          end
+          return groups if specify_spec_processes.count == num_groups
+          group_features_by_size(items_to_group(items), groups[specify_spec_processes.count..-1])
+          # Don't sort all the groups, only sort the ones not specified in specify_groups
+          sorted_groups = groups[specify_spec_processes.count..-1].map { |g| g[:items].sort }
+          groups[specify_spec_processes.count..-1] = sorted_groups
+          return groups
+        elsif isolate_count >= 1
           # add all files that should run in a multiple isolated processes to their own groups
           group_features_by_size(items_to_group(single_items), groups[0..(isolate_count - 1)])
           # group the non-isolated by size
@@ -40,7 +64,6 @@ module ParallelTests
           # group all by size
           group_features_by_size(items_to_group(items), groups)
         end
-
         groups.map! { |g| g[:items].sort }
       end
 
