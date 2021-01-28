@@ -37,6 +37,9 @@ test:
 ### Copy development schema (repeat after migrations)
     rake parallel:prepare
 
+### Run migrations in additional database(s) (repeat after migrations)
+    rake parallel:migrate
+
 ### Setup environment from scratch (create db and loads schema, useful for CI)
     rake parallel:setup
 
