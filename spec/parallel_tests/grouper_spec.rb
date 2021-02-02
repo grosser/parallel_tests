@@ -100,7 +100,7 @@ describe ParallelTests::Grouper do
       expect do
         call(3, specify_groups: '1|2|6')
       end.to raise_error(
-        "Could not find all specs from --specify-spec-processes in main selected files & folders"
+        "Could not find [\"6\"] from --specify-spec-processes in the main selected files & folders"
       )
     end
 
@@ -108,12 +108,20 @@ describe ParallelTests::Grouper do
       expect do
         call(3, specify_groups: '1,6|2')
       end.to raise_error(
-        "Could not find all specs from --specify-spec-processes in main selected files & folders"
+        "Could not find [\"6\"] from --specify-spec-processes in the main selected files & folders"
       )
     end
 
-    it "specify_groups does not abort when number of specs is equal to number passed in " do
-      expect(call(3, specify_groups: '1|2|3')).to eq([["1"], ["2"], ["3"]])
+    it "specify_groups aborts when number of specs is equal to number passed in" do
+      expect do
+        call(3, specify_groups: '1|2|3')
+      end.to raise_error(
+        "The number of groups in --specify-groups matches the number of specs from -n but there were other specs found in the main selected files & folders. Make sure -n is larger than the number of processes in --specify-groups if there are other specs that need to be run. The specs that aren't run: [\"4\", \"5\"]"
+      )
+    end
+
+    it "specify_groups does not abort when the every single spec is specified in it" do
+      expect(call(3, specify_groups: '1,2|3,4|5')).to eq([["1", "2"], ["3", "4"], ["5"]])
     end
   end
 

@@ -214,8 +214,8 @@ module ParallelTests
           <<~TEXT
             Use 'specify-groups' if you want to specify multiple specs running in multiple
             #{gap}processes in a specific formation. Commas indicate specs in the same process,
-            #{gap}pipes indicate specs in a new process.
-            #{gap}Ex.
+            #{gap}pipes indicate specs in a new process. Cannot use with --single, --isolate, or
+            #{gap}--isolate-n.  Ex.
             #{gap}$ parallel_tests -n 3 . --specify-groups '1_spec.rb,2_spec.rb|3_spec.rb'
             #{gap}\s\sProcess 1 will contain 1_spec.rb and 2_spec.rb
             #{gap}\s\sProcess 2 will contain 3_spec.rb
@@ -294,6 +294,11 @@ module ParallelTests
       allowed = [:filesize, :runtime, :found]
       if !allowed.include?(options[:group_by]) && options[:only_group]
         raise "--group-by #{allowed.join(" or ")} is required for --only-group"
+      end
+
+      not_allowed_with_specify_groups = [:single_process, :isolate, :isolate_count]
+      if options[:specify_groups] && options.keys.find { |k| not_allowed_with_specify_groups.include?(k) }
+        raise "Can't pass --specify-groups with any of these keys: --single, --isolate, or --isolate-n"
       end
 
       options

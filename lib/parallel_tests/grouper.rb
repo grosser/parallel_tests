@@ -29,28 +29,36 @@ module ParallelTests
         end
 
         if options[:specify_groups]
-          specify_spec_processes = options[:specify_groups].split('|')
-          specified_specs = options[:specify_groups].split(/[,|]/)
-          if specify_spec_processes.count > num_groups
+          specify_test_process_groups = options[:specify_groups].split('|')
+          all_specified_tests = specify_test_process_groups.map { |group| group.split(',') }.flatten
+          if specify_test_process_groups.count > num_groups
             raise 'Number of processes separated by pipe must be less than or equal to the total number of processes'
           end
 
-          specified_items, items = items.partition do |item, _size|
-            specified_specs.any? { |pattern| item =~ /#{pattern}/ }
+          specified_items_found, items = items.partition do |item, _size|
+            all_specified_tests.any? { |specified_spec| item == specified_spec }
           end
 
-          if (specified_specs - specified_items.map(&:first)).any?
-            raise 'Could not find all specs from --specify-spec-processes in main selected files & folders'
+          specified_specs_not_found = all_specified_tests - specified_items_found.map(&:first)
+          if specified_specs_not_found.any?
+            raise "Could not find #{specified_specs_not_found} from --specify-spec-processes in the main selected files & folders"
           end
 
-          specify_spec_processes.each_with_index do |specify_spec_process, i|
-            groups[i] = specify_spec_process.split(',')
+          if specify_test_process_groups.count == num_groups && items.flatten.any?
+            raise "The number of groups in --specify-groups matches the number of specs from -n but there were other specs found in the main selected files & folders. Make sure -n is larger than the number of processes in --specify-groups if there are other specs that need to be run. The specs that aren't run: #{items.map(&:first)}"
           end
-          return groups if specify_spec_processes.count == num_groups
-          group_features_by_size(items_to_group(items), groups[specify_spec_processes.count..-1])
+
+          specify_test_process_groups.each_with_index do |specify_test_process, i|
+            groups[i] = specify_test_process.split(',')
+          end
+
+          return groups if specify_test_process_groups.count == num_groups
+
+          regular_group_starting_process = specify_test_process_groups.count
+          group_features_by_size(items_to_group(items), groups[regular_group_starting_process..-1])
           # Don't sort all the groups, only sort the ones not specified in specify_groups
-          sorted_groups = groups[specify_spec_processes.count..-1].map { |g| g[:items].sort }
-          groups[specify_spec_processes.count..-1] = sorted_groups
+          sorted_groups = groups[regular_group_starting_process..-1].map { |g| g[:items].sort }
+          groups[regular_group_starting_process..-1] = sorted_groups
           return groups
         elsif isolate_count >= 1
           # add all files that should run in a multiple isolated processes to their own groups
