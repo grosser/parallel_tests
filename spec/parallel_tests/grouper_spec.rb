@@ -116,7 +116,7 @@ describe ParallelTests::Grouper do
       expect do
         call(3, specify_groups: '1|2|3')
       end.to raise_error(
-        "The number of groups in --specify-groups matches the number of specs from -n but there were other specs found in the main selected files & folders. Make sure -n is larger than the number of processes in --specify-groups if there are other specs that need to be run. The specs that aren't run: [\"4\", \"5\"]"
+        "The number of groups in --specify-groups matches the number of groups from -n but there were other specs found in the main selected files & folders not specified in --specify-groups. Make sure -n is larger than the number of processes in --specify-groups if there are other specs that need to be run. The specs that aren't run: [\"4\", \"5\"]"
       )
     end
 

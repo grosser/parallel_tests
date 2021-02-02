@@ -45,7 +45,7 @@ module ParallelTests
           end
 
           if specify_test_process_groups.count == num_groups && items.flatten.any?
-            raise "The number of groups in --specify-groups matches the number of specs from -n but there were other specs found in the main selected files & folders. Make sure -n is larger than the number of processes in --specify-groups if there are other specs that need to be run. The specs that aren't run: #{items.map(&:first)}"
+            raise "The number of groups in --specify-groups matches the number of groups from -n but there were other specs found in the main selected files & folders not specified in --specify-groups. Make sure -n is larger than the number of processes in --specify-groups if there are other specs that need to be run. The specs that aren't run: #{items.map(&:first)}"
           end
 
           specify_test_process_groups.each_with_index do |specify_test_process, i|
