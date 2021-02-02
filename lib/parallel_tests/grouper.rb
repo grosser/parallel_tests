@@ -41,7 +41,7 @@ module ParallelTests
 
           specified_specs_not_found = all_specified_tests - specified_items_found.map(&:first)
           if specified_specs_not_found.any?
-            raise "Could not find #{specified_specs_not_found} from --specify-spec-processes in the main selected files & folders"
+            raise "Could not find #{specified_specs_not_found} from --specify-groups in the main selected files & folders"
           end
 
           if specify_test_process_groups.count == num_groups && items.flatten.any?

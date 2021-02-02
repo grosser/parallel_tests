@@ -100,7 +100,7 @@ describe ParallelTests::Grouper do
       expect do
         call(3, specify_groups: '1|2|6')
       end.to raise_error(
-        "Could not find [\"6\"] from --specify-spec-processes in the main selected files & folders"
+        "Could not find [\"6\"] from --specify-groups in the main selected files & folders"
       )
     end
 
@@ -108,7 +108,7 @@ describe ParallelTests::Grouper do
       expect do
         call(3, specify_groups: '1,6|2')
       end.to raise_error(
-        "Could not find [\"6\"] from --specify-spec-processes in the main selected files & folders"
+        "Could not find [\"6\"] from --specify-groups in the main selected files & folders"
       )
     end
 
