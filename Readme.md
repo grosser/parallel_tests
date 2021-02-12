@@ -287,7 +287,7 @@ TIPS
    `export PARALLEL_TEST_FIRST_IS_1=true` will provide the same result
  - [email_spec and/or action_mailer_cache_delivery](https://github.com/grosser/parallel_tests/wiki)
  - [zeus-parallel_tests](https://github.com/sevos/zeus-parallel_tests)
- - [Distributed parallel test (e.g. Travis Support)](https://github.com/grosser/parallel_tests/wiki/Distributed-Parallel-Tests-and-Travis-Support)
+ - [Distributed Parallel Tests on CI systems (Travis, GitLab)](https://github.com/grosser/parallel_tests/wiki/Distributed-Parallel-Tests-on-CI-systems-(Travis,-GitLab))
  - [Capybara setup](https://github.com/grosser/parallel_tests/wiki)
  - [Sphinx setup](https://github.com/grosser/parallel_tests/wiki)
  - [Capistrano setup](https://github.com/grosser/parallel_tests/wiki/Remotely-with-capistrano) let your tests run on a big box instead of your laptop
