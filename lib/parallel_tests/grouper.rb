@@ -35,9 +35,7 @@ module ParallelTests
             raise 'Number of processes separated by pipe must be less than or equal to the total number of processes'
           end
 
-          specified_items_found, items = items.partition do |item, _size|
-            all_specified_tests.any? { |specified_spec| item == specified_spec }
-          end
+          specified_items_found, items = items.partition { |item, _size| all_specified_tests.include?(item) }
 
           specified_specs_not_found = all_specified_tests - specified_items_found.map(&:first)
           if specified_specs_not_found.any?
