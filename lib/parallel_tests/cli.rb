@@ -297,7 +297,7 @@ module ParallelTests
       end
 
       not_allowed_with_specify_groups = [:single_process, :isolate, :isolate_count]
-      if options[:specify_groups] && options.keys.find { |k| not_allowed_with_specify_groups.include?(k) }
+      if options[:specify_groups] && (options.keys & not_allowed_with_specify_groups).any?
         raise "Can't pass --specify-groups with any of these keys: --single, --isolate, or --isolate-n"
       end
 
