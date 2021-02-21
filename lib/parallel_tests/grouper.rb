@@ -29,13 +29,15 @@ module ParallelTests
         end
 
         if options[:specify_groups]
-          specify_test_process_groups = options[:specify_groups].split('|').map { |g| g.split(',') }
+          specify_test_process_groups = options[:specify_groups].split('|')
           all_specified_tests = specify_test_process_groups.map { |group| group.split(',') }.flatten
           if specify_test_process_groups.count > num_groups
             raise 'Number of processes separated by pipe must be less than or equal to the total number of processes'
           end
 
-          specified_items_found = items.select! { |item, _size| all_specified_tests.include?(item) } || []
+          specified_items_found, items = items.partition do |item, _size|
+            all_specified_tests.any? { |specified_spec| item == specified_spec }
+          end
 
           specified_specs_not_found = all_specified_tests - specified_items_found.map(&:first)
           if specified_specs_not_found.any?
@@ -43,12 +45,7 @@ module ParallelTests
           end
 
           if specify_test_process_groups.count == num_groups && items.flatten.any?
-            raise(
-              "The number of groups in --specify-groups matches the number of groups from -n but there were other specs " \
-              "found in the main selected files & folders not specified in --specify-groups. Make sure -n is larger than the " \
-              "number of processes in --specify-groups if there are other specs that need to be run. The specs that aren't run: " \
-              "#{items.map(&:first)}"
-            )
+            raise "The number of groups in --specify-groups matches the number of groups from -n but there were other specs found in the main selected files & folders not specified in --specify-groups. Make sure -n is larger than the number of processes in --specify-groups if there are other specs that need to be run. The specs that aren't run: #{items.map(&:first)}"
           end
 
           specify_test_process_groups.each_with_index do |specify_test_process, i|
