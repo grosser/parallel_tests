@@ -43,7 +43,12 @@ module ParallelTests
           end
 
           if specify_test_process_groups.count == num_groups && items.flatten.any?
-            raise "The number of groups in --specify-groups matches the number of groups from -n but there were other specs found in the main selected files & folders not specified in --specify-groups. Make sure -n is larger than the number of processes in --specify-groups if there are other specs that need to be run. The specs that aren't run: #{items.map(&:first)}"
+            raise(
+              "The number of groups in --specify-groups matches the number of groups from -n but there were other specs " \
+              "found in the main selected files & folders not specified in --specify-groups. Make sure -n is larger than the " \
+              "number of processes in --specify-groups if there are other specs that need to be run. The specs that aren't run: " \
+              "#{items.map(&:first)}"
+            )
           end
 
           specify_test_process_groups.each_with_index do |specify_test_process, i|
@@ -52,11 +57,11 @@ module ParallelTests
 
           return groups if specify_test_process_groups.count == num_groups
 
-          regular_group_starting_process = specify_test_process_groups.count
-          group_features_by_size(items_to_group(items), groups[regular_group_starting_process..-1])
+          remaining_groups = groups[specify_test_process_groups.count..-1]
+          group_features_by_size(items_to_group(items), remaining_groups)
           # Don't sort all the groups, only sort the ones not specified in specify_groups
-          sorted_groups = groups[regular_group_starting_process..-1].map { |g| g[:items].sort }
-          groups[regular_group_starting_process..-1] = sorted_groups
+          sorted_groups = remaining_groups.map { |g| g[:items].sort }
+          groups[specify_test_process_groups.count..-1] = sorted_groups
           return groups
         elsif isolate_count >= 1
           # add all files that should run in a multiple isolated processes to their own groups

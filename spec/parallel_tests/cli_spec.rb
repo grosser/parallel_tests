@@ -132,6 +132,7 @@ describe ParallelTests::CLI do
       it "groups can be just one string" do
         expect(call(["test", "--specify-groups", 'test'])).to eq(defaults.merge(specify_groups: 'test'))
       end
+
       it "groups can be a string separated by commas and pipes" do
         expect(call(["test", "--specify-groups", 'test1,test2|test3'])).to eq(defaults.merge(specify_groups: 'test1,test2|test3'))
       end
