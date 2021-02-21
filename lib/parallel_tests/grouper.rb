@@ -53,11 +53,11 @@ module ParallelTests
 
       def specify_groups(items, num_groups, options, groups)
         specify_test_process_groups = options[:specify_groups].split('|')
-        all_specified_tests = specify_test_process_groups.map { |group| group.split(',') }.flatten
         if specify_test_process_groups.count > num_groups
           raise 'Number of processes separated by pipe must be less than or equal to the total number of processes'
         end
 
+        all_specified_tests = specify_test_process_groups.map { |group| group.split(',') }.flatten
         specified_items_found, items = items.partition { |item, _size| all_specified_tests.include?(item) }
 
         specified_specs_not_found = all_specified_tests - specified_items_found.map(&:first)
@@ -74,6 +74,7 @@ module ParallelTests
           )
         end
 
+        # First order the specify_groups into the main groups array
         specify_test_process_groups.each_with_index do |specify_test_process, i|
           groups[i] = specify_test_process.split(',')
         end
@@ -81,6 +82,7 @@ module ParallelTests
         # Return early here as we've processed the specify_groups tests and those exactly match the items passed in
         return groups if specify_test_process_groups.count == num_groups
 
+        # Now sort the rest of the items into the main groups array
         remaining_groups = groups[specify_test_process_groups.count..-1]
         group_features_by_size(items_to_group(items), remaining_groups)
         # Don't sort all the groups, only sort the ones not specified in specify_groups
