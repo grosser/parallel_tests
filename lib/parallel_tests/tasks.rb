@@ -163,11 +163,11 @@ namespace :parallel do
   end
 
   # load the structure from the structure.sql file
-  desc "Load structure for test databases via db:structure:load --> parallel:load_structure[num_cpus]"
+  desc "Load structure for test databases via db:schema:load --> parallel:load_structure[num_cpus]"
   task :load_structure, :count do |_, args|
     ParallelTests::Tasks.run_in_parallel(
       "#{ParallelTests::Tasks.rake_bin} #{ParallelTests::Tasks.purge_before_load} " \
-      "db:structure:load RAILS_ENV=#{ParallelTests::Tasks.rails_env} DISABLE_DATABASE_ENVIRONMENT_CHECK=1", args
+      "db:schema:load RAILS_ENV=#{ParallelTests::Tasks.rails_env} DISABLE_DATABASE_ENVIRONMENT_CHECK=1", args
     )
   end
 
