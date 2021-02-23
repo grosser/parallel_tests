@@ -14,7 +14,7 @@ Add changes here in your PR
 
 ### Fixed
 
-- None
+- replace deprecated db:structure by db:schema (#801).
 
 ## 3.3.0 - 2020-09-16
 
