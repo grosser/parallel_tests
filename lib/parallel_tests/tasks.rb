@@ -123,7 +123,8 @@ namespace :parallel do
     ParallelTests::Tasks.check_for_pending_migrations
     if defined?(ActiveRecord::Base) && [:ruby, :sql].include?(ActiveRecord::Base.schema_format)
       # fast: dump once, load in parallel
-      Rake::Task["db:schema:dump"].invoke
+      type = (ActiveRecord::Base.schema_format == :ruby ? "schema" : "structure")
+      Rake::Task["db:#{type}:dump"].invoke
 
       # remove database connection to prevent "database is being accessed by other users"
       ActiveRecord::Base.remove_connection if ActiveRecord::Base.configurations.any?
@@ -159,6 +160,15 @@ namespace :parallel do
     command = "#{ParallelTests::Tasks.rake_bin} #{ParallelTests::Tasks.purge_before_load} " \
       "db:schema:load RAILS_ENV=#{ParallelTests::Tasks.rails_env} DISABLE_DATABASE_ENVIRONMENT_CHECK=1"
     ParallelTests::Tasks.run_in_parallel(ParallelTests::Tasks.suppress_schema_load_output(command), args)
+  end
+
+  # load the structure from the structure.sql file
+  desc "Load structure for test databases via db:schema:load --> parallel:load_structure[num_cpus]"
+  task :load_structure, :count do |_, args|
+    ParallelTests::Tasks.run_in_parallel(
+      "#{ParallelTests::Tasks.rake_bin} #{ParallelTests::Tasks.purge_before_load} " \
+      "db:schema:load RAILS_ENV=#{ParallelTests::Tasks.rails_env} DISABLE_DATABASE_ENVIRONMENT_CHECK=1", args
+    )
   end
 
   desc "Load the seed data from db/seeds.rb via db:seed --> parallel:seed[num_cpus]"
