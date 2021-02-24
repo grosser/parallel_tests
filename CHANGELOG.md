@@ -2,7 +2,34 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+- None
+
+### Added
+
+- None
+
+### Fixed
+
+- None
+
+## v3.5.0 - 2021-02-24
+
+### Breaking Changes
+
+- None
+
+### Added
+
 - Add support for specifying exactly how isolated processes run tests with 'specify-groups' option.
+- Refactorings for rubocop
+
+### Fixed
+
+- None
+
+## v3.4.0 - 2020-12-24
 
 ### Breaking Changes
 

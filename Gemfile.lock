@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    parallel_tests (3.4.0)
+    parallel_tests (3.5.0)
       parallel
 
 GEM
@@ -92,8 +92,6 @@ GEM
       unicode-display_width (>= 1.4.0, < 3.0)
     rubocop-ast (1.4.0)
       parser (>= 2.7.1.5)
-    rubocop-rake (0.5.1)
-      rubocop
     ruby-progressbar (1.11.0)
     spinach (0.11.0)
       colorize
@@ -121,7 +119,6 @@ DEPENDENCIES
   rake
   rspec (~> 3.3)
   rubocop
-  rubocop-rake
   spinach
   test-unit
 
