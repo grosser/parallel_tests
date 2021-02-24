@@ -128,6 +128,16 @@ describe ParallelTests::CLI do
       end
     end
 
+    context "specify groups" do
+      it "groups can be just one string" do
+        expect(call(["test", "--specify-groups", 'test'])).to eq(defaults.merge(specify_groups: 'test'))
+      end
+
+      it "groups can be a string separated by commas and pipes" do
+        expect(call(["test", "--specify-groups", 'test1,test2|test3'])).to eq(defaults.merge(specify_groups: 'test1,test2|test3'))
+      end
+    end
+
     context "when the -- option separator is used" do
       it "interprets arguments as files/directories" do
         expect(call(['--', 'test'])).to eq(files: ['test'])

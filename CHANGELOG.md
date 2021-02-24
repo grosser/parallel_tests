@@ -2,7 +2,7 @@
 
 ## Unreleased
 
-Add changes here in your PR
+- Add support for specifying exactly how isolated processes run tests with 'specify-groups' option.
 
 ### Breaking Changes
 

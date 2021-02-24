@@ -208,6 +208,23 @@ module ParallelTests
           "Use 'isolate'  singles with number of processes, default: 1."
         ) { |n| options[:isolate_count] = n }
 
+        gap = "\s" * 37
+        opts.on(
+          "--specify-groups [SPECS]",
+          <<~TEXT
+            Use 'specify-groups' if you want to specify multiple specs running in multiple
+            #{gap}processes in a specific formation. Commas indicate specs in the same process,
+            #{gap}pipes indicate specs in a new process. Cannot use with --single, --isolate, or
+            #{gap}--isolate-n.  Ex.
+            #{gap}$ parallel_tests -n 3 . --specify-groups '1_spec.rb,2_spec.rb|3_spec.rb'
+            #{gap}\s\sProcess 1 will contain 1_spec.rb and 2_spec.rb
+            #{gap}\s\sProcess 2 will contain 3_spec.rb
+            #{gap}\s\sProcess 3 will contain all other specs
+          TEXT
+        ) do |groups|
+          options[:specify_groups] = groups
+        end
+
         opts.on("--only-group INT[,INT]", Array) { |groups| options[:only_group] = groups.map(&:to_i) }
 
         opts.on("-e", "--exec [COMMAND]", "execute this code parallel and with ENV['TEST_ENV_NUMBER']") { |path| options[:execute] = path }
@@ -277,6 +294,11 @@ module ParallelTests
       allowed = [:filesize, :runtime, :found]
       if !allowed.include?(options[:group_by]) && options[:only_group]
         raise "--group-by #{allowed.join(" or ")} is required for --only-group"
+      end
+
+      not_allowed_with_specify_groups = [:single_process, :isolate, :isolate_count]
+      if options[:specify_groups] && (options.keys & not_allowed_with_specify_groups).any?
+        raise "Can't pass --specify-groups with any of these keys: --single, --isolate, or --isolate-n"
       end
 
       options

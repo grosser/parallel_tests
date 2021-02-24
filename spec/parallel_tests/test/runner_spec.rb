@@ -178,6 +178,28 @@ describe ParallelTests::Test::Runner do
 
         expect(valid_combinations).to include(actual)
       end
+
+      it 'groups by size and uses specified groups of specs in specific order in specific processes' do
+        skip if RUBY_PLATFORM == "java"
+        expect(ParallelTests::Test::Runner).to receive(:runtimes)
+          .and_return({ "aaa1" => 1, "aaa2" => 1, "aaa3" => 2, "bbb" => 3, "ccc" => 1, "ddd" => 2, "eee" => 1 })
+        result = call(
+          ["aaa1", "aaa2", "aaa3", "bbb", "ccc", "ddd", "eee"], 4, specify_groups: 'aaa2,aaa1|bbb', group_by: :runtime
+        )
+
+        specify_groups_1, specify_groups_2, *groups = result
+        expect(specify_groups_1).to eq(["aaa2", "aaa1"])
+        expect(specify_groups_2).to eq(["bbb"])
+        actual = groups.map(&:to_set).to_set
+
+        # both eee and ccs are the same size, so either can be in either group
+        valid_combinations = [
+          [["aaa3", "ccc"], ["ddd", "eee"]].map(&:to_set).to_set,
+          [["aaa3", "eee"], ["ddd", "ccc"]].map(&:to_set).to_set
+        ]
+
+        expect(valid_combinations).to include(actual)
+      end
     end
   end
 
