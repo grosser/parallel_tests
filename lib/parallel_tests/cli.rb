@@ -162,6 +162,7 @@ module ParallelTests
     end
 
     def parse_options!(argv)
+      newline_padding = " " * 37
       options = {}
       OptionParser.new do |opts|
         opts.banner = <<~BANNER
@@ -180,14 +181,14 @@ module ParallelTests
         opts.on("--exclude-pattern", "--exclude-pattern [PATTERN]", "exclude tests matching this regex pattern") { |pattern| options[:exclude_pattern] = /#{pattern}/ }
         opts.on(
           "--group-by [TYPE]",
-          <<~TEXT
+          <<~TEXT.rstrip.split("\n").join("\n#{newline_padding}")
             group tests by:
-                      found - order of finding files
-                      steps - number of cucumber/spinach steps
-                      scenarios - individual cucumber scenarios
-                      filesize - by size of the file
-                      runtime - info from runtime log
-                      default - runtime when runtime log is filled otherwise filesize
+            found - order of finding files
+            steps - number of cucumber/spinach steps
+            scenarios - individual cucumber scenarios
+            filesize - by size of the file
+            runtime - info from runtime log
+            default - runtime when runtime log is filled otherwise filesize
           TEXT
         ) { |type| options[:group_by] = type.to_sym }
         opts.on("-m [FLOAT]", "--multiply-processes [FLOAT]", Float, "use given number as a multiplier of processes to run") do |multiply|
@@ -208,22 +209,19 @@ module ParallelTests
           "Use 'isolate'  singles with number of processes, default: 1."
         ) { |n| options[:isolate_count] = n }
 
-        gap = "\s" * 37
         opts.on(
           "--specify-groups [SPECS]",
-          <<~TEXT
+          <<~TEXT.rstrip.split("\n").join("\n#{newline_padding}")
             Use 'specify-groups' if you want to specify multiple specs running in multiple
-            #{gap}processes in a specific formation. Commas indicate specs in the same process,
-            #{gap}pipes indicate specs in a new process. Cannot use with --single, --isolate, or
-            #{gap}--isolate-n.  Ex.
-            #{gap}$ parallel_tests -n 3 . --specify-groups '1_spec.rb,2_spec.rb|3_spec.rb'
-            #{gap}\s\sProcess 1 will contain 1_spec.rb and 2_spec.rb
-            #{gap}\s\sProcess 2 will contain 3_spec.rb
-            #{gap}\s\sProcess 3 will contain all other specs
+            processes in a specific formation. Commas indicate specs in the same process,
+            pipes indicate specs in a new process. Cannot use with --single, --isolate, or
+            --isolate-n.  Ex.
+            $ parallel_tests -n 3 . --specify-groups '1_spec.rb,2_spec.rb|3_spec.rb'
+              Process 1 will contain 1_spec.rb and 2_spec.rb
+              Process 2 will contain 3_spec.rb
+              Process 3 will contain all other specs
           TEXT
-        ) do |groups|
-          options[:specify_groups] = groups
-        end
+        ) { |groups| options[:specify_groups] = groups }
 
         opts.on("--only-group INT[,INT]", Array) { |groups| options[:only_group] = groups.map(&:to_i) }
 
@@ -239,10 +237,10 @@ module ParallelTests
         end
         opts.on(
           "--suffix [PATTERN]",
-          <<~TEXT
+          <<~TEXT.rstrip.split("\n").join("\n#{newline_padding}")
             override built in test file pattern (should match suffix):
-                      '_spec\.rb$' - matches rspec files
-                      '_(test|spec).rb$' - matches test or spec files
+            '_spec\.rb$' - matches rspec files
+            '_(test|spec).rb$' - matches test or spec files
           TEXT
         ) { |pattern| options[:suffix] = /#{pattern}/ }
         opts.on("--serialize-stdout", "Serialize stdout output, nothing will be written until everything is done") { options[:serialize_stdout] = true }
@@ -296,8 +294,7 @@ module ParallelTests
         raise "--group-by #{allowed.join(" or ")} is required for --only-group"
       end
 
-      not_allowed_with_specify_groups = [:single_process, :isolate, :isolate_count]
-      if options[:specify_groups] && (options.keys & not_allowed_with_specify_groups).any?
+      if options[:specify_groups] && (options.keys & [:single_process, :isolate, :isolate_count]).any?
         raise "Can't pass --specify-groups with any of these keys: --single, --isolate, or --isolate-n"
       end
 

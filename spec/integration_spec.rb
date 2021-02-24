@@ -390,6 +390,16 @@ describe 'CLI' do
     expect(group_2_result).to include("short test")
   end
 
+  it "shows nice --help" do
+    result = run_tests "--help"
+    expect(
+      result[/(.*)How many processes/, 1].size
+    ).to(
+      eq(result[/( +)found /, 1].size),
+      "Multiline option description must align with regular option description"
+    )
+  end
+
   context "RSpec" do
     it_fails_without_any_files "rspec"
 
