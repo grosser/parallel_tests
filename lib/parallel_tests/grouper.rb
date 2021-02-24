@@ -16,6 +16,7 @@ module ParallelTests
         groups = Array.new(num_groups) { { items: [], size: 0 } }
 
         return specify_groups(items, num_groups, options, groups) if options[:specify_groups]
+
         # add all files that should run in a single process to one group
         single_process_patterns = options[:single_process] || []
 
@@ -30,7 +31,7 @@ module ParallelTests
         end
 
         if isolate_count >= num_groups
-          raise 'Number of isolated processes must be less than total the number of processes'
+          raise 'Number of isolated processes must be >= total number of processes'
         end
 
         if isolate_count >= 1
@@ -62,15 +63,17 @@ module ParallelTests
 
         specified_specs_not_found = all_specified_tests - specified_items_found.map(&:first)
         if specified_specs_not_found.any?
-          raise "Could not find #{specified_specs_not_found} from --specify-groups in the main selected files & folders"
+          raise "Could not find #{specified_specs_not_found} from --specify-groups in the selected files & folders"
         end
 
         if specify_test_process_groups.count == num_groups && items.flatten.any?
           raise(
-            "The number of groups in --specify-groups matches the number of groups from -n but there were other specs " \
-            "found in the main selected files & folders not specified in --specify-groups. Make sure -n is larger than the " \
-            "number of processes in --specify-groups if there are other specs that need to be run. The specs that aren't run: " \
-            "#{items.map(&:first)}"
+            <<~ERROR
+              The number of groups in --specify-groups matches the number of groups from -n but there were other specs
+              found in the selected files & folders not specified in --specify-groups. Make sure -n is larger than the
+              number of processes in --specify-groups if there are other specs that need to be run. The specs that aren't run:
+              #{items.map(&:first)}
+            ERROR
           )
         end
 
@@ -79,15 +82,16 @@ module ParallelTests
           groups[i] = specify_test_process.split(',')
         end
 
-        # Return early here as we've processed the specify_groups tests and those exactly match the items passed in
+        # Return early when processed specify_groups tests exactly match the items passed in
         return groups if specify_test_process_groups.count == num_groups
 
         # Now sort the rest of the items into the main groups array
-        remaining_groups = groups[specify_test_process_groups.count..-1]
+        specified_range = specify_test_process_groups.count..-1
+        remaining_groups = groups[specified_range]
         group_features_by_size(items_to_group(items), remaining_groups)
         # Don't sort all the groups, only sort the ones not specified in specify_groups
         sorted_groups = remaining_groups.map { |g| g[:items].sort }
-        groups[specify_test_process_groups.count..-1] = sorted_groups
+        groups[specified_range] = sorted_groups
 
         groups
       end
