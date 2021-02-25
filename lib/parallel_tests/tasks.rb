@@ -172,7 +172,7 @@ namespace :parallel do
   task :load_structure, :count do |_, args|
     ParallelTests::Tasks.run_in_parallel(
       "#{ParallelTests::Tasks.rake_bin} #{ParallelTests::Tasks.purge_before_load} " \
-      "db:schema:load RAILS_ENV=#{ParallelTests::Tasks.rails_env} DISABLE_DATABASE_ENVIRONMENT_CHECK=1", args
+      "db:structure:load RAILS_ENV=#{ParallelTests::Tasks.rails_env} DISABLE_DATABASE_ENVIRONMENT_CHECK=1", args
     )
   end
 
