@@ -14,6 +14,22 @@
 
 - None
 
+# Changelog
+
+## v3.5.1 - 2021-03-07
+
+### Breaking Changes
+
+- None
+
+### Added
+
+- None
+
+### Fixed
+
+- Do not use db:structure for rails 6.1
+
 ## v3.5.0 - 2021-02-24
 
 ### Breaking Changes
