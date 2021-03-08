@@ -123,12 +123,10 @@ namespace :parallel do
     ParallelTests::Tasks.check_for_pending_migrations
     if defined?(ActiveRecord::Base) && [:ruby, :sql].include?(ActiveRecord::Base.schema_format)
       # fast: dump once, load in parallel
-      if Gem::Version.new(Rails.version) >= Gem::Version.new('6.1.0')
-        Rake::Task["db:schema:dump"].invoke
-      else
-        type = (ActiveRecord::Base.schema_format == :ruby ? "schema" : "structure")
-        Rake::Task["db:#{type}:dump"].invoke
-      end
+      type = "schema" if Gem::Version.new(Rails.version) >= Gem::Version.new('6.1.0')
+      type ||= ActiveRecord::Base.schema_format == :ruby ? "schema" : "structure"
+
+      Rake::Task["db:#{type}:dump"].invoke
 
       # remove database connection to prevent "database is being accessed by other users"
       ActiveRecord::Base.remove_connection if ActiveRecord::Base.configurations.any?
