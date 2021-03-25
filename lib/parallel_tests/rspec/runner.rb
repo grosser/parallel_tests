@@ -26,6 +26,10 @@ module ParallelTests
           "tmp/parallel_runtime_rspec.log"
         end
 
+        def default_test_folder
+          "spec"
+        end
+
         def test_file_name
           "spec"
         end

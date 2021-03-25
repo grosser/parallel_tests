@@ -12,6 +12,10 @@ module ParallelTests
           'cucumber'
         end
 
+        def default_test_folder
+          'features'
+        end
+
         def line_is_result?(line)
           super || line =~ SCENARIO_REGEX || line =~ SCENARIOS_RESULTS_BOUNDARY_REGEX
         end

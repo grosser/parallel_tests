@@ -54,8 +54,14 @@ describe 'CLI' do
     result
   end
 
-  def self.it_fails_without_any_files(type)
-    it "fails without any files" do
+  def self.it_runs_the_default_folder_if_it_exists(type, test_folder)
+    it "runs the default folder if it exists" do
+      full_path_to_test_folder = File.join(folder, test_folder)
+      ensure_folder full_path_to_test_folder
+      results = run_tests("", fail: false, type: type)
+      expect(results).to_not include("Pass files or folders to run")
+
+      FileUtils.remove_dir(full_path_to_test_folder, true)
       results = run_tests("", fail: true, type: type)
       expect(results).to include("Pass files or folders to run")
     end
@@ -402,7 +408,7 @@ describe 'CLI' do
   end
 
   context "RSpec" do
-    it_fails_without_any_files "rspec"
+    it_runs_the_default_folder_if_it_exists "rspec", "spec"
 
     it "captures seed with random failures with --verbose" do
       write 'spec/xxx_spec.rb', 'describe("it"){it("should"){puts "TEST1"}}'
@@ -426,7 +432,7 @@ describe 'CLI' do
       expect(result).to include('test_xxx') # verbose output of every test
     end
 
-    it_fails_without_any_files "test"
+    it_runs_the_default_folder_if_it_exists "test", "test"
   end
 
   context "Cucumber" do
@@ -480,7 +486,7 @@ describe 'CLI' do
       expect(result.scan(/YOUR TEST ENV IS \d?!/).sort).to eq(["YOUR TEST ENV IS !", "YOUR TEST ENV IS 2!"])
     end
 
-    it_fails_without_any_files "cucumber"
+    it_runs_the_default_folder_if_it_exists "cucumber", "features"
 
     it "collates failing scenarios" do
       write "features/pass.feature", "Feature: xxx\n  Scenario: xxx\n    Given I pass"
@@ -596,7 +602,7 @@ describe 'CLI' do
       expect(result.scan(/YOUR TEST ENV IS \d?!/).sort).to eq(["YOUR TEST ENV IS !", "YOUR TEST ENV IS 2!"])
     end
 
-    it_fails_without_any_files "spinach"
+    it_runs_the_default_folder_if_it_exists "spinach", "features"
   end
 
   describe "graceful shutdown" do

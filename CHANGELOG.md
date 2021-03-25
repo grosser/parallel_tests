@@ -8,7 +8,7 @@
 
 ### Added
 
-- None
+- Run default test folder if no arguments are passed.
 
 ### Fixed
 

@@ -9,6 +9,10 @@ module ParallelTests
           'spinach'
         end
 
+        def default_test_folder
+          'features'
+        end
+
         def runtime_logging
           # Not Yet Supported
           ""
