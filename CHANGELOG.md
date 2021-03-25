@@ -8,17 +8,25 @@
 
 ### Added
 
-- Run default test folder if no arguments are passed.
+- None
 
 ### Fixed
 
 - None
 
-### Dependencies
+## v3.6.0 - 2021-03-25
 
-- Drop ruby 2.4 support.
+### Breaking Changes
 
-# Changelog
+- Drop ruby 2.4 support
+
+### Added
+
+- Run default test folder if no arguments are passed.
+
+### Fixed
+
+- None
 
 ## v3.5.1 - 2021-03-07
 
