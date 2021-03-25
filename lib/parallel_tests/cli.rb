@@ -276,7 +276,7 @@ module ParallelTests
       unless options[:execute]
         unless files.any?
           default_test_folder = @runner.default_test_folder
-          files = [default_test_folder] if File.exist?(default_test_folder)
+          files = [default_test_folder] if File.directory?(default_test_folder)
           abort "Pass files or folders to run" unless files.any?
         end
         options[:files] = files.map { |file_path| Pathname.new(file_path).cleanpath.to_s }
