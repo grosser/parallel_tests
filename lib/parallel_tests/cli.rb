@@ -105,13 +105,11 @@ module ParallelTests
 
     def lock(lockfile)
       File.open(lockfile) do |lock|
-        begin
-          lock.flock File::LOCK_EX
-          yield
-        ensure
-          # This shouldn't be necessary, but appears to be
-          lock.flock File::LOCK_UN
-        end
+        lock.flock File::LOCK_EX
+        yield
+      ensure
+        # This shouldn't be necessary, but appears to be
+        lock.flock File::LOCK_UN
       end
     end
 
@@ -228,12 +226,10 @@ module ParallelTests
         opts.on("-e", "--exec [COMMAND]", "execute this code parallel and with ENV['TEST_ENV_NUMBER']") { |path| options[:execute] = path }
         opts.on("-o", "--test-options '[OPTIONS]'", "execute test commands with those options") { |arg| options[:test_options] = arg.lstrip }
         opts.on("-t", "--type [TYPE]", "test(default) / rspec / cucumber / spinach") do |type|
-          begin
-            @runner = load_runner(type)
-          rescue NameError, LoadError => e
-            puts "Runner for `#{type}` type has not been found! (#{e})"
-            abort
-          end
+          @runner = load_runner(type)
+        rescue NameError, LoadError => e
+          puts "Runner for `#{type}` type has not been found! (#{e})"
+          abort
         end
         opts.on(
           "--suffix [PATTERN]",
