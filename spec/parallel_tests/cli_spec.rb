@@ -13,9 +13,9 @@ describe ParallelTests::CLI do
       subject.send(:parse_options!, *args)
     end
 
-    it "fails without file" do
-      expect(subject).to receive(:abort).with("Pass files or folders to run")
-      call(["-n3"])
+    it "does not fail without file" do
+      expect(subject).not_to receive(:abort)
+      call(["-n3", "-t", "rspec"])
     end
 
     it "cleanups file paths" do

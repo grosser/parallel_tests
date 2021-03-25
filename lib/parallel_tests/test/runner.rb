@@ -15,6 +15,10 @@ module ParallelTests
           /_(test|spec).rb$/
         end
 
+        def default_test_folder
+          "test"
+        end
+
         def test_file_name
           "test"
         end

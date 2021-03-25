@@ -34,6 +34,10 @@ module ParallelTests
           @test_file_name || 'feature'
         end
 
+        def default_test_folder
+          'features'
+        end
+
         def test_suffix
           /\.feature$/
         end
