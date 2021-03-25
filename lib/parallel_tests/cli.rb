@@ -274,10 +274,10 @@ module ParallelTests
 
       files, remaining = extract_file_paths(argv)
       unless options[:execute]
-        unless files.any?
+        if files.empty?
           default_test_folder = @runner.default_test_folder
           files = [default_test_folder] if File.directory?(default_test_folder)
-          abort "Pass files or folders to run" unless files.any?
+          abort "Pass files or folders to run" if files.empty?
         end
         options[:files] = files.map { |file_path| Pathname.new(file_path).cleanpath.to_s }
       end
