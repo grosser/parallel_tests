@@ -14,6 +14,10 @@
 
 - None
 
+### Dependencies
+
+- Drop ruby 2.4 support.
+
 # Changelog
 
 ## v3.5.1 - 2021-03-07
