@@ -84,7 +84,8 @@ describe 'CLI' do
     expect(result).to include '2 processes for 2 specs, ~ 1 spec per process'
   end
 
-  describe "--fail-fast" do
+  # Uses `Process.kill` under the hood, which on Windows doesn't work as expected. It kills all process group instead of just one process.
+  describe "--fail-fast", unless: Gem.win_platform? do
     def run_tests(test_option: nil)
       super(
         "spec",
