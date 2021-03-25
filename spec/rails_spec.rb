@@ -13,8 +13,7 @@ describe 'rails' do
     result
   end
 
-  # TODO: rails 6
-  ['rails51', 'rails52'].each do |rails|
+  ['rails60', 'rails61'].each do |rails|
     it "can create and run #{rails}" do
       skip 'rails fixtures are not set up for java' if RUBY_PLATFORM == "java"
 
@@ -25,7 +24,6 @@ describe 'rails' do
           ENV.delete("RACK_ENV")
 
           sh "bundle config --local path vendor/bundle"
-          sh "bundle config --local force_ruby_platform true"
           sh "bundle install"
           sh "rm -rf db/*.sqlite3"
           sh "bundle exec rake db:setup parallel:create --trace 2>&1"
