@@ -84,7 +84,18 @@ module ParallelTests
         report_time_taken(&run_tests_proc)
       end
 
-      abort final_fail_message if any_test_failed?(test_results)
+      if any_test_failed?(test_results)
+        warn final_fail_message
+
+        # return the highest exit status to allow sub-processes to send things other than 1
+        exit_status = if options[:highest_exit_status]
+          test_results.map { |data| data.fetch(:exit_status) }.max
+        else
+          1
+        end
+
+        exit exit_status
+      end
     end
 
     def run_tests(group, process_number, num_processes, options)
@@ -206,6 +217,10 @@ module ParallelTests
           Integer,
           "Use 'isolate'  singles with number of processes, default: 1."
         ) { |n| options[:isolate_count] = n }
+
+        opts.on("--highest-exit-status", "Exit with the highest exit status provided by test run(s)") do
+          options[:highest_exit_status] = true
+        end
 
         opts.on(
           "--specify-groups [SPECS]",

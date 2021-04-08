@@ -29,6 +29,7 @@ jobs:
     - name: Setup OS dependencies
       uses: MSP-Greg/setup-ruby-pkgs@v1
       with:
+        bundler: 2.2.15
         ruby-version: ${{ matrix.ruby }}
         apt-get:  libsqlite3-dev
     - name: Install dependencies
