@@ -70,6 +70,35 @@ describe 'CLI' do
   let(:printed_commands) { /specs? per process\nbundle exec rspec/ }
   let(:printed_rerun) { "run the group again:\n\nbundle exec rspec" }
 
+  context "running tests sequentially" do
+    it "exits with 0 when each run is successful" do
+      run_tests "spec", type: 'rspec', fail: 0
+    end
+
+    it "exits with 1 when a test run fails" do
+      write 'spec/xxx2_spec.rb', 'describe("it"){it("should"){ expect(true).to be false }}'
+      run_tests "spec", type: 'rspec', fail: 1
+    end
+
+    it "exits with 1 even when the test run exits with a different status" do
+      write 'spec/xxx2_spec.rb', <<~SPEC
+        RSpec.configure { |c| c.failure_exit_code = 99 }
+        describe("it"){it("should"){ expect(true).to be false }}
+      SPEC
+
+      run_tests "spec", type: 'rspec', fail: 1
+    end
+
+    it "exits with the highest exit status" do
+      write 'spec/xxx2_spec.rb', <<~SPEC
+        RSpec.configure { |c| c.failure_exit_code = 99 }
+        describe("it"){it("should"){ expect(true).to be false }}
+      SPEC
+
+      run_tests "spec", type: 'rspec', add: "--highest-exit-status", fail: 99
+    end
+  end
+
   it "runs tests in parallel" do
     write 'spec/xxx_spec.rb', 'describe("it"){it("should"){puts "TEST1"}}'
     write 'spec/xxx2_spec.rb', 'describe("it"){it("should"){puts "TEST2"}}'
@@ -88,6 +117,35 @@ describe 'CLI' do
 
     # verify empty groups are discarded. if retained then it'd say 4 processes for 2 specs
     expect(result).to include '2 processes for 2 specs, ~ 1 spec per process'
+  end
+
+  context "running test in parallel" do
+    it "exits with 0 when each run is successful" do
+      run_tests "spec", type: 'rspec', processes: 4, fail: 0
+    end
+
+    it "exits with 1 when a test run fails" do
+      write 'spec/xxx2_spec.rb', 'describe("it"){it("should"){ expect(true).to be false }}'
+      run_tests "spec", type: 'rspec', processes: 4, fail: 1
+    end
+
+    it "exits with 1 even when the test run exits with a different status" do
+      write 'spec/xxx2_spec.rb', <<~SPEC
+        RSpec.configure { |c| c.failure_exit_code = 99 }
+        describe("it"){it("should"){ expect(true).to be false }}
+      SPEC
+
+      run_tests "spec", type: 'rspec', processes: 4, fail: 1
+    end
+
+    it "exits with the highest exit status" do
+      write 'spec/xxx2_spec.rb', <<~SPEC
+        RSpec.configure { |c| c.failure_exit_code = 99 }
+        describe("it"){it("should"){ expect(true).to be false }}
+      SPEC
+
+      run_tests "spec", type: 'rspec', processes: 4, add: "--highest-exit-status", fail: 99
+    end
   end
 
   # Uses `Process.kill` under the hood, which on Windows doesn't work as expected. It kills all process group instead of just one process.
