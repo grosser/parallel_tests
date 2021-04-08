@@ -8,6 +8,20 @@
 
 ### Added
 
+- None
+
+### Fixed
+
+- None
+
+## v3.7.0 - 2021-04-08
+
+### Breaking Changes
+
+- None
+
+### Added
+
 - Added `--highest-exit-status` option to return the highest exit status to allow sub-processes to send things other than 1
 
 ### Fixed
