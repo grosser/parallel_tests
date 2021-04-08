@@ -202,22 +202,21 @@ Options are:
     -p, --pattern [PATTERN]          run tests matching this regex pattern
         --exclude-pattern [PATTERN]  exclude tests matching this regex pattern
         --group-by [TYPE]            group tests by:
-          found - order of finding files
-          steps - number of cucumber/spinach steps
-          scenarios - individual cucumber scenarios
-          filesize - by size of the file
-          runtime - info from runtime log
-          default - runtime when runtime log is filled otherwise filesize
+                                     found - order of finding files
+                                     steps - number of cucumber/spinach steps
+                                     scenarios - individual cucumber scenarios
+                                     filesize - by size of the file
+                                     runtime - info from runtime log
+                                     default - runtime when runtime log is filled otherwise filesize
     -m, --multiply-processes [FLOAT] use given number as a multiplier of processes to run
     -s, --single [PATTERN]           Run all matching files in the same process
-    -i, --isolate                    Do not run any other tests in the group used by --single(-s).
-                                     Automatically turned on if --isolate-n is set above 0.
-        --isolate-n                  Number of processes for isolated groups. Default to 1 when --isolate is on.
+    -i, --isolate                    Do not run any other tests in the group used by --single(-s)
+        --isolate-n [PROCESSES]      Use 'isolate'  singles with number of processes, default: 1.
+        --highest-exit-status        Exit with the highest exit status provided by test run(s)
         --specify-groups [SPECS]     Use 'specify-groups' if you want to specify multiple specs running in multiple
                                      processes in a specific formation. Commas indicate specs in the same process,
-                                     pipes indicate specs in a new process.  Cannot use with --single, --isolate, or
+                                     pipes indicate specs in a new process. Cannot use with --single, --isolate, or
                                      --isolate-n.  Ex.
-                                     Ex.
                                      $ parallel_tests -n 3 . --specify-groups '1_spec.rb,2_spec.rb|3_spec.rb'
                                        Process 1 will contain 1_spec.rb and 2_spec.rb
                                        Process 2 will contain 3_spec.rb
@@ -227,8 +226,8 @@ Options are:
     -o, --test-options '[OPTIONS]'   execute test commands with those options
     -t, --type [TYPE]                test(default) / rspec / cucumber / spinach
         --suffix [PATTERN]           override built in test file pattern (should match suffix):
-          '_spec.rb$' - matches rspec files
-          '_(test|spec).rb$' - matches test or spec files
+                                     '_spec.rb$' - matches rspec files
+                                     '_(test|spec).rb$' - matches test or spec files
         --serialize-stdout           Serialize stdout output, nothing will be written until everything is done
         --prefix-output-with-test-env-number
                                      Prefixes test env number to the output when not using --serialize-stdout
