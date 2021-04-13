@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 require 'parallel_tests'
+require 'parallel_tests/output_rewriter'
 
 module ParallelTests
   module Test
@@ -161,7 +162,10 @@ module ParallelTests
                 read = read.force_encoding(Encoding.default_internal)
               end
               result << read
-              unless options[:serialize_stdout]
+
+              if options[:progress_bar_compatible]
+                ParallelTests::OutputRewriter.rewrite(new_group_output: result, group_index: env['TEST_ENV_NUMBER'].to_i)
+              elsif !options[:serialize_stdout]
                 message = read
                 message = "[TEST GROUP #{env['TEST_ENV_NUMBER']}] #{message}" if options[:prefix_output_with_test_env_number]
                 $stdout.print message
