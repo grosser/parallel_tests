@@ -11,7 +11,7 @@ module ParallelTests
 
       def by_scenarios(tests, num_groups, options = {})
         scenarios = group_by_scenarios(tests, options)
-        in_even_groups_by_size(scenarios, num_groups, options.slice(BY_SCENARIOS_SUPPORTED_OPTIONS))
+        in_even_groups_by_size(scenarios, num_groups, options.slice(*BY_SCENARIOS_SUPPORTED_OPTIONS))
       end
 
       def in_even_groups_by_size(items, num_groups, options = {})
@@ -128,14 +128,15 @@ module ParallelTests
       end
 
       def separate_single_items(items, options)
-        items.partition { |item, _size| to_single_items?(item, options) }
+        items.partition { |item| to_single_items?(item, options) }
       end
 
       def to_single_items?(item, options)
         if options[:single_process]
+          item = item_with_tags?(item) || item_with_size?(item) ? item[0] : item
           options[:single_process].any? { |pattern| item =~ pattern }
         elsif options[:single_process_tag]
-          raise "--single-tag option can be used only with '--group-by scenarios'" unless item_with_tags?(item)
+          raise "--single-tag option can only be used with '--group-by scenarios'" unless item_with_tags?(item)
           item_tags = item[1]
           item_tags.any? { |tag| tag.match?(options[:single_process_tag]) }
         else
