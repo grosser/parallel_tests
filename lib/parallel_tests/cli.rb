@@ -208,7 +208,11 @@ module ParallelTests
           (options[:single_process] ||= []) << /#{pattern}/
         end
 
-        opts.on("-i", "--isolate", "Do not run any other tests in the group used by --single(-s)") do
+        opts.on("--single-tag [TAG]", "Run all Cucumber/Gherkin scenarios with specified tag in the same process") do |tag|
+          options[:single_process_tag] = tag
+        end
+
+        opts.on("-i", "--isolate", "Do not run any other tests in the group used by --single(-s) or --single-tag") do
           options[:isolate] = true
         end
 
