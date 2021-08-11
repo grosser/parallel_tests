@@ -182,19 +182,24 @@ Setup for non-rails
 
     gem install parallel_tests
     # go to your project dir
-    parallel_test test/
-    parallel_rspec spec/
-    parallel_cucumber features/
-    parallel_spinach features/
+    parallel_test
+    parallel_rspec
+    parallel_cucumber
+    parallel_spinach
 
- - use `ENV['TEST_ENV_NUMBER']` inside your tests to select separate db/memcache/etc.
- - Only run selected files & folders:
+ - use `ENV['TEST_ENV_NUMBER']` inside your tests to select separate db/memcache/etc. (docker compose: expose it)
 
+ - Only run a subset of files / folders:
+ 
     `parallel_test test/bar test/baz/foo_text.rb`
 
  - Pass test-options and files via `--`:
-
-    `parallel_test -- -t acceptance -f progress -- spec/foo_spec.rb spec/acceptance`
+ 
+    `parallel_rspec -- -t acceptance -f progress -- spec/foo_spec.rb spec/acceptance`
+    
+ - Pass in test options, by using the -o flag (wrap everything in quotes):
+ 
+    `parallel_cucumber -n 2 -o '-p foo_profile --tags @only_this_tag or @only_that_tag --format summary'`
 
 Options are:
 <!-- copy output from bundle exec ./bin/parallel_test -h -->
