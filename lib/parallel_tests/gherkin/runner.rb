@@ -21,16 +21,13 @@ module ParallelTests
           options[:env] ||= {}
           options[:env] = options[:env].merge({ 'AUTOTEST' => '1' }) if $stdout.tty?
 
-          opts = cucumber_opts(options[:test_options])
-          puts "My opts are: #{opts}\n\n"
           cmd = [
             executable,
             (runtime_logging if File.directory?(File.dirname(runtime_log))),
-            opts[0],
             *sanitized_test_files,
-            opts[1]
+            cucumber_opts(options[:test_options])
           ].compact.reject(&:empty?).join(' ')
-          puts "I am running : #{cmd}\n\n"
+          execute_command(cmd, process_number, num_processes, options)
         end
 
         def test_file_name
@@ -70,25 +67,11 @@ module ParallelTests
         end
 
         def cucumber_opts(given)
-          initial =
-            if given =~ (/--profile/) || given =~ (/(^|\s)-p /)
-              given
-            else
-              [given, profile_from_config].compact.join(" ")
-            end
-
-          opts_as_individuals = initial.scan(/\S+\s\S+/)
-          desired_output = ['', '']
-
-          opts_as_individuals.each do |opt|
-            if opt.match?(/--retry \d+/)
-              desired_output[1] = opt
-            else
-              desired_output[0] = "#{desired_output[0]} #{opt}".strip
-            end
+          if given =~ (/--profile/) || given =~ (/(^|\s)-p /)
+            given
+          else
+            [given, profile_from_config].compact.join(" ")
           end
-
-          desired_output
         end
 
         def profile_from_config

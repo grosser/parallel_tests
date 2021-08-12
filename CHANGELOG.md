@@ -12,7 +12,8 @@
 
 ### Fixed
 
-- None
+- All cucumber options are now pushed to the end of the command invocation
+  - Fixes an issue where the `--retry` flag wouldn't work correctly 
 
 ## v3.7.0 - 2021-04-08
 
