@@ -74,9 +74,9 @@ shared_examples_for 'gherkin runners' do
 
       it "uses parallel profile" do
         if ParallelTests::WINDOWS
-          should_run_with %r{script/#{runner_name} .*foo bar --profile parallel "xxx"}
+          should_run_with %r{script/#{runner_name} "xxx" .*foo bar --profile parallel}
         else
-          should_run_with %r{script/#{runner_name} .*foo bar --profile parallel xxx}
+          should_run_with %r{script/#{runner_name} xxx .*foo bar --profile parallel}
         end
 
         call(['xxx'], 1, 22, test_options: 'foo bar')
@@ -84,9 +84,9 @@ shared_examples_for 'gherkin runners' do
 
       it "uses given profile via --profile" do
         if ParallelTests::WINDOWS
-          should_run_with %r{script/#{runner_name} .*--profile foo "xxx"$}
+          should_run_with %r{script/#{runner_name} "xxx" .*--profile foo$}
         else
-          should_run_with %r{script/#{runner_name} .*--profile foo xxx$}
+          should_run_with %r{script/#{runner_name} xxx .*--profile foo$}
         end
 
         call(['xxx'], 1, 22, test_options: '--profile foo')
@@ -94,9 +94,9 @@ shared_examples_for 'gherkin runners' do
 
       it "uses given profile via -p" do
         if ParallelTests::WINDOWS
-          should_run_with %r{script/#{runner_name} .*-p foo "xxx"$}
+          should_run_with %r{script/#{runner_name} "xxx" .*-p foo$}
         else
-          should_run_with %r{script/#{runner_name} .*-p foo xxx$}
+          should_run_with %r{script/#{runner_name} xxx .*-p foo$}
         end
 
         call(['xxx'], 1, 22, test_options: '-p foo')

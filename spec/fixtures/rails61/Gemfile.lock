@@ -1,7 +1,7 @@
 PATH
   remote: ../../..
   specs:
-    parallel_tests (3.5.2)
+    parallel_tests (3.7.0)
       parallel
 
 GEM
@@ -122,4 +122,4 @@ DEPENDENCIES
   tzinfo-data
 
 BUNDLED WITH
-   2.2.15
+   2.2.19

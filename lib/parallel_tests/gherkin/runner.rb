@@ -24,8 +24,8 @@ module ParallelTests
           cmd = [
             executable,
             (runtime_logging if File.directory?(File.dirname(runtime_log))),
-            cucumber_opts(options[:test_options]),
-            *sanitized_test_files
+            *sanitized_test_files,
+            cucumber_opts(options[:test_options])
           ].compact.reject(&:empty?).join(' ')
           execute_command(cmd, process_number, num_processes, options)
         end
