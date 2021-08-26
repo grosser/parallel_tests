@@ -42,6 +42,9 @@ test:
 
 ### Setup environment from scratch (create db and loads schema, useful for CI)
     rake parallel:setup
+    
+### Drop all test databases
+    rake parallel:drop
 
 ### Run!
     rake parallel:test          # Test::Unit
