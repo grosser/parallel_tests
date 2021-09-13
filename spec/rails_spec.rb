@@ -32,7 +32,7 @@ describe 'rails' do
           sh "bundle exec rake parallel:prepare"
           sh "bundle exec rails runner User.create", environment: { 'RAILS_ENV' => 'test' } # pollute the db
           out = sh "bundle exec rake parallel:prepare parallel:test"
-          expect(out).to match(/ 2 (tests|runs)/)
+          expect(out).to match(/ 3 (tests|runs)/)
         end
       end
     end
