@@ -465,6 +465,12 @@ describe 'CLI' do
     )
   end
 
+  it "can run with uncommon file names" do
+    skip if RUBY_PLATFORM == "java" # just too slow ...
+    write "test/long ( stuff ) _test.rb", "puts 'hey'"
+    expect(run_tests("test", processes: 2)).to include("hey")
+  end
+
   context "RSpec" do
     it_runs_the_default_folder_if_it_exists "rspec", "spec"
 
