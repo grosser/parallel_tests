@@ -13,7 +13,7 @@ describe 'rails' do
     result
   end
 
-  ['rails60', 'rails61'].each do |rails|
+  ['rails60', 'rails61', 'rails70'].each do |rails|
     it "can create and run #{rails}" do
       skip 'rails fixtures are not set up for java' if RUBY_PLATFORM == "java"
 
