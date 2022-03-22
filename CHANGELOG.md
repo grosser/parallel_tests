@@ -12,22 +12,8 @@
 
 ### Fixed
 
-- None
-
-## v3.7.4 - 2022-03-22
-
-### Breaking Changes
-
-- None
-
-### Added
-
-- None
-
-### Fixed
-
 - Added Rails 7.0 to fixtures
-- Fixes deprecation warning around the usage of `ActiveRecord::Base.schema_format`
+- Fixes deprecation warning around the usage of `ActiveRecord::Base.schema_format` and deprecation in Rails 7.1
 
 ## v3.7.1 - 2021-08-14
 
