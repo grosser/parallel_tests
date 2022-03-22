@@ -121,13 +121,23 @@ namespace :parallel do
   desc "Update test databases by dumping and loading --> parallel:prepare[num_cpus]"
   task(:prepare, [:count]) do |_, args|
     ParallelTests::Tasks.check_for_pending_migrations
-    if defined?(ActiveRecord::Base) && [:ruby, :sql].include?(ActiveRecord::Base.schema_format)
+    rails_version = Gem::Version.new(Rails.version)
+    valid_schema_formats = [:ruby, :sql]
+
+    correct_schema_format =
+      if rails_version >= Gem::Version.new('7.0')
+        valid_schema_formats.include?(ActiveRecord.schema_format)
+      else
+        valid_schema_formats.include?(ActiveRecord::Base.schema_format)
+      end
+
+    if defined?(ActiveRecord) && correct_schema_format
       # fast: dump once, load in parallel
       type =
-        if Gem::Version.new(Rails.version) >= Gem::Version.new('6.1.0')
+        if rails_version >= Gem::Version.new('6.1.0') || ActiveRecord::Base.schema_format == :ruby
           "schema"
         else
-          ActiveRecord::Base.schema_format == :ruby ? "schema" : "structure"
+          "structure"
         end
 
       Rake::Task["db:#{type}:dump"].invoke
