@@ -1,7 +1,7 @@
 PATH
   remote: ../../..
   specs:
-    parallel_tests (3.7.0)
+    parallel_tests (3.7.3)
       parallel
 
 GEM
@@ -63,9 +63,11 @@ GEM
     nio4r (2.5.7)
     nokogiri (1.11.2-x64-mingw32)
       racc (~> 1.4)
+    nokogiri (1.11.2-x86_64-darwin)
+      racc (~> 1.4)
     nokogiri (1.11.2-x86_64-linux)
       racc (~> 1.4)
-    parallel (1.20.1)
+    parallel (1.22.0)
     racc (1.5.2)
     rack (2.2.3)
     rack-test (1.1.0)
@@ -103,6 +105,7 @@ GEM
 
 PLATFORMS
   x64-mingw32
+  x86_64-darwin-20
   x86_64-linux
 
 DEPENDENCIES
