@@ -92,6 +92,32 @@ module ParallelTests
 
         [num_processes, pattern.to_s, options.to_s, pass_through.to_s]
       end
+
+      def schema_format_based_on_rails_version
+        if rails_7_or_greater?
+          ActiveRecord.schema_format
+        else
+          ActiveRecord::Base.schema_format
+        end
+      end
+
+      def schema_type_based_on_rails_version
+        if rails_61_or_greater? || schema_format_based_on_rails_version == :ruby
+          "schema"
+        else
+          "structure"
+        end
+      end
+
+      private
+
+      def rails_7_or_greater?
+        Gem::Version.new(Rails.version) >= Gem::Version.new('7.0')
+      end
+
+      def rails_61_or_greater?
+        Gem::Version.new(Rails.version) >= Gem::Version.new('6.1.0')
+      end
     end
   end
 end
@@ -121,24 +147,10 @@ namespace :parallel do
   desc "Update test databases by dumping and loading --> parallel:prepare[num_cpus]"
   task(:prepare, [:count]) do |_, args|
     ParallelTests::Tasks.check_for_pending_migrations
-    rails_version = Gem::Version.new(Rails.version)
-    valid_schema_formats = [:ruby, :sql]
 
-    correct_schema_format =
-      if rails_version >= Gem::Version.new('7.0')
-        valid_schema_formats.include?(ActiveRecord.schema_format)
-      else
-        valid_schema_formats.include?(ActiveRecord::Base.schema_format)
-      end
-
-    if defined?(ActiveRecord) && correct_schema_format
+    if defined?(ActiveRecord) && [:ruby, :sql].include?(ParallelTests::Tasks.schema_format_based_on_rails_version)
       # fast: dump once, load in parallel
-      type =
-        if rails_version >= Gem::Version.new('6.1.0') || ActiveRecord::Base.schema_format == :ruby
-          "schema"
-        else
-          "structure"
-        end
+      type = ParallelTests::Tasks.schema_type_based_on_rails_version
 
       Rake::Task["db:#{type}:dump"].invoke
 
