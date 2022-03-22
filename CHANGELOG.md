@@ -14,6 +14,21 @@
 
 - None
 
+## v3.7.4 - 2022-03-22
+
+### Breaking Changes
+
+- None
+
+### Added
+
+- None
+
+### Fixed
+
+- Added Rails 7.0 to fixtures
+- Fixes deprecation warning around the usage of `ActiveRecord::Base.schema_format`
+
 ## v3.7.1 - 2021-08-14
 
 ### Breaking Changes
@@ -27,7 +42,7 @@
 ### Fixed
 
 - All cucumber options are now pushed to the end of the command invocation
-  - Fixes an issue where the `--retry` flag wouldn't work correctly 
+  - Fixes an issue where the `--retry` flag wouldn't work correctly
 
 ## v3.7.0 - 2021-04-08
 
