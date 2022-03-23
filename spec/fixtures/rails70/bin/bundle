@@ -31,7 +31,7 @@ m = Module.new do
         bundler_version = a
       end
       next unless a =~ /\A--bundler(?:[= ](#{Gem::Version::VERSION_PATTERN}))?\z/
-      bundler_version = $1
+      bundler_version = Regexp.last_match(1)
       update_index = i
     end
     bundler_version
@@ -41,7 +41,7 @@ m = Module.new do
     gemfile = ENV["BUNDLE_GEMFILE"]
     return gemfile if gemfile && !gemfile.empty?
 
-    File.expand_path("../../Gemfile", __FILE__)
+    File.expand_path('../Gemfile', __dir__)
   end
 
   def lockfile
