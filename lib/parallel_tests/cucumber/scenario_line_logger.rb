@@ -27,7 +27,7 @@ module ParallelTests
               example_tags = example.tags.map(&:name)
               example_tags = scenario_tags + example_tags
               next unless matches_tags?(example_tags)
-              example.rows[1..-1].each do |row|
+              example.rows[1..].each do |row|
                 test_line = row.source_line
                 next if line_numbers.any? && !line_numbers.include?(test_line)
 
