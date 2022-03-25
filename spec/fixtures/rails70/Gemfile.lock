@@ -82,11 +82,7 @@ GEM
       net-protocol
       timeout
     nio4r (2.5.8)
-    nokogiri (1.13.3-x64-mingw32)
-      racc (~> 1.4)
     nokogiri (1.13.3-x86_64-darwin)
-      racc (~> 1.4)
-    nokogiri (1.13.3-x86_64-linux)
       racc (~> 1.4)
     parallel (1.22.0)
     racc (1.6.0)
@@ -140,4 +136,4 @@ DEPENDENCIES
   tzinfo-data
 
 BUNDLED WITH
-   2.3.9
+   2.3.7
