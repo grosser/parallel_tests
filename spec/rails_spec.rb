@@ -13,7 +13,8 @@ describe 'rails' do
     result
   end
 
-  ['rails60', 'rails61', 'rails70'].each do |rails|
+  Dir["spec/fixtures/rails*"].each do |folder|
+    rails = File.basename(folder)
     it "can create and run #{rails}" do
       skip 'rails fixtures are not set up for java' if RUBY_PLATFORM == "java"
 
