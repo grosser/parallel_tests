@@ -185,7 +185,8 @@ namespace :parallel do
   # just load the schema (good for integration server <-> no development db)
   desc "Load dumped schema for test databases via db:schema:load --> parallel:load_schema[num_cpus]"
   task :load_schema, :count do |_, args|
-    command = "#{ParallelTests::Tasks.rake_bin} #{ParallelTests::Tasks.purge_before_load} " \
+    command =
+      "#{ParallelTests::Tasks.rake_bin} #{ParallelTests::Tasks.purge_before_load} " \
       "db:schema:load RAILS_ENV=#{ParallelTests::Tasks.rails_env} DISABLE_DATABASE_ENVIRONMENT_CHECK=1"
     ParallelTests::Tasks.run_in_parallel(ParallelTests::Tasks.suppress_schema_load_output(command), args)
   end
@@ -233,7 +234,8 @@ namespace :parallel do
       # Using the relative path to find the binary allow to run a specific version of it
       executable = File.join(File.dirname(__FILE__), '..', '..', 'bin', 'parallel_test')
 
-      command = "#{ParallelTests.with_ruby_binary(Shellwords.escape(executable))} #{type} " \
+      command =
+        "#{ParallelTests.with_ruby_binary(Shellwords.escape(executable))} #{type} " \
         "--type #{test_framework} "        \
         "-n #{count} "                     \
         "--pattern '#{pattern}' "          \

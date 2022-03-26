@@ -67,7 +67,7 @@ describe ParallelTests::RSpec::RuntimeLogger do
 
     def write(file, content)
       FileUtils.mkdir_p(File.dirname(file))
-      File.open(file, 'w') { |f| f.write content }
+      File.write(file, content)
     end
 
     it "logs shared examples into the running files" do

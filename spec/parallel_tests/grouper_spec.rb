@@ -7,7 +7,7 @@ require 'tmpdir'
 describe ParallelTests::Grouper do
   describe '.by_steps' do
     def write(file, content)
-      File.open(file, 'w') { |f| f.write content }
+      File.write(file, content)
     end
 
     it "sorts features by steps" do
