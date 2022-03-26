@@ -12,6 +12,18 @@
 
 ### Fixed
 
+## 3.8.0 - 2022-03-26
+
+### Breaking Changes
+
+- Drop support for ruby 2.5 / 2.6
+
+### Added
+
+- Tesed on ruby 3.0 and 3.1
+
+### Fixed
+
 - Added Rails 7.0 to fixtures
 - Fixes deprecation warning around the usage of `ActiveRecord::Base.schema_format` and deprecation in Rails 7.1
 
