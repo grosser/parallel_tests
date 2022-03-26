@@ -2,16 +2,14 @@ name: test
 
 on:
   push:
-    branches:
-      - master
-
+    branches: [master]
   pull_request:
 
 jobs:
   build:
     runs-on: ${{ matrix.os }}
     strategy:
-      fail-fast: false
+      fail-fast: false # run all tests so we see which gem/ruby combinations break
       matrix:
         ruby: ['3.0', '2.7', head, jruby-head]
         os: [ubuntu-latest, windows-latest]
@@ -20,21 +18,14 @@ jobs:
         - ruby: '2.7' # lowest supported version
           os: ubuntu-latest
           task: rubocop
-    env:
-      RUBYOPT: -W0
-      # avoid warnings from https://github.blog/changelog/2020-10-01-github-actions-deprecating-set-env-and-add-path-commands/
-      ACTIONS_ALLOW_UNSECURE_COMMANDS: true
     steps:
     - uses: actions/checkout@master
-    - name: Setup OS dependencies
-      uses: MSP-Greg/setup-ruby-pkgs@v1
+    - uses: ruby/setup-ruby@v1
       with:
         ruby-version: ${{ matrix.ruby }}
-        apt-get:  libsqlite3-dev
-    - name: Install dependencies
-      run: bundle install --jobs 4
+        bundler-cache: true # runs 'bundle install' and caches installed gems automatically
     - name: rake ${{ matrix.task }}
-      run: bundle exec rake ${{ matrix.task }}
       # allow ruby/jruby-head to fail since they are moving targets
       # TODO: this will always show green, fix once https://github.com/actions/toolkit/issues/399 is resolved
       continue-on-error: ${{ endsWith(matrix.ruby, 'head') }}
+      run: bundle exec rake ${{ matrix.task }}
