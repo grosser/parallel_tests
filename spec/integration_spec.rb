@@ -17,7 +17,7 @@ describe 'CLI' do
   def write(file, content)
     path = "#{folder}/#{file}"
     ensure_folder File.dirname(path)
-    File.open(path, 'w') { |f| f.write content }
+    File.write(path, content)
     path
   end
 
@@ -298,7 +298,7 @@ describe 'CLI' do
   context "with given commands" do
     it "can exec given commands with ENV['TEST_ENV_NUMBER']" do
       result = `#{executable} -e 'ruby -e "print ENV[:TEST_ENV_NUMBER.to_s].to_i"' -n 4`
-      expect(result.gsub('"', '').split('').sort).to eq(['0', '2', '3', '4'])
+      expect(result.gsub('"', '').chars.sort).to eq(['0', '2', '3', '4'])
     end
 
     it "can exec given command non-parallel" do
@@ -308,7 +308,7 @@ describe 'CLI' do
 
     it "can exec given command with a restricted set of groups" do
       result = `#{executable} -e 'ruby -e "print ENV[:TEST_ENV_NUMBER.to_s].to_i"' -n 4 --only-group 1,3`
-      expect(result.gsub('"', '').split('').sort).to eq(['0', '3'])
+      expect(result.gsub('"', '').chars.sort).to eq(['0', '3'])
     end
 
     it "can serialize stdout" do
