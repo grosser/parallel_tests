@@ -1,3 +1,12 @@
+GIT
+  remote: https://github.com/grosser/spinach.git
+  revision: e4e08ffd6d0877d139d602f3f5ccba3c97d69a36
+  branch: grosser/json
+  specs:
+    spinach (0.11.0)
+      colorize
+      gherkin-ruby (>= 0.3.2)
+
 PATH
   remote: .
   specs:
@@ -55,7 +64,6 @@ GEM
     gherkin-ruby (0.3.2)
     i18n (1.10.0)
       concurrent-ruby (~> 1.0)
-    json (2.6.1)
     middleware (0.1.0)
     minitest (5.5.1)
     multi_test (0.1.2)
@@ -97,10 +105,6 @@ GEM
     rubocop-ast (1.16.0)
       parser (>= 3.1.1.0)
     ruby-progressbar (1.11.0)
-    spinach (0.11.0)
-      colorize
-      gherkin-ruby (>= 0.3.2)
-      json
     sys-uname (1.2.2)
       ffi (~> 1.1)
     test-unit (3.5.3)
@@ -123,7 +127,7 @@ DEPENDENCIES
   rake
   rspec (~> 3.3)
   rubocop
-  spinach
+  spinach!
   test-unit
 
 BUNDLED WITH
