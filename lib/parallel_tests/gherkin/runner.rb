@@ -62,7 +62,7 @@ module ParallelTests
               plural = "s" if (word == group) && (number != 1)
               "#{number} #{word}#{plural}"
             end
-            "#{sums[0]} (#{sums[1..-1].join(", ")})"
+            "#{sums[0]} (#{sums[1..].join(", ")})"
           end.compact.join("\n")
         end
 

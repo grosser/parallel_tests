@@ -81,7 +81,7 @@ module SharedExamples
 
       def setup_runtime_log # rubocop:disable Lint/NestedMethodDefinition
         File.open(log, 'w') do |f|
-          @files[1..-1].each { |file| f.puts "#{file}:#{@files.index(file)}" }
+          @files[1..].each { |file| f.puts "#{file}:#{@files.index(file)}" }
           f.puts "#{@files[0]}:10"
         end
       end

@@ -13,11 +13,11 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        ruby: ['3.0', '2.7', '2.6', '2.5', head, jruby-head]
+        ruby: ['3.0', '2.7', head, jruby-head]
         os: [ubuntu-latest, windows-latest]
-        task: [default]
+        task: [spec]
         include:
-        - ruby: '2.5' # lowest supported version
+        - ruby: '2.7' # lowest supported version
           os: ubuntu-latest
           task: rubocop
     env:
