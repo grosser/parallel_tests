@@ -8,7 +8,7 @@
 
 ### Added
 
-- None
+- Support Ruby 2.5 / 2.6
 
 ### Fixed
 

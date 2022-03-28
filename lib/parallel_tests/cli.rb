@@ -322,12 +322,12 @@ module ParallelTests
     def extract_file_paths(argv)
       dash_index = argv.rindex("--")
       file_args_at = (dash_index || -1) + 1
-      [argv[file_args_at..], argv[0...(dash_index || 0)]]
+      [argv[file_args_at..-1], argv[0...(dash_index || 0)]]
     end
 
     def extract_test_options(argv)
       dash_index = argv.index("--") || -1
-      argv[dash_index + 1..]
+      argv[dash_index + 1..-1]
     end
 
     def append_test_options(options, argv)
