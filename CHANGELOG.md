@@ -12,6 +12,12 @@
 
 ### Fixed
 
+## 3.8.1 - 2022-03-28
+
+### Added
+
+- Support Ruby 2.5 / 2.6
+
 ## 3.8.0 - 2022-03-26
 
 ### Breaking Changes
