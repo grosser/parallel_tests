@@ -9,7 +9,7 @@ module ParallelTests
 
       def by_scenarios(tests, num_groups, options = {})
         scenarios = group_by_scenarios(tests, options)
-        in_even_groups_by_size(scenarios, num_groups)
+        in_even_groups_by_size(scenarios, num_groups, options)
       end
 
       def by_scenarios_runtime(tests, num_groups, options = {})
