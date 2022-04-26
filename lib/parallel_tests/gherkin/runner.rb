@@ -82,7 +82,7 @@ module ParallelTests
 
         def tests_in_groups(tests, num_groups, options = {})
           @test_file_name = "scenario" if options[:group_by] == :scenarios
-          method = "by_#{options[:group_by]}"
+          method = "by_#{options[:group_by].to_s.tr("-", "_")}"
           if Grouper.respond_to?(method)
             Grouper.send(method, find_tests(tests, options), num_groups, options)
           else

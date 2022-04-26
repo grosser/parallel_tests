@@ -15,12 +15,12 @@ module ParallelTests
         end
 
         config.on_event :test_case_finished do |event|
-          @example_times[event.test_case.location.file] += ParallelTests.now.to_f - @start_at
+          @example_times[event.test_case.location] = ParallelTests.now.to_f - @start_at
         end
 
         config.on_event :test_run_finished do |_|
           lock_output do
-            @io.puts(@example_times.map { |file, time| "#{file}:#{time}" })
+            @io.puts(@example_times.map { |test_case_location, time| "#{test_case_location}:#{time}" })
           end
         end
       end
