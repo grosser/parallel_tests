@@ -51,7 +51,7 @@ module ParallelTests
           group_features_by_size(items_to_group(items), groups[isolate_count..-1])
         else
           # add all files that should run in a single non-isolated process to first group
-          single_items.each { |item, size| add_to_group(groups.first, item, size) }
+          group_features_by_size(items_to_group(single_items), [groups.first])
 
           # group all by size
           group_features_by_size(items_to_group(items), groups)
