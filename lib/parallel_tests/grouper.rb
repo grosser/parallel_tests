@@ -17,7 +17,8 @@ module ParallelTests
         scenarios_with_size = ParallelTests::Test::Runner.add_size(
           scenarios,
           group_by: :runtime,
-          runtime_log: options[:runtime_log]
+          runtime_log: options[:runtime_log],
+          allowed_missing_percent: options[:allowed_missing_percent]
         )
         in_even_groups_by_size(scenarios_with_size, num_groups, options)
       end
