@@ -153,24 +153,24 @@ describe ParallelTests::CLI do
 
       context "when the -o options has also been given" do
         it "merges the options together" do
-          expect(call(['-o', "'-f'", '--', 'test', '--foo', 'test2'])).to eq(files: ['test', '--foo', 'test2'], test_options: "'-f'")
+          expect(call(['-o', "'-f'", '--', 'test', '--foo', 'test2'])).to eq(files: ['test', '--foo', 'test2'], test_options: ['-f'])
         end
       end
 
       context "when a second -- option separator is used" do
         it "interprets the first set as test_options" do
-          expect(call(['--', '-r', 'foo', '--', 'test'])).to eq(files: ['test'], test_options: '-r foo')
-          expect(call(['--', '-r', 'foo', '--', 'test', 'test2'])).to eq(files: ['test', 'test2'], test_options: '-r foo')
-          expect(call(['--', '-r', 'foo', '-o', 'out.log', '--', 'test', 'test2'])).to eq(files: ['test', 'test2'], test_options: '-r foo -o out.log')
+          expect(call(['--', '-r', 'foo', '--', 'test'])).to eq(files: ['test'], test_options: ['-r', 'foo'])
+          expect(call(['--', '-r', 'foo', '--', 'test', 'test2'])).to eq(files: ['test', 'test2'], test_options: ['-r', 'foo'])
+          expect(call(['--', '-r', 'foo', '-o', 'out.log', '--', 'test', 'test2'])).to eq(files: ['test', 'test2'], test_options: ['-r', 'foo', '-o', 'out.log'])
         end
 
         context "when existing test_options have previously been given" do
           it "appends the new options" do
-            expect(call(['-o', "'-f'", '--', '-r', 'foo.rb', '--', 'test'])).to eq(files: ['test'], test_options: "'-f' -r foo.rb")
+            expect(call(['-o', '-f', '--', '-r', 'foo.rb', '--', 'test'])).to eq(files: ['test'], test_options: ['-f', '-r', 'foo.rb'])
           end
           it "correctly handles argument values with spaces" do
             argv = ["-o 'path with spaces1'", '--', '--out', 'path with spaces2', '--', 'foo']
-            expected_test_options = "'path with spaces1' --out path\\ with\\ spaces2"
+            expected_test_options = ['path with spaces1', '--out', 'path with spaces2']
             expect(call(argv)).to eq(files: ['foo'], test_options: expected_test_options)
           end
         end
@@ -202,7 +202,7 @@ describe ParallelTests::CLI do
   end
 
   describe ".report_failure_rerun_commmand" do
-    let(:single_failed_command) { [{ exit_status: 1, command: 'foo', seed: nil, output: 'blah' }] }
+    let(:single_failed_command) { [{ exit_status: 1, command: ['foo'], seed: nil, output: 'blah' }] }
 
     it "prints nothing if there are no failures" do
       expect($stdout).not_to receive(:puts)
@@ -253,9 +253,9 @@ describe ParallelTests::CLI do
             subject.send(
               :report_failure_rerun_commmand,
               [
-                { exit_status: 1, command: 'foo', seed: nil, output: 'blah' },
-                { exit_status: 1, command: 'bar', seed: nil, output: 'blah' },
-                { exit_status: 1, command: 'baz', seed: nil, output: 'blah' }
+                { exit_status: 1, command: ['foo'], seed: nil, output: 'blah' },
+                { exit_status: 1, command: ['bar'], seed: nil, output: 'blah' },
+                { exit_status: 1, command: ['baz'], seed: nil, output: 'blah' }
               ],
               { verbose: true }
             )
@@ -267,9 +267,9 @@ describe ParallelTests::CLI do
             subject.send(
               :report_failure_rerun_commmand,
               [
-                { exit_status: 1, command: 'foo --color', seed: nil, output: 'blah' },
-                { exit_status: 0, command: 'bar', seed: nil, output: 'blah' },
-                { exit_status: 1, command: 'baz', seed: nil, output: 'blah' }
+                { exit_status: 1, command: ['foo', '--color'], seed: nil, output: 'blah' },
+                { exit_status: 0, command: ['bar'], seed: nil, output: 'blah' },
+                { exit_status: 1, command: ['baz'], seed: nil, output: 'blah' }
               ],
               { verbose: true }
             )
@@ -277,12 +277,12 @@ describe ParallelTests::CLI do
         end
 
         it "prints the command with the seed added by the runner" do
-          command = 'rspec --color spec/foo_spec.rb'
+          command = ['rspec', '--color', 'spec/foo_spec.rb']
           seed = 555
 
           subject.instance_variable_set(:@runner, ParallelTests::Test::Runner)
           expect(ParallelTests::Test::Runner).to receive(:command_with_seed).with(command, seed)
-            .and_return("my seeded command result --seed #{seed}")
+            .and_return(['my', 'seeded', 'command', 'result', '--seed', seed])
           single_failed_command[0].merge!(seed: seed, command: command)
 
           expect do

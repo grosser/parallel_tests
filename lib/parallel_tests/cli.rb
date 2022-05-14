@@ -100,7 +100,7 @@ module ParallelTests
 
     def run_tests(group, process_number, num_processes, options)
       if group.empty?
-        { stdout: '', exit_status: 0, command: '', seed: nil }
+        { stdout: '', exit_status: 0, command: nil, seed: nil }
       else
         @runner.run_tests(group, process_number, num_processes, options)
       end
@@ -141,7 +141,7 @@ module ParallelTests
         failing_sets.each do |failing_set|
           command = failing_set[:command]
           command = @runner.command_with_seed(command, failing_set[:seed]) if failing_set[:seed]
-          puts command
+          puts Shellwords.shelljoin(command)
         end
       end
     end
@@ -238,7 +238,7 @@ module ParallelTests
         opts.on("--only-group INT[,INT]", Array) { |groups| options[:only_group] = groups.map(&:to_i) }
 
         opts.on("-e", "--exec [COMMAND]", "execute this code parallel and with ENV['TEST_ENV_NUMBER']") { |path| options[:execute] = path }
-        opts.on("-o", "--test-options '[OPTIONS]'", "execute test commands with those options") { |arg| options[:test_options] = arg.lstrip }
+        opts.on("-o", "--test-options '[OPTIONS]'", "execute test commands with those options") { |arg| options[:test_options] = Shellwords.shellsplit(arg) }
         opts.on("-t", "--type [TYPE]", "test(default) / rspec / cucumber / spinach") do |type|
           @runner = load_runner(type)
         rescue NameError, LoadError => e
@@ -333,8 +333,8 @@ module ParallelTests
       new_opts = extract_test_options(argv)
       return if new_opts.empty?
 
-      prev_and_new = [options[:test_options], new_opts.shelljoin]
-      options[:test_options] = prev_and_new.compact.join(' ')
+      options[:test_options] ||= []
+      options[:test_options] += new_opts
     end
 
     def load_runner(type)

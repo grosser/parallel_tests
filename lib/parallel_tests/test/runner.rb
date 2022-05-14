@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+require 'shellwords'
 require 'parallel_tests'
 
 module ParallelTests
@@ -25,7 +26,14 @@ module ParallelTests
 
         def run_tests(test_files, process_number, num_processes, options)
           require_list = test_files.map { |file| file.gsub(" ", "\\ ") }.join(" ")
-          cmd = "#{executable} -Itest -e '%w[#{require_list}].each { |f| require %{./\#{f}} }' -- #{options[:test_options]}"
+          cmd = [
+            *executable,
+            '-Itest',
+            '-e',
+            "%w[#{require_list}].each { |f| require %{./\#{f}} }",
+            '--',
+            *options[:test_options]
+          ]
           execute_command(cmd, process_number, num_processes, options)
         end
 
@@ -81,17 +89,20 @@ module ParallelTests
             "PARALLEL_TEST_GROUPS" => num_processes.to_s,
             "PARALLEL_PID_FILE" => ParallelTests.pid_file_path
           )
-          cmd = "nice #{cmd}" if options[:nice]
-          cmd = "#{cmd} 2>&1" if options[:combine_stderr]
+          cmd = ["nice", *cmd] if options[:nice]
 
-          puts cmd if report_process_command?(options) && !options[:serialize_stdout]
+          puts command_string(cmd) if report_process_command?(options) && !options[:serialize_stdout]
 
           execute_command_and_capture_output(env, cmd, options)
         end
 
         def execute_command_and_capture_output(env, cmd, options)
           pid = nil
-          output = IO.popen(env, cmd) do |io|
+
+          popen_options = {}
+          popen_options[:err] = [:child, :out] if options[:combine_stderr]
+
+          output = IO.popen(env, cmd, popen_options) do |io|
             pid = io.pid
             ParallelTests.pids.add(pid)
             capture_output(io, env, options)
@@ -100,7 +111,7 @@ module ParallelTests
           exitstatus = $?.exitstatus
           seed = output[/seed (\d+)/, 1]
 
-          output = [cmd, output].join("\n") if report_process_command?(options) && options[:serialize_stdout]
+          output = "#{command_string(cmd)}\n#{output}" if report_process_command?(options) && options[:serialize_stdout]
 
           { stdout: output, exit_status: exitstatus, command: cmd, seed: seed }
         end
@@ -129,18 +140,22 @@ module ParallelTests
 
         # remove old seed and add new seed
         def command_with_seed(cmd, seed)
-          clean = cmd.sub(/\s--seed\s+\d+\b/, '')
-          "#{clean} --seed #{seed}"
+          clean = remove_command_arguments(cmd, '--seed')
+          [*clean, '--seed', seed]
         end
 
         protected
 
         def executable
-          ENV['PARALLEL_TESTS_EXECUTABLE'] || determine_executable
+          if ENV.include?('PARALLEL_TESTS_EXECUTABLE')
+            [ENV['PARALLEL_TESTS_EXECUTABLE']]
+          else
+            determine_executable
+          end
         end
 
         def determine_executable
-          "ruby"
+          ["ruby"]
         end
 
         def sum_up_results(results)
@@ -237,6 +252,21 @@ module ParallelTests
           Dir[File.join(folder, pattern)].uniq.sort
         end
 
+        def remove_command_arguments(command, *args)
+          remove_next = false
+          command.select do |arg|
+            if remove_next
+              remove_next = false
+              false
+            elsif args.include?(arg)
+              remove_next = true
+              false
+            else
+              true
+            end
+          end
+        end
+
         private
 
         # fill gaps with unknown-runtime if given, average otherwise
@@ -251,6 +281,14 @@ module ParallelTests
 
         def report_process_command?(options)
           options[:verbose] || options[:verbose_process_command]
+        end
+
+        def command_string(command)
+          if command.is_a?(String)
+            command
+          else
+            Shellwords.shelljoin(command)
+          end
         end
       end
     end

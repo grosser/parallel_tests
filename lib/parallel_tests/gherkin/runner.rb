@@ -1,6 +1,5 @@
 # frozen_string_literal: true
 require "parallel_tests/test/runner"
-require 'shellwords'
 
 module ParallelTests
   module Gherkin
@@ -16,17 +15,13 @@ module ParallelTests
             end
           end
 
-          sanitized_test_files = combined_scenarios.map { |val| WINDOWS ? "\"#{val}\"" : Shellwords.escape(val) }
-
           options[:env] ||= {}
           options[:env] = options[:env].merge({ 'AUTOTEST' => '1' }) if $stdout.tty?
 
-          cmd = [
-            executable,
-            (runtime_logging if File.directory?(File.dirname(runtime_log))),
-            *sanitized_test_files,
-            cucumber_opts(options[:test_options])
-          ].compact.reject(&:empty?).join(' ')
+          cmd = executable
+          cmd += runtime_logging if File.directory?(File.dirname(runtime_log))
+          cmd += combined_scenarios
+          cmd += cucumber_opts(options[:test_options])
           execute_command(cmd, process_number, num_processes, options)
         end
 
@@ -67,17 +62,17 @@ module ParallelTests
         end
 
         def cucumber_opts(given)
-          if given =~ (/--profile/) || given =~ (/(^|\s)-p /)
+          if given&.include?('--profile') || given&.include?('-p')
             given
           else
-            [given, profile_from_config].compact.join(" ")
+            [*given, *profile_from_config]
           end
         end
 
         def profile_from_config
           # copied from https://github.com/cucumber/cucumber/blob/master/lib/cucumber/cli/profile_loader.rb#L85
           config = Dir.glob("{,.config/,config/}#{name}{.yml,.yaml}").first
-          "--profile parallel" if config && File.read(config) =~ /^parallel:/
+          ['--profile', 'parallel'] if config && File.read(config) =~ /^parallel:/
         end
 
         def tests_in_groups(tests, num_groups, options = {})
@@ -91,7 +86,7 @@ module ParallelTests
         end
 
         def runtime_logging
-          "--format ParallelTests::Gherkin::RuntimeLogger --out #{runtime_log}"
+          ['--format', 'ParallelTests::Gherkin::RuntimeLogger', '--out', runtime_log]
         end
 
         def runtime_log
@@ -102,11 +97,11 @@ module ParallelTests
           if File.exist?("bin/#{name}")
             ParallelTests.with_ruby_binary("bin/#{name}")
           elsif ParallelTests.bundler_enabled?
-            "bundle exec #{name}"
+            ["bundle", "exec", name]
           elsif File.file?("script/#{name}")
             ParallelTests.with_ruby_binary("script/#{name}")
           else
-            name.to_s
+            [name.to_s]
           end
         end
       end

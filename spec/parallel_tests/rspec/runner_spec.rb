@@ -20,7 +20,7 @@ describe ParallelTests::RSpec::Runner do
     it "runs command using nice when specifed" do
       ParallelTests.with_pid_file do
         expect(ParallelTests::Test::Runner).to receive(:execute_command_and_capture_output) do |_a, b, _c|
-          expect(b).to match(/^nice rspec/)
+          expect(b.first(2)).to eq(["nice", "rspec"])
         end
 
         call('xxx', 1, 22, nice: true)
@@ -28,26 +28,26 @@ describe ParallelTests::RSpec::Runner do
     end
 
     it "runs with color when called from cmdline" do
-      should_run_with(/ --tty/)
+      should_run_with ["rspec"], "--tty"
       expect($stdout).to receive(:tty?).and_return true
       call('xxx', 1, 22, {})
     end
 
     it "runs without color when not called from cmdline" do
-      should_not_run_with(/ --tty/)
+      should_not_run_with('--tty')
       expect($stdout).to receive(:tty?).and_return false
       call('xxx', 1, 22, {})
     end
 
     it "uses bin/rspec when present" do
       allow(File).to receive(:exist?).with('bin/rspec').and_return true
-      should_run_with %r{bin/rspec}
+      should_run_with ParallelTests.with_ruby_binary("bin/rspec")
       call('xxx', 1, 22, {})
     end
 
     it "uses no -O when no opts where found" do
       allow(File).to receive(:file?).with('spec/spec.opts').and_return false
-      should_not_run_with %r{spec/spec.opts}
+      should_not_run_with 'spec/spec.opts'
       call('xxx', 1, 22, {})
     end
 
@@ -56,15 +56,14 @@ describe ParallelTests::RSpec::Runner do
       expect(File).to receive(:file?).with('spec/parallel_spec.opts').and_return true
 
       allow(ParallelTests).to receive(:bundler_enabled?).and_return true
-      allow(ParallelTests::RSpec::Runner).to receive(:run).with("bundle info rspec-core").and_return "/foo/bar/rspec-core-2.4.2"
 
-      should_run_with %r{rspec\s+(--color --tty )?-O spec/parallel_spec.opts}
+      should_run_with ["bundle", "exec", "rspec"], "-O", "spec/parallel_spec.opts", "xxx"
       call('xxx', 1, 22, {})
     end
 
     it "uses options passed in" do
-      should_run_with /rspec -f n/
-      call('xxx', 1, 22, test_options: '-f n')
+      should_run_with ["rspec"], "-f", "n"
+      call('xxx', 1, 22, test_options: ['-f', 'n'])
     end
 
     it "returns the output" do
@@ -178,42 +177,42 @@ describe ParallelTests::RSpec::Runner do
   end
 
   describe ".command_with_seed" do
-    def call(args)
-      base = "ruby -Ilib:test test/minitest/test_minitest_unit.rb"
-      result = ParallelTests::RSpec::Runner.command_with_seed("#{base}#{args}", 555)
-      result.sub(base, '')
+    def call(*args)
+      base = ["ruby", "-Ilib:test", "test/minitest/test_minitest_unit.rb"]
+      result = ParallelTests::RSpec::Runner.command_with_seed([*base, *args], "555")
+      result[base.length..-1]
     end
 
     it "adds the randomized seed" do
-      expect(call("")).to eq(" --seed 555")
+      expect(call).to eq(["--seed", "555"])
     end
 
     it "does not duplicate seed" do
-      expect(call(" --seed 123")).to eq(" --seed 555")
+      expect(call("--seed", "123")).to eq(["--seed", "555"])
     end
 
-    it "does not match strange seeds stuff" do
-      expect(call(" --seed 123asdasd")).to eq(" --seed 123asdasd --seed 555")
+    it "does not duplicate strange seeds" do
+      expect(call("--seed", "123asdasd")).to eq(["--seed", "555"])
     end
 
     it "does not match non seeds" do
-      expect(call(" --seedling 123")).to eq(" --seedling 123 --seed 555")
+      expect(call("--seedling", "123")).to eq(["--seedling", "123", "--seed", "555"])
     end
 
     it "does not duplicate random" do
-      expect(call(" --order random")).to eq(" --seed 555")
+      expect(call("--order", "random")).to eq(["--seed", "555"])
     end
 
     it "does not duplicate rand" do
-      expect(call(" --order rand")).to eq(" --seed 555")
+      expect(call("--order", "rand")).to eq(["--seed", "555"])
     end
 
     it "does not duplicate rand with seed" do
-      expect(call(" --order rand:123")).to eq(" --seed 555")
+      expect(call("--order", "rand:123")).to eq(["--seed", "555"])
     end
 
     it "does not duplicate random with seed" do
-      expect(call(" --order random:123")).to eq(" --seed 555")
+      expect(call("--order", "random:123")).to eq(["--seed", "555"])
     end
   end
 end

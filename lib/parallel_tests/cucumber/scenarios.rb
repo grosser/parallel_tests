@@ -4,7 +4,6 @@ require 'cucumber/runtime'
 require 'cucumber'
 require 'parallel_tests/cucumber/scenario_line_logger'
 require 'parallel_tests/gherkin/listener'
-require 'shellwords'
 
 begin
   gem "cuke_modeler", "~> 3.0"
@@ -20,7 +19,7 @@ module ParallelTests
         def all(files, options = {})
           # Parse tag expression from given test options and ignore tag pattern. Refer here to understand how new tag expression syntax works - https://github.com/cucumber/cucumber/tree/master/tag-expressions
           tags = []
-          words = options[:test_options].to_s.shellsplit
+          words = options[:test_options] || []
           words.each_with_index { |w, i| tags << words[i + 1] if ["-t", "--tags"].include?(w) }
           if ignore = options[:ignore_tag_pattern]
             tags << "not (#{ignore})"

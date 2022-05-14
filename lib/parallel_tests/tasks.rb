@@ -30,12 +30,15 @@ module ParallelTests
 
       def run_in_parallel(cmd, options = {})
         load_lib
-        count = " -n #{options[:count]}" unless options[:count].to_s.empty?
+
         # Using the relative path to find the binary allow to run a specific version of it
         executable = File.expand_path('../../bin/parallel_test', __dir__)
-        non_parallel = (options[:non_parallel] ? ' --non-parallel' : '')
-        command = "#{ParallelTests.with_ruby_binary(Shellwords.escape(executable))} --exec '#{cmd}'#{count}#{non_parallel}"
-        abort unless system(command)
+        command = ParallelTests.with_ruby_binary(executable)
+        command += ['--exec', cmd]
+        command += ['-n', options[:count]] unless options[:count].to_s.empty?
+        command << '--non-parallel' if options[:non_parallel]
+
+        abort unless system(*command)
       end
 
       # this is a crazy-complex solution for a very simple problem:
@@ -89,7 +92,7 @@ module ParallelTests
         options = args.shift
         pass_through = args.shift
 
-        [num_processes, pattern.to_s, options.to_s, pass_through.to_s]
+        [num_processes, pattern, options, pass_through]
       end
 
       def schema_format_based_on_rails_version
@@ -233,14 +236,13 @@ namespace :parallel do
       # Using the relative path to find the binary allow to run a specific version of it
       executable = File.join(File.dirname(__FILE__), '..', '..', 'bin', 'parallel_test')
 
-      command =
-        "#{ParallelTests.with_ruby_binary(Shellwords.escape(executable))} #{type} " \
-        "--type #{test_framework} "        \
-        "-n #{count} "                     \
-        "--pattern '#{pattern}' "          \
-        "--test-options '#{options}' "     \
-        "#{pass_through}"
-      abort unless system(command) # allow to chain tasks e.g. rake parallel:spec parallel:features
+      command = [*ParallelTests.with_ruby_binary(executable), type, '--type', test_framework]
+      command += ['-n', count] if count
+      command += ['--pattern', pattern] if pattern
+      command += ['--test-options', options] if options
+      command << pass_through if pass_through
+
+      abort unless system(*command) # allow to chain tasks e.g. rake parallel:spec parallel:features
     end
   end
 end
