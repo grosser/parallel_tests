@@ -16,7 +16,7 @@ describe 'CLI' do
 
   def write(file, content)
     path = "#{folder}/#{file}"
-    ensure_folder File.dirname(path)
+    FileUtils.mkpath File.dirname(path)
     File.write(path, content)
     path
   end
@@ -33,12 +33,8 @@ describe 'CLI' do
     "ruby #{bin_folder}/parallel_#{options[:type] || 'test'}"
   end
 
-  def ensure_folder(folder)
-    FileUtils.mkpath(folder) unless File.exist?(folder)
-  end
-
   def run_tests(test_folder, options = {})
-    ensure_folder folder
+    FileUtils.mkpath folder
     processes = "-n #{options[:processes] || 2}" unless options[:processes] == false
     command = "#{executable(options)} #{test_folder} #{processes} #{options[:add]}"
     result = ''
@@ -57,7 +53,7 @@ describe 'CLI' do
   def self.it_runs_the_default_folder_if_it_exists(type, test_folder)
     it "runs the default folder if it exists" do
       full_path_to_test_folder = File.join(folder, test_folder)
-      ensure_folder full_path_to_test_folder
+      FileUtils.mkpath full_path_to_test_folder
       results = run_tests("", fail: false, type: type)
       expect(results).to_not include("Pass files or folders to run")
 
