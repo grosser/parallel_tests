@@ -264,7 +264,7 @@ describe ParallelTests::Test::Runner do
 
     it "finds test files nested in symlinked folders" do
       with_files(['a/a_test.rb', 'b/b_test.rb']) do |root|
-        `ln -s #{root}/a #{root}/b/link`
+        File.symlink("#{root}/a", "#{root}/b/link")
         expect(call(["#{root}/b"]).sort).to eq(
           [
             "#{root}/b/b_test.rb",
@@ -277,7 +277,7 @@ describe ParallelTests::Test::Runner do
     it "finds test files but ignores those in symlinked folders" do
       skip if RUBY_PLATFORM == "java" || Gem.win_platform?
       with_files(['a/a_test.rb', 'b/b_test.rb']) do |root|
-        `ln -s #{root}/a #{root}/b/link`
+        File.symlink("#{root}/a", "#{root}/b/link")
         expect(call(["#{root}/b"], symlinks: false).sort).to eq(["#{root}/b/b_test.rb"])
       end
     end

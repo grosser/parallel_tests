@@ -55,9 +55,8 @@ module ParallelTests
         remove_ignored_lines = %{(grep -v "#{ignore_regex}" || test 1)}
 
         if File.executable?('/bin/bash') && system('/bin/bash', '-c', "#{activate_pipefail} 2>/dev/null && test 1")
-          # We need to shell escape single quotes (' becomes '"'"') because
-          # run_in_parallel wraps command in single quotes
-          %{/bin/bash -c '"'"'#{activate_pipefail} && (#{command}) | #{remove_ignored_lines}'"'"'}
+          shell_command = "#{activate_pipefail} && (#{command}) | #{remove_ignored_lines}"
+          %(/bin/bash -c #{Shellwords.escape(shell_command)})
         else
           command
         end
