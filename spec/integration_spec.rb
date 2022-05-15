@@ -26,7 +26,7 @@ describe 'CLI' do
   end
 
   def bin_folder
-    "#{__dir__}/../bin"
+    File.expand_path('../bin', __dir__)
   end
 
   def executable(options = {})

@@ -18,7 +18,7 @@ module ParallelTests
       end
 
       def load_lib
-        $LOAD_PATH << File.expand_path(File.join(File.dirname(__FILE__), '..'))
+        $LOAD_PATH << File.expand_path('..', __dir__)
         require "parallel_tests"
       end
 
@@ -231,7 +231,7 @@ namespace :parallel do
 
       type = 'features' if test_framework == 'spinach'
       # Using the relative path to find the binary allow to run a specific version of it
-      executable = File.join(File.dirname(__FILE__), '..', '..', 'bin', 'parallel_test')
+      executable = File.expand_path('../../bin/parallel_test', __dir__)
 
       command =
         "#{ParallelTests.with_ruby_binary(Shellwords.escape(executable))} #{type} " \
