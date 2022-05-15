@@ -147,7 +147,7 @@ describe ParallelTests::CLI do
         expect(call(['--', 'test', '--foo', 'test2'])).to eq(files: ['test', '--foo', 'test2'])
       end
 
-      it "corectly handles arguments with spaces" do
+      it "correctly handles arguments with spaces" do
         expect(call(['--', 'file name with space'])).to eq(files: ['file name with space'])
       end
 
@@ -168,7 +168,7 @@ describe ParallelTests::CLI do
           it "appends the new options" do
             expect(call(['-o', "'-f'", '--', '-r', 'foo.rb', '--', 'test'])).to eq(files: ['test'], test_options: "'-f' -r foo.rb")
           end
-          it "corectly handles argument values with spaces" do
+          it "correctly handles argument values with spaces" do
             argv = ["-o 'path with spaces1'", '--', '--out', 'path with spaces2', '--', 'foo']
             expected_test_options = "'path with spaces1' --out path\\ with\\ spaces2"
             expect(call(argv)).to eq(files: ['foo'], test_options: expected_test_options)
