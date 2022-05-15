@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+require 'fileutils'
 require 'spec_helper'
 
 describe 'rails' do
@@ -29,7 +30,7 @@ describe 'rails' do
 
           sh "bundle config --local path vendor/bundle"
           sh "bundle install"
-          sh "rm -rf db/*.sqlite3"
+          FileUtils.rm_f(Dir['db/*.sqlite3'])
           sh "bundle exec rake db:setup parallel:create --trace 2>&1"
           # Also test the case where the DBs need to be dropped
           sh "bundle exec rake parallel:drop parallel:create"
