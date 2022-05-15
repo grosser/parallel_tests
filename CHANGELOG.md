@@ -4,7 +4,7 @@
 
 ### Breaking Changes
 
-- None
+- Changed subprocesses to execute without a shell.
 
 ### Added
 

@@ -385,7 +385,7 @@ describe 'CLI' do
     write "test/xxx_test.rb", 'puts "Test output: YES"'
     result = run_tests(["test"], processes: 2, type: 'test', add: ['--verbose'])
     expect(result).to include "Test output: YES"
-    expect(result).to include "[test/xxx_test.rb]"
+    expect(result).to include "\\[test/xxx_test.rb\\]"
     expect(result).not_to include Dir.pwd
   end
 
@@ -487,7 +487,7 @@ describe 'CLI' do
       write 'spec/xxx2_spec.rb', 'describe("it"){it("should"){1.should == 2}}'
       result = run_tests ["spec", "--verbose"], add: ["--test-options", "--seed 1234"], fail: true, type: 'rspec'
       expect(result).to include("Randomized with seed 1234")
-      expect(result).to include("bundle exec rspec spec/xxx2_spec.rb --seed 1234")
+      expect(result).to include("bundle exec rspec --seed 1234 spec/xxx2_spec.rb")
     end
   end
 

@@ -16,7 +16,7 @@ shared_examples_for 'gherkin runners' do
 
     it "allows to override runner executable via PARALLEL_TESTS_EXECUTABLE" do
       ENV['PARALLEL_TESTS_EXECUTABLE'] = 'script/custom_rspec'
-      should_run_with(%r{script/custom_rspec})
+      should_run_with ["script/custom_rspec"]
       call(['xxx'], 1, 22, {})
     end
 
@@ -29,39 +29,34 @@ shared_examples_for 'gherkin runners' do
 
     it "runs bundle exec {runner_name} when on bundler 0.9" do
       allow(ParallelTests).to receive(:bundler_enabled?).and_return true
-      should_run_with /bundle exec #{runner_name}/
+      should_run_with ["bundle", "exec", runner_name]
       call(['xxx'], 1, 22, {})
     end
 
     it "runs script/{runner_name} when script/{runner_name} is found" do
-      should_run_with %r{script/#{runner_name}}
+      should_run_with ParallelTests.with_ruby_binary("script/#{runner_name}")
       call(['xxx'], 1, 22, {})
     end
 
     it "runs {runner_name} by default" do
       allow(File).to receive(:file?).with("script/#{runner_name}").and_return false
-      should_run_with /^#{runner_name}/
+      should_run_with [runner_name]
       call(['xxx'], 1, 22, {})
     end
 
     it "uses bin/{runner_name} when present" do
       allow(File).to receive(:exist?).with("bin/#{runner_name}").and_return true
-      should_run_with %r{bin/#{runner_name}}
+      should_run_with ParallelTests.with_ruby_binary("bin/#{runner_name}")
       call(['xxx'], 1, 22, {})
     end
 
     it "uses options passed in" do
-      should_run_with %r{script/#{runner_name} .*-p default}
-      call(['xxx'], 1, 22, test_options: '-p default')
+      should_run_with ParallelTests.with_ruby_binary("script/#{runner_name}"), "-p", "default"
+      call(['xxx'], 1, 22, test_options: ['-p', 'default'])
     end
 
     it "sanitizes dangerous file runner_names" do
-      if ParallelTests::WINDOWS
-        should_run_with /"xx x"/
-      else
-        should_run_with /xx\\ x/
-      end
-
+      should_run_with ParallelTests.with_ruby_binary("script/#{runner_name}"), "xx x"
       call(['xx x'], 1, 22, {})
     end
 
@@ -73,46 +68,31 @@ shared_examples_for 'gherkin runners' do
       end
 
       it "uses parallel profile" do
-        if ParallelTests::WINDOWS
-          should_run_with %r{script/#{runner_name} "xxx" .*foo bar --profile parallel}
-        else
-          should_run_with %r{script/#{runner_name} xxx .*foo bar --profile parallel}
-        end
-
-        call(['xxx'], 1, 22, test_options: 'foo bar')
+        should_run_with ParallelTests.with_ruby_binary("script/#{runner_name}"), "xxx", "foo", "bar", "--profile", "parallel"
+        call(['xxx'], 1, 22, test_options: ['foo', 'bar'])
       end
 
       it "uses given profile via --profile" do
-        if ParallelTests::WINDOWS
-          should_run_with %r{script/#{runner_name} "xxx" .*--profile foo$}
-        else
-          should_run_with %r{script/#{runner_name} xxx .*--profile foo$}
-        end
-
-        call(['xxx'], 1, 22, test_options: '--profile foo')
+        should_run_with ParallelTests.with_ruby_binary("script/#{runner_name}"), "--profile", "foo"
+        call(['xxx'], 1, 22, test_options: ['--profile', 'foo'])
       end
 
       it "uses given profile via -p" do
-        if ParallelTests::WINDOWS
-          should_run_with %r{script/#{runner_name} "xxx" .*-p foo$}
-        else
-          should_run_with %r{script/#{runner_name} xxx .*-p foo$}
-        end
-
-        call(['xxx'], 1, 22, test_options: '-p foo')
+        should_run_with ParallelTests.with_ruby_binary("script/#{runner_name}"), "-p", "foo"
+        call(['xxx'], 1, 22, test_options: ['-p', 'foo'])
       end
     end
 
     it "does not use parallel profile if config/{runner_name}.yml does not contain it" do
       file_contents = 'blob: -f progress'
-      should_run_with %r{script/#{runner_name} .*foo bar}
+      should_run_with ParallelTests.with_ruby_binary("script/#{runner_name}"), "foo", "bar"
       expect(Dir).to receive(:glob).and_return ["config/#{runner_name}.yml"]
       expect(File).to receive(:read).with("config/#{runner_name}.yml").and_return file_contents
-      call(['xxx'], 1, 22, test_options: 'foo bar')
+      call(['xxx'], 1, 22, test_options: ['foo', 'bar'])
     end
 
     it "does not use the parallel profile if config/{runner_name}.yml does not exist" do
-      should_run_with %r{script/#{runner_name}} # TODO: this test looks useless...
+      should_run_with ParallelTests.with_ruby_binary("script/#{runner_name}") # TODO: this test looks useless...
       expect(Dir).to receive(:glob).and_return []
       call(['xxx'], 1, 22, {})
     end
@@ -222,13 +202,8 @@ shared_examples_for 'gherkin runners' do
       test_files = ['features/a.rb:23', 'features/a.rb:44', 'features/b.rb:12']
 
       expect(ParallelTests::Test::Runner).to receive(:execute_command) do |a, _b, _c, _d|
-        argv = a.split.last(2)
-
-        if ParallelTests::WINDOWS
-          expect(argv).to eq(['"features/a.rb:23:44"', '"features/b.rb:12"'])
-        else
-          expect(argv).to eq(["features/a.rb:23:44", "features/b.rb:12"])
-        end
+        argv = a.last(2)
+        expect(argv).to eq(["features/a.rb:23:44", "features/b.rb:12"])
       end
 
       call(test_files, 1, 2, { group_by: :scenarios })

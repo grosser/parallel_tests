@@ -35,8 +35,8 @@ module ParallelTests
         end
 
         def command_with_seed(cmd, seed)
-          clean = cmd.sub(/\s--order\s+random(:\d+)?\b/, '')
-          "#{clean} --order random:#{seed}"
+          clean = remove_command_arguments(cmd, '--order')
+          [*clean, '--order', "random:#{seed}"]
         end
       end
     end

@@ -6,27 +6,27 @@ describe ParallelTests::Tasks do
   describe ".parse_args" do
     it "should return the count" do
       args = { count: 2 }
-      expect(ParallelTests::Tasks.parse_args(args)).to eq([2, "", "", ""])
+      expect(ParallelTests::Tasks.parse_args(args)).to eq([2, nil, nil, nil])
     end
 
     it "should default to the prefix" do
       args = { count: "models" }
-      expect(ParallelTests::Tasks.parse_args(args)).to eq([nil, "models", "", ""])
+      expect(ParallelTests::Tasks.parse_args(args)).to eq([nil, "models", nil, nil])
     end
 
     it "should return the count and pattern" do
       args = { count: 2, pattern: "models" }
-      expect(ParallelTests::Tasks.parse_args(args)).to eq([2, "models", "", ""])
+      expect(ParallelTests::Tasks.parse_args(args)).to eq([2, "models", nil, nil])
     end
 
     it "should return the count, pattern, and options" do
       args = { count: 2, pattern: "plain", options: "-p default" }
-      expect(ParallelTests::Tasks.parse_args(args)).to eq([2, "plain", "-p default", ""])
+      expect(ParallelTests::Tasks.parse_args(args)).to eq([2, "plain", "-p default", nil])
     end
 
     it "should return the count, pattern, and options" do
       args = { count: 2, pattern: "plain", options: "-p default --group-by steps" }
-      expect(ParallelTests::Tasks.parse_args(args)).to eq([2, "plain", "-p default --group-by steps", ""])
+      expect(ParallelTests::Tasks.parse_args(args)).to eq([2, "plain", "-p default --group-by steps", nil])
     end
 
     it "should return the count, pattern, test options, and pass-through options" do
@@ -61,22 +61,30 @@ describe ParallelTests::Tasks do
     end
 
     it "runs command in parallel" do
-      expect(ParallelTests::Tasks).to receive(:system).with(/#{full_path} --exec 'echo'$/).and_return true
+      expect(ParallelTests::Tasks).to receive(:system)
+        .with(*ParallelTests.with_ruby_binary(full_path), '--exec', 'echo')
+        .and_return true
       ParallelTests::Tasks.run_in_parallel("echo")
     end
 
     it "runs command with :count option" do
-      expect(ParallelTests::Tasks).to receive(:system).with(/#{full_path} --exec 'echo' -n 123$/).and_return true
+      expect(ParallelTests::Tasks).to receive(:system)
+        .with(*ParallelTests.with_ruby_binary(full_path), '--exec', 'echo', '-n', 123)
+        .and_return true
       ParallelTests::Tasks.run_in_parallel("echo", count: 123)
     end
 
     it "runs without -n with blank :count option" do
-      expect(ParallelTests::Tasks).to receive(:system).with(/#{full_path} --exec 'echo'$/).and_return true
+      expect(ParallelTests::Tasks).to receive(:system)
+        .with(*ParallelTests.with_ruby_binary(full_path), '--exec', 'echo')
+        .and_return true
       ParallelTests::Tasks.run_in_parallel("echo", count: "")
     end
 
     it "runs command with :non_parallel option" do
-      expect(ParallelTests::Tasks).to receive(:system).with(/#{full_path} --exec 'echo' --non-parallel$/).and_return true
+      expect(ParallelTests::Tasks).to receive(:system)
+        .with(*ParallelTests.with_ruby_binary(full_path), '--exec', 'echo', '--non-parallel')
+        .and_return true
       ParallelTests::Tasks.run_in_parallel("echo", non_parallel: true)
     end
 

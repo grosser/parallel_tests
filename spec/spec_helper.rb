@@ -51,15 +51,18 @@ module SpecHelper
     end
   end
 
-  def should_run_with(regex)
+  def should_run_with(command, *args)
     expect(ParallelTests::Test::Runner).to receive(:execute_command) do |a, _b, _c, _d|
-      expect(a).to match(regex)
+      expect(a.first(command.length)).to eq(command)
+      args.each do |arg|
+        expect(a).to include(arg)
+      end
     end
   end
 
-  def should_not_run_with(regex)
+  def should_not_run_with(arg)
     expect(ParallelTests::Test::Runner).to receive(:execute_command) do |a, _b, _c, _d|
-      expect(a).to_not match(regex)
+      expect(a).to_not include(arg)
     end
   end
 end
