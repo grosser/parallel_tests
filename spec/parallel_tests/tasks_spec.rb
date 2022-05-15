@@ -92,7 +92,7 @@ describe ParallelTests::Tasks do
       # Explictly run as a parameter to /bin/sh to simulate how
       # the command will be run by parallel_test --exec
       # This also tests shell escaping of single quotes
-      result = `/bin/sh -c '#{ParallelTests::Tasks.suppress_output(command, grep)}'`
+      result = IO.popen(['/bin/sh', '-c', ParallelTests::Tasks.suppress_output(command, grep)], &:read)
       [result, $?.success?]
     end
 
