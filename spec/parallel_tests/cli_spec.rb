@@ -23,7 +23,7 @@ describe ParallelTests::CLI do
     end
 
     it "parses execute" do
-      expect(call(["--exec", "echo"])).to eq(execute: "echo")
+      expect(call(["--exec", "echo"])).to eq(execute: ["echo"])
     end
 
     it "parses excludes pattern" do

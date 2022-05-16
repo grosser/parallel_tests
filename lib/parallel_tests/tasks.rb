@@ -34,9 +34,9 @@ module ParallelTests
         # Using the relative path to find the binary allow to run a specific version of it
         executable = File.expand_path('../../bin/parallel_test', __dir__)
         command = ParallelTests.with_ruby_binary(executable)
-        command += ['--exec', cmd]
         command += ['-n', options[:count]] unless options[:count].to_s.empty?
         command << '--non-parallel' if options[:non_parallel]
+        command += ['--exec', *cmd]
 
         abort unless system(*command)
       end
@@ -51,15 +51,14 @@ module ParallelTests
       # - pipefail makes pipe fail with exitstatus of first failed command
       # - pipefail is not supported in (zsh)
       # - defining a new rake task like silence_schema would force users to load parallel_tests in test env
-      # - do not use ' since run_in_parallel uses them to quote stuff
       # - simple system "set -o pipefail" returns nil even though set -o pipefail exists with 0
       def suppress_output(command, ignore_regex)
         activate_pipefail = "set -o pipefail"
-        remove_ignored_lines = %{(grep -v "#{ignore_regex}" || true)}
+        remove_ignored_lines = %{(grep -v #{Shellwords.escape(ignore_regex)} || true)}
 
         if File.executable?('/bin/bash') && system('/bin/bash', '-c', "#{activate_pipefail} 2>/dev/null")
-          shell_command = "#{activate_pipefail} && (#{command}) | #{remove_ignored_lines}"
-          %(/bin/bash -c #{Shellwords.escape(shell_command)})
+          shell_command = "#{activate_pipefail} && (#{Shellwords.shelljoin(command)}) | #{remove_ignored_lines}"
+          ['/bin/bash', '-c', shell_command]
         else
           command
         end
@@ -134,15 +133,21 @@ namespace :parallel do
   desc "Create test databases via db:create --> parallel:create[num_cpus]"
   task :create, :count do |_, args|
     ParallelTests::Tasks.run_in_parallel(
-      "#{ParallelTests::Tasks.rake_bin} db:create RAILS_ENV=#{ParallelTests::Tasks.rails_env}", args
+      [ParallelTests::Tasks.rake_bin, "db:create", "RAILS_ENV=#{ParallelTests::Tasks.rails_env}"],
+      args
     )
   end
 
   desc "Drop test databases via db:drop --> parallel:drop[num_cpus]"
   task :drop, :count do |_, args|
     ParallelTests::Tasks.run_in_parallel(
-      "#{ParallelTests::Tasks.rake_bin} db:drop RAILS_ENV=#{ParallelTests::Tasks.rails_env} " \
-      "DISABLE_DATABASE_ENVIRONMENT_CHECK=1", args
+      [
+        ParallelTests::Tasks.rake_bin,
+        "db:drop",
+        "RAILS_ENV=#{ParallelTests::Tasks.rails_env}",
+        "DISABLE_DATABASE_ENVIRONMENT_CHECK=1"
+      ],
+      args
     )
   end
 
@@ -164,7 +169,7 @@ namespace :parallel do
       # slow: dump and load in in serial
       args = args.to_hash.merge(non_parallel: true) # normal merge returns nil
       task_name = Rake::Task.task_defined?('db:test:prepare') ? 'db:test:prepare' : 'app:db:test:prepare'
-      ParallelTests::Tasks.run_in_parallel("#{ParallelTests::Tasks.rake_bin} #{task_name}", args)
+      ParallelTests::Tasks.run_in_parallel([ParallelTests::Tasks.rake_bin, task_name], args)
       next
     end
   end
@@ -173,23 +178,29 @@ namespace :parallel do
   desc "Update test databases via db:migrate --> parallel:migrate[num_cpus]"
   task :migrate, :count do |_, args|
     ParallelTests::Tasks.run_in_parallel(
-      "#{ParallelTests::Tasks.rake_bin} db:migrate RAILS_ENV=#{ParallelTests::Tasks.rails_env}", args
+      [ParallelTests::Tasks.rake_bin, "db:migrate", "RAILS_ENV=#{ParallelTests::Tasks.rails_env}"],
+      args
     )
   end
 
   desc "Rollback test databases via db:rollback --> parallel:rollback[num_cpus]"
   task :rollback, :count do |_, args|
     ParallelTests::Tasks.run_in_parallel(
-      "#{ParallelTests::Tasks.rake_bin} db:rollback RAILS_ENV=#{ParallelTests::Tasks.rails_env}", args
+      [ParallelTests::Tasks.rake_bin, "db:rollback", "RAILS_ENV=#{ParallelTests::Tasks.rails_env}"],
+      args
     )
   end
 
   # just load the schema (good for integration server <-> no development db)
   desc "Load dumped schema for test databases via db:schema:load --> parallel:load_schema[num_cpus]"
   task :load_schema, :count do |_, args|
-    command =
-      "#{ParallelTests::Tasks.rake_bin} #{ParallelTests::Tasks.purge_before_load} " \
-      "db:schema:load RAILS_ENV=#{ParallelTests::Tasks.rails_env} DISABLE_DATABASE_ENVIRONMENT_CHECK=1"
+    command = [
+      ParallelTests::Tasks.rake_bin,
+      ParallelTests::Tasks.purge_before_load,
+      "db:schema:load",
+      "RAILS_ENV=#{ParallelTests::Tasks.rails_env}",
+      "DISABLE_DATABASE_ENVIRONMENT_CHECK=1"
+    ]
     ParallelTests::Tasks.run_in_parallel(ParallelTests::Tasks.suppress_schema_load_output(command), args)
   end
 
@@ -198,23 +209,34 @@ namespace :parallel do
   desc "Load structure for test databases via db:schema:load --> parallel:load_structure[num_cpus]"
   task :load_structure, :count do |_, args|
     ParallelTests::Tasks.run_in_parallel(
-      "#{ParallelTests::Tasks.rake_bin} #{ParallelTests::Tasks.purge_before_load} " \
-      "db:structure:load RAILS_ENV=#{ParallelTests::Tasks.rails_env} DISABLE_DATABASE_ENVIRONMENT_CHECK=1", args
+      [
+        ParallelTests::Tasks.rake_bin,
+        ParallelTests::Tasks.purge_before_load,
+        "db:structure:load",
+        "RAILS_ENV=#{ParallelTests::Tasks.rails_env}",
+        "DISABLE_DATABASE_ENVIRONMENT_CHECK=1"
+      ],
+      args
     )
   end
 
   desc "Load the seed data from db/seeds.rb via db:seed --> parallel:seed[num_cpus]"
   task :seed, :count do |_, args|
     ParallelTests::Tasks.run_in_parallel(
-      "#{ParallelTests::Tasks.rake_bin} db:seed RAILS_ENV=#{ParallelTests::Tasks.rails_env}", args
+      [
+        ParallelTests::Tasks.rake_bin,
+        "db:seed",
+        "RAILS_ENV=#{ParallelTests::Tasks.rails_env}"
+      ],
+      args
     )
   end
 
   desc "Launch given rake command in parallel"
   task :rake, :command, :count do |_, args|
     ParallelTests::Tasks.run_in_parallel(
-      "RAILS_ENV=#{ParallelTests::Tasks.rails_env} #{ParallelTests::Tasks.rake_bin} " \
-      "#{args.command}", args
+      [ParallelTests::Tasks.rake_bin, args.command, "RAILS_ENV=#{ParallelTests::Tasks.rails_env}"],
+      args
     )
   end
 
