@@ -106,7 +106,7 @@ describe ParallelTests::Tasks do
 
     context "with pipefail supported" do
       before :all do
-        unless system("/bin/bash", "-c", "set -o pipefail 2>/dev/null && test 1")
+        unless system("/bin/bash", "-c", "set -o pipefail 2>/dev/null")
           skip "pipefail is not supported on your system"
         end
       end
@@ -120,11 +120,11 @@ describe ParallelTests::Tasks do
       end
 
       it "should fail if command fails and the pattern matches" do
-        expect(call("echo 123 && test", "123")).to eq(["", false])
+        expect(call("echo 123 && false", "123")).to eq(["", false])
       end
 
       it "should fail if command fails and the pattern fails" do
-        expect(call("echo 124 && test", "123")).to eq(["124\n", false])
+        expect(call("echo 124 && false", "123")).to eq(["124\n", false])
       end
     end
 
@@ -132,7 +132,7 @@ describe ParallelTests::Tasks do
       before do
         expect(ParallelTests::Tasks).to receive(:system).with(
           '/bin/bash', '-c',
-          'set -o pipefail 2>/dev/null && test 1'
+          'set -o pipefail 2>/dev/null'
         ).and_return false
       end
 
@@ -141,7 +141,7 @@ describe ParallelTests::Tasks do
       end
 
       it "should not filter and fail" do
-        expect(call("echo 123 && test", "123")).to eq(["123\n", false])
+        expect(call("echo 123 && false", "123")).to eq(["123\n", false])
       end
     end
   end

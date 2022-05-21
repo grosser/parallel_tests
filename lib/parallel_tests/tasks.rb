@@ -55,9 +55,9 @@ module ParallelTests
       # - simple system "set -o pipefail" returns nil even though set -o pipefail exists with 0
       def suppress_output(command, ignore_regex)
         activate_pipefail = "set -o pipefail"
-        remove_ignored_lines = %{(grep -v "#{ignore_regex}" || test 1)}
+        remove_ignored_lines = %{(grep -v "#{ignore_regex}" || true)}
 
-        if File.executable?('/bin/bash') && system('/bin/bash', '-c', "#{activate_pipefail} 2>/dev/null && test 1")
+        if File.executable?('/bin/bash') && system('/bin/bash', '-c', "#{activate_pipefail} 2>/dev/null")
           shell_command = "#{activate_pipefail} && (#{command}) | #{remove_ignored_lines}"
           %(/bin/bash -c #{Shellwords.escape(shell_command)})
         else
