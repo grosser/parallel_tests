@@ -20,7 +20,7 @@ module ParallelTests
       options[:first_is_1] ||= first_is_1?
 
       if options[:execute]
-        execute_shell_command_in_parallel(options[:execute], num_processes, options)
+        execute_command_in_parallel(options[:execute], num_processes, options)
       else
         run_tests_in_parallel(num_processes, options)
       end
@@ -237,7 +237,7 @@ module ParallelTests
 
         opts.on("--only-group INT[,INT]", Array) { |groups| options[:only_group] = groups.map(&:to_i) }
 
-        opts.on("-e", "--exec [COMMAND]", "execute this code parallel and with ENV['TEST_ENV_NUMBER']") { |path| options[:execute] = path }
+        opts.on("-e", "--exec [COMMAND]", "execute this code parallel and with ENV['TEST_ENV_NUMBER']") { |arg| options[:execute] = Shellwords.shellsplit(arg) }
         opts.on("-o", "--test-options '[OPTIONS]'", "execute test commands with those options") { |arg| options[:test_options] = Shellwords.shellsplit(arg) }
         opts.on("-t", "--type [TYPE]", "test(default) / rspec / cucumber / spinach") do |type|
           @runner = load_runner(type)
@@ -344,7 +344,7 @@ module ParallelTests
       klass_name.split('::').inject(Object) { |x, y| x.const_get(y) }
     end
 
-    def execute_shell_command_in_parallel(command, num_processes, options)
+    def execute_command_in_parallel(command, num_processes, options)
       runs = if options[:only_group]
         options[:only_group].map { |g| g - 1 }
       else

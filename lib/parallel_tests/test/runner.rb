@@ -91,7 +91,7 @@ module ParallelTests
           )
           cmd = ["nice", *cmd] if options[:nice]
 
-          puts command_string(cmd) if report_process_command?(options) && !options[:serialize_stdout]
+          puts Shellwords.shelljoin(cmd) if report_process_command?(options) && !options[:serialize_stdout]
 
           execute_command_and_capture_output(env, cmd, options)
         end
@@ -111,7 +111,7 @@ module ParallelTests
           exitstatus = $?.exitstatus
           seed = output[/seed (\d+)/, 1]
 
-          output = "#{command_string(cmd)}\n#{output}" if report_process_command?(options) && options[:serialize_stdout]
+          output = "#{Shellwords.shelljoin(cmd)}\n#{output}" if report_process_command?(options) && options[:serialize_stdout]
 
           { stdout: output, exit_status: exitstatus, command: cmd, seed: seed }
         end
@@ -281,14 +281,6 @@ module ParallelTests
 
         def report_process_command?(options)
           options[:verbose] || options[:verbose_process_command]
-        end
-
-        def command_string(command)
-          if command.is_a?(String)
-            command
-          else
-            Shellwords.shelljoin(command)
-          end
         end
       end
     end
