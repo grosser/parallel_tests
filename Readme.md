@@ -42,7 +42,7 @@ test:
 
 ### Setup environment from scratch (create db and loads schema, useful for CI)
     rake parallel:setup
-    
+
 ### Drop all test databases
     rake parallel:drop
 
@@ -193,15 +193,15 @@ Setup for non-rails
  - use `ENV['TEST_ENV_NUMBER']` inside your tests to select separate db/memcache/etc. (docker compose: expose it)
 
  - Only run a subset of files / folders:
- 
+
     `parallel_test test/bar test/baz/foo_text.rb`
 
  - Pass test-options and files via `--`:
- 
+
     `parallel_rspec -- -t acceptance -f progress -- spec/foo_spec.rb spec/acceptance`
-    
+
  - Pass in test options, by using the -o flag (wrap everything in quotes):
- 
+
     `parallel_cucumber -n 2 -o '-p foo_profile --tags @only_this_tag or @only_that_tag --format summary'`
 
 Options are:
