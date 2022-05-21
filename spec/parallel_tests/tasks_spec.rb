@@ -69,7 +69,7 @@ describe ParallelTests::Tasks do
 
     it "runs command with :count option" do
       expect(ParallelTests::Tasks).to receive(:system)
-        .with(*ParallelTests.with_ruby_binary(full_path), '-n', 123, '--exec', 'echo')
+        .with(*ParallelTests.with_ruby_binary(full_path), '--exec', 'echo', '-n', 123)
         .and_return true
       ParallelTests::Tasks.run_in_parallel(["echo"], count: 123)
     end
@@ -83,7 +83,7 @@ describe ParallelTests::Tasks do
 
     it "runs command with :non_parallel option" do
       expect(ParallelTests::Tasks).to receive(:system)
-        .with(*ParallelTests.with_ruby_binary(full_path), '--non-parallel', '--exec', 'echo')
+        .with(*ParallelTests.with_ruby_binary(full_path), '--exec', 'echo', '--non-parallel')
         .and_return true
       ParallelTests::Tasks.run_in_parallel(["echo"], non_parallel: true)
     end

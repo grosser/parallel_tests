@@ -34,9 +34,9 @@ module ParallelTests
         # Using the relative path to find the binary allow to run a specific version of it
         executable = File.expand_path('../../bin/parallel_test', __dir__)
         command = ParallelTests.with_ruby_binary(executable)
+        command += ['--exec', Shellwords.join(cmd)]
         command += ['-n', options[:count]] unless options[:count].to_s.empty?
         command << '--non-parallel' if options[:non_parallel]
-        command += ['--exec', *cmd]
 
         abort unless system(*command)
       end

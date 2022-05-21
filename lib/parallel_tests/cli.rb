@@ -237,10 +237,7 @@ module ParallelTests
 
         opts.on("--only-group INT[,INT]", Array) { |groups| options[:only_group] = groups.map(&:to_i) }
 
-        opts.on("-e", "--exec", "execute remaining commands in parallel and with ENV['TEST_ENV_NUMBER']") do
-          options[:execute] = true
-          opts.terminate
-        end
+        opts.on("-e", "--exec [COMMAND]", "execute this code parallel and with ENV['TEST_ENV_NUMBER']") { |arg| options[:execute] = Shellwords.shellsplit(arg) }
         opts.on("-o", "--test-options '[OPTIONS]'", "execute test commands with those options") { |arg| options[:test_options] = Shellwords.shellsplit(arg) }
         opts.on("-t", "--type [TYPE]", "test(default) / rspec / cucumber / spinach") do |type|
           @runner = load_runner(type)
@@ -289,10 +286,8 @@ module ParallelTests
         options[:non_parallel] = true
       end
 
-      if options[:execute]
-        options[:execute] = argv
-      else
-        files, remaining = extract_file_paths(argv)
+      files, remaining = extract_file_paths(argv)
+      unless options[:execute]
         if files.empty?
           default_test_folder = @runner.default_test_folder
           if File.directory?(default_test_folder)
@@ -302,9 +297,9 @@ module ParallelTests
           end
         end
         options[:files] = files.map { |file_path| Pathname.new(file_path).cleanpath.to_s }
-
-        append_test_options(options, remaining)
       end
+
+      append_test_options(options, remaining)
 
       options[:group_by] ||= :filesize if options[:only_group]
 

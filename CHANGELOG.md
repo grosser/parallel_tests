@@ -6,22 +6,6 @@
 
 - Changed subprocesses to execute without a shell.
 
-- Changed `-e` / `--exec` to consume all remaining arguments rather than a
-  single string. Each argument will be passed as a single argument to the
-  subprocess. It now must be the last argument in the command line. For example:
-
-  *Before*
-
-  ```console
-  parallel_test -e 'ruby -e "puts %[hello from process #{ENV[:TEST_ENV_NUMBER.to_s].inspect}]"' -n 5
-  ```
-
-  *After*
-
-  ```console
-  parallel_test -n 5 -e ruby -e "puts %[hello from process #{ENV[:TEST_ENV_NUMBER.to_s].inspect}]"
-  ```
-
 ### Added
 
 - Support Ruby 2.5 / 2.6

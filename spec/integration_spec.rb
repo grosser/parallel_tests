@@ -36,10 +36,9 @@ describe 'CLI' do
   def run_tests(test_folder, options = {})
     FileUtils.mkpath folder
 
-    command = executable(options)
+    command = [*executable(options), *test_folder]
     command += ["-n", (options[:processes] || 2).to_s] unless options[:processes] == false
     command += options[:add] if options[:add]
-    command += test_folder if test_folder
 
     result = ''
     Dir.chdir(folder) do
@@ -72,12 +71,12 @@ describe 'CLI' do
 
   context "running tests sequentially" do
     it "exits with 0 when each run is successful" do
-      run_tests ["spec"], type: 'rspec', fail: 0
+      run_tests "spec", type: 'rspec', fail: 0
     end
 
     it "exits with 1 when a test run fails" do
       write 'spec/xxx2_spec.rb', 'describe("it"){it("should"){ expect(true).to be false }}'
-      run_tests ["spec"], type: 'rspec', fail: 1
+      run_tests "spec", type: 'rspec', fail: 1
     end
 
     it "exits with 1 even when the test run exits with a different status" do
@@ -86,7 +85,7 @@ describe 'CLI' do
         describe("it"){it("should"){ expect(true).to be false }}
       SPEC
 
-      run_tests ["spec"], type: 'rspec', fail: 1
+      run_tests "spec", type: 'rspec', fail: 1
     end
 
     it "exits with the highest exit status" do
@@ -95,7 +94,7 @@ describe 'CLI' do
         describe("it"){it("should"){ expect(true).to be false }}
       SPEC
 
-      run_tests ["spec"], type: 'rspec', add: ["--highest-exit-status"], fail: 99
+      run_tests "spec", type: 'rspec', add: ["--highest-exit-status"], fail: 99
     end
   end
 
@@ -103,7 +102,7 @@ describe 'CLI' do
     write 'spec/xxx_spec.rb', 'describe("it"){it("should"){puts "TEST1"}}'
     write 'spec/xxx2_spec.rb', 'describe("it"){it("should"){puts "TEST2"}}'
     # set processes to false so we verify empty groups are discarded by default
-    result = run_tests ["spec"], type: 'rspec', processes: 4
+    result = run_tests "spec", type: 'rspec', processes: 4
 
     # test ran and gave their puts
     expect(result).to include('TEST1')
@@ -121,12 +120,12 @@ describe 'CLI' do
 
   context "running test in parallel" do
     it "exits with 0 when each run is successful" do
-      run_tests ["spec"], type: 'rspec', processes: 4, fail: 0
+      run_tests "spec", type: 'rspec', processes: 4, fail: 0
     end
 
     it "exits with 1 when a test run fails" do
       write 'spec/xxx2_spec.rb', 'describe("it"){it("should"){ expect(true).to be false }}'
-      run_tests ["spec"], type: 'rspec', processes: 4, fail: 1
+      run_tests "spec", type: 'rspec', processes: 4, fail: 1
     end
 
     it "exits with 1 even when the test run exits with a different status" do
@@ -135,7 +134,7 @@ describe 'CLI' do
         describe("it"){it("should"){ expect(true).to be false }}
       SPEC
 
-      run_tests ["spec"], type: 'rspec', processes: 4, fail: 1
+      run_tests "spec", type: 'rspec', processes: 4, fail: 1
     end
 
     it "exits with the highest exit status" do
@@ -144,7 +143,7 @@ describe 'CLI' do
         describe("it"){it("should"){ expect(true).to be false }}
       SPEC
 
-      run_tests ["spec"], type: 'rspec', processes: 4, add: ["--highest-exit-status"], fail: 99
+      run_tests "spec", type: 'rspec', processes: 4, add: ["--highest-exit-status"], fail: 99
     end
   end
 
@@ -155,7 +154,7 @@ describe 'CLI' do
       test_options = "--format doc --order defined"
       test_options = "#{test_options} #{test_option}" if test_option
       super(
-        ["spec"],
+        "spec",
         fail: true,
         type: 'rspec',
         processes: 2,
@@ -203,7 +202,7 @@ describe 'CLI' do
 
   it "runs tests which outputs accented characters" do
     write "spec/xxx_spec.rb", "#encoding: utf-8\ndescribe('it'){it('should'){puts 'Byłem tu'}}"
-    result = run_tests ["spec"], type: 'rspec'
+    result = run_tests "spec", type: 'rspec'
     # test ran and gave their puts
     expect(result).to include('Byłem tu')
   end
@@ -221,13 +220,13 @@ describe 'CLI' do
     # Need to tell Ruby to default to utf-8 to simulate environments where
     # this is set. (Otherwise, it defaults to nil and the undefined conversion
     # issue doesn't come up.)
-    result = run_tests(['test'], fail: true, export: { 'RUBYOPT' => 'Eutf-8:utf-8' })
+    result = run_tests('test', fail: true, export: { 'RUBYOPT' => 'Eutf-8:utf-8' })
     expect(result).to include('¯\_(ツ)_/¯')
   end
 
   it "does not run any tests if there are none" do
     write 'spec/xxx_spec.rb', '1'
-    result = run_tests ["spec"], type: 'rspec'
+    result = run_tests "spec", type: 'rspec'
     expect(result).to include('No examples found')
     expect(result).to include('Took')
   end
@@ -259,7 +258,7 @@ describe 'CLI' do
   it "fails when tests fail" do
     write 'spec/xxx_spec.rb', 'describe("it"){it("should"){puts "TEST1"}}'
     write 'spec/xxx2_spec.rb', 'describe("it"){it("should"){expect(1).to eq(2)}}'
-    result = run_tests ["spec"], fail: true, type: 'rspec'
+    result = run_tests "spec", fail: true, type: 'rspec'
 
     expect(result).to include_exactly_times('1 example, 1 failure', 1)
     expect(result).to include_exactly_times('1 example, 0 failure', 1)
@@ -269,7 +268,7 @@ describe 'CLI' do
   it "can serialize stdout" do
     write 'spec/xxx_spec.rb', '5.times{describe("it"){it("should"){sleep 0.01; puts "TEST1"}}}'
     write 'spec/xxx2_spec.rb', 'sleep 0.01; 5.times{describe("it"){it("should"){sleep 0.01; puts "TEST2"}}}'
-    result = run_tests ["spec"], type: 'rspec', add: ["--serialize-stdout"]
+    result = run_tests "spec", type: 'rspec', add: ["--serialize-stdout"]
 
     expect(result).not_to match(/TEST1.*TEST2.*TEST1/m)
     expect(result).not_to match(/TEST2.*TEST1.*TEST2/m)
@@ -278,7 +277,7 @@ describe 'CLI' do
   it "can show simulated output when serializing stdout" do
     write 'spec/xxx_spec.rb', 'describe("it"){it("should"){sleep 0.5; puts "TEST1"}}'
     write 'spec/xxx2_spec.rb', 'describe("it"){it("should"){sleep 1; puts "TEST2"}}'
-    result = run_tests ["spec"], type: 'rspec', add: ["--serialize-stdout"], export: { 'PARALLEL_TEST_HEARTBEAT_INTERVAL' => '0.01' }
+    result = run_tests "spec", type: 'rspec', add: ["--serialize-stdout"], export: { 'PARALLEL_TEST_HEARTBEAT_INTERVAL' => '0.01' }
     expect(result).to match(/\.{4}.*TEST1.*\.{4}.*TEST2/m)
   end
 
@@ -299,13 +298,13 @@ describe 'CLI' do
 
   context "with given commands" do
     it "can exec given commands with ENV['TEST_ENV_NUMBER']" do
-      result = run_tests ['-e', 'ruby', '-e', "print ENV[:TEST_ENV_NUMBER.to_s].to_i"], processes: 4
+      result = run_tests ['-e', 'ruby -e "print ENV[:TEST_ENV_NUMBER.to_s].to_i"'], processes: 4
       expect(result.gsub('"', '').chars.sort).to eq(['0', '2', '3', '4'])
     end
 
     it "can exec given command non-parallel" do
       result = run_tests(
-        ['-e', 'ruby', '-e', "sleep(rand(10)/100.0); puts ENV[:TEST_ENV_NUMBER.to_s].inspect"],
+        ['-e', 'ruby -e "sleep(rand(10)/100.0); puts ENV[:TEST_ENV_NUMBER.to_s].inspect"'],
         processes: 4,
         add: ['--non-parallel']
       )
@@ -314,7 +313,7 @@ describe 'CLI' do
 
     it "can exec given command with a restricted set of groups" do
       result = run_tests(
-        ['-e', 'ruby', '-e', "print ENV[:TEST_ENV_NUMBER.to_s].to_i"],
+        ['-e', 'ruby -e "print ENV[:TEST_ENV_NUMBER.to_s].to_i"'],
         process: 4,
         add: ['--only-group', '1,3']
       )
@@ -323,7 +322,7 @@ describe 'CLI' do
 
     it "can serialize stdout" do
       result = run_tests(
-        ['-e', 'ruby', '-e', "5.times{sleep 0.01;puts ENV[:TEST_ENV_NUMBER.to_s].to_i;STDOUT.flush}"],
+        ['-e', 'ruby -e "5.times{sleep 0.01;puts ENV[:TEST_ENV_NUMBER.to_s].to_i;STDOUT.flush}"'],
         processes: 2,
         add: ['--serialize-stdout']
       )
@@ -332,11 +331,11 @@ describe 'CLI' do
     end
 
     it "exists with success if all sub-processes returned success" do
-      expect(system(*executable, '-n', '4', '-e', 'cat', '/dev/null')).to eq(true)
+      expect(system(*executable, '-e', 'cat /dev/null', '-n', '4')).to eq(true)
     end
 
     it "exists with failure if any sub-processes returned failure" do
-      expect(system(*executable, '-n', '4', '-e', 'test', '-e', 'xxxx')).to eq(false)
+      expect(system(*executable, '-e', 'test -e xxxx', '-n', '4')).to eq(false)
     end
   end
 

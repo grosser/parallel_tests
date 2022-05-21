@@ -258,7 +258,7 @@ Options are:
 
 You can run any kind of code in parallel with -e / --exec
 
-    parallel_test -n 5 -e ruby -e "puts %[hello from process #{ENV[:TEST_ENV_NUMBER.to_s].inspect}]"
+    parallel_test -n 5 -e 'ruby -e "puts %[hello from process #{ENV[:TEST_ENV_NUMBER.to_s].inspect}]"'
     hello from process "2"
     hello from process ""
     hello from process "3"
