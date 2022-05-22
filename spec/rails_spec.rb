@@ -26,6 +26,7 @@ describe 'rails' do
           ENV.delete("RACK_ENV")
 
           run ["bundle", "config", "--local", "path", "vendor/bundle"]
+          run ["bundle", "config", "--local", "frozen", "true"]
           run ["bundle", "install"]
           FileUtils.rm_f(Dir['db/*.sqlite3'])
           run ["bundle", "exec", "rake", "db:setup", "parallel:create"]
