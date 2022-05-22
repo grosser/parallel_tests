@@ -56,7 +56,7 @@ module ParallelTests
         activate_pipefail = "set -o pipefail"
         remove_ignored_lines = %{(grep -v #{Shellwords.escape(ignore_regex)} || true)}
 
-        if File.executable?('/bin/bash') && system('/bin/bash', '-c', "#{activate_pipefail} 2>/dev/null")
+        if system('/bin/bash', '-c', "#{activate_pipefail} 2>/dev/null")
           shell_command = "#{activate_pipefail} && (#{Shellwords.shelljoin(command)}) | #{remove_ignored_lines}"
           ['/bin/bash', '-c', shell_command]
         else
