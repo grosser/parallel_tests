@@ -4,13 +4,15 @@
 
 ### Breaking Changes
 
-- Changed subprocesses to execute without a shell.
+### Added
+
+### Fixed
+
+## 3.9.0 - 2022-05-22
 
 ### Added
 
-- Support Ruby 2.5 / 2.6
-
-### Fixed
+- Subprocesses execute without a shell.
 
 ## 3.8.1 - 2022-03-28
 
