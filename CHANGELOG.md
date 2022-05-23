@@ -8,6 +8,8 @@
 
 ### Fixed
 
+- Fixed `NoMethodError` exception when running Rake task `parallel:setup`.
+
 ## 3.9.0 - 2022-05-22
 
 ### Added

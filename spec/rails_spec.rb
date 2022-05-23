@@ -31,6 +31,7 @@ describe 'rails' do
           run ["bundle", "exec", "rake", "db:setup", "parallel:create"]
           # Also test the case where the DBs need to be dropped
           run ["bundle", "exec", "rake", "parallel:drop", "parallel:create"]
+          run ["bundle", "exec", "rake", "parallel:setup"]
           run ["bundle", "exec", "rake", "parallel:prepare"]
           run ["bundle", "exec", "rails", "runner", "User.create"], environment: { 'RAILS_ENV' => 'test' } # pollute the db
           out = run ["bundle", "exec", "rake", "parallel:prepare", "parallel:test"]
