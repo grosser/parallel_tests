@@ -6,6 +6,9 @@
 
 ### Added
 
+- Changed Rake subtasks to always use the same Rake executable as the parent
+  process.
+
 ### Fixed
 
 ## 3.9.1 - 2022-05-23
