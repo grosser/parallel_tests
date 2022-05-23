@@ -3,6 +3,9 @@ require 'bundler/setup'
 require 'bump/tasks'
 require 'bundler/gem_tasks'
 
+# update all versions so bundling does not fail on CI
+Bump.replace_in_default = Dir["spec/fixtures/rails*/Gemfile.lock"]
+
 task default: [:spec, :rubocop]
 
 task :spec do
