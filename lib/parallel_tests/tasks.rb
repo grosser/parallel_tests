@@ -126,7 +126,7 @@ end
 namespace :parallel do
   desc "Setup test databases via db:setup --> parallel:setup[num_cpus]"
   task :setup, :count do |_, args|
-    command = "#{ParallelTests::Tasks.rake_bin} db:setup RAILS_ENV=#{ParallelTests::Tasks.rails_env}"
+    command = [ParallelTests::Tasks.rake_bin, "db:setup", "RAILS_ENV=#{ParallelTests::Tasks.rails_env}"]
     ParallelTests::Tasks.run_in_parallel(ParallelTests::Tasks.suppress_schema_load_output(command), args)
   end
 
