@@ -8,6 +8,12 @@
 
 ### Fixed
 
+## 3.10.1 - 2022-05-23
+
+### Fixed
+
+- Running rake tasks with number of processes or extra args
+
 ## 3.10.0 - 2022-05-23
 
 ### Added

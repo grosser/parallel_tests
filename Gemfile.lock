@@ -10,7 +10,7 @@ GIT
 PATH
   remote: .
   specs:
-    parallel_tests (3.10.0)
+    parallel_tests (3.10.1)
       parallel
 
 GEM
