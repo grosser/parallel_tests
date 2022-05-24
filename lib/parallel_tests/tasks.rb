@@ -251,7 +251,7 @@ namespace :parallel do
       executable = File.expand_path('../../bin/parallel_test', __dir__)
 
       command = [*ParallelTests.with_ruby_binary(executable), type, '--type', test_framework]
-      command += ['-n', count] if count
+      command += ['-n', count.to_s] if count
       command += ['--pattern', pattern] if pattern
       command += ['--test-options', options] if options
       command << pass_through if pass_through
