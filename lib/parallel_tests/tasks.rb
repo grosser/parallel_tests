@@ -244,7 +244,7 @@ namespace :parallel do
         'test' => 'test',
         'features' => 'cucumber',
         'features-spinach' => 'spinach'
-      }[type]
+      }.fetch(type)
 
       type = 'features' if test_framework == 'spinach'
       # Using the relative path to find the binary allow to run a specific version of it
