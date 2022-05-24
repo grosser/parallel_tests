@@ -244,17 +244,17 @@ namespace :parallel do
         'test' => 'test',
         'features' => 'cucumber',
         'features-spinach' => 'spinach'
-      }[type]
+      }.fetch(type)
 
       type = 'features' if test_framework == 'spinach'
       # Using the relative path to find the binary allow to run a specific version of it
       executable = File.expand_path('../../bin/parallel_test', __dir__)
 
       command = [*ParallelTests.with_ruby_binary(executable), type, '--type', test_framework]
-      command += ['-n', count] if count
+      command += ['-n', count.to_s] if count
       command += ['--pattern', pattern] if pattern
       command += ['--test-options', options] if options
-      command << pass_through if pass_through
+      command += Shellwords.shellsplit pass_through if pass_through
 
       abort unless system(*command) # allow to chain tasks e.g. rake parallel:spec parallel:features
     end
