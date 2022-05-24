@@ -254,7 +254,7 @@ namespace :parallel do
       command += ['-n', count.to_s] if count
       command += ['--pattern', pattern] if pattern
       command += ['--test-options', options] if options
-      command << pass_through if pass_through
+      command += Shellwords.shellsplit pass_through if pass_through
 
       abort unless system(*command) # allow to chain tasks e.g. rake parallel:spec parallel:features
     end
