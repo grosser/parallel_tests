@@ -228,7 +228,7 @@ module ParallelTests
             processes in a specific formation. Commas indicate specs in the same process,
             pipes indicate specs in a new process. Cannot use with --single, --isolate, or
             --isolate-n.  Ex.
-            $ parallel_tests -n 3 . --specify-groups '1_spec.rb,2_spec.rb|3_spec.rb'
+            $ parallel_test -n 3 . --specify-groups '1_spec.rb,2_spec.rb|3_spec.rb'
               Process 1 will contain 1_spec.rb and 2_spec.rb
               Process 2 will contain 3_spec.rb
               Process 3 will contain all other specs
