@@ -4,6 +4,9 @@
 
 ### Breaking Changes
 
+- Raise a custom `RuntimeLogTooSmallError` exception when the runtime log is too
+  small instead of a generic `RuntimeError`.
+
 ### Added
 
 ### Fixed
