@@ -4,12 +4,16 @@
 
 ### Breaking Changes
 
-- Raise a custom `RuntimeLogTooSmallError` exception when the runtime log is too
-  small instead of a generic `RuntimeError`.
-
 ### Added
 
 ### Fixed
+
+## 3.11.0 - 2022-05-27
+
+### Changed
+
+- Raise a custom `RuntimeLogTooSmallError` exception when the runtime log is too
+  small instead of a generic `RuntimeError`.
 
 ## 3.10.1 - 2022-05-23
 
