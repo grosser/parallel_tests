@@ -5,6 +5,8 @@ require 'parallel_tests'
 module ParallelTests
   module Test
     class Runner
+      RuntimeLogTooSmallError = Class.new(StandardError)
+
       class << self
         # --- usually overwritten by other runners
 
@@ -199,7 +201,7 @@ module ParallelTests
             allowed_missing -= 1 unless time = runtimes[test]
             if allowed_missing < 0
               log = options[:runtime_log] || runtime_log
-              raise "Runtime log file '#{log}' does not contain sufficient data to sort #{tests.size} test files, please update or remove it."
+              raise RuntimeLogTooSmallError, "Runtime log file '#{log}' does not contain sufficient data to sort #{tests.size} test files, please update or remove it."
             end
             [test, time]
           end

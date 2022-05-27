@@ -90,7 +90,7 @@ describe ParallelTests::Test::Runner do
 
       it "fails when there is too little log" do
         File.write("tmp/parallel_runtime_test.log", "xxx:123\nyyy:123\naaa:123")
-        expect { call(["aaa", "bbb", "ccc"], 3, group_by: :runtime) }.to raise_error(RuntimeError)
+        expect { call(["aaa", "bbb", "ccc"], 3, group_by: :runtime) }.to raise_error(ParallelTests::Test::Runner::RuntimeLogTooSmallError)
       end
 
       it "groups a lot of missing files when allow-missing is high" do
