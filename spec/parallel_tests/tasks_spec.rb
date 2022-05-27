@@ -201,7 +201,7 @@ describe ParallelTests::Tasks do
     end
   end
 
-  describe '.purge_before_load' do
+  describe ".purge_before_load" do
     context 'Rails < 4.2.0' do
       before do
         stub_const('Rails', double(version: '3.2.1'))
@@ -228,6 +228,29 @@ describe ParallelTests::Tasks do
 
         expect(ParallelTests::Tasks.purge_before_load).to eq 'app:db:purge'
       end
+    end
+  end
+
+  describe ".build_run_command" do
+    it "builds simple command" do
+      expect(ParallelTests::Tasks.build_run_command("test", {})).to eq [
+        "#{Dir.pwd}/bin/parallel_test", "test", "--type", "test"
+      ]
+    end
+
+    it "fails on unknown" do
+      expect { ParallelTests::Tasks.build_run_command("foo", {}) }.to raise_error(KeyError)
+    end
+
+    it "builds with all arguments" do
+      command = ParallelTests::Tasks.build_run_command(
+        "test",
+        count: 1, pattern: "foo", options: "bar", pass_through: "baz baz"
+      )
+      expect(command).to eq [
+        "#{Dir.pwd}/bin/parallel_test", "test", "--type", "test",
+        "-n", "1", "--pattern", "foo", "--test-options", "bar", "baz", "baz"
+      ]
     end
   end
 end

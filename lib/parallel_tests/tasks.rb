@@ -102,6 +102,29 @@ module ParallelTests
         end
       end
 
+      def build_run_command(type, args)
+        count, pattern, options, pass_through = ParallelTests::Tasks.parse_args(args)
+        test_framework = {
+          'spec' => 'rspec',
+          'test' => 'test',
+          'features' => 'cucumber',
+          'features-spinach' => 'spinach'
+        }.fetch(type)
+
+        type = 'features' if test_framework == 'spinach'
+
+        # Using the relative path to find the binary allow to run a specific version of it
+        executable = File.expand_path('../../bin/parallel_test', __dir__)
+        executable = ParallelTests.with_ruby_binary(executable)
+
+        command = [*executable, type, '--type', test_framework]
+        command += ['-n', count.to_s] if count
+        command += ['--pattern', pattern] if pattern
+        command += ['--test-options', options] if options
+        command += Shellwords.shellsplit pass_through if pass_through
+        command
+      end
+
       private
 
       def rails_7_or_greater?
@@ -237,24 +260,7 @@ namespace :parallel do
     task type, [:count, :pattern, :options, :pass_through] do |_t, args|
       ParallelTests::Tasks.check_for_pending_migrations
       ParallelTests::Tasks.load_lib
-
-      count, pattern, options, pass_through = ParallelTests::Tasks.parse_args(args)
-      test_framework = {
-        'spec' => 'rspec',
-        'test' => 'test',
-        'features' => 'cucumber',
-        'features-spinach' => 'spinach'
-      }.fetch(type)
-
-      type = 'features' if test_framework == 'spinach'
-      # Using the relative path to find the binary allow to run a specific version of it
-      executable = File.expand_path('../../bin/parallel_test', __dir__)
-
-      command = [*ParallelTests.with_ruby_binary(executable), type, '--type', test_framework]
-      command += ['-n', count.to_s] if count
-      command += ['--pattern', pattern] if pattern
-      command += ['--test-options', options] if options
-      command += Shellwords.shellsplit pass_through if pass_through
+      command = ParallelTests::Tasks.build_run_command(type, args)
 
       abort unless system(*command) # allow to chain tasks e.g. rake parallel:spec parallel:features
     end
