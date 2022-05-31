@@ -61,20 +61,15 @@ module ParallelTests
         groups = @runner.tests_in_groups(options[:files], num_processes, options)
         groups.reject!(&:empty?)
 
-        test_results = if options[:only_group]
-          groups_to_run = options[:only_group].map { |i| groups[i - 1] }.compact
-          report_number_of_tests(groups_to_run) unless options[:quiet]
-          execute_in_parallel(groups_to_run, groups_to_run.size, options) do |group|
-            run_tests(group, groups_to_run.index(group), 1, options)
-          end
-        else
-          report_number_of_tests(groups) unless options[:quiet]
-
-          execute_in_parallel(groups, groups.size, options) do |group|
-            run_tests(group, groups.index(group), num_processes, options)
-          end
+        if options[:only_group]
+          groups = options[:only_group].map { |i| groups[i - 1] }.compact
+          num_processes = 1
         end
 
+        report_number_of_tests(groups) unless options[:quiet]
+        test_results = execute_in_parallel(groups, groups.size, options) do |group|
+          run_tests(group, groups.index(group), num_processes, options)
+        end
         report_results(test_results, options) unless options[:quiet]
       end
 
