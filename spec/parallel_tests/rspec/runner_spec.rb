@@ -17,7 +17,7 @@ describe ParallelTests::RSpec::Runner do
       ParallelTests::RSpec::Runner.run_tests(*args)
     end
 
-    it "runs command using nice when specifed" do
+    it "runs command using nice when specified" do
       ParallelTests.with_pid_file do
         expect(ParallelTests::Test::Runner).to receive(:execute_command_and_capture_output) do |_a, b, _c|
           expect(b.first(2)).to eq(["nice", "rspec"])
@@ -119,7 +119,7 @@ describe ParallelTests::RSpec::Runner do
       ParallelTests::RSpec::Runner.send(:find_tests, *args)
     end
 
-    it "doesn't find bakup files with the same name as test files" do
+    it "doesn't find backup files with the same name as test files" do
       with_files(['a/x_spec.rb', 'a/x_spec.rb.bak']) do |root|
         expect(call(["#{root}/"])).to eq(["#{root}/a/x_spec.rb"])
       end

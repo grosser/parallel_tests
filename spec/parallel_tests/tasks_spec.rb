@@ -97,7 +97,7 @@ describe ParallelTests::Tasks do
 
   describe ".suppress_output", unless: Gem.win_platform? do
     def call(command, grep)
-      # Explictly run as a parameter to /bin/bash to simulate how
+      # Explicitly run as a parameter to /bin/bash to simulate how
       # the command will be run by parallel_test --exec
       # This also tests shell escaping of single quotes
       shell_command = [

@@ -70,7 +70,7 @@ describe ParallelTests::Cucumber::Scenarios do
               Examples:
                 | colour  |
                 | magenta |
-                | fuschia |
+                | fuchsia |
 
               @green
               Examples:

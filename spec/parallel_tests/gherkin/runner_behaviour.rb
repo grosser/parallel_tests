@@ -215,7 +215,7 @@ shared_examples_for 'gherkin runners' do
       ParallelTests::Gherkin::Runner.send(:find_tests, *args)
     end
 
-    it "doesn't find bakup files with the same name as test files" do
+    it "doesn't find backup files with the same name as test files" do
       with_files(['a/x.feature', 'a/x.feature.bak']) do |root|
         expect(call(["#{root}/"])).to eq(
           [

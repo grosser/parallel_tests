@@ -352,7 +352,7 @@ describe ParallelTests::Test::Runner do
       end
     end
 
-    it "doesn't find bakup files with the same name as test files" do
+    it "doesn't find backup files with the same name as test files" do
       with_files(['a/x_test.rb', 'a/x_test.rb.bak']) do |root|
         expect(call(["#{root}/"])).to eq(
           [
