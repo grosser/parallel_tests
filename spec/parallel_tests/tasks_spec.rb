@@ -233,7 +233,9 @@ describe ParallelTests::Tasks do
 
   describe ".build_run_command" do
     it "builds simple command" do
-      expect(ParallelTests::Tasks.build_run_command("test", {})).to eq [
+      command = ParallelTests::Tasks.build_run_command("test", {})
+      command.shift 2 if command.include?("--") # windows prefixes ruby executable
+      expect(command).to eq [
         "#{Dir.pwd}/bin/parallel_test", "test", "--type", "test"
       ]
     end
@@ -247,6 +249,7 @@ describe ParallelTests::Tasks do
         "test",
         count: 1, pattern: "foo", options: "bar", pass_through: "baz baz"
       )
+      command.shift 2 if command.include?("--") # windows prefixes ruby executable
       expect(command).to eq [
         "#{Dir.pwd}/bin/parallel_test", "test", "--type", "test",
         "-n", "1", "--pattern", "foo", "--test-options", "bar", "baz", "baz"
