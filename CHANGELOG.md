@@ -54,7 +54,7 @@
 
 ### Added
 
-- Tesed on ruby 3.0 and 3.1
+- Tested on ruby 3.0 and 3.1
 
 ### Fixed
 
@@ -226,7 +226,7 @@
 ## 2.29.2 - 2019-08-06
 
 ### Fixed
-- Eliminate some ruby warnings relating to ambigious arguments, unused variables, a redefined method, and uninitialized instance variables ([#712](https://github.com/grosser/parallel_tests/pull/712)).
+- Eliminate some ruby warnings relating to ambiguous arguments, unused variables, a redefined method, and uninitialized instance variables ([#712](https://github.com/grosser/parallel_tests/pull/712)).
 
 ## 2.29.1 - 2019-06-13
 

@@ -96,7 +96,7 @@ describe ParallelTests::Grouper do
       )
     end
 
-    it "specify_groups aborts when spec passed in doesnt match existing specs" do
+    it "specify_groups aborts when spec passed in doesn't match existing specs" do
       expect do
         call(3, specify_groups: '1|2|6')
       end.to raise_error(
@@ -104,7 +104,7 @@ describe ParallelTests::Grouper do
       )
     end
 
-    it "specify_groups aborts when spec passed in doesnt match existing specs again" do
+    it "specify_groups aborts when spec passed in doesn't match existing specs again" do
       expect do
         call(3, specify_groups: '1,6|2')
       end.to raise_error(
