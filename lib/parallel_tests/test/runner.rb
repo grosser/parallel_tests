@@ -86,12 +86,16 @@ module ParallelTests
         end
 
         def execute_command(cmd, process_number, num_processes, options)
+          number = test_env_number(process_number, options).to_s
           env = (options[:env] || {}).merge(
-            "TEST_ENV_NUMBER" => test_env_number(process_number, options).to_s,
+            "TEST_ENV_NUMBER" => number,
             "PARALLEL_TEST_GROUPS" => num_processes.to_s,
             "PARALLEL_PID_FILE" => ParallelTests.pid_file_path
           )
           cmd = ["nice", *cmd] if options[:nice]
+
+          # being able to run with for example `-output foo-$TEST_ENV_NUMBER` worked originally and is convenient
+          cmd.map! { |c| c.gsub("$TEST_ENV_NUMBER", number).gsub("${TEST_ENV_NUMBER}", number) }
 
           puts Shellwords.shelljoin(cmd) if report_process_command?(options) && !options[:serialize_stdout]
 
