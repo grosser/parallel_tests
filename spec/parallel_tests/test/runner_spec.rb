@@ -581,6 +581,14 @@ describe ParallelTests::Test::Runner do
       end
     end
 
+    it "allows using TEST_ENV_NUMBER in arguments" do
+      run_with_file("puts ARGV") do |path|
+        result = call(["ruby", path, "$TEST_ENV_NUMBER"], 1, 4, {})
+        expect(result[:stdout].chomp).to eq '2'
+        expect(result[:exit_status]).to eq 0
+      end
+    end
+
     describe "rspec seed" do
       it "includes seed when provided" do
         run_with_file("puts 'Run options: --seed 555'") do |path|

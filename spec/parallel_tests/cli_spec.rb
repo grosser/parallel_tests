@@ -201,7 +201,7 @@ describe ParallelTests::CLI do
     end
   end
 
-  describe ".report_failure_rerun_commmand" do
+  describe ".report_failure_rerun_command" do
     let(:single_failed_command) { [{ exit_status: 1, command: ['foo'], seed: nil, output: 'blah' }] }
 
     it "prints nothing if there are no failures" do
