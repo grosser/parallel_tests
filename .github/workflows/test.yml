@@ -12,7 +12,7 @@ jobs:
       matrix:
         ruby: ['2.5', '2.6', '2.7', '3.0', '3.1', head, jruby-head]
         os: [ubuntu-latest, windows-latest]
-        gemfile: [cucumber_3, cucumber_4, cuke_modeler_2, cuke_modeler_3]
+        gemfile: [cucumber_3, cucumber_4, cuke_modeler_3_minimum, cuke_modeler_3]
         task: [spec]
         include:
           - ruby: '2.5' # lowest supported version
@@ -20,14 +20,14 @@ jobs:
             gemfile: cuke_modeler_3 # Any one of the gemfiles should be fine
             task: rubocop
         exclude:
-          # CukeModeler 2.x does not support beyond Ruby 2
-          - gemfile: cuke_modeler_2
+          # CukeModeler 3.x does not support Ruby 3 until CM 3.6
+          - gemfile: cuke_modeler_3_minimum
             ruby: jruby-head
-          - gemfile: cuke_modeler_2
+          - gemfile: cuke_modeler_3_minimum
             ruby: head
-          - gemfile: cuke_modeler_2
+          - gemfile: cuke_modeler_3_minimum
             ruby: '3.1'
-          - gemfile: cuke_modeler_2
+          - gemfile: cuke_modeler_3_minimum
             ruby: '3.0'
     env: # $BUNDLE_GEMFILE must be set at the job level, so that it is set for all steps
       BUNDLE_GEMFILE: ci_gemfiles/${{ matrix.gemfile }}.gemfile
