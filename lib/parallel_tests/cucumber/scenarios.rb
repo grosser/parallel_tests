@@ -52,8 +52,8 @@ module ParallelTests
             feature_tags = feature.tags.map(&:name)
 
             # We loop on each children of the feature
-            # TODO: Handle versions of CukeModeler that don't have Rules
-            test_models = feature.tests + feature.rules.map(&:tests).flatten
+            test_models = feature.tests
+            test_models += feature.rules.map(&:tests).flatten if feature.respond_to?(:rules)
             test_models.each do |test|
               # It's a scenario, we add it to the scenario_line_logger
               scenario_line_logger.visit_feature_element(document.path, test, feature_tags, line_numbers: test_lines)
