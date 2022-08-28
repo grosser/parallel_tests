@@ -126,8 +126,8 @@ PLATFORMS
 
 DEPENDENCIES
   bump
-  cucumber
-  cuke_modeler
+  cucumber (~> 4.0)
+  cuke_modeler (~> 3.0)
   minitest (~> 5.5.0)
   parallel_tests!
   rake
