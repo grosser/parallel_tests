@@ -12,7 +12,7 @@ jobs:
       matrix:
         ruby: ['2.5', '2.6', '2.7', '3.0', '3.1', head, jruby-head]
         os: [ubuntu-latest, windows-latest]
-        gemfile: [cucumber_3, cucumber_4, cuke_modeler_3_minimum, cuke_modeler_3]
+        gemfile: [cucumber_4, cuke_modeler_3_minimum, cuke_modeler_3]
         task: [spec]
         include:
           - ruby: '2.5' # lowest supported version
