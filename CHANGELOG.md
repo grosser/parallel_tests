@@ -8,6 +8,8 @@
 
 ### Fixed
 
+- Grouping by scenarios now works for tests that are nested under Rules.
+
 ## 3.11.0 - 2022-05-27
 
 ### Changed
