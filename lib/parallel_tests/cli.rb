@@ -383,7 +383,7 @@ module ParallelTests
     end
 
     def first_is_1?
-      val = ENV["PARALLEL_TEST_FIRST_IS_1"]
+      val = ENV.fetch("PARALLEL_TEST_FIRST_IS_1", nil)
       ['1', 'true'].include?(val)
     end
 
