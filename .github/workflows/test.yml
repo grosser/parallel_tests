@@ -22,13 +22,13 @@ jobs:
         exclude:
           # CukeModeler 2.x does not support beyond Ruby 2
           - gemfile: cuke_modeler2
-            ruby-version: jruby-head
+            ruby: jruby-head
           - gemfile: cuke_modeler2
-            ruby-version: head
+            ruby: head
           - gemfile: cuke_modeler2
-            ruby-version: '3.1'
+            ruby: '3.1'
           - gemfile: cuke_modeler2
-            ruby-version: '3.0'
+            ruby: '3.0'
     env: # $BUNDLE_GEMFILE must be set at the job level, so that it is set for all steps
       BUNDLE_GEMFILE: ci_gemfiles/${{ matrix.gemfile }}.gemfile
     steps:
