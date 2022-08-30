@@ -17,5 +17,12 @@ Gem::Specification.new name, ParallelTests::VERSION do |s|
   s.license = "MIT"
   s.executables = ["parallel_spinach", "parallel_cucumber", "parallel_rspec", "parallel_test"]
   s.add_runtime_dependency "parallel"
+
+  s.add_development_dependency 'cucumber', '~> 4.0'
+  s.add_development_dependency 'cuke_modeler', '~> 3.0'
+  s.add_development_dependency "rake"
+  s.add_development_dependency 'rspec', '~> 3.3'
+  s.add_development_dependency "rubocop"
+
   s.required_ruby_version = '>= 2.5.0'
 end

@@ -16,7 +16,7 @@ module ParallelTests
     def determine_number_of_processes(count)
       [
         count,
-        ENV["PARALLEL_TEST_PROCESSORS"],
+        ENV.fetch("PARALLEL_TEST_PROCESSORS", nil),
         Parallel.processor_count
       ].detect { |c| !c.to_s.strip.empty? }.to_i
     end
@@ -68,8 +68,8 @@ module ParallelTests
     end
 
     def last_process?
-      current_process_number = ENV['TEST_ENV_NUMBER']
-      total_processes = ENV['PARALLEL_TEST_GROUPS']
+      current_process_number = ENV.fetch('TEST_ENV_NUMBER', nil)
+      total_processes = ENV.fetch('PARALLEL_TEST_GROUPS', nil)
       return true if current_process_number.nil? && total_processes.nil?
       current_process_number = '1' if current_process_number.nil?
       current_process_number == total_processes

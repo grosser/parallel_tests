@@ -232,4 +232,54 @@ describe ParallelTests::Cucumber::Scenarios do
       expect(scenarios.length).to eq 1
     end
   end
+
+  cuke_modeler_version = Gem.loaded_specs['cuke_modeler'].version.version
+  major = cuke_modeler_version.match(/^(\d+)\./)[1].to_i
+  minor = cuke_modeler_version.match(/^\d+\.(\d+)\./)[1].to_i
+
+  # CukeModeler doesn't support Rule models until 3.2.0
+  context 'with Rules', if: (major > 3) || (minor >= 2) do
+    let(:feature_file) do
+      Tempfile.new('grouper.feature').tap do |feature|
+        feature.write <<-EOS
+        Feature: Grouping by scenario
+
+          Scenario: First
+            Given I do nothing
+
+          Scenario Outline: Second
+            Given I don't do anything
+          Examples:
+            | param   |
+            | value 1 |
+            | value 2 |
+
+          Rule:
+            Scenario: Third
+             Given I don't do anything
+
+          Rule:
+            Scenario Outline: Fourth
+              Given I don't do anything
+            Examples:
+              | param   |
+              | value 1 |
+              | value 2 |
+        EOS
+        feature.rewind
+      end
+    end
+
+    it 'returns all the scenarios' do
+      scenarios = ParallelTests::Cucumber::Scenarios.all([feature_file.path])
+      expect(scenarios).to match_array [
+        "#{feature_file.path}:3",
+        "#{feature_file.path}:10",
+        "#{feature_file.path}:11",
+        "#{feature_file.path}:14",
+        "#{feature_file.path}:22",
+        "#{feature_file.path}:23"
+      ]
+    end
+  end
 end
