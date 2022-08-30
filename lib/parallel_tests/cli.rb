@@ -383,7 +383,7 @@ module ParallelTests
     end
 
     def first_is_1?
-      val = ENV.fetch("PARALLEL_TEST_FIRST_IS_1", nil)
+      val = ENV["PARALLEL_TEST_FIRST_IS_1"]
       ['1', 'true'].include?(val)
     end
 
@@ -391,7 +391,7 @@ module ParallelTests
     def simulate_output_for_ci(simulate)
       if simulate
         progress_indicator = Thread.new do
-          interval = Float(ENV.fetch('PARALLEL_TEST_HEARTBEAT_INTERVAL', 60))
+          interval = Float(ENV['PARALLEL_TEST_HEARTBEAT_INTERVAL'] || 60)
           loop do
             sleep interval
             print '.'

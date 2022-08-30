@@ -233,12 +233,7 @@ describe ParallelTests::Cucumber::Scenarios do
     end
   end
 
-  cuke_modeler_version = Gem.loaded_specs['cuke_modeler'].version.version
-  major = cuke_modeler_version.match(/^(\d+)\./)[1].to_i
-  minor = cuke_modeler_version.match(/^\d+\.(\d+)\./)[1].to_i
-
-  # CukeModeler doesn't support Rule models until 3.2.0
-  context 'with Rules', if: (major > 3) || (minor >= 2) do
+  context 'with Rules' do # cuke_modeler >=3.2
     let(:feature_file) do
       Tempfile.new('grouper.feature').tap do |feature|
         feature.write <<-EOS
