@@ -19,7 +19,7 @@ end
 
 desc "bundle all gemfiles [EXTRA=]"
 task :bundle_all do
-  extra = ENV.fetch("EXTRA", nil) || "install"
+  extra = ENV["EXTRA"] || "install"
 
   gemfiles = (["Gemfile"] + Dir["spec/fixtures/rails*/Gemfile"])
   raise if gemfiles.size < 3

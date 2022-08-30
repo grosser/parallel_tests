@@ -66,7 +66,6 @@ GEM
     gherkin-ruby (0.3.2)
     i18n (1.10.0)
       concurrent-ruby (~> 1.0)
-    json (2.6.2)
     middleware (0.1.0)
     minitest (5.5.1)
     multi_test (0.1.2)
@@ -96,17 +95,16 @@ GEM
       diff-lcs (>= 1.2.0, < 2.0)
       rspec-support (~> 3.11.0)
     rspec-support (3.11.0)
-    rubocop (1.35.1)
-      json (~> 2.3)
+    rubocop (1.28.2)
       parallel (~> 1.10)
-      parser (>= 3.1.2.1)
+      parser (>= 3.1.0.0)
       rainbow (>= 2.2.2, < 4.0)
       regexp_parser (>= 1.8, < 3.0)
-      rexml (>= 3.2.5, < 4.0)
-      rubocop-ast (>= 1.20.1, < 2.0)
+      rexml
+      rubocop-ast (>= 1.17.0, < 2.0)
       ruby-progressbar (~> 1.7)
       unicode-display_width (>= 1.4.0, < 3.0)
-    rubocop-ast (1.21.0)
+    rubocop-ast (1.17.0)
       parser (>= 3.1.1.0)
     ruby-progressbar (1.11.0)
     sys-uname (1.2.2)
@@ -127,14 +125,15 @@ PLATFORMS
 DEPENDENCIES
   bump
   cucumber (~> 4.0)
-  cuke_modeler (~> 3.0)
+  cuke_modeler (~> 3.6)
   minitest (~> 5.5.0)
   parallel_tests!
   rake
   rspec (~> 3.3)
-  rubocop
+  rubocop (~> 1.28.0)
+  rubocop-ast (~> 1.17.0)
   spinach!
   test-unit
 
 BUNDLED WITH
-   2.3.6
+   2.3.7

@@ -128,3 +128,7 @@ Style/CaseEquality:
 
 Lint/EmptyClass:
   Enabled: false
+
+# ENV.fetch('FOO', nil) is the same as ENV['FOO']
+Style/FetchEnvVar:
+  Enabled: false

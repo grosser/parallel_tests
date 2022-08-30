@@ -153,8 +153,8 @@ module ParallelTests
         protected
 
         def executable
-          if ENV.include?('PARALLEL_TESTS_EXECUTABLE')
-            [ENV.fetch('PARALLEL_TESTS_EXECUTABLE')]
+          if (executable = ENV['PARALLEL_TESTS_EXECUTABLE'])
+            [executable]
           else
             determine_executable
           end
