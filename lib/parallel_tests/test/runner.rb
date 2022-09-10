@@ -73,7 +73,7 @@ module ParallelTests
               []
             end
             if runtimes.size * 1.5 > tests.size
-              puts "Using recorded test runtime"
+              puts "Using recorded test runtime" unless options[:quiet]
               sort_by_runtime(tests, runtimes)
             else
               sort_by_filesize(tests)
