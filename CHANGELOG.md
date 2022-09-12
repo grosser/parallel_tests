@@ -8,6 +8,12 @@
 
 ### Fixed
 
+## v3.12.1 - 2022-09-12
+
+### Fixed
+
+- `--quiet` no longer prints 'Using recorded test runtime'
+
 ## v3.12.0 - 2022-08-30
 
 ### Fixed
