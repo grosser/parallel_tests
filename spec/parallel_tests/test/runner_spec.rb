@@ -610,7 +610,7 @@ describe ParallelTests::Test::Runner do
     def call(*args)
       base = ["ruby", "-Ilib:test", "test/minitest/test_minitest_unit.rb"]
       result = ParallelTests::Test::Runner.command_with_seed([*base, *args], "555")
-      result[base.length..-1]
+      result[base.length..]
     end
 
     it "adds the randomized seed" do
