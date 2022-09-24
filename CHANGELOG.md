@@ -8,6 +8,12 @@
 
 ### Fixed
 
+## 3.13.0 - 2022-09-23
+
+### Changed
+
+- Drop support for ruby 2.5
+
 ## v3.12.1 - 2022-09-12
 
 ### Fixed
