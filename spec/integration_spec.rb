@@ -66,8 +66,8 @@ describe 'CLI' do
     end
   end
 
-  let(:printed_commands) { /specs? per process\nbundle exec rspec/ }
-  let(:printed_rerun) { "run the group again:\n\nbundle exec rspec" }
+  let(:printed_commands) { /specs? per process\nTEST_ENV_NUMBER=(\d+)? PARALLEL_TEST_GROUPS=\d+ bundle exec rspec/ }
+  let(:printed_rerun) { /run the group again:\n\nTEST_ENV_NUMBER=(\d+)? PARALLEL_TEST_GROUPS=\d+ bundle exec rspec/ }
 
   context "running tests sequentially" do
     it "exits with 0 when each run is successful" do
@@ -231,28 +231,14 @@ describe 'CLI' do
     expect(result).to include('Took')
   end
 
-  it "shows command and rerun with --verbose" do
+  it "shows command and rerun with --verbose-command" do
     write 'spec/xxx_spec.rb', 'describe("it"){it("should"){puts "TEST1"}}'
     write 'spec/xxx2_spec.rb', 'describe("it"){it("should"){expect(1).to eq(2)}}'
-    result = run_tests ["spec", "--verbose"], type: 'rspec', fail: true
+    result = run_tests ["spec", "--verbose-command"], type: 'rspec', fail: true
     expect(result).to match printed_commands
-    expect(result).to include printed_rerun
+    expect(result).to match printed_rerun
     expect(result).to include "bundle exec rspec spec/xxx_spec.rb"
     expect(result).to include "bundle exec rspec spec/xxx2_spec.rb"
-  end
-
-  it "shows only rerun with --verbose-rerun-command" do
-    write 'spec/xxx_spec.rb', 'describe("it"){it("should"){expect(1).to eq(2)}}'
-    result = run_tests ["spec", "--verbose-rerun-command"], type: 'rspec', fail: true
-    expect(result).to include printed_rerun
-    expect(result).to_not match printed_commands
-  end
-
-  it "shows only process with --verbose-process-command" do
-    write 'spec/xxx_spec.rb', 'describe("it"){it("should"){expect(1).to eq(2)}}'
-    result = run_tests ["spec", "--verbose-process-command"], type: 'rspec', fail: true
-    expect(result).to_not include printed_rerun
-    expect(result).to match printed_commands
   end
 
   it "fails when tests fail" do

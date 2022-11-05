@@ -131,12 +131,12 @@ module ParallelTests
       failing_sets = test_results.reject { |r| r[:exit_status] == 0 }
       return if failing_sets.none?
 
-      if options[:verbose] || options[:verbose_rerun_command]
+      if options[:verbose] || options[:verbose_command]
         puts "\n\nTests have failed for a parallel_test group. Use the following command to run the group again:\n\n"
         failing_sets.each do |failing_set|
           command = failing_set[:command]
           command = @runner.command_with_seed(command, failing_set[:seed]) if failing_set[:seed]
-          puts Shellwords.shelljoin(command)
+          @runner.print_command(command, failing_set[:env] || {})
         end
       end
     end
@@ -261,8 +261,7 @@ module ParallelTests
         opts.on("--first-is-1", "Use \"1\" as TEST_ENV_NUMBER to not reuse the default test environment") { options[:first_is_1] = true }
         opts.on("--fail-fast", "Stop all groups when one group fails (best used with --test-options '--fail-fast' if supported") { options[:fail_fast] = true }
         opts.on("--verbose", "Print debug output") { options[:verbose] = true }
-        opts.on("--verbose-process-command", "Displays only the command that will be executed by each process") { options[:verbose_process_command] = true }
-        opts.on("--verbose-rerun-command", "When there are failures, displays the command executed by each process that failed") { options[:verbose_rerun_command] = true }
+        opts.on("--verbose-command", "Displays the command that will be executed by each process and when there are failures displays the command executed by each process that failed") { options[:verbose_command] = true }
         opts.on("--quiet", "Print only tests output") { options[:quiet] = true }
         opts.on("-v", "--version", "Show Version") do
           puts ParallelTests::VERSION
