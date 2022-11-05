@@ -55,15 +55,9 @@ describe ParallelTests::CLI do
       expect(call(["test", "--verbose"])).to eq(defaults.merge(verbose: true))
     end
 
-    it "parses --verbose-process-command" do
-      expect(call(['test', '--verbose-process-command'])).to eq(
-        defaults.merge(verbose_process_command: true)
-      )
-    end
-
-    it "parses --verbose-rerun-command" do
-      expect(call(['test', '--verbose-rerun-command'])).to eq(
-        defaults.merge(verbose_rerun_command: true)
+    it "parses --verbose-command" do
+      expect(call(['test', '--verbose-command'])).to eq(
+        defaults.merge(verbose_command: true)
       )
     end
 
@@ -225,6 +219,10 @@ describe ParallelTests::CLI do
     end
 
     describe "failure" do
+      before do
+        subject.instance_variable_set(:@runner, ParallelTests::Test::Runner)
+      end
+
       context 'without options' do
         it_prints_nothing_about_rerun_commands({})
       end
@@ -233,11 +231,11 @@ describe ParallelTests::CLI do
         it_prints_nothing_about_rerun_commands(verbose: false)
       end
 
-      context "with verbose rerun" do
+      context "with verbose command" do
         it "prints command if there is a failure" do
           expect do
-            subject.send(:report_failure_rerun_commmand, single_failed_command, verbose_rerun_command: true)
-          end.to output("\n\nTests have failed for a parallel_test group. Use the following command to run the group again:\n\nfoo\n").to_stdout
+            subject.send(:report_failure_rerun_commmand, single_failed_command, verbose_command: true)
+          end.to output("\n\nTests have failed for a parallel_test group. Use the following command to run the group again:\n\nTEST_ENV_NUMBER= PARALLEL_TEST_GROUPS= foo\n").to_stdout
         end
       end
 
@@ -245,7 +243,7 @@ describe ParallelTests::CLI do
         it "prints a message and the command if there is a failure" do
           expect do
             subject.send(:report_failure_rerun_commmand, single_failed_command, verbose: true)
-          end.to output("\n\nTests have failed for a parallel_test group. Use the following command to run the group again:\n\nfoo\n").to_stdout
+          end.to output("\n\nTests have failed for a parallel_test group. Use the following command to run the group again:\n\nTEST_ENV_NUMBER= PARALLEL_TEST_GROUPS= foo\n").to_stdout
         end
 
         it "prints multiple commands if there are multiple failures" do
@@ -259,7 +257,7 @@ describe ParallelTests::CLI do
               ],
               { verbose: true }
             )
-          end.to output(/foo\nbar\nbaz/).to_stdout
+          end.to output(/\sfoo\n.+?\sbar\n.+?\sbaz/).to_stdout
         end
 
         it "only includes failures" do
@@ -273,14 +271,13 @@ describe ParallelTests::CLI do
               ],
               { verbose: true }
             )
-          end.to output(/foo --color\nbaz/).to_stdout
+          end.to output(/\sfoo --color\n.+?\sbaz/).to_stdout
         end
 
         it "prints the command with the seed added by the runner" do
           command = ['rspec', '--color', 'spec/foo_spec.rb']
           seed = 555
 
-          subject.instance_variable_set(:@runner, ParallelTests::Test::Runner)
           expect(ParallelTests::Test::Runner).to receive(:command_with_seed).with(command, seed)
             .and_return(['my', 'seeded', 'command', 'result', '--seed', seed])
           single_failed_command[0].merge!(seed: seed, command: command)

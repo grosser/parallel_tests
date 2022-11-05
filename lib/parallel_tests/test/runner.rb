@@ -97,9 +97,14 @@ module ParallelTests
           # being able to run with for example `-output foo-$TEST_ENV_NUMBER` worked originally and is convenient
           cmd.map! { |c| c.gsub("$TEST_ENV_NUMBER", number).gsub("${TEST_ENV_NUMBER}", number) }
 
-          puts Shellwords.shelljoin(cmd) if report_process_command?(options) && !options[:serialize_stdout]
+          print_command(cmd, env) if report_process_command?(options) && !options[:serialize_stdout]
 
           execute_command_and_capture_output(env, cmd, options)
+        end
+
+        def print_command(command, env)
+          env_str = ['TEST_ENV_NUMBER', 'PARALLEL_TEST_GROUPS'].map { |e| "#{e}=#{env[e]}" }.join(' ')
+          puts [env_str, Shellwords.shelljoin(command)].compact.join(' ')
         end
 
         def execute_command_and_capture_output(env, cmd, options)
@@ -119,7 +124,7 @@ module ParallelTests
 
           output = "#{Shellwords.shelljoin(cmd)}\n#{output}" if report_process_command?(options) && options[:serialize_stdout]
 
-          { stdout: output, exit_status: exitstatus, command: cmd, seed: seed }
+          { env: env, stdout: output, exit_status: exitstatus, command: cmd, seed: seed }
         end
 
         def find_results(test_output)
@@ -286,7 +291,7 @@ module ParallelTests
         end
 
         def report_process_command?(options)
-          options[:verbose] || options[:verbose_process_command]
+          options[:verbose] || options[:verbose_command]
         end
       end
     end
