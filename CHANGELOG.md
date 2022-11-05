@@ -3,7 +3,16 @@
 ## Unreleased
 
 ### Breaking Changes
+
+### Added
+
+### Fixed
+
+## 4.0.0 - 2022-11-05
+
+### Breaking Changes
 - The `--verbose-process-command` and `--verbose-rerun-command` are combined into `--verbose-command`. See [#884](https://github.com/grosser/parallel_tests/pull/884).
+- Drop ruby 2.6 support
 
 ### Added
 
