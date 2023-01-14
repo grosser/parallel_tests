@@ -110,7 +110,7 @@ module ParallelTests
         def execute_command_and_capture_output(env, cmd, options)
           pid = nil
 
-          popen_options = {}
+          popen_options = { pgroup: true }
           popen_options[:err] = [:child, :out] if options[:combine_stderr]
 
           output = IO.popen(env, cmd, popen_options) do |io|
