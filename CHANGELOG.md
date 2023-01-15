@@ -8,15 +8,17 @@
 
 ### Fixed
 
+## 4.1.0 - 2023-01-14
+
+### Fixed
+
+- Avoid double sending of SIGINT to subprocesses [#889](https://github.com/grosser/parallel_tests/pull/889)
+
 ## 4.0.0 - 2022-11-05
 
 ### Breaking Changes
 - The `--verbose-process-command` and `--verbose-rerun-command` are combined into `--verbose-command`. See [#884](https://github.com/grosser/parallel_tests/pull/884).
 - Drop ruby 2.6 support
-
-### Added
-
-### Fixed
 
 ## 3.13.0 - 2022-09-23
 
