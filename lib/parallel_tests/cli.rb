@@ -32,9 +32,23 @@ module ParallelTests
       @graceful_shutdown_attempted ||= false
       Kernel.exit if @graceful_shutdown_attempted
 
-      # The Pid class's synchronize method can't be called directly from a trap
-      # Using Thread workaround https://github.com/ddollar/foreman/issues/332
-      Thread.new { ParallelTests.stop_all_processes }
+      # In a shell, all sub-processes also get an interrupt, so they shut themselves down.
+      # In a background process this does not happen and we need to do it ourselves.
+      # We cannot always send the interrupt since then the sub-processes would get interrupted twice when in foreground
+      # and that messes with interrupt handling.
+      #
+      # (can simulate detached with `(bundle exec parallel_rspec test/a_spec.rb -n 2 &)`)
+      # also the integration test "passes on int signal to child processes" is detached.
+      #
+      # On windows getpgid does not work so we resort to always killing which is the smaller bug.
+      #
+      # The ParallelTests::Pids `synchronize` method can't be called directly from a trap,
+      # using Thread workaround https://github.com/ddollar/foreman/issues/332
+      Thread.new do
+        if Gem.win_platform? || ((child_pid = ParallelTests.pids.all.first) && Process.getpgid(child_pid) != Process.pid)
+          ParallelTests.stop_all_processes
+        end
+      end
 
       @graceful_shutdown_attempted = true
     end

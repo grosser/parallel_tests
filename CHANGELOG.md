@@ -8,6 +8,8 @@
 
 ### Fixed
 
+- Avoid double sending int while also not breaking debugging [#891](https://github.com/grosser/parallel_tests/pull/891)
+
 ## 4.1.0 - 2023-01-14
 
 ### Fixed

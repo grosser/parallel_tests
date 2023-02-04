@@ -108,11 +108,10 @@ module ParallelTests
         end
 
         def execute_command_and_capture_output(env, cmd, options)
-          pid = nil
-
-          popen_options = { pgroup: true }
+          popen_options = {} # do not add `pgroup: true`, it will break `binding.irb` inside the test
           popen_options[:err] = [:child, :out] if options[:combine_stderr]
 
+          pid = nil
           output = IO.popen(env, cmd, popen_options) do |io|
             pid = io.pid
             ParallelTests.pids.add(pid)
