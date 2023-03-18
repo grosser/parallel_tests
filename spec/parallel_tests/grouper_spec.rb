@@ -72,7 +72,7 @@ describe ParallelTests::Grouper do
       expect do
         call(3, single_process: [/1/], isolate_count: 3)
       end.to raise_error(
-        "Number of isolated processes must be less than total the number of processes"
+        "Number of isolated processes must be >= total number of processes"
       )
     end
 
