@@ -249,8 +249,7 @@ Options are:
         --first-is-1                 Use "1" as TEST_ENV_NUMBER to not reuse the default test environment
         --fail-fast                  Stop all groups when one group fails (best used with --test-options '--fail-fast' if supported
         --verbose                    Print debug output
-        --verbose-process-command    Displays only the command that will be executed by each process
-        --verbose-rerun-command      When there are failures, displays the command executed by each process that failed
+        --verbose-command            Displays the command that will be executed by each process and when there are failures displays the command executed by each process that failed
         --quiet                      Print only tests output
     -v, --version                    Show Version
     -h, --help                       Show this.
