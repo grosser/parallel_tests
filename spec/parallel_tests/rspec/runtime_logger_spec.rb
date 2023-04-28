@@ -90,7 +90,7 @@ describe ParallelTests::RSpec::RuntimeLogger do
 
       system(
         { 'TEST_ENV_NUMBER' => '1' },
-        "rspec spec -I #{Bundler.root.join("lib")} --format ParallelTests::RSpec::RuntimeLogger --out runtime.log 2>&1"
+        "rspec", "spec", "-I", Bundler.root.join("lib").to_s, "--format", "ParallelTests::RSpec::RuntimeLogger", "--out", "runtime.log"
       ) || raise("nope")
 
       result = File.read("runtime.log")
@@ -122,7 +122,7 @@ describe ParallelTests::RSpec::RuntimeLogger do
 
       system(
         { 'TEST_ENV_NUMBER' => '1' },
-        "rspec spec -I #{Bundler.root.join("lib")} --format ParallelTests::RSpec::RuntimeLogger --out runtime.log 2>&1"
+        "rspec", "spec", "-I", Bundler.root.join("lib").to_s, "--format", "ParallelTests::RSpec::RuntimeLogger", "--out", "runtime.log"
       ) || raise("nope")
 
       result = File.read("runtime.log")

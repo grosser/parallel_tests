@@ -38,10 +38,6 @@ module ParallelTests
         isolate_count = isolate_count(options)
 
         if isolate_count >= num_groups
-          raise 'Number of isolated processes must be less than total the number of processes'
-        end
-
-        if isolate_count >= num_groups
           raise 'Number of isolated processes must be >= total number of processes'
         end
 
@@ -49,7 +45,7 @@ module ParallelTests
           # add all files that should run in a multiple isolated processes to their own groups
           group_features_by_size(items_to_group(single_items), groups[0..(isolate_count - 1)])
           # group the non-isolated by size
-          group_features_by_size(items_to_group(items), groups[isolate_count..-1])
+          group_features_by_size(items_to_group(items), groups[isolate_count..])
         else
           # add all files that should run in a single non-isolated process to first group
           group_features_by_size(items_to_group(single_items), [groups.first])

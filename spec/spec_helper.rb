@@ -44,22 +44,25 @@ module SpecHelper
     Dir.mktmpdir do |root|
       files.each do |file|
         parent = "#{root}/#{File.dirname(file)}"
-        FileUtils.mkpath(parent) unless File.exist?(parent)
+        FileUtils.mkpath(parent)
         FileUtils.touch(File.join(root, file))
       end
       yield root
     end
   end
 
-  def should_run_with(regex)
+  def should_run_with(command, *args)
     expect(ParallelTests::Test::Runner).to receive(:execute_command) do |a, _b, _c, _d|
-      expect(a).to match(regex)
+      expect(a.first(command.length)).to eq(command)
+      args.each do |arg|
+        expect(a).to include(arg)
+      end
     end
   end
 
-  def should_not_run_with(regex)
+  def should_not_run_with(arg)
     expect(ParallelTests::Test::Runner).to receive(:execute_command) do |a, _b, _c, _d|
-      expect(a).to_not match(regex)
+      expect(a).to_not include(arg)
     end
   end
 end
@@ -81,7 +84,7 @@ module SharedExamples
 
       def setup_runtime_log # rubocop:disable Lint/NestedMethodDefinition
         File.open(log, 'w') do |f|
-          @files[1..-1].each { |file| f.puts "#{file}:#{@files.index(file)}" }
+          @files[1..].each { |file| f.puts "#{file}:#{@files.index(file)}" }
           f.puts "#{@files[0]}:10"
         end
       end

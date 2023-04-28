@@ -4,13 +4,77 @@
 
 ### Breaking Changes
 
-- None
+### Added
+
+### Fixed
+
+## 4.2.0 - 2023-02-06
+
+### Fixed
+
+- Avoid double sending int while also not breaking debugging [#891](https://github.com/grosser/parallel_tests/pull/891)
+
+## 4.1.0 - 2023-01-14
+
+### Fixed
+
+- Avoid double sending of SIGINT to subprocesses [#889](https://github.com/grosser/parallel_tests/pull/889)
+
+## 4.0.0 - 2022-11-05
+
+### Breaking Changes
+- The `--verbose-process-command` and `--verbose-rerun-command` are combined into `--verbose-command`. See [#884](https://github.com/grosser/parallel_tests/pull/884).
+- Drop ruby 2.6 support
+
+## 3.13.0 - 2022-09-23
+
+### Changed
+
+- Drop support for ruby 2.5
+
+## v3.12.1 - 2022-09-12
+
+### Fixed
+
+- `--quiet` no longer prints 'Using recorded test runtime'
+
+## v3.12.0 - 2022-08-30
+
+### Fixed
+
+- Grouping by scenarios now works for tests that are nested under Rules.
+
+## 3.11.0 - 2022-05-27
+
+### Changed
+
+- Raise a custom `RuntimeLogTooSmallError` exception when the runtime log is too
+  small instead of a generic `RuntimeError`.
+
+## 3.10.1 - 2022-05-23
+
+### Fixed
+
+- Running rake tasks with number of processes or extra args
+
+## 3.10.0 - 2022-05-23
 
 ### Added
 
-- Support Ruby 2.5 / 2.6
+- Changed Rake subtasks to always use the same Rake executable as the parent
+  process.
+
+## 3.9.1 - 2022-05-23
 
 ### Fixed
+
+- Fixed `NoMethodError` exception when running Rake task `parallel:setup`.
+
+## 3.9.0 - 2022-05-22
+
+### Added
+
+- Subprocesses execute without a shell.
 
 ## 3.8.1 - 2022-03-28
 
@@ -26,7 +90,7 @@
 
 ### Added
 
-- Tesed on ruby 3.0 and 3.1
+- Tested on ruby 3.0 and 3.1
 
 ### Fixed
 
@@ -198,7 +262,7 @@
 ## 2.29.2 - 2019-08-06
 
 ### Fixed
-- Eliminate some ruby warnings relating to ambigious arguments, unused variables, a redefined method, and uninitialized instance variables ([#712](https://github.com/grosser/parallel_tests/pull/712)).
+- Eliminate some ruby warnings relating to ambiguous arguments, unused variables, a redefined method, and uninitialized instance variables ([#712](https://github.com/grosser/parallel_tests/pull/712)).
 
 ## 2.29.1 - 2019-06-13
 

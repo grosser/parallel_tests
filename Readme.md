@@ -1,8 +1,7 @@
 # parallel_tests
 
 [![Gem Version](https://badge.fury.io/rb/parallel_tests.svg)](https://rubygems.org/gems/parallel_tests)
-[![Build Status](https://travis-ci.org/grosser/parallel_tests.svg)](https://travis-ci.org/grosser/parallel_tests/builds)
-[![Build status](https://github.com/grosser/parallel_tests/workflows/windows/badge.svg)](https://github.com/grosser/parallel_tests/actions?query=workflow%3Awindows)
+[![Build status](https://github.com/grosser/parallel_tests/workflows/test/badge.svg)](https://github.com/grosser/parallel_tests/actions?query=workflow%3Atest)
 
 Speedup Test::Unit + RSpec + Cucumber + Spinach by running parallel on multiple CPU cores.<br/>
 ParallelTests splits tests into even groups (by number of lines or runtime) and runs each group in a single process with its own database.
@@ -42,7 +41,7 @@ test:
 
 ### Setup environment from scratch (create db and loads schema, useful for CI)
     rake parallel:setup
-    
+
 ### Drop all test databases
     rake parallel:drop
 
@@ -193,15 +192,15 @@ Setup for non-rails
  - use `ENV['TEST_ENV_NUMBER']` inside your tests to select separate db/memcache/etc. (docker compose: expose it)
 
  - Only run a subset of files / folders:
- 
+
     `parallel_test test/bar test/baz/foo_text.rb`
 
  - Pass test-options and files via `--`:
- 
+
     `parallel_rspec -- -t acceptance -f progress -- spec/foo_spec.rb spec/acceptance`
-    
+
  - Pass in test options, by using the -o flag (wrap everything in quotes):
- 
+
     `parallel_cucumber -n 2 -o '-p foo_profile --tags @only_this_tag or @only_that_tag --format summary'`
 
 Options are:
@@ -250,8 +249,7 @@ Options are:
         --first-is-1                 Use "1" as TEST_ENV_NUMBER to not reuse the default test environment
         --fail-fast                  Stop all groups when one group fails (best used with --test-options '--fail-fast' if supported
         --verbose                    Print debug output
-        --verbose-process-command    Displays only the command that will be executed by each process
-        --verbose-rerun-command      When there are failures, displays the command executed by each process that failed
+        --verbose-command            Displays the command that will be executed by each process and when there are failures displays the command executed by each process that failed
         --quiet                      Print only tests output
     -v, --version                    Show Version
     -h, --help                       Show this.
@@ -402,6 +400,9 @@ inspired by [pivotal labs](https://blog.pivotal.io/labs/labs/parallelize-your-rs
  - [Vikram B Kumar](https://github.com/v-kumar)
  - [Joshua Pinter](https://github.com/joshuapinter)
  - [Zach Dennis](https://github.com/zdennis)
+ - [Jon Dufresne](https://github.com/jdufresne)
+ - [Eric Kessler](https://github.com/enkessler)
+ - [Adis Osmonov](https://github.com/adis-io)
 
 [Michael Grosser](http://grosser.it)<br/>
 michael@grosser.it<br/>

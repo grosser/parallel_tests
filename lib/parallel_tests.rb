@@ -76,7 +76,7 @@ module ParallelTests
     end
 
     def with_ruby_binary(command)
-      WINDOWS ? "#{RUBY_BINARY} -- #{command}" : command
+      WINDOWS ? [RUBY_BINARY, '--', command] : [command]
     end
 
     def wait_for_other_processes_to_finish

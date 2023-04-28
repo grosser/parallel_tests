@@ -1,6 +1,6 @@
 AllCops:
   NewCops: enable
-  TargetRubyVersion: 2.5
+  TargetRubyVersion: 2.7
   SuggestExtensions: false
   Exclude:
   - '**/vendor/bundle/**/*'
@@ -127,4 +127,8 @@ Style/CaseEquality:
   Enabled: false
 
 Lint/EmptyClass:
+  Enabled: false
+
+# ENV.fetch('FOO', nil) is the same as ENV['FOO']
+Style/FetchEnvVar:
   Enabled: false

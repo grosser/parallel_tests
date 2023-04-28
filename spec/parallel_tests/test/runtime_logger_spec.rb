@@ -2,17 +2,19 @@
 require 'spec_helper'
 
 describe ParallelTests::Test::RuntimeLogger do
-  def sh(command)
-    result = `#{command} 2>&1`
+  def run(command)
+    result = IO.popen(command, err: [:child, :out], &:read)
     raise "FAILED: #{result}" unless $?.success?
   end
 
-  def run_tests
-    sh "ruby #{Bundler.root}/bin/parallel_test test -n 2"
+  def run_tests(repo_root_dir)
+    run ["ruby", "#{repo_root_dir}/bin/parallel_test", "test", "-n", "2"]
   end
 
   it "writes a correct log on minitest-5" do
     skip if RUBY_PLATFORM == "java" # just too slow ...
+    repo_root = Dir.pwd
+
     use_temporary_directory do
       # setup simple structure
       FileUtils.mkdir "test"
@@ -37,7 +39,7 @@ describe ParallelTests::Test::RuntimeLogger do
         RUBY
       end
 
-      run_tests
+      run_tests(repo_root)
 
       # log looking good ?
       lines = File.read("tmp/parallel_runtime_test.log").split("\n").sort.map { |x| x.sub(/\d$/, "") }
