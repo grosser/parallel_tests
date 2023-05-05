@@ -103,7 +103,7 @@ module ParallelTests
       end
 
       def largest_first(files)
-        files.sort_by { |_item, size| size }.reverse
+        files.sort_by { |item, size| [size, item] }.reverse
       end
 
       def smallest_group(groups)

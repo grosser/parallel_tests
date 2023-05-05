@@ -248,7 +248,7 @@ module ParallelTests
             else
               file_or_folder
             end
-          end.uniq
+          end.uniq.sort
         end
 
         def files_in_folder(folder, options = {})

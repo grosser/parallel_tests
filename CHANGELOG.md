@@ -8,6 +8,8 @@
 
 ### Fixed
 
+- Made grouping deterministic [#903](https://github.com/grosser/parallel_tests/issues/903)
+
 ## 4.2.0 - 2023-02-06
 
 ### Fixed
