@@ -95,7 +95,7 @@ module ParallelTests
           cmd = ["nice", *cmd] if options[:nice]
 
           # being able to run with for example `-output foo-$TEST_ENV_NUMBER` worked originally and is convenient
-          cmd.map! { |c| c.gsub("$TEST_ENV_NUMBER", number).gsub("${TEST_ENV_NUMBER}", number) }
+          cmd = cmd.map { |c| c.gsub("$TEST_ENV_NUMBER", number).gsub("${TEST_ENV_NUMBER}", number) }
 
           print_command(cmd, env) if report_process_command?(options) && !options[:serialize_stdout]
 

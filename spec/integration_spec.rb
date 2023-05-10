@@ -288,6 +288,11 @@ describe 'CLI' do
       expect(result.gsub('"', '').chars.sort).to eq(['0', '2', '3', '4'])
     end
 
+    it "can exec given commands with $TEST_ENV_NUMBER" do
+      result = run_tests ['-e', 'echo foo-$TEST_ENV_NUMBER'], processes: 4
+      expect(result.split(/\n+/).sort).to eq(['foo-', 'foo-2', 'foo-3', 'foo-4'])
+    end
+
     it "can exec given command non-parallel" do
       result = run_tests(
         ['-e', 'ruby -e "sleep(rand(10)/100.0); puts ENV[:TEST_ENV_NUMBER.to_s].inspect"'],
