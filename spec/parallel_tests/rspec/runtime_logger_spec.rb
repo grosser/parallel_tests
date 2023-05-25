@@ -19,7 +19,7 @@ describe ParallelTests::RSpec::RuntimeLogger do
       end
 
       example = double(file_path: "#{Dir.pwd}/spec/foo.rb")
-      example = double(group: example) unless ParallelTests::RSpec::RuntimeLogger::RSPEC_2
+      example = double(group: example)
 
       logger.example_group_started example
       logger.example_group_finished example

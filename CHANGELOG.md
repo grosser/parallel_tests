@@ -4,6 +4,8 @@
 
 ### Breaking Changes
 
+- Drop support for RSpec 2.
+
 ### Added
 
 ### Fixed
