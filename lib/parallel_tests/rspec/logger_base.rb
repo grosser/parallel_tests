@@ -7,8 +7,6 @@ end
 require 'rspec/core/formatters/base_text_formatter'
 
 class ParallelTests::RSpec::LoggerBase < RSpec::Core::Formatters::BaseTextFormatter
-  RSPEC_2 = RSpec::Core::Version::STRING.start_with?('2')
-
   def initialize(*args)
     super
 
