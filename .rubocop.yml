@@ -78,6 +78,9 @@ Layout/LineLength:
   Enabled: false
   Max: 120
 
+Style/RedundantConstantBase:
+  Enabled: false
+
 Style/RegexpLiteral:
   Enabled: false
 
