@@ -38,7 +38,7 @@ class ParallelTests::RSpec::RuntimeLogger < ParallelTests::RSpec::LoggerBase
     lock_output do
       @example_times.each do |file, time|
         relative_path = file.sub(%r{^#{Regexp.escape Dir.pwd}/}, '').sub(%r{^\./}, "")
-        @output.puts "#{relative_path}:#{time > 0 ? time : 0}"
+        @output.puts "#{relative_path}:#{[time, 0].max}"
       end
     end
     @output.flush

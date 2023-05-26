@@ -258,7 +258,7 @@ module ParallelTests
           "--suffix [PATTERN]",
           <<~TEXT.rstrip.split("\n").join("\n#{newline_padding}")
             override built in test file pattern (should match suffix):
-            '_spec\.rb$' - matches rspec files
+            '_spec.rb$' - matches rspec files
             '_(test|spec).rb$' - matches test or spec files
           TEXT
         ) { |pattern| options[:suffix] = /#{pattern}/ }
