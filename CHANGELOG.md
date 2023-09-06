@@ -8,6 +8,9 @@
 
 ### Added
 
+- Document unexpected behavior where the `--only-group` flag will also set a
+  grouping strategy.
+
 ### Fixed
 
 ## 4.2.0 - 2023-02-06

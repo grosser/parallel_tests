@@ -244,7 +244,15 @@ module ParallelTests
           TEXT
         ) { |groups| options[:specify_groups] = groups }
 
-        opts.on("--only-group INT[,INT]", Array) { |groups| options[:only_group] = groups.map(&:to_i) }
+        opts.on(
+          "--only-group INT[,INT]",
+          Array,
+          <<~TEXT.rstrip.split("\n").join("\n#{newline_padding}")
+            Only run the given group numbers. Note that this will force the 'filesize'
+            grouping strategy (even when the runtime log is present) unless you explicitly
+            set it otherwise via the '-group-by' flag.
+          TEXT
+        ) { |groups| options[:only_group] = groups.map(&:to_i) }
 
         opts.on("-e", "--exec [COMMAND]", "execute this code parallel and with ENV['TEST_ENV_NUMBER']") { |arg| options[:execute] = Shellwords.shellsplit(arg) }
         opts.on("-o", "--test-options '[OPTIONS]'", "execute test commands with those options") { |arg| options[:test_options] = Shellwords.shellsplit(arg) }

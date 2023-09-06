@@ -228,7 +228,9 @@ Options are:
                                        Process 1 will contain 1_spec.rb and 2_spec.rb
                                        Process 2 will contain 3_spec.rb
                                        Process 3 will contain all other specs
-        --only-group INT[,INT]
+        --only-group INT[,INT]       Only run the given group numbers. Note that this will force the 'filesize'
+                                     grouping strategy (even when the runtime log is present) unless you explicitly
+                                     set it otherwise via the '-group-by' flag.
     -e, --exec [COMMAND]             execute this code parallel and with ENV['TEST_ENV_NUMBER']
     -o, --test-options '[OPTIONS]'   execute test commands with those options
     -t, --type [TYPE]                test(default) / rspec / cucumber / spinach
