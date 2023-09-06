@@ -248,9 +248,8 @@ module ParallelTests
           "--only-group INT[,INT]",
           Array,
           <<~TEXT.rstrip.split("\n").join("\n#{newline_padding}")
-            Only run the given group numbers. Note that this will force the 'filesize'
-            grouping strategy (even when the runtime log is present) unless you explicitly
-            set it otherwise via the '-group-by' flag.
+            Only run the given group numbers.
+            Changes `--group-by` default to 'filesize'.
           TEXT
         ) { |groups| options[:only_group] = groups.map(&:to_i) }
 
