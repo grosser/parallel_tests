@@ -4,6 +4,12 @@
 
 ### Breaking Changes
 
+### Added
+
+## 4.2.2 - 2023-09-05
+
+### Breaking Changes
+
 - Drop support for RSpec 2.
 
 ### Added
@@ -11,7 +17,12 @@
 - Document unexpected behavior where the `--only-group` flag will also set a
   grouping strategy.
 
+## 4.2.1 - 2023-05-05
+
 ### Fixed
+
+- Fix $TEST_ENV_NUMBER replacing code to not affect all processes (#905)
+- Remove duplicate raise codes. (#897)
 
 ## 4.2.0 - 2023-02-06
 
