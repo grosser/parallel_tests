@@ -33,8 +33,10 @@ module ParallelTests
           "spec"
         end
 
+        # used to find all _spec.rb files
+        # supports also feature files used by rspec turnip extension
         def test_suffix
-          /_spec\.rb$/
+          /(_spec\.rb|\.feature)$/
         end
 
         def line_is_result?(line)
