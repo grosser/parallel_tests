@@ -6,6 +6,8 @@
 
 ### Added
 
+- Support for RSpec turnip feature files.
+
 ## 4.2.2 - 2023-09-05
 
 ### Breaking Changes

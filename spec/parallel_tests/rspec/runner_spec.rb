@@ -119,6 +119,12 @@ describe ParallelTests::RSpec::Runner do
       ParallelTests::RSpec::Runner.send(:find_tests, *args)
     end
 
+    it "finds turnip feature files" do
+      with_files(['a/test.feature']) do |root|
+        expect(call(["#{root}/"])).to eq(["#{root}/a/test.feature"])
+      end
+    end
+
     it "doesn't find backup files with the same name as test files" do
       with_files(['a/x_spec.rb', 'a/x_spec.rb.bak']) do |root|
         expect(call(["#{root}/"])).to eq(["#{root}/a/x_spec.rb"])
