@@ -106,11 +106,13 @@ at_exit do
 end
 ```
 
-Even test group run-times
-=========================
+Even test group runtimes
+========================
 
-Test groups are often not balanced and will run for different times, making everything wait for the slowest group.
-Use these loggers to record test runtime and then use the recorded runtime to balance test groups more evenly.
+Test groups will often run for different times, making the full test run as slow as the slowest group.
+
+Step 1: Use these loggers (see below) to record test runtime
+Step 2: Your next run will use the recorded test runtimes (use `--runtime-log <file>` if you picked a location different from below)
 
 ### RSpec
 
@@ -128,8 +130,10 @@ Add to your `test_helper.rb`:
 require 'parallel_tests/test/runtime_logger' if ENV['RECORD_RUNTIME']
 ```
 
-results will be logged to tmp/parallel_runtime_test.log when `RECORD_RUNTIME` is set,
+results will be logged to `tmp/parallel_runtime_test.log` when `RECORD_RUNTIME` is set,
 so it is not always required or overwritten.
+
+### TODO: add instructions for other frameworks
 
 Loggers
 =======
