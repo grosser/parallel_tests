@@ -3,8 +3,8 @@
 [![Gem Version](https://badge.fury.io/rb/parallel_tests.svg)](https://rubygems.org/gems/parallel_tests)
 [![Build status](https://github.com/grosser/parallel_tests/workflows/test/badge.svg)](https://github.com/grosser/parallel_tests/actions?query=workflow%3Atest)
 
-Speedup Test::Unit + RSpec + Cucumber + Spinach by running parallel on multiple CPU cores.<br/>
-ParallelTests splits tests into even groups (by number of lines or runtime) and runs each group in a single process with its own database.
+Speedup Minitest + RSpec + Turnip + Cucumber + Spinach by running parallel on multiple CPU cores.<br/>
+ParallelTests splits tests into balanced groups (by number of lines or runtime) and runs each group in a process with its own database.
 
 Setup for Rails
 ===============
@@ -46,7 +46,7 @@ test:
     rake parallel:drop
 
 ### Run!
-    rake parallel:test          # Test::Unit
+    rake parallel:test          # Minitest
     rake parallel:spec          # RSpec
     rake parallel:features      # Cucumber
     rake parallel:features-spinach       # Spinach
