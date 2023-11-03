@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Sort the output of `runtime_logger` for RSpec to show slowest tests first
+
 ### Breaking Changes
 
 ### Added

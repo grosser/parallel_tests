@@ -36,6 +36,8 @@ class ParallelTests::RSpec::RuntimeLogger < ParallelTests::RSpec::LoggerBase
   def start_dump(*)
     return unless ENV['TEST_ENV_NUMBER'] # only record when running in parallel
     lock_output do
+      # Order the output from slowest to fastest
+      @example_times = @example_times.sort_by(&:last).reverse
       @example_times.each do |file, time|
         relative_path = file.sub(%r{^#{Regexp.escape Dir.pwd}/}, '').sub(%r{^\./}, "")
         @output.puts "#{relative_path}:#{[time, 0].max}"
