@@ -151,7 +151,7 @@ Add the following to your `.rspec_parallel` (or `.rspec`) :
 RSpec: FailuresLogger
 -----------------------
 
-Produce pastable command-line snippets for each failed example. For example:
+Produce pasteable command-line snippets for each failed example. For example:
 
 ```bash
 rspec /path/to/my_spec.rb:123 # should do something
