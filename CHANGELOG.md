@@ -3,6 +3,8 @@
 ## Unreleased
 
 - Sort the output of `runtime_logger` for RSpec to show slowest tests first
+- Add new `ParallelTests::RSpec::VerboseFormatter` to output detailed
+  information about each example as it starts and finishes.
 
 ### Breaking Changes
 
