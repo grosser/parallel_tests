@@ -183,6 +183,22 @@ To rerun failures:
 
     cucumber @tmp/cucumber_failures.log
 
+Formatters
+==========
+
+RSpec: VerboseFormatter
+
+Output the RSpec PID, parallel process number, spec status, and the full
+example description. The formatter outputs one line when starting an example
+and then again when finishing. Use like the RSpec documentation but plays
+nicely with parallel processes.
+
+Usage:
+
+```console
+$ parallel_rspec -- --format ParallelTests::RSpec::VerboseFormatter --
+```
+
 Setup for non-rails
 ===================
 
