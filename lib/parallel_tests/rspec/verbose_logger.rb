@@ -3,7 +3,7 @@
 require 'rspec/core/formatters/base_text_formatter'
 require 'parallel_tests/rspec/runner'
 
-class ParallelTests::RSpec::VerboseFormatter < RSpec::Core::Formatters::BaseTextFormatter
+class ParallelTests::RSpec::VerboseLogger < RSpec::Core::Formatters::BaseTextFormatter
   RSpec::Core::Formatters.register(
     self,
     :example_group_started,

@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe ParallelTests::RSpec::VerboseFormatter do
+describe ParallelTests::RSpec::VerboseLogger do
   def run(command)
     result = IO.popen(command, err: [:child, :out], &:read)
     raise "FAILED: #{result}" unless $?.success?
@@ -39,7 +39,7 @@ describe ParallelTests::RSpec::VerboseFormatter do
         "#{repo_root}/bin/parallel_rspec",
         "-n", "2",
         "--",
-        "--format", "ParallelTests::RSpec::VerboseFormatter",
+        "--format", "ParallelTests::RSpec::VerboseLogger",
         "--"
       ]
 
