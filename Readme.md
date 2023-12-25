@@ -151,7 +151,7 @@ Add the following to your `.rspec_parallel` (or `.rspec`) :
 RSpec: FailuresLogger
 -----------------------
 
-Produce pastable command-line snippets for each failed example. For example:
+Produce pasteable command-line snippets for each failed example. For example:
 
 ```bash
 rspec /path/to/my_spec.rb:123 # should do something
@@ -163,6 +163,24 @@ Add to `.rspec_parallel` or use as CLI flag:
     --format ParallelTests::RSpec::FailuresLogger --out tmp/failing_specs.log
 
 (Not needed to retry failures, for that pass [--only-failures](https://relishapp.com/rspec/rspec-core/docs/command-line/only-failures) to rspec)
+
+
+RSpec: VerboseLogger
+-----------------------
+
+Prints a single line for starting and finishing each example, to see what is currently running in each process.
+
+```
+# PID, parallel process number, spec status, example description
+[14403] [2] [STARTED] Foo foo
+[14402] [1] [STARTED] Bar bar
+[14402] [1] [PASSED] Bar bar
+```
+
+Add to `.rspec_parallel` or use as CLI flag:
+
+      --format ParallelTests::RSpec::VerboseLogger
+
 
 Cucumber: FailuresLogger
 -----------------------
@@ -182,22 +200,6 @@ Note if your `cucumber.yml` default profile uses `<%= std_opts %>` you may need 
 To rerun failures:
 
     cucumber @tmp/cucumber_failures.log
-
-Formatters
-==========
-
-RSpec: VerboseFormatter
-
-Output the RSpec PID, parallel process number, spec status, and the full
-example description. The formatter outputs one line when starting an example
-and then again when finishing. Use like the RSpec documentation but plays
-nicely with parallel processes.
-
-Usage:
-
-```console
-$ parallel_rspec -- --format ParallelTests::RSpec::VerboseFormatter --
-```
 
 Setup for non-rails
 ===================
