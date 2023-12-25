@@ -2,13 +2,17 @@
 
 ## Unreleased
 
-- Sort the output of `runtime_logger` for RSpec to show slowest tests first
-- Add new `ParallelTests::RSpec::VerboseFormatter` to output detailed
-  information about each example as it starts and finishes.
-
 ### Breaking Changes
 
 ### Added
+
+## 4.4.0 - 2023-12-24
+
+### Added
+
+- Sort the output of `runtime_logger` for RSpec to show slowest tests first
+- Add new `ParallelTests::RSpec::VerboseLogger` to output detailed
+  information about each example and it's process as it starts and finishes.
 
 ## 4.3.0 - 2023-10-08
 
