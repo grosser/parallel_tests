@@ -134,11 +134,11 @@ module ParallelTests
         @@configured_databases ||= ActiveRecord::Tasks::DatabaseTasks.setup_initial_database_yaml
       end
 
-      def for_each_database
-        return unless configured_databases.present?
+      def for_each_database(&block)
+        return unless configured_databases.present? && block_given?
 
         ActiveRecord::Tasks::DatabaseTasks.for_each(configured_databases) do |name|
-          yield name
+          block.call(name)
         end
       end
 
