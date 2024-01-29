@@ -32,18 +32,21 @@ test:
 
 ### Create additional database(s)
     rake parallel:create
+    rake parallel:create:secondary (create only `secondary` database if using multiple databases)
 
 ### Copy development schema (repeat after migrations)
     rake parallel:prepare
 
 ### Run migrations in additional database(s) (repeat after migrations)
     rake parallel:migrate
+    rake parallel:migrate:secondary (migrate only `secondary` database if using multiple databases)
 
 ### Setup environment from scratch (create db and loads schema, useful for CI)
     rake parallel:setup
 
 ### Drop all test databases
     rake parallel:drop
+    rake parallel:drop:secondary (drop only `secondary` database if using multiple databases)
 
 ### Run!
     rake parallel:test          # Minitest

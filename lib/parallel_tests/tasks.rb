@@ -48,6 +48,9 @@ module ParallelTests
         activate_pipefail = "set -o pipefail"
         remove_ignored_lines = %{(grep -v #{Shellwords.escape(ignore_regex)} || true)}
 
+        # remove nil values (ex: #purge_before_load returns nil)
+        command.compact!
+
         if system('/bin/bash', '-c', "#{activate_pipefail} 2>/dev/null")
           shell_command = "#{activate_pipefail} && (#{Shellwords.shelljoin(command)}) | #{remove_ignored_lines}"
           ['/bin/bash', '-c', shell_command]
@@ -125,6 +128,20 @@ module ParallelTests
         command
       end
 
+      def configured_databases
+        return [] unless defined?(ActiveRecord) && rails_61_or_greater?
+
+        @@configured_databases ||= ActiveRecord::Tasks::DatabaseTasks.setup_initial_database_yaml
+      end
+
+      def for_each_database
+        return unless configured_databases.present?
+
+        ActiveRecord::Tasks::DatabaseTasks.for_each(configured_databases) do |name|
+          yield name
+        end
+      end
+
       private
 
       def rails_7_or_greater?
@@ -153,6 +170,17 @@ namespace :parallel do
     )
   end
 
+  # create individual databases in multi DB setups
+  ParallelTests::Tasks.for_each_database do |name|
+    desc "Create test #{name} database via db:create:#{name} --> parallel:create:#{name}[num_cpus]"
+    task "create:#{name}".to_sym, :count do |_, args|
+      ParallelTests::Tasks.run_in_parallel(
+        [$0, "db:create:#{name}", "RAILS_ENV=#{ParallelTests::Tasks.rails_env}"],
+        args
+      )
+    end
+  end
+
   desc "Drop test databases via db:drop --> parallel:drop[num_cpus]"
   task :drop, :count do |_, args|
     ParallelTests::Tasks.run_in_parallel(
@@ -164,6 +192,22 @@ namespace :parallel do
       ],
       args
     )
+  end
+
+  # drop individual databases in multi DB setups
+  ParallelTests::Tasks.for_each_database do |name|
+    desc "Drop test #{name} database via db:drop:#{name} --> parallel:drop:#{name}[num_cpus]"
+    task "drop:#{name}".to_sym, :count do |_, args|
+      ParallelTests::Tasks.run_in_parallel(
+        [
+          $0,
+          "db:drop:#{name}",
+          "RAILS_ENV=#{ParallelTests::Tasks.rails_env}",
+          "DISABLE_DATABASE_ENVIRONMENT_CHECK=1"
+        ],
+        args
+      )
+    end
   end
 
   desc "Update test databases by dumping and loading --> parallel:prepare[num_cpus]"
@@ -198,6 +242,17 @@ namespace :parallel do
     )
   end
 
+  # migrate individual databases in multi DB setups
+  ParallelTests::Tasks.for_each_database do |name|
+    desc "Update test #{name} database via db:migrate:#{name} --> parallel:migrate:#{name}[num_cpus]"
+    task "migrate:#{name}".to_sym, :count do |_, args|
+      ParallelTests::Tasks.run_in_parallel(
+        [$0, "db:migrate:#{name}", "RAILS_ENV=#{ParallelTests::Tasks.rails_env}"],
+        args
+      )
+    end
+  end
+
   desc "Rollback test databases via db:rollback --> parallel:rollback[num_cpus]"
   task :rollback, :count do |_, args|
     ParallelTests::Tasks.run_in_parallel(
@@ -217,6 +272,21 @@ namespace :parallel do
       "DISABLE_DATABASE_ENVIRONMENT_CHECK=1"
     ]
     ParallelTests::Tasks.run_in_parallel(ParallelTests::Tasks.suppress_schema_load_output(command), args)
+  end
+
+  # load the schema for individual databases in multi DB setups
+  ParallelTests::Tasks.for_each_database do |name|
+    desc "Load dumped schema for test #{name} database via db:schema:load:#{name} --> parallel:load_schema:#{name}[num_cpus]"
+    task "load_schema:#{name}".to_sym, :count do |_, args|
+      command = [
+        $0,
+        ParallelTests::Tasks.purge_before_load,
+        "db:schema:load:#{name}",
+        "RAILS_ENV=#{ParallelTests::Tasks.rails_env}",
+        "DISABLE_DATABASE_ENVIRONMENT_CHECK=1"
+      ]
+      ParallelTests::Tasks.run_in_parallel(ParallelTests::Tasks.suppress_schema_load_output(command), args)
+    end
   end
 
   # load the structure from the structure.sql file
