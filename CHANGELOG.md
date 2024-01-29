@@ -5,6 +5,7 @@
 ### Breaking Changes
 
 ### Added
+- Support for running tasks against individual databases in a multi-database setup with Rails >= 6.1 ([#930](https://github.com/grosser/parallel_tests/pull/930))
 
 ## 4.4.0 - 2023-12-24
 
