@@ -111,7 +111,7 @@ Even test group runtimes
 
 Test groups will often run for different times, making the full test run as slow as the slowest group.
 
-Step 1: Use these loggers (see below) to record test runtime
+Step 1: Use these loggers (see below) to record test runtime  
 Step 2: Your next run will use the recorded test runtimes (use `--runtime-log <file>` if you picked a location different from below)
 
 ### RSpec
