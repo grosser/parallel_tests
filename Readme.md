@@ -437,6 +437,7 @@ inspired by [pivotal labs](https://blog.pivotal.io/labs/labs/parallelize-your-rs
  - [Jon Dufresne](https://github.com/jdufresne)
  - [Eric Kessler](https://github.com/enkessler)
  - [Adis Osmonov](https://github.com/adis-io)
+ - [Josh Westbrook](https://github.com/joshwestbrook)
 
 [Michael Grosser](http://grosser.it)<br/>
 michael@grosser.it<br/>
