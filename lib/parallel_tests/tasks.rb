@@ -135,10 +135,10 @@ module ParallelTests
       end
 
       def for_each_database(&block)
-        return unless defined?(ActiveRecord)
-
         # Use nil to represent all databases
         block&.call(nil)
+
+        return unless defined?(ActiveRecord)
 
         ActiveRecord::Tasks::DatabaseTasks.for_each(configured_databases) do |name|
           block&.call(name)
