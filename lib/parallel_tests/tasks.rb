@@ -168,13 +168,7 @@ namespace :parallel do
   ParallelTests::Tasks.for_each_database do |name|
     task_name = 'create'
     task_name += ":#{name}" if name
-    description = if name
-                    "Create test #{name} database via db:#{task_name} --> parallel:#{task_name}[num_cpus]"
-                  else
-                    "Create test databases via db:#{task_name} --> parallel:#{task_name}[num_cpus]"
-                  end
-
-    desc description
+    desc "Create test#{" #{name}" if name} database via db:#{task_name} --> parallel:#{task_name}[num_cpus]"
     task task_name.to_sym, :count do |_, args|
       ParallelTests::Tasks.run_in_parallel(
         [$0, "db:#{task_name}", "RAILS_ENV=#{ParallelTests::Tasks.rails_env}"],
@@ -186,13 +180,7 @@ namespace :parallel do
   ParallelTests::Tasks.for_each_database do |name|
     task_name = 'drop'
     task_name += ":#{name}" if name
-    description = if name
-                    "Drop test #{name} database via db:#{task_name} --> parallel:#{task_name}[num_cpus]"
-                  else
-                    "Drop test databases via db:#{task_name} --> parallel:#{task_name}[num_cpus]"
-                  end
-
-    desc description
+    desc "Drop test#{" #{name}" if name} database via db:#{task_name} --> parallel:#{task_name}[num_cpus]"
     task task_name.to_sym, :count do |_, args|
       ParallelTests::Tasks.run_in_parallel(
         [
@@ -233,13 +221,7 @@ namespace :parallel do
   ParallelTests::Tasks.for_each_database do |name|
     task_name = 'migrate'
     task_name += ":#{name}" if name
-    description = if name
-                    "Update test #{name} database via db:#{task_name} --> parallel:#{task_name}[num_cpus]"
-                  else
-                    "Update test databases via db:#{task_name} --> parallel:#{task_name}[num_cpus]"
-                  end
-
-    desc description
+    desc "Update test#{" #{name}" if name} database via db:#{task_name} --> parallel:#{task_name}[num_cpus]"
     task task_name.to_sym, :count do |_, args|
       ParallelTests::Tasks.run_in_parallel(
         [$0, "db:#{task_name}", "RAILS_ENV=#{ParallelTests::Tasks.rails_env}"],
@@ -264,13 +246,7 @@ namespace :parallel do
     task_name = 'load_schema'
     task_name += ":#{name}" if name
 
-    description = if name
-                    "Load dumped schema for test #{name} database via #{rails_task} --> parallel:#{task_name}[num_cpus]"
-                  else
-                    "Load dumped schema for test databases via #{rails_task} --> parallel:#{task_name}[num_cpus]"
-                  end
-
-    desc description
+    desc "Load dumped schema for test#{" #{name}" if name} database via #{rails_task} --> parallel:#{task_name}[num_cpus]"
     task task_name.to_sym, :count do |_, args|
       command = [
         $0,
