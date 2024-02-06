@@ -135,6 +135,8 @@ module ParallelTests
       end
 
       def for_each_database(&block)
+        return unless defined?(ActiveRecord)
+
         # Use nil to represent all databases
         block&.call(nil)
 
