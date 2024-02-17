@@ -138,7 +138,8 @@ module ParallelTests
         # Use nil to represent all databases
         block&.call(nil)
 
-        return unless defined?(ActiveRecord)
+        # skip if not rails or old rails version
+        return if !defined?(ActiveRecord::Tasks::DatabaseTasks) || !ActiveRecord::Tasks::DatabaseTasks.respond_to?(:for_each)
 
         ActiveRecord::Tasks::DatabaseTasks.for_each(configured_databases) do |name|
           block&.call(name)
