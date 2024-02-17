@@ -6,6 +6,14 @@
 
 ### Added
 
+### Fixed
+
+## 4.5.1 - 2024-02-16
+
+### Fixed
+
+Rails 5.2 and gherkin fixes
+
 ## 4.5.0 - 2024-02-06
 
 ### Added
