@@ -194,6 +194,13 @@ describe ParallelTests do
         expect(ParallelTests.pids.count).to eq(0)
       end
     end
+
+    it "doesn't fail if the pid has already been killed", unless: Gem.win_platform? do
+      ParallelTests.with_pid_file do
+        ParallelTests.pids.add(1234)
+        expect { ParallelTests.stop_all_processes }.not_to raise_error
+      end
+    end
   end
 
   it "has a version" do
