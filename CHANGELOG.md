@@ -8,6 +8,11 @@
 
 ### Fixed
 
+## 4.5.2 - 2024-02-16
+
+### Fixed
+- do not crash when a pid file was already deleted when trying to delete it
+
 ## 4.5.1 - 2024-02-16
 
 ### Fixed
