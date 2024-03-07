@@ -9,10 +9,14 @@ Gem::Specification.new name, ParallelTests::VERSION do |s|
   s.homepage = "https://github.com/grosser/#{name}"
   s.metadata = {
     "bug_tracker_uri" => "https://github.com/grosser/#{name}/issues",
+    "changelog_uri" => "https://github.com/grosser/#{name}/blob/v#{s.version}/CHANGELOG.md",
     "documentation_uri" => "https://github.com/grosser/#{name}/blob/v#{s.version}/Readme.md",
     "source_code_uri" => "https://github.com/grosser/#{name}/tree/v#{s.version}",
     "wiki_uri" => "https://github.com/grosser/#{name}/wiki"
   }
+
+
+
   s.files = Dir["{lib,bin}/**/*"] + ["Readme.md"]
   s.license = "MIT"
   s.executables = ["parallel_spinach", "parallel_cucumber", "parallel_rspec", "parallel_test"]
