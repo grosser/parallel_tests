@@ -278,6 +278,7 @@ module ParallelTests
         opts.on("--nice", "execute test commands with low priority.") { options[:nice] = true }
         opts.on("--runtime-log [PATH]", "Location of previously recorded test runtimes") { |path| options[:runtime_log] = path }
         opts.on("--allowed-missing [INT]", Integer, "Allowed percentage of missing runtimes (default = 50)") { |percent| options[:allowed_missing_percent] = percent }
+        opts.on('--allow-duplicates', 'When detecting files to run, allow duplicates') { |arg| options[:allow_duplicates] = true }
         opts.on("--unknown-runtime [FLOAT]", Float, "Use given number as unknown runtime (otherwise use average time)") { |time| options[:unknown_runtime] = time }
         opts.on("--first-is-1", "Use \"1\" as TEST_ENV_NUMBER to not reuse the default test environment") { options[:first_is_1] = true }
         opts.on("--fail-fast", "Stop all groups when one group fails (best used with --test-options '--fail-fast' if supported") { options[:fail_fast] = true }

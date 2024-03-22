@@ -279,6 +279,7 @@ Options are:
         --nice                       execute test commands with low priority.
         --runtime-log [PATH]         Location of previously recorded test runtimes
         --allowed-missing [INT]      Allowed percentage of missing runtimes (default = 50)
+        --allow-duplicates           When detecting files to run, allow duplicates. Useful for local debugging
         --unknown-runtime [FLOAT]    Use given number as unknown runtime (otherwise use average time)
         --first-is-1                 Use "1" as TEST_ENV_NUMBER to not reuse the default test environment
         --fail-fast                  Stop all groups when one group fails (best used with --test-options '--fail-fast' if supported

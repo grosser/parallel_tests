@@ -1,6 +1,7 @@
 # Changelog
 
 ## Unreleased
+- Add `--allow-duplicates` flag to support re-running 1 spec multiple times
 
 ### Breaking Changes
 

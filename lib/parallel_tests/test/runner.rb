@@ -238,6 +238,7 @@ module ParallelTests
           suffix_pattern = options[:suffix] || test_suffix
           include_pattern = options[:pattern] || //
           exclude_pattern = options[:exclude_pattern]
+          allow_duplicates = options[:allow_duplicates]
 
           (tests || []).flat_map do |file_or_folder|
             if File.directory?(file_or_folder)
@@ -248,7 +249,7 @@ module ParallelTests
             else
               file_or_folder
             end
-          end.uniq
+          end.then { |files| allow_duplicates ? files : files.uniq }
         end
 
         def files_in_folder(folder, options = {})
