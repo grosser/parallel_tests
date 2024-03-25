@@ -1,13 +1,17 @@
 # Changelog
 
 ## Unreleased
-- Add `--allow-duplicates` flag to support re-running 1 spec multiple times
 
 ### Breaking Changes
 
 ### Added
 
 ### Fixed
+
+## 4.6.0 - 2024-03-25
+
+## Added
+- Add `--allow-duplicates` flag to support re-running 1 spec multiple times
 
 ## 4.5.2 - 2024-02-16
 
