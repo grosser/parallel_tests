@@ -240,7 +240,7 @@ module ParallelTests
           exclude_pattern = options[:exclude_pattern]
           allow_duplicates = options[:allow_duplicates]
 
-          (tests || []).flat_map do |file_or_folder|
+          files = (tests || []).flat_map do |file_or_folder|
             if File.directory?(file_or_folder)
               files = files_in_folder(file_or_folder, options)
               files = files.grep(suffix_pattern).grep(include_pattern)
