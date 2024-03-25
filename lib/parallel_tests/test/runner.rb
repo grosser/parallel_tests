@@ -238,8 +238,9 @@ module ParallelTests
           suffix_pattern = options[:suffix] || test_suffix
           include_pattern = options[:pattern] || //
           exclude_pattern = options[:exclude_pattern]
+          allow_duplicates = options[:allow_duplicates]
 
-          (tests || []).flat_map do |file_or_folder|
+          files = (tests || []).flat_map do |file_or_folder|
             if File.directory?(file_or_folder)
               files = files_in_folder(file_or_folder, options)
               files = files.grep(suffix_pattern).grep(include_pattern)
@@ -248,7 +249,9 @@ module ParallelTests
             else
               file_or_folder
             end
-          end.uniq
+          end
+
+          allow_duplicates ? files : files.uniq
         end
 
         def files_in_folder(folder, options = {})

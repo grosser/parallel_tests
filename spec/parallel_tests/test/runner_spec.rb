@@ -387,6 +387,10 @@ describe ParallelTests::Test::Runner do
     it "discards duplicates" do
       expect(call(['baz', 'baz'])).to eq(['baz'])
     end
+
+    it "keeps duplicates when allow_duplicates" do
+      expect(call(['baz', 'baz'], allow_duplicates: true)).to eq(['baz', 'baz'])
+    end
   end
 
   describe ".summarize_results" do

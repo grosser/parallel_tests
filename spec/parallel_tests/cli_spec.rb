@@ -78,6 +78,10 @@ describe ParallelTests::CLI do
         .to eq(defaults.merge(first_is_1: true))
     end
 
+    it "parses allow-duplicates" do
+      expect(call(["test", "--allow-duplicates"])).to eq(defaults.merge(allow_duplicates: true))
+    end
+
     context "parse only-group" do
       it "group_by should be set to filesize" do
         expect(call(["test", "--only-group", '1'])).to eq(defaults.merge(only_group: [1], group_by: :filesize))
