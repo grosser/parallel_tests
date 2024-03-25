@@ -249,7 +249,9 @@ module ParallelTests
             else
               file_or_folder
             end
-          end.then { |files| allow_duplicates ? files : files.uniq }
+          end
+
+          allow_duplicates ? files : files.uniq
         end
 
         def files_in_folder(folder, options = {})
