@@ -319,7 +319,6 @@ describe ParallelTests::CLI do
       before do
         allow(subject).to receive(:puts)
         expect(subject).to receive(:load_runner).with("my_test_runner").and_return(ParallelTests::MyTestRunner::Runner)
-        allow(ParallelTests::MyTestRunner::Runner).to receive(:test_file_name).and_return("test")
         expect(ParallelTests::MyTestRunner::Runner).to receive(:tests_in_groups).and_return(
           [
             ['aaa', 'bbb'],
@@ -361,6 +360,57 @@ describe ParallelTests::CLI do
         subject.run(['test', '-n', '3', '--only-group', '2,3', '-t', 'my_test_runner'])
       end
     end
+
+    context 'when --allow-duplicates' do
+      let(:results) { { stdout: "", exit_status: 0 } }
+      let(:common_options) do
+        { files: ['test'], allow_duplicates: true, first_is_1: false }
+      end
+      before do
+        allow(subject).to receive(:puts)
+        expect(subject).to receive(:load_runner).with('my_test_runner').and_return(ParallelTests::MyTestRunner::Runner)
+        expect(subject).to receive(:report_results).and_return(nil)
+      end
+
+      it "calls run_tests multiples times when same file is passed" do
+        options = common_options.merge(count: 4, only_group: [3, 4], group_by: :filesize)
+        expect(subject).to receive(:run_tests).once.with(['test'], 0, 1, options).and_return(results)
+        expect(subject).to receive(:run_tests).once.with(['foo'], 1, 1, options).and_return(results)
+        subject.run(['test', '-n', '4', '--allow-duplicates', '--only-group', '3,4', '-t', 'my_test_runner'])
+      end
+
+      it "calls run_tests multiples times when same file is passed" do
+        options = common_options.merge(count: 2)
+        expect(subject).to receive(:run_tests).once.with(['foo'], 3, 2, options).and_return(results)
+        expect(subject).to receive(:run_tests).once.with(['test'], 2, 2, options).and_return(results)
+        expect(subject).to receive(:run_tests).once.with(['test'], 1, 2, options).and_return(results)
+        expect(subject).to receive(:run_tests).once.with(['test'], 0, 2, options).and_return(results)
+        subject.run(['test', '-n', '2', '--allow-duplicates', '-t', 'my_test_runner'])
+      end
+
+      it "also calls run_tests multiples times when same file is passed" do
+        options = common_options.merge(count: 4)
+        expect(subject).to receive(:run_tests).once.with(['foo'], 3, 4, options).and_return(results)
+        expect(subject).to receive(:run_tests).once.with(['test'], 2, 4, options).and_return(results)
+        expect(subject).to receive(:run_tests).once.with(['test'], 1, 4, options).and_return(results)
+        expect(subject).to receive(:run_tests).once.with(['test'], 0, 4, options).and_return(results)
+        subject.run(['test', '-n', '4', '--allow-duplicates', '-t', 'my_test_runner'])
+      end
+
+      it "also calls run_tests multiples times when same file is passed" do
+        options = common_options.merge(count: 4, first_is_1: true)
+        expect(subject).to receive(:run_tests).once.with(['foo'], 4, 4, options).and_return(results)
+        expect(subject).to receive(:run_tests).once.with(['test'], 3, 4, options).and_return(results)
+        expect(subject).to receive(:run_tests).once.with(['test'], 2, 4, options).and_return(results)
+        expect(subject).to receive(:run_tests).once.with(['test'], 1, 4, options).and_return(results)
+        subject.run(['test', '-n', '4', '--first-is-1', '--allow-duplicates', '-t', 'my_test_runner'])
+      end
+
+      #   # expect(subject).to receive(:run_tests).twice.and_return(results)
+      #   # expect(subject).to receive(:run_tests).twice.and_return(results)
+      #   subject.run(['test', '-n', '3', '--allow-duplicates', '--only-group', '1,2,3', '-t', 'my_test_runner'])
+      # end
+    end
   end
 
   describe "#display_duration" do
@@ -392,6 +442,20 @@ end
 module ParallelTests
   module MyTestRunner
     class Runner
+      class << self
+        def test_file_name
+          "test"
+        end
+
+        def tests_in_groups(_tests, _num_groups, _options = {})
+          [
+            ['test'],
+            ['test'],
+            ['test'],
+            ['foo']
+          ]
+        end
+      end
     end
   end
 end
