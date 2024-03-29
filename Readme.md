@@ -61,17 +61,17 @@ test:
     rake parallel:features      # Cucumber
     rake parallel:features-spinach       # Spinach
 
-    rake parallel:test[1] --> force 1 CPU --> 86 seconds
+    rake "parallel:test[1]" --> force 1 CPU --> 86 seconds
     rake parallel:test    --> got 2 CPUs? --> 47 seconds
     rake parallel:test    --> got 4 CPUs? --> 26 seconds
     ...
 
 Test by pattern with Regex (e.g. use one integration server per subfolder / see if you broke any 'user'-related tests)
 
-    rake parallel:test[^test/unit] # every test file in test/unit folder
-    rake parallel:test[user]  # run users_controller + user_helper + user tests
-    rake parallel:test['user|product']  # run user and product related tests
-    rake parallel:spec['spec\/(?!features)'] # run RSpec tests except the tests in spec/features
+    rake "parallel:test[^test/unit]" # every test file in test/unit folder
+    rake "parallel:test[user]"  # run users_controller + user_helper + user tests
+    rake "parallel:test['user|product']"  # run user and product related tests
+    rake "parallel:spec['spec\/(?!features)']" # run RSpec tests except the tests in spec/features
 
 
 ### Example output
@@ -87,9 +87,9 @@ Test by pattern with Regex (e.g. use one integration server per subfolder / see 
 ```Bash
 RAILS_ENV=test parallel_test -e "rake my:custom:task"
 # or
-rake parallel:rake[my:custom:task]
+rake "parallel:rake[my:custom:task]"
 # limited parallelism
-rake parallel:rake[my:custom:task,2]
+rake "parallel:rake[my:custom:task,2]"
 ```
 
 
