@@ -71,30 +71,28 @@ module ParallelTests
     def run_tests_in_parallel(num_processes, options)
       test_results = nil
 
-      # run_tests_proc = -> do
-      groups = @runner.tests_in_groups(options[:files], num_processes, options)
-      groups.reject!(&:empty?)
+      run_tests_proc = -> do
+        groups = @runner.tests_in_groups(options[:files], num_processes, options)
+        groups.reject!(&:empty?)
 
-      if options[:only_group]
-        groups = options[:only_group].map { |i| groups[i - 1] }.compact
-        num_processes = 1
+        if options[:only_group]
+          groups = options[:only_group].map { |i| groups[i - 1] }.compact
+          num_processes = 1
+        end
+
+        report_number_of_tests(groups) unless options[:quiet]
+        test_results = execute_in_parallel(groups, groups.size, options) do |group|
+          test_env = env_index(options).call(groups, group)
+          run_tests(group, test_env, num_processes, options)
+        end
+        report_results(test_results, options) unless options[:quiet]
       end
 
-      report_number_of_tests(groups) unless options[:quiet]
-
-      test_results = execute_in_parallel(groups, groups.size, options) do |group|
-        test_env = env_index(options).call(groups, group)
-        run_tests(group, test_env, num_processes, options)
+      if options[:quiet]
+        run_tests_proc.call
+      else
+        report_time_taken(&run_tests_proc)
       end
-
-      report_results(test_results, options) unless options[:quiet]
-      # end
-
-      # if options[:quiet]
-      #   run_tests_proc.call
-      # else
-      #   report_time_taken(&run_tests_proc)
-      # end
 
       if any_test_failed?(test_results)
         warn final_fail_message
@@ -119,7 +117,7 @@ module ParallelTests
         if options[:allow_duplicates]
           proc { start += 1 }
         else
-          ->(grps, grp) { grps.index(grp) }
+          ->(groups, group) { groups.index(group) }
         end
     end
 
