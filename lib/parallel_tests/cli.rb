@@ -57,8 +57,8 @@ module ParallelTests
       Tempfile.open 'parallel_tests-lock' do |lock|
         ParallelTests.with_pid_file do
           simulate_output_for_ci options[:serialize_stdout] do
-            Parallel.map(items, in_threads: num_processes) do |item|
-              result = yield(item)
+            Parallel.map_with_index(items, in_threads: num_processes) do |item, index|
+              result = yield(item, index)
               reprint_output(result, lock.path) if options[:serialize_stdout]
               ParallelTests.stop_all_processes if options[:fail_fast] && result[:exit_status] != 0
               result
@@ -81,9 +81,9 @@ module ParallelTests
         end
 
         report_number_of_tests(groups) unless options[:quiet]
-        test_results = execute_in_parallel(groups, groups.size, options) do |group|
-          test_env = env_index(options).call(groups, group)
-          run_tests(group, test_env, num_processes, options)
+        test_results = execute_in_parallel(groups, groups.size, options) do |group, index|
+          test_env_number = options[:first_is_1] ? index + 1 : index
+          run_tests(group, test_env_number, num_processes, options)
         end
         report_results(test_results, options) unless options[:quiet]
       end
@@ -106,19 +106,6 @@ module ParallelTests
 
         exit exit_status
       end
-    end
-
-    def env_index(options)
-      return @env_index if defined?(@env_index)
-
-      start = options[:first_is_1] ? 0 : -1
-
-      @env_index =
-        if options[:allow_duplicates]
-          proc { start += 1 }
-        else
-          ->(groups, group) { groups.index(group) }
-        end
     end
 
     def run_tests(group, process_number, num_processes, options)
