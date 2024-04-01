@@ -394,9 +394,9 @@ describe ParallelTests::CLI do
 
       it "calls run_tests with --first-is-1" do
         options = common_options.merge(count: processes, first_is_1: true)
+        expect(subject).to receive(:run_tests).once.with(['foo'], 0, processes, options).and_return(results)
         expect(subject).to receive(:run_tests).once.with(['foo'], 1, processes, options).and_return(results)
-        expect(subject).to receive(:run_tests).once.with(['foo'], 2, processes, options).and_return(results)
-        expect(subject).to receive(:run_tests).once.with(['bar'], 3, processes, options).and_return(results)
+        expect(subject).to receive(:run_tests).once.with(['bar'], 2, processes, options).and_return(results)
         subject.run(['test', '-n', processes.to_s, '--first-is-1', '--allow-duplicates', '-t', 'my_test_runner'])
       end
     end

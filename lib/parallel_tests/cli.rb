@@ -82,8 +82,7 @@ module ParallelTests
 
         report_number_of_tests(groups) unless options[:quiet]
         test_results = execute_in_parallel(groups, groups.size, options) do |group, index|
-          test_env_number = options[:first_is_1] ? index + 1 : index
-          run_tests(group, test_env_number, num_processes, options)
+          run_tests(group, index, num_processes, options)
         end
         report_results(test_results, options) unless options[:quiet]
       end
