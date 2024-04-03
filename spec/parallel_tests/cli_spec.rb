@@ -361,6 +361,45 @@ describe ParallelTests::CLI do
         subject.run(['test', '-n', '3', '--only-group', '2,3', '-t', 'my_test_runner'])
       end
     end
+
+    context 'when --allow-duplicates' do
+      let(:results) { { stdout: "", exit_status: 0 } }
+      let(:processes) { 2 }
+      let(:common_options) do
+        { files: ['test'], allow_duplicates: true, first_is_1: false }
+      end
+      before do
+        allow(subject).to receive(:puts)
+        expect(subject).to receive(:load_runner).with("my_test_runner").and_return(ParallelTests::MyTestRunner::Runner)
+        allow(ParallelTests::MyTestRunner::Runner).to receive(:test_file_name).and_return("test")
+        expect(subject).to receive(:report_results).and_return(nil)
+      end
+
+      before do
+        expect(ParallelTests::MyTestRunner::Runner).to receive(:tests_in_groups).and_return(
+          [
+            ['foo'],
+            ['foo'],
+            ['bar']
+          ]
+        )
+      end
+
+      it "calls run_tests with --only-group" do
+        options = common_options.merge(count: processes, only_group: [2, 3], group_by: :filesize)
+        expect(subject).to receive(:run_tests).once.with(['foo'], 0, 1, options).and_return(results)
+        expect(subject).to receive(:run_tests).once.with(['bar'], 1, 1, options).and_return(results)
+        subject.run(['test', '-n', processes.to_s, '--allow-duplicates', '--only-group', '2,3', '-t', 'my_test_runner'])
+      end
+
+      it "calls run_tests with --first-is-1" do
+        options = common_options.merge(count: processes, first_is_1: true)
+        expect(subject).to receive(:run_tests).once.with(['foo'], 0, processes, options).and_return(results)
+        expect(subject).to receive(:run_tests).once.with(['foo'], 1, processes, options).and_return(results)
+        expect(subject).to receive(:run_tests).once.with(['bar'], 2, processes, options).and_return(results)
+        subject.run(['test', '-n', processes.to_s, '--first-is-1', '--allow-duplicates', '-t', 'my_test_runner'])
+      end
+    end
   end
 
   describe "#display_duration" do
