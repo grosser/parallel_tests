@@ -7,7 +7,11 @@
 ### Added
 
 ### Fixed
-- The `--allow-attributes` flag now runs duplicate tests in different groups
+
+## 4.6.1 - 2024-04-03
+
+### Fixed
+- The `--allow-duplicates` flag now runs duplicate tests in different groups
 
 ## 4.6.0 - 2024-03-25
 
