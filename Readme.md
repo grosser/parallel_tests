@@ -252,6 +252,8 @@ Options are:
     -i, --isolate                    Do not run any other tests in the group used by --single(-s)
         --isolate-n [PROCESSES]      Use 'isolate'  singles with number of processes, default: 1.
         --highest-exit-status        Exit with the highest exit status provided by test run(s)
+                                     If failure-exit-code is specified, that value takes priority.
+        --failure-exit-code [INT]    Specify the exit code to use when tests fail.
         --specify-groups [SPECS]     Use 'specify-groups' if you want to specify multiple specs running in multiple
                                      processes in a specific formation. Commas indicate specs in the same process,
                                      pipes indicate specs in a new process. Cannot use with --single, --isolate, or
