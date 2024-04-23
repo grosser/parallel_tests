@@ -224,15 +224,12 @@ module ParallelTests
         opts.on(
           "--isolate-n [PROCESSES]",
           Integer,
-          "Use 'isolate'  singles with number of processes, default: 1."
+          "Use 'isolate'  singles with number of processes, default: 1"
         ) { |n| options[:isolate_count] = n }
 
         opts.on(
           "--highest-exit-status",
-          <<~TEXT.rstrip.split("\n").join("\n#{newline_padding}")
-            Exit with the highest exit status provided by test run(s)
-            If failure-exit-code is specified, that value takes priority.
-          TEXT
+          "Exit with the highest exit status provided by test run(s)"
         ) { options[:highest_exit_status] = true }
 
         opts.on(
@@ -248,7 +245,7 @@ module ParallelTests
             processes in a specific formation. Commas indicate specs in the same process,
             pipes indicate specs in a new process. Cannot use with --single, --isolate, or
             --isolate-n.  Ex.
-            $ parallel_test -n 3 . --specify-groups '1_spec.rb,2_spec.rb|3_spec.rb'
+            $ parallel_tests -n 3 . --specify-groups '1_spec.rb,2_spec.rb|3_spec.rb'
               Process 1 will contain 1_spec.rb and 2_spec.rb
               Process 2 will contain 3_spec.rb
               Process 3 will contain all other specs
@@ -340,6 +337,10 @@ module ParallelTests
 
       if options[:specify_groups] && (options.keys & [:single_process, :isolate, :isolate_count]).any?
         raise "Can't pass --specify-groups with any of these keys: --single, --isolate, or --isolate-n"
+      end
+
+      if options[:failure_exit_code] && options[:highest_exit_status]
+        raise "Can't pass --failure-exit-code and --highest-exit-status"
       end
 
       options

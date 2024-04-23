@@ -250,10 +250,9 @@ Options are:
     -m, --multiply-processes [FLOAT] use given number as a multiplier of processes to run
     -s, --single [PATTERN]           Run all matching files in the same process
     -i, --isolate                    Do not run any other tests in the group used by --single(-s)
-        --isolate-n [PROCESSES]      Use 'isolate'  singles with number of processes, default: 1.
+        --isolate-n [PROCESSES]      Use 'isolate'  singles with number of processes, default: 1
         --highest-exit-status        Exit with the highest exit status provided by test run(s)
-                                     If failure-exit-code is specified, that value takes priority.
-        --failure-exit-code [INT]    Specify the exit code to use when tests fail.
+        --failure-exit-code [INT]    Specify the exit code to use when tests fail
         --specify-groups [SPECS]     Use 'specify-groups' if you want to specify multiple specs running in multiple
                                      processes in a specific formation. Commas indicate specs in the same process,
                                      pipes indicate specs in a new process. Cannot use with --single, --isolate, or
@@ -262,9 +261,8 @@ Options are:
                                        Process 1 will contain 1_spec.rb and 2_spec.rb
                                        Process 2 will contain 3_spec.rb
                                        Process 3 will contain all other specs
-        --only-group INT[,INT]       Only run the given group numbers. Note that this will force the 'filesize'
-                                     grouping strategy (even when the runtime log is present) unless you explicitly
-                                     set it otherwise via the '-group-by' flag.
+        --only-group INT[,INT]       Only run the given group numbers.
+                                     Changes `--group-by` default to 'filesize'.
     -e, --exec [COMMAND]             execute this code parallel and with ENV['TEST_ENV_NUMBER']
     -o, --test-options '[OPTIONS]'   execute test commands with those options
     -t, --type [TYPE]                test(default) / rspec / cucumber / spinach
@@ -281,7 +279,7 @@ Options are:
         --nice                       execute test commands with low priority.
         --runtime-log [PATH]         Location of previously recorded test runtimes
         --allowed-missing [INT]      Allowed percentage of missing runtimes (default = 50)
-        --allow-duplicates           When detecting files to run, allow duplicates. Useful for local debugging
+        --allow-duplicates           When detecting files to run, allow duplicates
         --unknown-runtime [FLOAT]    Use given number as unknown runtime (otherwise use average time)
         --first-is-1                 Use "1" as TEST_ENV_NUMBER to not reuse the default test environment
         --fail-fast                  Stop all groups when one group fails (best used with --test-options '--fail-fast' if supported
