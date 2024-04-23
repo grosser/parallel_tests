@@ -61,6 +61,10 @@ describe ParallelTests::CLI do
       )
     end
 
+    it "parses --failure-exit-code" do
+      expect(call(["test", "--failure-exit-code", "42"])).to eq(defaults.merge(failure_exit_code: 42))
+    end
+
     it "parses --quiet" do
       expect(call(["test", "--quiet"])).to eq(defaults.merge(quiet: true))
     end
