@@ -5,6 +5,7 @@
 ### Breaking Changes
 
 ### Added
+- Added `--failure-exit-code [INT]` flag to specify a custom exit code when tests fail. This option allows users to define a specific exit code that the test suite should return if any tests fail.
 
 ### Fixed
 
