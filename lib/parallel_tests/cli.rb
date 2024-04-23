@@ -96,8 +96,9 @@ module ParallelTests
       if any_test_failed?(test_results)
         warn final_fail_message
 
-        # return the highest exit status to allow sub-processes to send things other than 1
-        exit_status = if options[:highest_exit_status]
+        exit_status = if options[:failure_exit_code]
+          options[:failure_exit_code]
+        elsif options[:highest_exit_status]
           test_results.map { |data| data.fetch(:exit_status) }.max
         else
           1
@@ -226,9 +227,19 @@ module ParallelTests
           "Use 'isolate'  singles with number of processes, default: 1."
         ) { |n| options[:isolate_count] = n }
 
-        opts.on("--highest-exit-status", "Exit with the highest exit status provided by test run(s)") do
-          options[:highest_exit_status] = true
-        end
+        opts.on(
+          "--highest-exit-status",
+          <<~TEXT.rstrip.split("\n").join("\n#{newline_padding}")
+            Exit with the highest exit status provided by test run(s)
+            If failure-exit-code is specified, that value takes priority.
+          TEXT
+        ) { options[:highest_exit_status] = true }
+
+        opts.on(
+          "--failure-exit-code [INT]",
+          Integer,
+          "Specify the exit code to use when tests fail"
+        ) { |code| options[:failure_exit_code] = code }
 
         opts.on(
           "--specify-groups [SPECS]",
