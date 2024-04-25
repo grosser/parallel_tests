@@ -293,7 +293,7 @@ module ParallelTests
         end
 
         def report_process_command?(options)
-          options[:verbose] || options[:verbose_command]
+          options[:verbose] || options[:verbose_process_command]
         end
       end
     end

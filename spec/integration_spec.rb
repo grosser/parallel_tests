@@ -241,6 +241,20 @@ describe 'CLI' do
     expect(result).to include "bundle exec rspec spec/xxx2_spec.rb"
   end
 
+  it "shows only rerun with --verbose-rerun-command" do
+    write 'spec/xxx_spec.rb', 'describe("it"){it("should"){expect(1).to eq(2)}}'
+    result = run_tests ["spec", "--verbose-rerun-command"], type: 'rspec', fail: true
+    expect(result).to match printed_rerun
+    expect(result).to_not match printed_commands
+  end
+
+  it "shows only process with --verbose-process-command" do
+    write 'spec/xxx_spec.rb', 'describe("it"){it("should"){expect(1).to eq(2)}}'
+    result = run_tests ["spec", "--verbose-process-command"], type: 'rspec', fail: true
+    expect(result).to_not match printed_rerun
+    expect(result).to match printed_commands
+  end
+
   it "fails when tests fail" do
     write 'spec/xxx_spec.rb', 'describe("it"){it("should"){puts "TEST1"}}'
     write 'spec/xxx2_spec.rb', 'describe("it"){it("should"){expect(1).to eq(2)}}'

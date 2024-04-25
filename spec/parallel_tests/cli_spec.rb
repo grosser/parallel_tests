@@ -57,7 +57,19 @@ describe ParallelTests::CLI do
 
     it "parses --verbose-command" do
       expect(call(['test', '--verbose-command'])).to eq(
-        defaults.merge(verbose_command: true)
+        defaults.merge(verbose_process_command: true, verbose_rerun_command: true)
+      )
+    end
+
+    it "parses --verbose-process-command" do
+      expect(call(['test', '--verbose-process-command'])).to eq(
+        defaults.merge(verbose_process_command: true)
+      )
+    end
+
+    it "parses --verbose-rerun-command" do
+      expect(call(['test', '--verbose-rerun-command'])).to eq(
+        defaults.merge(verbose_rerun_command: true)
       )
     end
 
@@ -239,10 +251,10 @@ describe ParallelTests::CLI do
         it_prints_nothing_about_rerun_commands(verbose: false)
       end
 
-      context "with verbose command" do
+      context "with verbose rerun command" do
         it "prints command if there is a failure" do
           expect do
-            subject.send(:report_failure_rerun_commmand, single_failed_command, verbose_command: true)
+            subject.send(:report_failure_rerun_commmand, single_failed_command, verbose_rerun_command: true)
           end.to output("\n\nTests have failed for a parallel_test group. Use the following command to run the group again:\n\nTEST_ENV_NUMBER= PARALLEL_TEST_GROUPS= foo\n").to_stdout
         end
       end
