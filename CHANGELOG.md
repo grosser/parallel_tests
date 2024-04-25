@@ -1,15 +1,20 @@
 # Changelog
 
 ## Unreleased
-- Restored the `--verbose-process-command` and `--verbose-rerun-command` options, removed in version 4.0.0.
-See [#952](https://github.com/grosser/parallel_tests/pull/952).
-`--verbose-command` continues to be supported and is equivalent to set the 2 options above.
 
 ### Breaking Changes
 
 ### Added
 
 ### Fixed
+
+## 4.8.0 - 2024-04-25
+
+### Added
+
+- Restored the `--verbose-process-command` and `--verbose-rerun-command` options, removed in version 4.0.0.
+See [#952](https://github.com/grosser/parallel_tests/pull/952).
+`--verbose-command` continues to be supported and is equivalent to set the 2 options above.
 
 ## 4.7.0 - 2024-04-23
 
