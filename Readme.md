@@ -1,7 +1,7 @@
 # parallel_tests
 
 [![Gem Version](https://badge.fury.io/rb/parallel_tests.svg)](https://rubygems.org/gems/parallel_tests)
-[![Build status](https://github.com/grosser/parallel_tests/workflows/test/badge.svg)](https://github.com/grosser/parallel_tests/actions?query=workflow%3Atest)
+[![Build status](https://github.com/grosser/parallel_tests/workflows/test/badge.svg)](https://github.com/grosser/parallel_tests/actions?query=workflow%3Atest&branch=master)
 
 Speedup Minitest + RSpec + Turnip + Cucumber + Spinach by running parallel on multiple CPU cores.<br/>
 ParallelTests splits tests into balanced groups (by number of lines or runtime) and runs each group in a process with its own database.
