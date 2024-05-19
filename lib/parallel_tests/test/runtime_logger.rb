@@ -8,12 +8,12 @@ module ParallelTests
       @@prepared = false
 
       class << self
-        def log_test_run(test)
+        def log_test_run(file)
           prepare
 
           result = nil
           time = ParallelTests.delta { result = yield }
-          log(test, time)
+          log(file, time)
 
           result
         end
@@ -51,18 +51,12 @@ module ParallelTests
           File.write(logfile, '')
         end
 
-        def log(test, time)
-          return unless message = message(test, time)
+        def log(file, time)
+          return unless file
           with_locked_log do |logfile|
-            logfile.seek(0, IO::SEEK_END)
-            logfile.puts message
+            logfile.seek 0, IO::SEEK_END
+            logfile.puts "#{file.sub("#{Dir.pwd}/", "")}:#{time}"
           end
-        end
-
-        def message(test, delta)
-          return unless method = test.public_instance_methods(true).detect { |m| m =~ /^test_/ }
-          filename = test.instance_method(method).source_location.first.sub("#{Dir.pwd}/", "")
-          "#{filename}:#{delta}"
         end
 
         def logfile
@@ -73,18 +67,16 @@ module ParallelTests
   end
 end
 
-if defined?(Minitest::Runnable) # Minitest 5
-  class << Minitest::Runnable
-    prepend(
-      Module.new do
-        def run(*)
-          ParallelTests::Test::RuntimeLogger.log_test_run(self) do
-            super
-          end
+if defined?(Minitest::Test) # Minitest 5
+  Minitest::Test.prepend(
+    Module.new do
+      def run(*)
+        ParallelTests::Test::RuntimeLogger.log_test_run(method(name).source_location.first) do
+          super
         end
       end
-    )
-  end
+    end
+  )
 
   class << Minitest
     prepend(
