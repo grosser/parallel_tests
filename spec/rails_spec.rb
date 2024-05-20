@@ -20,10 +20,7 @@ describe 'rails' do
 
       Dir.chdir("spec/fixtures/#{rails}") do
         Bundler.with_unbundled_env do
-          # unset travis things
-          ENV.delete("RAILS_ENV")
-          ENV.delete("RACK_ENV")
-
+          ENV.delete "RUBYLIB"
           run ["bundle", "config", "--local", "path", "vendor/bundle"]
           run ["bundle", "config", "--local", "frozen", "true"]
           run ["bundle", "install"]
