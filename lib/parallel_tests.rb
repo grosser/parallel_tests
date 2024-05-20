@@ -44,7 +44,7 @@ module ParallelTests
 
     def stop_all_processes
       pids.all.each { |pid| Process.kill(:INT, pid) }
-    rescue Errno::ESRCH
+    rescue Errno::ESRCH, Errno::EPERM
       # Process already terminated, do nothing
     end
 

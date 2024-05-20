@@ -14,17 +14,13 @@ describe 'rails' do
   Dir["spec/fixtures/rails*"].each do |folder|
     rails = File.basename(folder)
     next if RUBY_VERSION >= "3.1.0" && rails < "rails70" # https://github.com/rails/rails/issues/43998
-    next if RUBY_VERSION < "2.7.0" && rails >= "rails70"
 
     it "can create and run #{rails}" do
       skip 'rails fixtures are not set up for java' if RUBY_PLATFORM == "java"
 
       Dir.chdir("spec/fixtures/#{rails}") do
         Bundler.with_unbundled_env do
-          # unset travis things
-          ENV.delete("RAILS_ENV")
-          ENV.delete("RACK_ENV")
-
+          ENV.delete "RUBYLIB"
           run ["bundle", "config", "--local", "path", "vendor/bundle"]
           run ["bundle", "config", "--local", "frozen", "true"]
           run ["bundle", "install"]
