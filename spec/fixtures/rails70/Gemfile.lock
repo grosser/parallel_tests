@@ -112,8 +112,6 @@ GEM
     rake (13.0.6)
     sqlite3 (2.0.1)
       mini_portile2 (~> 2.8.0)
-    sqlite3 (2.0.1-x64-mingw32)
-    sqlite3 (2.0.1-x86_64-darwin)
     strscan (3.0.1)
     thor (1.2.1)
     timeout (0.2.0)
@@ -128,10 +126,6 @@ GEM
 
 PLATFORMS
   ruby
-  x64-mingw32
-  x86_64-darwin-20
-  x86_64-darwin-21
-  x86_64-linux
 
 DEPENDENCIES
   actioncable (= 7.0.2.3)

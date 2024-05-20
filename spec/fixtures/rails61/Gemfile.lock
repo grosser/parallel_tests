@@ -67,12 +67,6 @@ GEM
     nokogiri (1.16.5)
       mini_portile2 (~> 2.8.2)
       racc (~> 1.4)
-    nokogiri (1.16.5-x64-mingw32)
-      racc (~> 1.4)
-    nokogiri (1.16.5-x86_64-darwin)
-      racc (~> 1.4)
-    nokogiri (1.16.5-x86_64-linux)
-      racc (~> 1.4)
     parallel (1.22.1)
     racc (1.6.0)
     rack (2.2.3)
@@ -100,8 +94,6 @@ GEM
       sprockets (>= 3.0.0)
     sqlite3 (2.0.1)
       mini_portile2 (~> 2.8.0)
-    sqlite3 (2.0.1-x64-mingw32)
-    sqlite3 (2.0.1-x86_64-darwin)
     thor (1.2.1)
     tzinfo (2.0.4)
       concurrent-ruby (~> 1.0)
@@ -114,10 +106,6 @@ GEM
 
 PLATFORMS
   ruby
-  x64-mingw32
-  x86_64-darwin-20
-  x86_64-darwin-21
-  x86_64-linux
 
 DEPENDENCIES
   actioncable (= 6.1.3)
