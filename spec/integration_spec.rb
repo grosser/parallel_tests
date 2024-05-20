@@ -571,12 +571,13 @@ describe 'CLI' do
       write "features/fail2.feature", "Feature: xxx\n  Scenario: xxx\n    Given I fail"
       results = run_tests ["features"], processes: 3, type: "cucumber", fail: true
 
-      failing_scenarios = if Gem.win_platform?
+      failing_scenarios = if Gem.win_platform? && RUBY_VERSION < "3.3.0"
         ["cucumber features/fail1.feature:2 # Scenario: xxx", "cucumber features/fail2.feature:2 # Scenario: xxx"]
       else
         ["cucumber features/fail2.feature:2 # Scenario: xxx", "cucumber features/fail1.feature:2 # Scenario: xxx"]
       end
 
+      results.gsub!(/.*WARNING.*\n/, "")
       expect(results).to include <<-EOF.gsub('        ', '')
         Failing Scenarios:
         #{failing_scenarios[0]}

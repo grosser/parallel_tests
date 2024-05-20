@@ -16,7 +16,7 @@ GEM
     ast (2.4.2)
     builder (3.2.4)
     bump (0.10.0)
-    colorize (0.8.1)
+    colorize (1.1.0)
     concurrent-ruby (1.1.10)
     cucumber (4.1.0)
       builder (~> 3.2, >= 3.2.3)
@@ -72,6 +72,8 @@ GEM
       middleware
       thor
       thread_safe
+    racc (1.8.0)
+    racc (1.8.0-java)
     rainbow (3.1.1)
     rake (13.0.6)
     regexp_parser (2.8.0)
@@ -129,10 +131,11 @@ DEPENDENCIES
   cuke_modeler (~> 3.6)
   minitest (~> 5.5.0)
   parallel_tests!
+  racc
   rake
   rspec (~> 3.3)
   rubocop (~> 1.51.0)
-  spinach (~> 0.12)
+  spinach
   test-unit
 
 BUNDLED WITH
