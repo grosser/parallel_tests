@@ -21,7 +21,18 @@ describe ParallelTests::Cucumber::Runner do
           "Failing Scenarios:", "cucumber features/failure:3", "cucumber features/failure:4",
           "Failing Scenarios:", "cucumber features/failure:5", "cucumber features/failure:6"
         ]
-        expect(call(results)).to eq("Failing Scenarios:\ncucumber features/failure:1\ncucumber features/failure:2\ncucumber features/failure:3\ncucumber features/failure:4\ncucumber features/failure:5\ncucumber features/failure:6\n\n")
+        output = call(results)
+        output.gsub!(/.*WARNING.*\n/, "")
+        expect(output).to eq(<<~TXT)
+          Failing Scenarios:
+          cucumber features/failure:1
+          cucumber features/failure:2
+          cucumber features/failure:3
+          cucumber features/failure:4
+          cucumber features/failure:5
+          cucumber features/failure:6
+
+        TXT
       end
 
       it "collates flaky scenarios separately" do

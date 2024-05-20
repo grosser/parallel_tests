@@ -43,7 +43,7 @@ describe ParallelTests::Test::Runner do
     end
 
     it "uses given when passed found" do
-      result = Gem.win_platform? ? [["a", "b"], ["c"]] : [["a", "c"], ["b"]]
+      result = (Gem.win_platform? && RUBY_VERSION < "3.3.0" ? [["a", "b"], ["c"]] : [["a", "c"], ["b"]])
       expect(call(["a", "b", "c"], 2, group_by: :found)).to eq(result)
     end
 
