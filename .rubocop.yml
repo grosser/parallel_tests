@@ -1,6 +1,6 @@
 AllCops:
   NewCops: enable
-  TargetRubyVersion: 2.7
+  TargetRubyVersion: 3.0
   SuggestExtensions: false
   Exclude:
   - '**/vendor/bundle/**/*'

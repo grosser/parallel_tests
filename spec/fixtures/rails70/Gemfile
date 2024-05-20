@@ -13,6 +13,6 @@ gem 'activerecord', rails_version
 gem 'activesupport', rails_version
 gem 'railties', rails_version
 
-gem 'sqlite3', '~> 1.7.3' # last before 2.0
+gem 'sqlite3', '~> 1.7.3' # last before 2.0 which has weird install errors
 gem 'tzinfo-data'
 gem 'parallel_tests', path: "../../../", group: :development
