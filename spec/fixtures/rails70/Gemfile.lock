@@ -110,7 +110,10 @@ GEM
       thor (~> 1.0)
       zeitwerk (~> 2.5)
     rake (13.0.6)
-    sqlite3 (1.4.2)
+    sqlite3 (2.0.1)
+      mini_portile2 (~> 2.8.0)
+    sqlite3 (2.0.1-x64-mingw32)
+    sqlite3 (2.0.1-x86_64-darwin)
     strscan (3.0.1)
     thor (1.2.1)
     timeout (0.2.0)
@@ -145,4 +148,4 @@ DEPENDENCIES
   tzinfo-data
 
 BUNDLED WITH
-   2.3.7
+   2.5.10
