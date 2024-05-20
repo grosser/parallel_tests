@@ -1,7 +1,7 @@
 # parallel_tests
 
 [![Gem Version](https://badge.fury.io/rb/parallel_tests.svg)](https://rubygems.org/gems/parallel_tests)
-[![Build status](https://github.com/grosser/parallel_tests/workflows/test/badge.svg)](https://github.com/grosser/parallel_tests/actions?query=workflow%3Atest)
+[![Build status](https://github.com/grosser/parallel_tests/workflows/test/badge.svg)](https://github.com/grosser/parallel_tests/actions?query=workflow%3Atest&branch=master)
 
 Speedup Minitest + RSpec + Turnip + Cucumber + Spinach by running parallel on multiple CPU cores.<br/>
 ParallelTests splits tests into balanced groups (by number of lines or runtime) and runs each group in a process with its own database.
@@ -93,7 +93,7 @@ rake "parallel:rake[my:custom:task,2]"
 ```
 
 
-Running things once
+Running setup or teardown once
 ===================
 
 ```Ruby
@@ -121,8 +121,11 @@ Even test group runtimes
 
 Test groups will often run for different times, making the full test run as slow as the slowest group.
 
-Step 1: Use these loggers (see below) to record test runtime
-Step 2: Your next run will use the recorded test runtimes (use `--runtime-log <file>` if you picked a location different from below)
+**Step 1**: Use these loggers (see below) to record test runtime
+
+**Step 2**: The next test run will use the recorded test runtimes (use `--runtime-log <file>` if you picked a location different from below)
+
+**Step 3**: Automate upload/download of test runtime from your CI system [example](https://github.com/grosser/parallel_rails_example/blob/master/.github/workflows/test.yml) (chunks need to be combined, an alternative is [amend](https://github.com/grosser/amend))
 
 ### RSpec
 
@@ -142,8 +145,6 @@ require 'parallel_tests/test/runtime_logger' if ENV['RECORD_RUNTIME']
 
 results will be logged to `tmp/parallel_runtime_test.log` when `RECORD_RUNTIME` is set,
 so it is not always required or overwritten.
-
-### TODO: add instructions for other frameworks
 
 Loggers
 =======
