@@ -241,6 +241,20 @@ describe 'CLI' do
     expect(result).to include "bundle exec rspec spec/xxx2_spec.rb"
   end
 
+  it "shows only rerun with --verbose-rerun-command" do
+    write 'spec/xxx_spec.rb', 'describe("it"){it("should"){expect(1).to eq(2)}}'
+    result = run_tests ["spec", "--verbose-rerun-command"], type: 'rspec', fail: true
+    expect(result).to match printed_rerun
+    expect(result).to_not match printed_commands
+  end
+
+  it "shows only process with --verbose-process-command" do
+    write 'spec/xxx_spec.rb', 'describe("it"){it("should"){expect(1).to eq(2)}}'
+    result = run_tests ["spec", "--verbose-process-command"], type: 'rspec', fail: true
+    expect(result).to_not match printed_rerun
+    expect(result).to match printed_commands
+  end
+
   it "fails when tests fail" do
     write 'spec/xxx_spec.rb', 'describe("it"){it("should"){puts "TEST1"}}'
     write 'spec/xxx2_spec.rb', 'describe("it"){it("should"){expect(1).to eq(2)}}'
@@ -286,6 +300,11 @@ describe 'CLI' do
     it "can exec given commands with ENV['TEST_ENV_NUMBER']" do
       result = run_tests ['-e', 'ruby -e "print ENV[:TEST_ENV_NUMBER.to_s].to_i"'], processes: 4
       expect(result.gsub('"', '').chars.sort).to eq(['0', '2', '3', '4'])
+    end
+
+    it "can exec given commands with $TEST_ENV_NUMBER" do
+      result = run_tests ['-e', 'echo foo-$TEST_ENV_NUMBER'], processes: 4
+      expect(result.split(/\n+/).sort).to eq(['foo-', 'foo-2', 'foo-3', 'foo-4'])
     end
 
     it "can exec given command non-parallel" do
@@ -552,12 +571,13 @@ describe 'CLI' do
       write "features/fail2.feature", "Feature: xxx\n  Scenario: xxx\n    Given I fail"
       results = run_tests ["features"], processes: 3, type: "cucumber", fail: true
 
-      failing_scenarios = if Gem.win_platform?
+      failing_scenarios = if Gem.win_platform? && RUBY_VERSION < "3.3.0"
         ["cucumber features/fail1.feature:2 # Scenario: xxx", "cucumber features/fail2.feature:2 # Scenario: xxx"]
       else
         ["cucumber features/fail2.feature:2 # Scenario: xxx", "cucumber features/fail1.feature:2 # Scenario: xxx"]
       end
 
+      results.gsub!(/.*WARNING.*\n/, "")
       expect(results).to include <<-EOF.gsub('        ', '')
         Failing Scenarios:
         #{failing_scenarios[0]}

@@ -98,7 +98,7 @@ module ParallelTests
           cmd = ["nice", *cmd] if options[:nice]
 
           # being able to run with for example `-output foo-$TEST_ENV_NUMBER` worked originally and is convenient
-          cmd.map! { |c| c.gsub("$TEST_ENV_NUMBER", number).gsub("${TEST_ENV_NUMBER}", number) }
+          cmd = cmd.map { |c| c.gsub("$TEST_ENV_NUMBER", number).gsub("${TEST_ENV_NUMBER}", number) }
 
           print_command(cmd, env) if report_process_command?(options) && !options[:serialize_stdout]
 
@@ -241,8 +241,9 @@ module ParallelTests
           suffix_pattern = options[:suffix] || test_suffix
           include_pattern = options[:pattern] || //
           exclude_pattern = options[:exclude_pattern]
+          allow_duplicates = options[:allow_duplicates]
 
-          (tests || []).flat_map do |file_or_folder|
+          files = (tests || []).flat_map do |file_or_folder|
             if File.directory?(file_or_folder)
               files = files_in_folder(file_or_folder, options)
               files = files.grep(suffix_pattern).grep(include_pattern)
@@ -251,7 +252,9 @@ module ParallelTests
             else
               file_or_folder
             end
-          end.uniq
+          end
+
+          allow_duplicates ? files : files.uniq
         end
 
         def files_in_folder(folder, options = {})
@@ -293,7 +296,7 @@ module ParallelTests
         end
 
         def report_process_command?(options)
-          options[:verbose] || options[:verbose_command]
+          options[:verbose] || options[:verbose_process_command]
         end
       end
     end

@@ -43,7 +43,7 @@ describe ParallelTests::Test::Runner do
     end
 
     it "uses given when passed found" do
-      result = Gem.win_platform? ? [["a", "b"], ["c"]] : [["a", "c"], ["b"]]
+      result = (Gem.win_platform? && RUBY_VERSION < "3.3.0" ? [["a", "b"], ["c"]] : [["a", "c"], ["b"]])
       expect(call(["a", "b", "c"], 2, group_by: :found)).to eq(result)
     end
 
@@ -147,12 +147,12 @@ describe ParallelTests::Test::Runner do
 
         isolated, *groups = result
         expect(isolated).to eq(["aaa"])
-        actual = groups.map(&:to_set).to_set
+        actual = groups.to_set(&:to_set)
 
         # both eee and ccs are the same size, so either can be in either group
         valid_combinations = [
-          [["bbb", "eee"], ["ccc", "ddd"]].map(&:to_set).to_set,
-          [["bbb", "ccc"], ["eee", "ddd"]].map(&:to_set).to_set
+          [["bbb", "eee"], ["ccc", "ddd"]].to_set(&:to_set),
+          [["bbb", "ccc"], ["eee", "ddd"]].to_set(&:to_set)
         ]
 
         expect(valid_combinations).to include(actual)
@@ -169,12 +169,12 @@ describe ParallelTests::Test::Runner do
         isolated_1, isolated_2, *groups = result
         expect(isolated_1).to eq(["aaa2"])
         expect(isolated_2).to eq(["aaa1", "aaa3"])
-        actual = groups.map(&:to_set).to_set
+        actual = groups.to_set(&:to_set)
 
         # both eee and ccs are the same size, so either can be in either group
         valid_combinations = [
-          [["bbb", "eee"], ["ccc", "ddd"]].map(&:to_set).to_set,
-          [["bbb", "ccc"], ["eee", "ddd"]].map(&:to_set).to_set
+          [["bbb", "eee"], ["ccc", "ddd"]].to_set(&:to_set),
+          [["bbb", "ccc"], ["eee", "ddd"]].to_set(&:to_set)
         ]
 
         expect(valid_combinations).to include(actual)
@@ -191,12 +191,12 @@ describe ParallelTests::Test::Runner do
         specify_groups_1, specify_groups_2, *groups = result
         expect(specify_groups_1).to eq(["aaa2", "aaa1"])
         expect(specify_groups_2).to eq(["bbb"])
-        actual = groups.map(&:to_set).to_set
+        actual = groups.to_set(&:to_set)
 
         # both eee and ccs are the same size, so either can be in either group
         valid_combinations = [
-          [["aaa3", "ccc"], ["ddd", "eee"]].map(&:to_set).to_set,
-          [["aaa3", "eee"], ["ddd", "ccc"]].map(&:to_set).to_set
+          [["aaa3", "ccc"], ["ddd", "eee"]].to_set(&:to_set),
+          [["aaa3", "eee"], ["ddd", "ccc"]].to_set(&:to_set)
         ]
 
         expect(valid_combinations).to include(actual)
@@ -386,6 +386,10 @@ describe ParallelTests::Test::Runner do
 
     it "discards duplicates" do
       expect(call(['baz', 'baz'])).to eq(['baz'])
+    end
+
+    it "keeps duplicates when allow_duplicates" do
+      expect(call(['baz', 'baz'], allow_duplicates: true)).to eq(['baz', 'baz'])
     end
   end
 

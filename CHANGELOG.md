@@ -8,6 +8,77 @@
 
 ### Fixed
 
+## 4.7.1 - 2024-04-25
+
+### Added
+
+- Restored the `--verbose-process-command` and `--verbose-rerun-command` options, removed in version 4.0.0.
+See [#952](https://github.com/grosser/parallel_tests/pull/952).
+`--verbose-command` continues to be supported and is equivalent to set the 2 options above.
+
+## 4.7.0 - 2024-04-23
+
+### Added
+- Added `--failure-exit-code [INT]` flag to specify a custom exit code when tests fail. This option allows users to define a specific exit code that the test suite should return if any tests fail.
+
+## 4.6.1 - 2024-04-03
+
+### Fixed
+- The `--allow-duplicates` flag now runs duplicate tests in different groups
+
+## 4.6.0 - 2024-03-25
+
+## Added
+- Add `--allow-duplicates` flag to support re-running 1 spec multiple times
+
+## 4.5.2 - 2024-02-16
+
+### Fixed
+- do not crash when a pid file was already deleted when trying to delete it
+
+## 4.5.1 - 2024-02-16
+
+### Fixed
+
+Rails 5.2 and gherkin fixes
+
+## 4.5.0 - 2024-02-06
+
+### Added
+- Support for running tasks against individual databases in a multi-database setup with Rails >= 6.1 ([#930](https://github.com/grosser/parallel_tests/pull/930))
+
+## 4.4.0 - 2023-12-24
+
+### Added
+
+- Sort the output of `runtime_logger` for RSpec to show slowest tests first
+- Add new `ParallelTests::RSpec::VerboseLogger` to output detailed
+  information about each example and it's process as it starts and finishes.
+
+## 4.3.0 - 2023-10-08
+
+### Added
+
+- Support for RSpec turnip feature files.
+
+## 4.2.2 - 2023-09-05
+
+### Breaking Changes
+
+- Drop support for RSpec 2.
+
+### Added
+
+- Document unexpected behavior where the `--only-group` flag will also set a
+  grouping strategy.
+
+## 4.2.1 - 2023-05-05
+
+### Fixed
+
+- Fix $TEST_ENV_NUMBER replacing code to not affect all processes (#905)
+- Remove duplicate raise codes. (#897)
+
 ## 4.2.0 - 2023-02-06
 
 ### Fixed

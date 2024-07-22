@@ -19,7 +19,7 @@ describe ParallelTests::RSpec::RuntimeLogger do
       end
 
       example = double(file_path: "#{Dir.pwd}/spec/foo.rb")
-      example = double(group: example) unless ParallelTests::RSpec::RuntimeLogger::RSPEC_2
+      example = double(group: example)
 
       logger.example_group_started example
       logger.example_group_finished example
@@ -120,13 +120,22 @@ describe ParallelTests::RSpec::RuntimeLogger do
         end
       RUBY
 
+      write "spec/slower_spec.rb", <<-RUBY
+        describe "xxx" do
+          it "is slow" do
+            sleep 3
+          end
+      end
+      RUBY
+
       system(
         { 'TEST_ENV_NUMBER' => '1' },
         "rspec", "spec", "-I", Bundler.root.join("lib").to_s, "--format", "ParallelTests::RSpec::RuntimeLogger", "--out", "runtime.log"
       ) || raise("nope")
 
       result = File.read("runtime.log")
-      expect(result).to include "a_spec.rb:1.5"
+      expect(result).to start_with("spec/slower_spec.rb:3.0")
+      expect(result).to include "spec/a_spec.rb:1.5"
     end
   end
 end

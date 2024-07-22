@@ -4,8 +4,8 @@ require "parallel_tests/gherkin/runner"
 module ParallelTests
   module Cucumber
     class Runner < ParallelTests::Gherkin::Runner
-      SCENARIOS_RESULTS_BOUNDARY_REGEX = /^(Failing|Flaky) Scenarios:$/.freeze
-      SCENARIO_REGEX = %r{^cucumber features/.+:\d+}.freeze
+      SCENARIOS_RESULTS_BOUNDARY_REGEX = /^(Failing|Flaky) Scenarios:$/
+      SCENARIO_REGEX = %r{^cucumber features/.+:\d+}
 
       class << self
         def name
