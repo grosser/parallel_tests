@@ -20,7 +20,7 @@ module ParallelTests
       options[:first_is_1] ||= first_is_1?
 
       if options[:execute]
-        execute_shell_command_in_parallel(options[:execute], num_processes, options)
+        execute_command_in_parallel(options[:execute], num_processes, options)
       else
         run_tests_in_parallel(num_processes, options)
       end
@@ -32,9 +32,23 @@ module ParallelTests
       @graceful_shutdown_attempted ||= false
       Kernel.exit if @graceful_shutdown_attempted
 
-      # The Pid class's synchronize method can't be called directly from a trap
-      # Using Thread workaround https://github.com/ddollar/foreman/issues/332
-      Thread.new { ParallelTests.stop_all_processes }
+      # In a shell, all sub-processes also get an interrupt, so they shut themselves down.
+      # In a background process this does not happen and we need to do it ourselves.
+      # We cannot always send the interrupt since then the sub-processes would get interrupted twice when in foreground
+      # and that messes with interrupt handling.
+      #
+      # (can simulate detached with `(bundle exec parallel_rspec test/a_spec.rb -n 2 &)`)
+      # also the integration test "passes on int signal to child processes" is detached.
+      #
+      # On windows getpgid does not work so we resort to always killing which is the smaller bug.
+      #
+      # The ParallelTests::Pids `synchronize` method can't be called directly from a trap,
+      # using Thread workaround https://github.com/ddollar/foreman/issues/332
+      Thread.new do
+        if Gem.win_platform? || ((child_pid = ParallelTests.pids.all.first) && Process.getpgid(child_pid) != Process.pid)
+          ParallelTests.stop_all_processes
+        end
+      end
 
       @graceful_shutdown_attempted = true
     end
@@ -43,8 +57,8 @@ module ParallelTests
       Tempfile.open 'parallel_tests-lock' do |lock|
         ParallelTests.with_pid_file do
           simulate_output_for_ci options[:serialize_stdout] do
-            Parallel.map(items, in_threads: num_processes) do |item|
-              result = yield(item)
+            Parallel.map_with_index(items, in_threads: num_processes) do |item, index|
+              result = yield(item, index)
               reprint_output(result, lock.path) if options[:serialize_stdout]
               ParallelTests.stop_all_processes if options[:fail_fast] && result[:exit_status] != 0
               result
@@ -61,20 +75,15 @@ module ParallelTests
         groups = @runner.tests_in_groups(options[:files], num_processes, options)
         groups.reject!(&:empty?)
 
-        test_results = if options[:only_group]
-          groups_to_run = options[:only_group].map { |i| groups[i - 1] }.compact
-          report_number_of_tests(groups_to_run) unless options[:quiet]
-          execute_in_parallel(groups_to_run, groups_to_run.size, options) do |group|
-            run_tests(group, groups_to_run.index(group), 1, options)
-          end
-        else
-          report_number_of_tests(groups) unless options[:quiet]
-
-          execute_in_parallel(groups, groups.size, options) do |group|
-            run_tests(group, groups.index(group), num_processes, options)
-          end
+        if options[:only_group]
+          groups = options[:only_group].map { |i| groups[i - 1] }.compact
+          num_processes = 1
         end
 
+        report_number_of_tests(groups) unless options[:quiet]
+        test_results = execute_in_parallel(groups, groups.size, options) do |group, index|
+          run_tests(group, index, num_processes, options)
+        end
         report_results(test_results, options) unless options[:quiet]
       end
 
@@ -87,8 +96,9 @@ module ParallelTests
       if any_test_failed?(test_results)
         warn final_fail_message
 
-        # return the highest exit status to allow sub-processes to send things other than 1
-        exit_status = if options[:highest_exit_status]
+        exit_status = if options[:failure_exit_code]
+          options[:failure_exit_code]
+        elsif options[:highest_exit_status]
           test_results.map { |data| data.fetch(:exit_status) }.max
         else
           1
@@ -100,7 +110,7 @@ module ParallelTests
 
     def run_tests(group, process_number, num_processes, options)
       if group.empty?
-        { stdout: '', exit_status: 0, command: '', seed: nil }
+        { stdout: '', exit_status: 0, command: nil, seed: nil }
       else
         @runner.run_tests(group, process_number, num_processes, options)
       end
@@ -140,9 +150,8 @@ module ParallelTests
         puts "\n\nTests have failed for a parallel_test group. Use the following command to run the group again:\n\n"
         failing_sets.each do |failing_set|
           command = failing_set[:command]
-          command = command.gsub(/;export [A-Z_]+;/, ' ') # remove ugly export statements
           command = @runner.command_with_seed(command, failing_set[:seed]) if failing_set[:seed]
-          puts command
+          @runner.print_command(command, failing_set[:env] || {})
         end
       end
     end
@@ -219,12 +228,19 @@ module ParallelTests
         opts.on(
           "--isolate-n [PROCESSES]",
           Integer,
-          "Use 'isolate'  singles with number of processes, default: 1."
+          "Use 'isolate'  singles with number of processes, default: 1"
         ) { |n| options[:isolate_count] = n }
 
-        opts.on("--highest-exit-status", "Exit with the highest exit status provided by test run(s)") do
-          options[:highest_exit_status] = true
-        end
+        opts.on(
+          "--highest-exit-status",
+          "Exit with the highest exit status provided by test run(s)"
+        ) { options[:highest_exit_status] = true }
+
+        opts.on(
+          "--failure-exit-code [INT]",
+          Integer,
+          "Specify the exit code to use when tests fail"
+        ) { |code| options[:failure_exit_code] = code }
 
         opts.on(
           "--specify-groups [SPECS]",
@@ -240,10 +256,17 @@ module ParallelTests
           TEXT
         ) { |groups| options[:specify_groups] = groups }
 
-        opts.on("--only-group INT[,INT]", Array) { |groups| options[:only_group] = groups.map(&:to_i) }
+        opts.on(
+          "--only-group INT[,INT]",
+          Array,
+          <<~TEXT.rstrip.split("\n").join("\n#{newline_padding}")
+            Only run the given group numbers.
+            Changes `--group-by` default to 'filesize'.
+          TEXT
+        ) { |groups| options[:only_group] = groups.map(&:to_i) }
 
-        opts.on("-e", "--exec [COMMAND]", "execute this code parallel and with ENV['TEST_ENV_NUMBER']") { |path| options[:execute] = path }
-        opts.on("-o", "--test-options '[OPTIONS]'", "execute test commands with those options") { |arg| options[:test_options] = arg.lstrip }
+        opts.on("-e", "--exec [COMMAND]", "execute this code parallel and with ENV['TEST_ENV_NUMBER']") { |arg| options[:execute] = Shellwords.shellsplit(arg) }
+        opts.on("-o", "--test-options '[OPTIONS]'", "execute test commands with those options") { |arg| options[:test_options] = Shellwords.shellsplit(arg) }
         opts.on("-t", "--type [TYPE]", "test(default) / rspec / cucumber / spinach") do |type|
           @runner = load_runner(type)
         rescue NameError, LoadError => e
@@ -254,7 +277,7 @@ module ParallelTests
           "--suffix [PATTERN]",
           <<~TEXT.rstrip.split("\n").join("\n#{newline_padding}")
             override built in test file pattern (should match suffix):
-            '_spec\.rb$' - matches rspec files
+            '_spec.rb$' - matches rspec files
             '_(test|spec).rb$' - matches test or spec files
           TEXT
         ) { |pattern| options[:suffix] = /#{pattern}/ }
@@ -267,12 +290,14 @@ module ParallelTests
         opts.on("--nice", "execute test commands with low priority.") { options[:nice] = true }
         opts.on("--runtime-log [PATH]", "Location of previously recorded test runtimes") { |path| options[:runtime_log] = path }
         opts.on("--allowed-missing [INT]", Integer, "Allowed percentage of missing runtimes (default = 50)") { |percent| options[:allowed_missing_percent] = percent }
+        opts.on('--allow-duplicates', 'When detecting files to run, allow duplicates') { options[:allow_duplicates] = true }
         opts.on("--unknown-runtime [FLOAT]", Float, "Use given number as unknown runtime (otherwise use average time)") { |time| options[:unknown_runtime] = time }
         opts.on("--first-is-1", "Use \"1\" as TEST_ENV_NUMBER to not reuse the default test environment") { options[:first_is_1] = true }
         opts.on("--fail-fast", "Stop all groups when one group fails (best used with --test-options '--fail-fast' if supported") { options[:fail_fast] = true }
         opts.on("--verbose", "Print debug output") { options[:verbose] = true }
-        opts.on("--verbose-process-command", "Displays only the command that will be executed by each process") { options[:verbose_process_command] = true }
-        opts.on("--verbose-rerun-command", "When there are failures, displays the command executed by each process that failed") { options[:verbose_rerun_command] = true }
+        opts.on("--verbose-command", "Combines options --verbose-process-command and --verbose-rerun-command") { options.merge! verbose_process_command: true, verbose_rerun_command: true }
+        opts.on("--verbose-process-command", "Print the command that will be executed by each process before it begins") { options[:verbose_process_command] = true }
+        opts.on("--verbose-rerun-command", "After a process fails, print the command executed by that process") { options[:verbose_rerun_command] = true }
         opts.on("--quiet", "Print only tests output") { options[:quiet] = true }
         opts.on("-v", "--version", "Show Version") do
           puts ParallelTests::VERSION
@@ -320,26 +345,30 @@ module ParallelTests
         raise "Can't pass --specify-groups with any of these keys: --single, --isolate, or --isolate-n"
       end
 
+      if options[:failure_exit_code] && options[:highest_exit_status]
+        raise "Can't pass --failure-exit-code and --highest-exit-status"
+      end
+
       options
     end
 
     def extract_file_paths(argv)
       dash_index = argv.rindex("--")
       file_args_at = (dash_index || -1) + 1
-      [argv[file_args_at..-1], argv[0...(dash_index || 0)]]
+      [argv[file_args_at..], argv[0...(dash_index || 0)]]
     end
 
     def extract_test_options(argv)
       dash_index = argv.index("--") || -1
-      argv[dash_index + 1..-1]
+      argv[dash_index + 1..]
     end
 
     def append_test_options(options, argv)
       new_opts = extract_test_options(argv)
       return if new_opts.empty?
 
-      prev_and_new = [options[:test_options], new_opts.shelljoin]
-      options[:test_options] = prev_and_new.compact.join(' ')
+      options[:test_options] ||= []
+      options[:test_options] += new_opts
     end
 
     def load_runner(type)
@@ -349,7 +378,7 @@ module ParallelTests
       klass_name.split('::').inject(Object) { |x, y| x.const_get(y) }
     end
 
-    def execute_shell_command_in_parallel(command, num_processes, options)
+    def execute_command_in_parallel(command, num_processes, options)
       runs = if options[:only_group]
         options[:only_group].map { |g| g - 1 }
       else
@@ -401,7 +430,7 @@ module ParallelTests
     def simulate_output_for_ci(simulate)
       if simulate
         progress_indicator = Thread.new do
-          interval = Float(ENV.fetch('PARALLEL_TEST_HEARTBEAT_INTERVAL', 60))
+          interval = Float(ENV['PARALLEL_TEST_HEARTBEAT_INTERVAL'] || 60)
           loop do
             sleep interval
             print '.'

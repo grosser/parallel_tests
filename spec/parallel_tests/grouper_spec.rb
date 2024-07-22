@@ -7,7 +7,7 @@ require 'tmpdir'
 describe ParallelTests::Grouper do
   describe '.by_steps' do
     def write(file, content)
-      File.open(file, 'w') { |f| f.write content }
+      File.write(file, content)
     end
 
     it "sorts features by steps" do
@@ -72,7 +72,7 @@ describe ParallelTests::Grouper do
       expect do
         call(3, single_process: [/1/], isolate_count: 3)
       end.to raise_error(
-        "Number of isolated processes must be less than total the number of processes"
+        "Number of isolated processes must be >= total number of processes"
       )
     end
 
@@ -96,7 +96,7 @@ describe ParallelTests::Grouper do
       )
     end
 
-    it "specify_groups aborts when spec passed in doesnt match existing specs" do
+    it "specify_groups aborts when spec passed in doesn't match existing specs" do
       expect do
         call(3, specify_groups: '1|2|6')
       end.to raise_error(
@@ -104,7 +104,7 @@ describe ParallelTests::Grouper do
       )
     end
 
-    it "specify_groups aborts when spec passed in doesnt match existing specs again" do
+    it "specify_groups aborts when spec passed in doesn't match existing specs again" do
       expect do
         call(3, specify_groups: '1,6|2')
       end.to raise_error(

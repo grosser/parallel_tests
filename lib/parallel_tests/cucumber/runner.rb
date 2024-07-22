@@ -4,8 +4,8 @@ require "parallel_tests/gherkin/runner"
 module ParallelTests
   module Cucumber
     class Runner < ParallelTests::Gherkin::Runner
-      SCENARIOS_RESULTS_BOUNDARY_REGEX = /^(Failing|Flaky) Scenarios:$/.freeze
-      SCENARIO_REGEX = %r{^cucumber features/.+:\d+}.freeze
+      SCENARIOS_RESULTS_BOUNDARY_REGEX = /^(Failing|Flaky) Scenarios:$/
+      SCENARIO_REGEX = %r{^cucumber features/.+:\d+}
 
       class << self
         def name
@@ -35,8 +35,8 @@ module ParallelTests
         end
 
         def command_with_seed(cmd, seed)
-          clean = cmd.sub(/\s--order\s+random(:\d+)?\b/, '')
-          "#{clean} --order random:#{seed}"
+          clean = remove_command_arguments(cmd, '--order')
+          [*clean, '--order', "random:#{seed}"]
         end
       end
     end

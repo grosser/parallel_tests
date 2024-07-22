@@ -21,7 +21,18 @@ describe ParallelTests::Cucumber::Runner do
           "Failing Scenarios:", "cucumber features/failure:3", "cucumber features/failure:4",
           "Failing Scenarios:", "cucumber features/failure:5", "cucumber features/failure:6"
         ]
-        expect(call(results)).to eq("Failing Scenarios:\ncucumber features/failure:1\ncucumber features/failure:2\ncucumber features/failure:3\ncucumber features/failure:4\ncucumber features/failure:5\ncucumber features/failure:6\n\n")
+        output = call(results)
+        output.gsub!(/.*WARNING.*\n/, "")
+        expect(output).to eq(<<~TXT)
+          Failing Scenarios:
+          cucumber features/failure:1
+          cucumber features/failure:2
+          cucumber features/failure:3
+          cucumber features/failure:4
+          cucumber features/failure:5
+          cucumber features/failure:6
+
+        TXT
       end
 
       it "collates flaky scenarios separately" do
@@ -37,20 +48,20 @@ describe ParallelTests::Cucumber::Runner do
   end
 
   describe ".command_with_seed" do
-    def call(part)
-      ParallelTests::Cucumber::Runner.command_with_seed("cucumber#{part}", 555)
+    def call(*args)
+      ParallelTests::Cucumber::Runner.command_with_seed(['cucumber', *args], 555)
     end
 
     it "adds the randomized seed" do
-      expect(call("")).to eq("cucumber --order random:555")
+      expect(call).to eq(["cucumber", "--order", "random:555"])
     end
 
     it "does not duplicate existing random command" do
-      expect(call(" --order random good1.feature")).to eq("cucumber good1.feature --order random:555")
+      expect(call("--order", "random", "good1.feature")).to eq(["cucumber", "good1.feature", "--order", "random:555"])
     end
 
     it "does not duplicate existing random command with seed" do
-      expect(call(" --order random:123 good1.feature")).to eq("cucumber good1.feature --order random:555")
+      expect(call("--order", "random:123", "good1.feature")).to eq(["cucumber", "good1.feature", "--order", "random:555"])
     end
   end
 end

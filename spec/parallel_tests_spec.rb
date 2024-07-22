@@ -185,13 +185,20 @@ describe ParallelTests do
     it 'kills the running child process', unless: Gem.win_platform? do
       ParallelTests.with_pid_file do
         Thread.new do
-          ParallelTests::Test::Runner.execute_command('sleep 3', 1, 1, {})
+          ParallelTests::Test::Runner.execute_command(['sleep', '3'], 1, 1, {})
         end
         sleep(0.2)
         expect(ParallelTests.pids.count).to eq(1)
         ParallelTests.stop_all_processes
         sleep(0.2)
         expect(ParallelTests.pids.count).to eq(0)
+      end
+    end
+
+    it "doesn't fail if the pid has already been killed", unless: Gem.win_platform? do
+      ParallelTests.with_pid_file do
+        ParallelTests.pids.add(1234)
+        expect { ParallelTests.stop_all_processes }.not_to raise_error
       end
     end
   end

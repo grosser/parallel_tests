@@ -1,6 +1,6 @@
 AllCops:
   NewCops: enable
-  TargetRubyVersion: 2.5
+  TargetRubyVersion: 3.0
   SuggestExtensions: false
   Exclude:
   - '**/vendor/bundle/**/*'
@@ -78,6 +78,9 @@ Layout/LineLength:
   Enabled: false
   Max: 120
 
+Style/RedundantConstantBase:
+  Enabled: false
+
 Style/RegexpLiteral:
   Enabled: false
 
@@ -127,4 +130,8 @@ Style/CaseEquality:
   Enabled: false
 
 Lint/EmptyClass:
+  Enabled: false
+
+# ENV.fetch('FOO', nil) is the same as ENV['FOO']
+Style/FetchEnvVar:
   Enabled: false

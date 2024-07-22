@@ -15,7 +15,7 @@ module ParallelTests
 
         def runtime_logging
           # Not Yet Supported
-          ""
+          []
         end
       end
     end

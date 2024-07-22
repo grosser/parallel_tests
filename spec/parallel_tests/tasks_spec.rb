@@ -6,27 +6,27 @@ describe ParallelTests::Tasks do
   describe ".parse_args" do
     it "should return the count" do
       args = { count: 2 }
-      expect(ParallelTests::Tasks.parse_args(args)).to eq([2, "", "", ""])
+      expect(ParallelTests::Tasks.parse_args(args)).to eq([2, nil, nil, nil])
     end
 
     it "should default to the prefix" do
       args = { count: "models" }
-      expect(ParallelTests::Tasks.parse_args(args)).to eq([nil, "models", "", ""])
+      expect(ParallelTests::Tasks.parse_args(args)).to eq([nil, "models", nil, nil])
     end
 
     it "should return the count and pattern" do
       args = { count: 2, pattern: "models" }
-      expect(ParallelTests::Tasks.parse_args(args)).to eq([2, "models", "", ""])
+      expect(ParallelTests::Tasks.parse_args(args)).to eq([2, "models", nil, nil])
     end
 
     it "should return the count, pattern, and options" do
       args = { count: 2, pattern: "plain", options: "-p default" }
-      expect(ParallelTests::Tasks.parse_args(args)).to eq([2, "plain", "-p default", ""])
+      expect(ParallelTests::Tasks.parse_args(args)).to eq([2, "plain", "-p default", nil])
     end
 
     it "should return the count, pattern, and options" do
       args = { count: 2, pattern: "plain", options: "-p default --group-by steps" }
-      expect(ParallelTests::Tasks.parse_args(args)).to eq([2, "plain", "-p default --group-by steps", ""])
+      expect(ParallelTests::Tasks.parse_args(args)).to eq([2, "plain", "-p default --group-by steps", nil])
     end
 
     it "should return the count, pattern, test options, and pass-through options" do
@@ -61,62 +61,75 @@ describe ParallelTests::Tasks do
     end
 
     it "runs command in parallel" do
-      expect(ParallelTests::Tasks).to receive(:system).with(/#{full_path} --exec 'echo'$/).and_return true
-      ParallelTests::Tasks.run_in_parallel("echo")
+      expect(ParallelTests::Tasks).to receive(:system)
+        .with(*ParallelTests.with_ruby_binary(full_path), '--exec', 'echo')
+        .and_return true
+      ParallelTests::Tasks.run_in_parallel(["echo"])
     end
 
     it "runs command with :count option" do
-      expect(ParallelTests::Tasks).to receive(:system).with(/#{full_path} --exec 'echo' -n 123$/).and_return true
-      ParallelTests::Tasks.run_in_parallel("echo", count: 123)
+      expect(ParallelTests::Tasks).to receive(:system)
+        .with(*ParallelTests.with_ruby_binary(full_path), '--exec', 'echo', '-n', 123)
+        .and_return true
+      ParallelTests::Tasks.run_in_parallel(["echo"], count: 123)
     end
 
     it "runs without -n with blank :count option" do
-      expect(ParallelTests::Tasks).to receive(:system).with(/#{full_path} --exec 'echo'$/).and_return true
-      ParallelTests::Tasks.run_in_parallel("echo", count: "")
+      expect(ParallelTests::Tasks).to receive(:system)
+        .with(*ParallelTests.with_ruby_binary(full_path), '--exec', 'echo')
+        .and_return true
+      ParallelTests::Tasks.run_in_parallel(["echo"], count: "")
     end
 
     it "runs command with :non_parallel option" do
-      expect(ParallelTests::Tasks).to receive(:system).with(/#{full_path} --exec 'echo' --non-parallel$/).and_return true
-      ParallelTests::Tasks.run_in_parallel("echo", non_parallel: true)
+      expect(ParallelTests::Tasks).to receive(:system)
+        .with(*ParallelTests.with_ruby_binary(full_path), '--exec', 'echo', '--non-parallel')
+        .and_return true
+      ParallelTests::Tasks.run_in_parallel(["echo"], non_parallel: true)
     end
 
     it "runs aborts if the command fails" do
       expect(ParallelTests::Tasks).to receive(:system).and_return false
       expect(ParallelTests::Tasks).to receive(:abort).and_return false
-      ParallelTests::Tasks.run_in_parallel("echo")
+      ParallelTests::Tasks.run_in_parallel(["echo"])
     end
   end
 
   describe ".suppress_output", unless: Gem.win_platform? do
     def call(command, grep)
-      # Explictly run as a parameter to /bin/sh to simulate how
+      # Explicitly run as a parameter to /bin/bash to simulate how
       # the command will be run by parallel_test --exec
       # This also tests shell escaping of single quotes
-      result = `/bin/sh -c '#{ParallelTests::Tasks.suppress_output(command, grep)}'`
+      shell_command = [
+        '/bin/bash',
+        '-c',
+        Shellwords.shelljoin(ParallelTests::Tasks.suppress_output(command, grep))
+      ]
+      result = IO.popen(shell_command, &:read)
       [result, $?.success?]
     end
 
     context "with pipefail supported" do
       before :all do
-        unless system("/bin/bash", "-c", "set -o pipefail 2>/dev/null && test 1")
+        unless system("/bin/bash", "-c", "set -o pipefail 2>/dev/null")
           skip "pipefail is not supported on your system"
         end
       end
 
       it "should hide offending lines" do
-        expect(call("echo 123", "123")).to eq(["", true])
+        expect(call(["echo", "123"], "123")).to eq(["", true])
       end
 
       it "should not hide other lines" do
-        expect(call("echo 124", "123")).to eq(["124\n", true])
+        expect(call(["echo", "124"], "123")).to eq(["124\n", true])
       end
 
       it "should fail if command fails and the pattern matches" do
-        expect(call("echo 123 && test", "123")).to eq(["", false])
+        expect(call(['/bin/bash', '-c', 'echo 123 && false'], "123")).to eq(["", false])
       end
 
       it "should fail if command fails and the pattern fails" do
-        expect(call("echo 124 && test", "123")).to eq(["124\n", false])
+        expect(call(['/bin/bash', '-c', 'echo 124 && false'], "123")).to eq(["124\n", false])
       end
     end
 
@@ -124,16 +137,16 @@ describe ParallelTests::Tasks do
       before do
         expect(ParallelTests::Tasks).to receive(:system).with(
           '/bin/bash', '-c',
-          'set -o pipefail 2>/dev/null && test 1'
+          'set -o pipefail 2>/dev/null'
         ).and_return false
       end
 
       it "should not filter and succeed" do
-        expect(call("echo 123", "123")).to eq(["123\n", true])
+        expect(call(["echo", "123"], "123")).to eq(["123\n", true])
       end
 
       it "should not filter and fail" do
-        expect(call("echo 123 && test", "123")).to eq(["123\n", false])
+        expect(call(['/bin/bash', '-c', 'echo 123 && false'], "123")).to eq(["123\n", false])
       end
     end
   end
@@ -188,7 +201,7 @@ describe ParallelTests::Tasks do
     end
   end
 
-  describe '.purge_before_load' do
+  describe ".purge_before_load" do
     context 'Rails < 4.2.0' do
       before do
         stub_const('Rails', double(version: '3.2.1'))
@@ -215,6 +228,32 @@ describe ParallelTests::Tasks do
 
         expect(ParallelTests::Tasks.purge_before_load).to eq 'app:db:purge'
       end
+    end
+  end
+
+  describe ".build_run_command" do
+    it "builds simple command" do
+      command = ParallelTests::Tasks.build_run_command("test", {})
+      command.shift 2 if command.include?("--") # windows prefixes ruby executable
+      expect(command).to eq [
+        "#{Dir.pwd}/bin/parallel_test", "test", "--type", "test"
+      ]
+    end
+
+    it "fails on unknown" do
+      expect { ParallelTests::Tasks.build_run_command("foo", {}) }.to raise_error(KeyError)
+    end
+
+    it "builds with all arguments" do
+      command = ParallelTests::Tasks.build_run_command(
+        "test",
+        count: 1, pattern: "foo", options: "bar", pass_through: "baz baz"
+      )
+      command.shift 2 if command.include?("--") # windows prefixes ruby executable
+      expect(command).to eq [
+        "#{Dir.pwd}/bin/parallel_test", "test", "--type", "test",
+        "-n", "1", "--pattern", "foo", "--test-options", "bar", "baz", "baz"
+      ]
     end
   end
 end

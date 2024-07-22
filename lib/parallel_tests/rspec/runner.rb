@@ -7,8 +7,7 @@ module ParallelTests
       DEV_NULL = (WINDOWS ? "NUL" : "/dev/null")
       class << self
         def run_tests(test_files, process_number, num_processes, options)
-          exe = executable # expensive, so we cache
-          cmd = [exe, options[:test_options], color, spec_opts, *test_files].compact.join(" ")
+          cmd = [*executable, *options[:test_options], *color, *spec_opts, *test_files]
           execute_command(cmd, process_number, num_processes, options)
         end
 
@@ -16,9 +15,9 @@ module ParallelTests
           if File.exist?("bin/rspec")
             ParallelTests.with_ruby_binary("bin/rspec")
           elsif ParallelTests.bundler_enabled?
-            "bundle exec rspec"
+            ["bundle", "exec", "rspec"]
           else
-            "rspec"
+            ["rspec"]
           end
         end
 
@@ -34,8 +33,10 @@ module ParallelTests
           "spec"
         end
 
+        # used to find all _spec.rb files
+        # supports also feature files used by rspec turnip extension
         def test_suffix
-          /_spec\.rb$/
+          /(_spec\.rb|\.feature)$/
         end
 
         def line_is_result?(line)
@@ -48,8 +49,8 @@ module ParallelTests
         # --order rand:1234
         # --order random:1234
         def command_with_seed(cmd, seed)
-          clean = cmd.sub(/\s--(seed\s+\d+|order\s+rand(om)?(:\d+)?)\b/, '')
-          "#{clean} --seed #{seed}"
+          clean = remove_command_arguments(cmd, '--seed', '--order')
+          [*clean, '--seed', seed]
         end
 
         # Summarize results from threads and colorize results based on failure and pending counts.
@@ -71,19 +72,13 @@ module ParallelTests
 
         private
 
-        # so it can be stubbed....
-        def run(cmd)
-          `#{cmd}`
-        end
-
         def color
-          '--color --tty' if $stdout.tty?
+          ['--color', '--tty'] if $stdout.tty?
         end
 
         def spec_opts
           options_file = ['.rspec_parallel', 'spec/parallel_spec.opts', 'spec/spec.opts'].detect { |f| File.file?(f) }
-          return unless options_file
-          "-O #{options_file}"
+          ["-O", options_file] if options_file
         end
       end
     end

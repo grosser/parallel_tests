@@ -1,9 +1,12 @@
 # frozen_string_literal: true
+require 'shellwords'
 require 'parallel_tests'
 
 module ParallelTests
   module Test
     class Runner
+      RuntimeLogTooSmallError = Class.new(StandardError)
+
       class << self
         # --- usually overwritten by other runners
 
@@ -24,8 +27,15 @@ module ParallelTests
         end
 
         def run_tests(test_files, process_number, num_processes, options)
-          require_list = test_files.map { |file| file.sub(" ", "\\ ") }.join(" ")
-          cmd = "#{executable} -Itest -e '%w[#{require_list}].each { |f| require %{./\#{f}} }' -- #{options[:test_options]}"
+          require_list = test_files.map { |file| file.gsub(" ", "\\ ") }.join(" ")
+          cmd = [
+            *executable,
+            '-Itest',
+            '-e',
+            "%w[#{require_list}].each { |f| require %{./\#{f}} }",
+            '--',
+            *options[:test_options]
+          ]
           execute_command(cmd, process_number, num_processes, options)
         end
 
@@ -63,7 +73,7 @@ module ParallelTests
               []
             end
             if runtimes.size * 1.5 > tests.size
-              puts "Using recorded test runtime"
+              puts "Using recorded test runtime" unless options[:quiet]
               sort_by_runtime(tests, runtimes)
             else
               sort_by_filesize(tests)
@@ -76,22 +86,33 @@ module ParallelTests
         end
 
         def execute_command(cmd, process_number, num_processes, options)
+          number = test_env_number(process_number, options).to_s
           env = (options[:env] || {}).merge(
-            "TEST_ENV_NUMBER" => test_env_number(process_number, options).to_s,
+            "TEST_ENV_NUMBER" => number,
             "PARALLEL_TEST_GROUPS" => num_processes.to_s,
             "PARALLEL_PID_FILE" => ParallelTests.pid_file_path
           )
-          cmd = "nice #{cmd}" if options[:nice]
-          cmd = "#{cmd} 2>&1" if options[:combine_stderr]
+          cmd = ["nice", *cmd] if options[:nice]
 
-          puts cmd if report_process_command?(options) && !options[:serialize_stdout]
+          # being able to run with for example `-output foo-$TEST_ENV_NUMBER` worked originally and is convenient
+          cmd = cmd.map { |c| c.gsub("$TEST_ENV_NUMBER", number).gsub("${TEST_ENV_NUMBER}", number) }
+
+          print_command(cmd, env) if report_process_command?(options) && !options[:serialize_stdout]
 
           execute_command_and_capture_output(env, cmd, options)
         end
 
+        def print_command(command, env)
+          env_str = ['TEST_ENV_NUMBER', 'PARALLEL_TEST_GROUPS'].map { |e| "#{e}=#{env[e]}" }.join(' ')
+          puts [env_str, Shellwords.shelljoin(command)].compact.join(' ')
+        end
+
         def execute_command_and_capture_output(env, cmd, options)
+          popen_options = {} # do not add `pgroup: true`, it will break `binding.irb` inside the test
+          popen_options[:err] = [:child, :out] if options[:combine_stderr]
+
           pid = nil
-          output = IO.popen(env, cmd) do |io|
+          output = IO.popen(env, cmd, popen_options) do |io|
             pid = io.pid
             ParallelTests.pids.add(pid)
             capture_output(io, env, options)
@@ -100,9 +121,9 @@ module ParallelTests
           exitstatus = $?.exitstatus
           seed = output[/seed (\d+)/, 1]
 
-          output = [cmd, output].join("\n") if report_process_command?(options) && options[:serialize_stdout]
+          output = "#{Shellwords.shelljoin(cmd)}\n#{output}" if report_process_command?(options) && options[:serialize_stdout]
 
-          { stdout: output, exit_status: exitstatus, command: cmd, seed: seed }
+          { env: env, stdout: output, exit_status: exitstatus, command: cmd, seed: seed }
         end
 
         def find_results(test_output)
@@ -129,18 +150,22 @@ module ParallelTests
 
         # remove old seed and add new seed
         def command_with_seed(cmd, seed)
-          clean = cmd.sub(/\s--seed\s+\d+\b/, '')
-          "#{clean} --seed #{seed}"
+          clean = remove_command_arguments(cmd, '--seed')
+          [*clean, '--seed', seed]
         end
 
         protected
 
         def executable
-          ENV['PARALLEL_TESTS_EXECUTABLE'] || determine_executable
+          if (executable = ENV['PARALLEL_TESTS_EXECUTABLE'])
+            [executable]
+          else
+            determine_executable
+          end
         end
 
         def determine_executable
-          "ruby"
+          ["ruby"]
         end
 
         def sum_up_results(results)
@@ -184,7 +209,7 @@ module ParallelTests
             allowed_missing -= 1 unless time = runtimes[test]
             if allowed_missing < 0
               log = options[:runtime_log] || runtime_log
-              raise "Runtime log file '#{log}' does not contain sufficient data to sort #{tests.size} test files, please update or remove it."
+              raise RuntimeLogTooSmallError, "Runtime log file '#{log}' does not contain sufficient data to sort #{tests.size} test files, please update or remove it."
             end
             [test, time]
           end
@@ -213,8 +238,9 @@ module ParallelTests
           suffix_pattern = options[:suffix] || test_suffix
           include_pattern = options[:pattern] || //
           exclude_pattern = options[:exclude_pattern]
+          allow_duplicates = options[:allow_duplicates]
 
-          (tests || []).flat_map do |file_or_folder|
+          files = (tests || []).flat_map do |file_or_folder|
             if File.directory?(file_or_folder)
               files = files_in_folder(file_or_folder, options)
               files = files.grep(suffix_pattern).grep(include_pattern)
@@ -223,7 +249,9 @@ module ParallelTests
             else
               file_or_folder
             end
-          end.uniq
+          end
+
+          allow_duplicates ? files : files.uniq
         end
 
         def files_in_folder(folder, options = {})
@@ -235,6 +263,21 @@ module ParallelTests
             "**{,/*/**}/*"
           end
           Dir[File.join(folder, pattern)].uniq.sort
+        end
+
+        def remove_command_arguments(command, *args)
+          remove_next = false
+          command.select do |arg|
+            if remove_next
+              remove_next = false
+              false
+            elsif args.include?(arg)
+              remove_next = true
+              false
+            else
+              true
+            end
+          end
         end
 
         private

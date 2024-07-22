@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+require "set"
 require "spec_helper"
 require "parallel_tests/test/runner"
 
@@ -21,7 +22,7 @@ describe ParallelTests::Test::Runner do
 
     it "uses options" do
       expect(ParallelTests::Test::Runner).to receive(:execute_command) do |a, _, _, _d|
-        expect(a).to match(/ruby -Itest .* -- -v/)
+        expect(a).to eq(["ruby", "-Itest", "-e", "%w[xxx].each { |f| require %{./\#{f}} }", "--", "-v"])
       end
       call(['xxx'], 1, 22, test_options: '-v')
     end
@@ -42,7 +43,7 @@ describe ParallelTests::Test::Runner do
     end
 
     it "uses given when passed found" do
-      result = Gem.win_platform? ? [["a", "b"], ["c"]] : [["a", "c"], ["b"]]
+      result = (Gem.win_platform? && RUBY_VERSION < "3.3.0" ? [["a", "b"], ["c"]] : [["a", "c"], ["b"]])
       expect(call(["a", "b", "c"], 2, group_by: :found)).to eq(result)
     end
 
@@ -89,7 +90,7 @@ describe ParallelTests::Test::Runner do
 
       it "fails when there is too little log" do
         File.write("tmp/parallel_runtime_test.log", "xxx:123\nyyy:123\naaa:123")
-        expect { call(["aaa", "bbb", "ccc"], 3, group_by: :runtime) }.to raise_error(RuntimeError)
+        expect { call(["aaa", "bbb", "ccc"], 3, group_by: :runtime) }.to raise_error(ParallelTests::Test::Runner::RuntimeLogTooSmallError)
       end
 
       it "groups a lot of missing files when allow-missing is high" do
@@ -146,12 +147,12 @@ describe ParallelTests::Test::Runner do
 
         isolated, *groups = result
         expect(isolated).to eq(["aaa"])
-        actual = groups.map(&:to_set).to_set
+        actual = groups.to_set(&:to_set)
 
         # both eee and ccs are the same size, so either can be in either group
         valid_combinations = [
-          [["bbb", "eee"], ["ccc", "ddd"]].map(&:to_set).to_set,
-          [["bbb", "ccc"], ["eee", "ddd"]].map(&:to_set).to_set
+          [["bbb", "eee"], ["ccc", "ddd"]].to_set(&:to_set),
+          [["bbb", "ccc"], ["eee", "ddd"]].to_set(&:to_set)
         ]
 
         expect(valid_combinations).to include(actual)
@@ -168,12 +169,12 @@ describe ParallelTests::Test::Runner do
         isolated_1, isolated_2, *groups = result
         expect(isolated_1).to eq(["aaa2"])
         expect(isolated_2).to eq(["aaa1", "aaa3"])
-        actual = groups.map(&:to_set).to_set
+        actual = groups.to_set(&:to_set)
 
         # both eee and ccs are the same size, so either can be in either group
         valid_combinations = [
-          [["bbb", "eee"], ["ccc", "ddd"]].map(&:to_set).to_set,
-          [["bbb", "ccc"], ["eee", "ddd"]].map(&:to_set).to_set
+          [["bbb", "eee"], ["ccc", "ddd"]].to_set(&:to_set),
+          [["bbb", "ccc"], ["eee", "ddd"]].to_set(&:to_set)
         ]
 
         expect(valid_combinations).to include(actual)
@@ -190,12 +191,12 @@ describe ParallelTests::Test::Runner do
         specify_groups_1, specify_groups_2, *groups = result
         expect(specify_groups_1).to eq(["aaa2", "aaa1"])
         expect(specify_groups_2).to eq(["bbb"])
-        actual = groups.map(&:to_set).to_set
+        actual = groups.to_set(&:to_set)
 
         # both eee and ccs are the same size, so either can be in either group
         valid_combinations = [
-          [["aaa3", "ccc"], ["ddd", "eee"]].map(&:to_set).to_set,
-          [["aaa3", "eee"], ["ddd", "ccc"]].map(&:to_set).to_set
+          [["aaa3", "ccc"], ["ddd", "eee"]].to_set(&:to_set),
+          [["aaa3", "eee"], ["ddd", "ccc"]].to_set(&:to_set)
         ]
 
         expect(valid_combinations).to include(actual)
@@ -263,7 +264,7 @@ describe ParallelTests::Test::Runner do
 
     it "finds test files nested in symlinked folders" do
       with_files(['a/a_test.rb', 'b/b_test.rb']) do |root|
-        `ln -s #{root}/a #{root}/b/link`
+        File.symlink("#{root}/a", "#{root}/b/link")
         expect(call(["#{root}/b"]).sort).to eq(
           [
             "#{root}/b/b_test.rb",
@@ -276,7 +277,7 @@ describe ParallelTests::Test::Runner do
     it "finds test files but ignores those in symlinked folders" do
       skip if RUBY_PLATFORM == "java" || Gem.win_platform?
       with_files(['a/a_test.rb', 'b/b_test.rb']) do |root|
-        `ln -s #{root}/a #{root}/b/link`
+        File.symlink("#{root}/a", "#{root}/b/link")
         expect(call(["#{root}/b"], symlinks: false).sort).to eq(["#{root}/b/b_test.rb"])
       end
     end
@@ -351,7 +352,7 @@ describe ParallelTests::Test::Runner do
       end
     end
 
-    it "doesn't find bakup files with the same name as test files" do
+    it "doesn't find backup files with the same name as test files" do
       with_files(['a/x_test.rb', 'a/x_test.rb.bak']) do |root|
         expect(call(["#{root}/"])).to eq(
           [
@@ -385,6 +386,10 @@ describe ParallelTests::Test::Runner do
 
     it "discards duplicates" do
       expect(call(['baz', 'baz'])).to eq(['baz'])
+    end
+
+    it "keeps duplicates when allow_duplicates" do
+      expect(call(['baz', 'baz'], allow_duplicates: true)).to eq(['baz', 'baz'])
     end
   end
 
@@ -445,7 +450,7 @@ describe ParallelTests::Test::Runner do
 
     it "sets process number to 2 for 1" do
       run_with_file("puts ENV['TEST_ENV_NUMBER']") do |path|
-        result = call("ruby #{path}", 1, 4, {})
+        result = call(["ruby", path], 1, 4, {})
         expect(result[:stdout].chomp).to eq '2'
         expect(result[:exit_status]).to eq 0
       end
@@ -453,7 +458,7 @@ describe ParallelTests::Test::Runner do
 
     it "sets process number to '' for 0" do
       run_with_file("puts ENV['TEST_ENV_NUMBER'].inspect") do |path|
-        result = call("ruby #{path}", 0, 4, {})
+        result = call(["ruby", path], 0, 4, {})
         expect(result[:stdout].chomp).to eq '""'
         expect(result[:exit_status]).to eq 0
       end
@@ -461,7 +466,7 @@ describe ParallelTests::Test::Runner do
 
     it "sets process number to 1 for 0 if requested" do
       run_with_file("puts ENV['TEST_ENV_NUMBER']") do |path|
-        result = call("ruby #{path}", 0, 4, first_is_1: true)
+        result = call(["ruby", path], 0, 4, first_is_1: true)
         expect(result[:stdout].chomp).to eq '1'
         expect(result[:exit_status]).to eq 0
       end
@@ -469,7 +474,7 @@ describe ParallelTests::Test::Runner do
 
     it 'sets PARALLEL_TEST_GROUPS so child processes know that they are being run under parallel_tests' do
       run_with_file("puts ENV['PARALLEL_TEST_GROUPS']") do |path|
-        result = call("ruby #{path}", 1, 4, {})
+        result = call(["ruby", path], 1, 4, {})
         expect(result[:stdout].chomp).to eq('4')
         expect(result[:exit_status]).to eq(0)
       end
@@ -478,7 +483,7 @@ describe ParallelTests::Test::Runner do
     it "skips reads from stdin" do
       skip "hangs on normal ruby, works on jruby" unless RUBY_PLATFORM == "java"
       run_with_file("$stdin.read; puts 123") do |path|
-        result = call("ruby #{path}", 1, 2, {})
+        result = call(["ruby", path], 1, 2, {})
         expect(result).to include(
           {
             stdout: "123\n",
@@ -490,7 +495,7 @@ describe ParallelTests::Test::Runner do
 
     it "waits for process to finish" do
       run_with_file("sleep 0.5; puts 123; sleep 0.5; puts 345") do |path|
-        result = call("ruby #{path}", 1, 4, {})
+        result = call(["ruby", path], 1, 4, {})
         expect(result[:stdout].lines.map(&:chomp)).to eq ['123', '345']
         expect(result[:exit_status]).to eq 0
       end
@@ -504,7 +509,7 @@ describe ParallelTests::Test::Runner do
           received << x.strip
         end
 
-        result = call("ruby #{path}", 1, 4, {})
+        result = call(["ruby", path], 1, 4, {})
         expect(received).to eq("123345567")
         expect(result[:stdout].lines.map(&:chomp)).to eq ['123', '345567']
         expect(result[:exit_status]).to eq 0
@@ -513,7 +518,7 @@ describe ParallelTests::Test::Runner do
 
     it "works with synced stdout" do
       run_with_file("$stdout.sync = true; puts 123; sleep 0.1; puts 345") do |path|
-        result = call("ruby #{path}", 1, 4, {})
+        result = call(["ruby", path], 1, 4, {})
         expect(result[:stdout].lines.map(&:chomp)).to eq ['123', '345']
         expect(result[:exit_status]).to eq 0
       end
@@ -522,7 +527,7 @@ describe ParallelTests::Test::Runner do
     it "does not print to stdout with :serialize_stdout" do
       run_with_file("puts 123") do |path|
         expect($stdout).not_to receive(:print)
-        result = call("ruby #{path}", 1, 4, serialize_stdout: true)
+        result = call(["ruby", path], 1, 4, serialize_stdout: true)
         expect(result[:stdout].chomp).to eq '123'
         expect(result[:exit_status]).to eq 0
       end
@@ -531,7 +536,7 @@ describe ParallelTests::Test::Runner do
     it "adds test env number to stdout with :prefix_output_with_test_env_number" do
       run_with_file("puts 123") do |path|
         expect($stdout).to receive(:print).with("[TEST GROUP 2] 123#{new_line_char}")
-        result = call("ruby #{path}", 1, 4, prefix_output_with_test_env_number: true)
+        result = call(["ruby", path], 1, 4, prefix_output_with_test_env_number: true)
         expect(result[:stdout].chomp).to eq '123'
         expect(result[:exit_status]).to eq 0
       end
@@ -540,7 +545,7 @@ describe ParallelTests::Test::Runner do
     it "does not add test env number to stdout without :prefix_output_with_test_env_number" do
       run_with_file("puts 123") do |path|
         expect($stdout).to receive(:print).with("123#{new_line_char}")
-        result = call("ruby #{path}", 1, 4, prefix_output_with_test_env_number: false)
+        result = call(["ruby", path], 1, 4, prefix_output_with_test_env_number: false)
         expect(result[:stdout].chomp).to eq '123'
         expect(result[:exit_status]).to eq 0
       end
@@ -548,7 +553,7 @@ describe ParallelTests::Test::Runner do
 
     it "returns correct exit status" do
       run_with_file("puts 123; exit 5") do |path|
-        result = call("ruby #{path}", 1, 4, {})
+        result = call(["ruby", path], 1, 4, {})
         expect(result[:stdout].chomp).to eq '123'
         expect(result[:exit_status]).to eq 5
       end
@@ -557,7 +562,7 @@ describe ParallelTests::Test::Runner do
     it "prints each stream to the correct stream" do
       skip "open3"
       _out, err = run_with_file("puts 123 ; $stderr.puts 345 ; exit 5") do |path|
-        result = call("ruby #{path}", 1, 4, {})
+        result = call(["ruby", path], 1, 4, {})
         expect(result).to include(
           stdout: "123\n",
           exit_status: 5
@@ -568,29 +573,37 @@ describe ParallelTests::Test::Runner do
 
     it "uses a lower priority process when the nice option is used", unless: Gem.win_platform? do
       priority_cmd = "puts Process.getpriority(Process::PRIO_PROCESS, 0)"
-      priority_without_nice = run_with_file(priority_cmd) { |cmd| call("ruby #{cmd}", 1, 4, {}) }.first.to_i
-      priority_with_nice = run_with_file(priority_cmd) { |cmd| call("ruby #{cmd}", 1, 4, nice: true) }.first.to_i
+      priority_without_nice = run_with_file(priority_cmd) { |cmd| call(["ruby", cmd], 1, 4, {}) }.first.to_i
+      priority_with_nice = run_with_file(priority_cmd) { |cmd| call(["ruby", cmd], 1, 4, nice: true) }.first.to_i
       expect(priority_without_nice).to be < priority_with_nice
     end
 
     it "returns command used" do
       run_with_file("puts 123; exit 5") do |path|
-        result = call("ruby #{path}", 1, 4, {})
-        expect(result).to include(command: "ruby #{path}")
+        result = call(["ruby", path], 1, 4, {})
+        expect(result).to include(command: ["ruby", path])
+      end
+    end
+
+    it "allows using TEST_ENV_NUMBER in arguments" do
+      run_with_file("puts ARGV") do |path|
+        result = call(["ruby", path, "$TEST_ENV_NUMBER"], 1, 4, {})
+        expect(result[:stdout].chomp).to eq '2'
+        expect(result[:exit_status]).to eq 0
       end
     end
 
     describe "rspec seed" do
       it "includes seed when provided" do
         run_with_file("puts 'Run options: --seed 555'") do |path|
-          result = call("ruby #{path}", 1, 4, {})
+          result = call(["ruby", path], 1, 4, {})
           expect(result).to include(seed: "555")
         end
       end
 
       it "seed is nil when not provided" do
         run_with_file("puts 555") do |path|
-          result = call("ruby #{path}", 1, 4, {})
+          result = call(["ruby", path], 1, 4, {})
           expect(result).to include(seed: nil)
         end
       end
@@ -598,26 +611,26 @@ describe ParallelTests::Test::Runner do
   end
 
   describe ".command_with_seed" do
-    def call(args)
-      base = "ruby -Ilib:test test/minitest/test_minitest_unit.rb"
-      result = ParallelTests::Test::Runner.command_with_seed("#{base}#{args}", 555)
-      result.sub(base, '')
+    def call(*args)
+      base = ["ruby", "-Ilib:test", "test/minitest/test_minitest_unit.rb"]
+      result = ParallelTests::Test::Runner.command_with_seed([*base, *args], "555")
+      result[base.length..]
     end
 
     it "adds the randomized seed" do
-      expect(call("")).to eq(" --seed 555")
+      expect(call).to eq(["--seed", "555"])
     end
 
     it "does not duplicate seed" do
-      expect(call(" --seed 123")).to eq(" --seed 555")
+      expect(call("--seed", "123")).to eq(["--seed", "555"])
     end
 
-    it "does not match strange seeds stuff" do
-      expect(call(" --seed 123asdasd")).to eq(" --seed 123asdasd --seed 555")
+    it "does not duplicate strange seeds" do
+      expect(call("--seed", "123asdasd")).to eq(["--seed", "555"])
     end
 
     it "does not match non seeds" do
-      expect(call(" --seedling 123")).to eq(" --seedling 123 --seed 555")
+      expect(call("--seedling", "123")).to eq(["--seedling", "123", "--seed", "555"])
     end
   end
 end

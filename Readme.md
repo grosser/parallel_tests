@@ -1,11 +1,10 @@
 # parallel_tests
 
 [![Gem Version](https://badge.fury.io/rb/parallel_tests.svg)](https://rubygems.org/gems/parallel_tests)
-[![Build Status](https://travis-ci.org/grosser/parallel_tests.svg)](https://travis-ci.org/grosser/parallel_tests/builds)
-[![Build status](https://github.com/grosser/parallel_tests/workflows/windows/badge.svg)](https://github.com/grosser/parallel_tests/actions?query=workflow%3Awindows)
+[![Build status](https://github.com/grosser/parallel_tests/workflows/test/badge.svg)](https://github.com/grosser/parallel_tests/actions?query=workflow%3Atest&branch=master)
 
-Speedup Test::Unit + RSpec + Cucumber + Spinach by running parallel on multiple CPU cores.<br/>
-ParallelTests splits tests into even groups (by number of lines or runtime) and runs each group in a single process with its own database.
+Speedup Minitest + RSpec + Turnip + Cucumber + Spinach by running parallel on multiple CPU cores.<br/>
+ParallelTests splits tests into balanced groups (by number of lines or runtime) and runs each group in a process with its own database.
 
 Setup for Rails
 ===============
@@ -34,32 +33,45 @@ test:
 ### Create additional database(s)
     rake parallel:create
 
+### (Multi-DB) Create individual database
+    rake parallel:create:<database>
+    rake parallel:create:secondary
+
 ### Copy development schema (repeat after migrations)
     rake parallel:prepare
 
 ### Run migrations in additional database(s) (repeat after migrations)
     rake parallel:migrate
 
+### (Multi-DB) Run migrations in individual database
+    rake parallel:migrate:<database>
+
 ### Setup environment from scratch (create db and loads schema, useful for CI)
     rake parallel:setup
 
+### Drop all test databases
+    rake parallel:drop
+
+### (Multi-DB) Drop individual test database
+    rake parallel:drop:<database>
+
 ### Run!
-    rake parallel:test          # Test::Unit
+    rake parallel:test          # Minitest
     rake parallel:spec          # RSpec
     rake parallel:features      # Cucumber
     rake parallel:features-spinach       # Spinach
 
-    rake parallel:test[1] --> force 1 CPU --> 86 seconds
+    rake "parallel:test[1]" --> force 1 CPU --> 86 seconds
     rake parallel:test    --> got 2 CPUs? --> 47 seconds
     rake parallel:test    --> got 4 CPUs? --> 26 seconds
     ...
 
 Test by pattern with Regex (e.g. use one integration server per subfolder / see if you broke any 'user'-related tests)
 
-    rake parallel:test[^test/unit] # every test file in test/unit folder
-    rake parallel:test[user]  # run users_controller + user_helper + user tests
-    rake parallel:test['user|product']  # run user and product related tests
-    rake parallel:spec['spec\/(?!features)'] # run RSpec tests except the tests in spec/features
+    rake "parallel:test[^test/unit]" # every test file in test/unit folder
+    rake "parallel:test[user]"  # run users_controller + user_helper + user tests
+    rake "parallel:test['user|product']"  # run user and product related tests
+    rake "parallel:spec['spec\/(?!features)']" # run RSpec tests except the tests in spec/features
 
 
 ### Example output
@@ -75,13 +87,13 @@ Test by pattern with Regex (e.g. use one integration server per subfolder / see 
 ```Bash
 RAILS_ENV=test parallel_test -e "rake my:custom:task"
 # or
-rake parallel:rake[my:custom:task]
+rake "parallel:rake[my:custom:task]"
 # limited parallelism
-rake parallel:rake[my:custom:task,2]
+rake "parallel:rake[my:custom:task,2]"
 ```
 
 
-Running things once
+Running setup or teardown once
 ===================
 
 ```Ruby
@@ -104,11 +116,16 @@ at_exit do
 end
 ```
 
-Even test group run-times
-=========================
+Even test group runtimes
+========================
 
-Test groups are often not balanced and will run for different times, making everything wait for the slowest group.
-Use these loggers to record test runtime and then use the recorded runtime to balance test groups more evenly.
+Test groups will often run for different times, making the full test run as slow as the slowest group.
+
+**Step 1**: Use these loggers (see below) to record test runtime
+
+**Step 2**: The next test run will use the recorded test runtimes (use `--runtime-log <file>` if you picked a location different from below)
+
+**Step 3**: Automate upload/download of test runtime from your CI system [example](https://github.com/grosser/parallel_rails_example/blob/master/.github/workflows/test.yml) (chunks need to be combined, an alternative is [amend](https://github.com/grosser/amend))
 
 ### RSpec
 
@@ -126,7 +143,7 @@ Add to your `test_helper.rb`:
 require 'parallel_tests/test/runtime_logger' if ENV['RECORD_RUNTIME']
 ```
 
-results will be logged to tmp/parallel_runtime_test.log when `RECORD_RUNTIME` is set,
+results will be logged to `tmp/parallel_runtime_test.log` when `RECORD_RUNTIME` is set,
 so it is not always required or overwritten.
 
 Loggers
@@ -145,7 +162,7 @@ Add the following to your `.rspec_parallel` (or `.rspec`) :
 RSpec: FailuresLogger
 -----------------------
 
-Produce pastable command-line snippets for each failed example. For example:
+Produce pasteable command-line snippets for each failed example. For example:
 
 ```bash
 rspec /path/to/my_spec.rb:123 # should do something
@@ -157,6 +174,24 @@ Add to `.rspec_parallel` or use as CLI flag:
     --format ParallelTests::RSpec::FailuresLogger --out tmp/failing_specs.log
 
 (Not needed to retry failures, for that pass [--only-failures](https://relishapp.com/rspec/rspec-core/docs/command-line/only-failures) to rspec)
+
+
+RSpec: VerboseLogger
+-----------------------
+
+Prints a single line for starting and finishing each example, to see what is currently running in each process.
+
+```
+# PID, parallel process number, spec status, example description
+[14403] [2] [STARTED] Foo foo
+[14402] [1] [STARTED] Bar bar
+[14402] [1] [PASSED] Bar bar
+```
+
+Add to `.rspec_parallel` or use as CLI flag:
+
+      --format ParallelTests::RSpec::VerboseLogger
+
 
 Cucumber: FailuresLogger
 -----------------------
@@ -182,19 +217,24 @@ Setup for non-rails
 
     gem install parallel_tests
     # go to your project dir
-    parallel_test test/
-    parallel_rspec spec/
-    parallel_cucumber features/
-    parallel_spinach features/
+    parallel_test
+    parallel_rspec
+    parallel_cucumber
+    parallel_spinach
 
- - use `ENV['TEST_ENV_NUMBER']` inside your tests to select separate db/memcache/etc.
- - Only run selected files & folders:
+ - use `ENV['TEST_ENV_NUMBER']` inside your tests to select separate db/memcache/etc. (docker compose: expose it)
+
+ - Only run a subset of files / folders:
 
     `parallel_test test/bar test/baz/foo_text.rb`
 
  - Pass test-options and files via `--`:
 
-    `parallel_test -- -t acceptance -f progress -- spec/foo_spec.rb spec/acceptance`
+    `parallel_rspec -- -t acceptance -f progress -- spec/foo_spec.rb spec/acceptance`
+
+ - Pass in test options, by using the -o flag (wrap everything in quotes):
+
+    `parallel_cucumber -n 2 -o '-p foo_profile --tags @only_this_tag or @only_that_tag --format summary'`
 
 Options are:
 <!-- copy output from bundle exec ./bin/parallel_test -h -->
@@ -211,8 +251,9 @@ Options are:
     -m, --multiply-processes [FLOAT] use given number as a multiplier of processes to run
     -s, --single [PATTERN]           Run all matching files in the same process
     -i, --isolate                    Do not run any other tests in the group used by --single(-s)
-        --isolate-n [PROCESSES]      Use 'isolate'  singles with number of processes, default: 1.
+        --isolate-n [PROCESSES]      Use 'isolate'  singles with number of processes, default: 1
         --highest-exit-status        Exit with the highest exit status provided by test run(s)
+        --failure-exit-code [INT]    Specify the exit code to use when tests fail
         --specify-groups [SPECS]     Use 'specify-groups' if you want to specify multiple specs running in multiple
                                      processes in a specific formation. Commas indicate specs in the same process,
                                      pipes indicate specs in a new process. Cannot use with --single, --isolate, or
@@ -221,7 +262,8 @@ Options are:
                                        Process 1 will contain 1_spec.rb and 2_spec.rb
                                        Process 2 will contain 3_spec.rb
                                        Process 3 will contain all other specs
-        --only-group INT[,INT]
+        --only-group INT[,INT]       Only run the given group numbers.
+                                     Changes `--group-by` default to 'filesize'.
     -e, --exec [COMMAND]             execute this code parallel and with ENV['TEST_ENV_NUMBER']
     -o, --test-options '[OPTIONS]'   execute test commands with those options
     -t, --type [TYPE]                test(default) / rspec / cucumber / spinach
@@ -238,12 +280,14 @@ Options are:
         --nice                       execute test commands with low priority.
         --runtime-log [PATH]         Location of previously recorded test runtimes
         --allowed-missing [INT]      Allowed percentage of missing runtimes (default = 50)
+        --allow-duplicates           When detecting files to run, allow duplicates
         --unknown-runtime [FLOAT]    Use given number as unknown runtime (otherwise use average time)
         --first-is-1                 Use "1" as TEST_ENV_NUMBER to not reuse the default test environment
         --fail-fast                  Stop all groups when one group fails (best used with --test-options '--fail-fast' if supported
         --verbose                    Print debug output
-        --verbose-process-command    Displays only the command that will be executed by each process
-        --verbose-rerun-command      When there are failures, displays the command executed by each process that failed
+        --verbose-command            Combines options --verbose-process-command and --verbose-rerun-command
+        --verbose-process-command    Print the command that will be executed by each process before it begins
+        --verbose-rerun-command      After a process fails, print the command executed by that process
         --quiet                      Print only tests output
     -v, --version                    Show Version
     -h, --help                       Show this.
@@ -394,6 +438,12 @@ inspired by [pivotal labs](https://blog.pivotal.io/labs/labs/parallelize-your-rs
  - [Vikram B Kumar](https://github.com/v-kumar)
  - [Joshua Pinter](https://github.com/joshuapinter)
  - [Zach Dennis](https://github.com/zdennis)
+ - [Jon Dufresne](https://github.com/jdufresne)
+ - [Eric Kessler](https://github.com/enkessler)
+ - [Adis Osmonov](https://github.com/adis-io)
+ - [Josh Westbrook](https://github.com/joshwestbrook)
+ - [Jay Dorsey](https://github.com/jaydorsey)
+ - [hatsu](https://github.com/hatsu38)
 
 [Michael Grosser](http://grosser.it)<br/>
 michael@grosser.it<br/>

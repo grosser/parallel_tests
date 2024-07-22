@@ -44,6 +44,8 @@ module ParallelTests
 
     def stop_all_processes
       pids.all.each { |pid| Process.kill(:INT, pid) }
+    rescue Errno::ESRCH, Errno::EPERM
+      # Process already terminated, do nothing
     end
 
     # copied from http://github.com/carlhuda/bundler Bundler::SharedHelpers#find_gemfile
@@ -76,7 +78,7 @@ module ParallelTests
     end
 
     def with_ruby_binary(command)
-      WINDOWS ? "#{RUBY_BINARY} -- #{command}" : command
+      WINDOWS ? [RUBY_BINARY, '--', command] : [command]
     end
 
     def wait_for_other_processes_to_finish
