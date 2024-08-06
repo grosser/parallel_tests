@@ -2,6 +2,7 @@
 require "parallel"
 require "parallel_tests/railtie" if defined? Rails::Railtie
 require "rbconfig"
+require "concurrent-ruby"
 
 module ParallelTests
   WINDOWS = (RbConfig::CONFIG['host_os'] =~ /cygwin|mswin|mingw|bccwin|wince|emx/)
@@ -17,7 +18,7 @@ module ParallelTests
       [
         count,
         ENV["PARALLEL_TEST_PROCESSORS"],
-        Parallel.processor_count
+        Concurrent.available_processor_count
       ].detect { |c| !c.to_s.strip.empty? }.to_i
     end
 

@@ -4,7 +4,7 @@ require "spec_helper"
 describe ParallelTests do
   describe ".determine_number_of_processes" do
     before do
-      allow(Parallel).to receive(:processor_count).and_return 20
+      allow(Concurrent).to receive(:available_processor_count).and_return 20
     end
 
     def call(count)
