@@ -44,9 +44,15 @@ module ParallelTests
       #
       # The ParallelTests::Pids `synchronize` method can't be called directly from a trap,
       # using Thread workaround https://github.com/ddollar/foreman/issues/332
-      Thread.new do
-        if Gem.win_platform? || ((child_pid = ParallelTests.pids.all.first) && Process.getpgid(child_pid) != Process.pid)
-          ParallelTests.stop_all_processes
+      unless ENV['PARALLEL_TEST_INTERRUPT_MODE'] == 'never'
+        Thread.new do
+          should_interrupt = ENV['PARALLEL_TEST_INTERRUPT_MODE'] == 'always'
+          should_interrupt ||= Gem.win_platform?
+          should_interrupt ||= ((child_pid = ParallelTests.pids.all.first) && Process.getpgid(child_pid) != Process.pid)
+
+          if should_interrupt
+            ParallelTests.stop_all_processes
+          end
         end
       end
 
