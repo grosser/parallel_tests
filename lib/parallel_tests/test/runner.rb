@@ -158,7 +158,7 @@ module ParallelTests
 
         def executable
           if (executable = ENV['PARALLEL_TESTS_EXECUTABLE'])
-            [executable]
+            Shellwords.shellsplit(executable)
           else
             determine_executable
           end
