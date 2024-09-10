@@ -15,8 +15,6 @@ Gem::Specification.new name, ParallelTests::VERSION do |s|
     "wiki_uri" => "https://github.com/grosser/#{name}/wiki"
   }
 
-
-
   s.files = Dir["{lib,bin}/**/*"] + ["Readme.md"]
   s.license = "MIT"
   s.executables = ["parallel_spinach", "parallel_cucumber", "parallel_rspec", "parallel_test"]

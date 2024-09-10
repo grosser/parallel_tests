@@ -18,6 +18,12 @@ describe ParallelTests::Test::Runner do
         expect(a).to include("script/custom_rspec")
       end
       call(['xxx'], 1, 22, {})
+
+      ENV['PARALLEL_TESTS_EXECUTABLE'] = 'ruby -Icustom_option script/custom_rspec'
+      expect(ParallelTests::Test::Runner).to receive(:execute_command) do |a, _, _, _d|
+        expect(a).to include("ruby", "-Icustom_option", "script/custom_rspec")
+      end
+      call(['xxx'], 1, 22, {})
     end
 
     it "uses options" do

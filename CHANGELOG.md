@@ -8,6 +8,8 @@
 
 ### Fixed
 
+- Restore support for passing custom command lines as PARALLEL_TESTS_EXECUTABLE.
+
 ## 4.7.1 - 2024-04-25
 
 ### Added
