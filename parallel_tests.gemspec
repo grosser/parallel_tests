@@ -12,7 +12,8 @@ Gem::Specification.new name, ParallelTests::VERSION do |s|
     "changelog_uri" => "https://github.com/grosser/#{name}/blob/v#{s.version}/CHANGELOG.md",
     "documentation_uri" => "https://github.com/grosser/#{name}/blob/v#{s.version}/Readme.md",
     "source_code_uri" => "https://github.com/grosser/#{name}/tree/v#{s.version}",
-    "wiki_uri" => "https://github.com/grosser/#{name}/wiki"
+    "wiki_uri" => "https://github.com/grosser/#{name}/wiki",
+    "rubygems_mfa_required" => "true"
   }
 
   s.files = Dir["{lib,bin}/**/*"] + ["Readme.md"]
