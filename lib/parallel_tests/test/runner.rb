@@ -85,6 +85,39 @@ module ParallelTests
           tests
         end
 
+        def process_in_batches(cmd, os_cmd_length_limit, tests)
+          # Filter elements not starting with value in tests to retain in each batch
+          # i.e. retain common parameters for each batch
+          retained_elements = cmd.reject { |s| s.start_with?(tests) }
+        
+          # elements that needs to be checked for length and sliced into batches
+          non_retained_elements = cmd.select { |s| s.start_with?(tests) }
+        
+          batches = []
+          index = 0
+          while index < non_retained_elements.length
+            batch = retained_elements.dup
+            total_length = batch.map(&:length).sum
+            total_length += batch.size # account for spaces between elements
+        
+            while index < non_retained_elements.length
+              current_element_length = non_retained_elements[index].length
+              current_element_length += 1 # account for spaces between elements
+        
+              # Check if the current element can be added without exceeding the os cmd length limit
+              break unless total_length + current_element_length <= os_cmd_length_limit
+        
+              batch << non_retained_elements[index]
+              total_length += current_element_length
+              index += 1
+            end
+        
+            batches << batch
+          end
+        
+          batches
+        end
+
         def execute_command(cmd, process_number, num_processes, options)
           number = test_env_number(process_number, options).to_s
           env = (options[:env] || {}).merge(
@@ -99,7 +132,26 @@ module ParallelTests
 
           print_command(cmd, env) if report_process_command?(options) && !options[:serialize_stdout]
 
-          execute_command_and_capture_output(env, cmd, options)
+          result = []
+          process_in_batches(cmd, 8191, options[:files].first).each do |subcmd|
+            result << execute_command_and_capture_output(env, subcmd, options)
+          end
+
+          # combine the output of result array into a single Hash
+          combined_result = {}
+          result.each do |res|
+            if combined_result.empty?
+              combined_result = res
+            else
+              combined_result[:env] = res[:env]
+              combined_result[:stdout] = combined_result[:stdout].to_s + res[:stdout].to_s
+              combined_result[:exit_status] = combined_result[:exit_status] + res[:exit_status] # just add
+              combined_result[:command] = combined_result[:command] | res[:command]
+              combined_result[:seed] = res[:seed]
+            end
+          end
+
+          combined_result
         end
 
         def print_command(command, env)
