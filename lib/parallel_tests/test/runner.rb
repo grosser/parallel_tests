@@ -133,7 +133,7 @@ module ParallelTests
           print_command(cmd, env) if report_process_command?(options) && !options[:serialize_stdout]
 
           result = []
-          process_in_batches(cmd, 8191, options[:files].first).each do |subcmd|
+          result = process_in_batches(cmd, 8191, options[:files].first).map do |subcmd|
             result << execute_command_and_capture_output(env, subcmd, options)
           end
 
