@@ -143,7 +143,6 @@ module ParallelTests
             if combined_result.empty?
               combined_result = res
             else
-              combined_result[:env] = res[:env]
               combined_result[:stdout] = combined_result[:stdout].to_s + res[:stdout].to_s
               combined_result[:exit_status] = combined_result[:exit_status] + res[:exit_status] # just add
               combined_result[:command] = combined_result[:command] | res[:command]
