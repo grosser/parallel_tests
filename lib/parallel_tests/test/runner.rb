@@ -146,7 +146,6 @@ module ParallelTests
               combined_result[:stdout] = combined_result[:stdout].to_s + res[:stdout].to_s
               combined_result[:exit_status] = combined_result[:exit_status] + res[:exit_status] # just add
               combined_result[:command] = combined_result[:command] | res[:command]
-              combined_result[:seed] = res[:seed]
             end
           end
 
