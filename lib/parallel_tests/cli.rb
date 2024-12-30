@@ -109,7 +109,22 @@ module ParallelTests
     end
 
     def run_tests(group, process_number, num_processes, options)
-      @runner.run_tests(group, process_number, num_processes, options)
+      if (limit = options[:test_file_limit])
+        # TODO: will have some bugs with summarizing results and last process
+        results = group.each_slice(limit).map do |slice|
+          @runner.run_tests(slice, process_number, num_processes, options)
+        end
+        result = results[0]
+        results[1..].each do |res|
+          result[:stdout] = result[:stdout].to_s + res[:stdout].to_s
+          result[:exit_status] = [res[:exit_status], result[:exit_status]].max
+          # adding all files back in, not using original cmd to show what was actually run
+          result[:command] |= res[:command]
+        end
+        result
+      else
+        @runner.run_tests(group, process_number, num_processes, options)
+      end
     end
 
     def reprint_output(result, lockfile)
@@ -286,6 +301,7 @@ module ParallelTests
         opts.on("--unknown-runtime SECONDS", Float, "Use given number as unknown runtime (otherwise use average time)") { |time| options[:unknown_runtime] = time }
         opts.on("--first-is-1", "Use \"1\" as TEST_ENV_NUMBER to not reuse the default test environment") { options[:first_is_1] = true }
         opts.on("--fail-fast", "Stop all groups when one group fails (best used with --test-options '--fail-fast' if supported") { options[:fail_fast] = true }
+        opts.on("--test-file-limit LIMIT", Integer, "Limit to this number of files per test run by batching (for windows set to ~100 to stay below 8192 max command limit, might have bugs from reusing test-env-number and summarizing partial results)") { |limit| options[:test_file_limit] = limit }
         opts.on("--verbose", "Print debug output") { options[:verbose] = true }
         opts.on("--verbose-command", "Combines options --verbose-process-command and --verbose-rerun-command") { options.merge! verbose_process_command: true, verbose_rerun_command: true }
         opts.on("--verbose-process-command", "Print the command that will be executed by each process before it begins") { options[:verbose_process_command] = true }
