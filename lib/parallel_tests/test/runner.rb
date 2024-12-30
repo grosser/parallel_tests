@@ -85,39 +85,32 @@ module ParallelTests
           tests
         end
 
-        def process_in_batches(cmd, os_cmd_length_limit, tests)
-          # Filter elements not starting with value in tests to retain in each batch
-          split_elements = cmd.partition { |s| s.start_with?(tests) }
-          
-          # elements that needs to be checked for length and sliced into batches
-          non_retained_elements = split_elements.first
-        
-          # common parameters for each batch
-          retained_elements = split_elements.last
-        
+        def split_command_into_batches(cmd, limit, test_folders)
+          raise "only testing a single folder is supported when splitting into batches" if test_folders.size != 1
+          tests, base = cmd.partition { |arg| arg.start_with?(test_folders.first) }
+
           batches = []
-          index = 0
-          while index < non_retained_elements.length
-            batch = retained_elements.dup
-            total_length = batch.map(&:length).sum
-            total_length += batch.size # account for spaces between elements
-        
-            while index < non_retained_elements.length
-              current_element_length = non_retained_elements[index].length
-              current_element_length += 1 # account for spaces between elements
-        
-              # Check if the current element can be added without exceeding the os cmd length limit
-              break unless total_length + current_element_length <= os_cmd_length_limit
-        
-              batch << non_retained_elements[index]
-              total_length += current_element_length
-              index += 1
+          batch = base.dup # first batch
+          tests.each do |file|
+            if (batch + [file]).shelljoin.size > limit
+              batches << batch
+              batch = base.dup
             end
-        
-            batches << batch
+            batch << file
           end
-        
+          batches << batch # last batch
           batches
+        end
+
+        def combine_batch_results(results)
+          result = results[0]
+          results[1..].each do |res|
+            result[:stdout] = result[:stdout].to_s + res[:stdout].to_s
+            result[:exit_status] = [res[:exit_status], result[:exit_status]].max
+            # adding all files back in, not using original cmd to show what was actually run
+            result[:command] |= res[:command]
+          end
+          result
         end
 
         def execute_command(cmd, process_number, num_processes, options)
@@ -134,24 +127,14 @@ module ParallelTests
 
           print_command(cmd, env) if report_process_command?(options) && !options[:serialize_stdout]
 
-          result = []
-          process_in_batches(cmd, 8191, options[:files].first).map do |subcmd|
-            result << execute_command_and_capture_output(env, subcmd, options)
-          end
-
-          # combine the output of result array into a single Hash
-          combined_result = {}
-          result.each do |res|
-            if combined_result.empty?
-              combined_result = res
-            else
-              combined_result[:stdout] = combined_result[:stdout].to_s + res[:stdout].to_s
-              combined_result[:exit_status] = res[:exit_status] > combined_result[:exit_status] ? res[:exit_status] : combined_result[:exit_status] # keep the max
-              combined_result[:command] = combined_result[:command] | res[:command]
+          if (limit = options[:cmd_length_limit])
+            results = split_command_into_batches(cmd, limit, options[:files]).map do |subcmd|
+              execute_command_and_capture_output(env, subcmd, options)
             end
+            combine_batch_results(results)
+          else
+            execute_command_and_capture_output(env, cmd, options)
           end
-
-          combined_result
         end
 
         def print_command(command, env)

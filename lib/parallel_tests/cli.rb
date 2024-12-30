@@ -290,6 +290,7 @@ module ParallelTests
         opts.on("--unknown-runtime [FLOAT]", Float, "Use given number as unknown runtime (otherwise use average time)") { |time| options[:unknown_runtime] = time }
         opts.on("--first-is-1", "Use \"1\" as TEST_ENV_NUMBER to not reuse the default test environment") { options[:first_is_1] = true }
         opts.on("--fail-fast", "Stop all groups when one group fails (best used with --test-options '--fail-fast' if supported") { options[:fail_fast] = true }
+        opts.on("--cmd-length-limit", Integer, "Limit commands to this length by batching files that are being tested (use 8192 for windows)") { |limit| options[:cmd_length_limit] = limit }
         opts.on("--verbose", "Print debug output") { options[:verbose] = true }
         opts.on("--verbose-command", "Combines options --verbose-process-command and --verbose-rerun-command") { options.merge! verbose_process_command: true, verbose_rerun_command: true }
         opts.on("--verbose-process-command", "Print the command that will be executed by each process before it begins") { options[:verbose_process_command] = true }
