@@ -87,11 +87,13 @@ module ParallelTests
 
         def process_in_batches(cmd, os_cmd_length_limit, tests)
           # Filter elements not starting with value in tests to retain in each batch
-          # i.e. retain common parameters for each batch
-          retained_elements = cmd.reject { |s| s.start_with?(tests) }
-        
+          split_elements = cmd.partition { |s| s.start_with?(tests) }
+          
           # elements that needs to be checked for length and sliced into batches
-          non_retained_elements = cmd.select { |s| s.start_with?(tests) }
+          non_retained_elements = split_elements.first
+        
+          # common parameters for each batch
+          retained_elements = split_elements.last
         
           batches = []
           index = 0
@@ -133,7 +135,7 @@ module ParallelTests
           print_command(cmd, env) if report_process_command?(options) && !options[:serialize_stdout]
 
           result = []
-          result = process_in_batches(cmd, 8191, options[:files].first).map do |subcmd|
+          process_in_batches(cmd, 8191, options[:files].first).map do |subcmd|
             result << execute_command_and_capture_output(env, subcmd, options)
           end
 
@@ -144,7 +146,7 @@ module ParallelTests
               combined_result = res
             else
               combined_result[:stdout] = combined_result[:stdout].to_s + res[:stdout].to_s
-              combined_result[:exit_status] = combined_result[:exit_status] + res[:exit_status] # just add
+              combined_result[:exit_status] = res[:exit_status] > combined_result[:exit_status] ? res[:exit_status] : combined_result[:exit_status] # keep the max
               combined_result[:command] = combined_result[:command] | res[:command]
             end
           end
