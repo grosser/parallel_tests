@@ -25,6 +25,8 @@ class ParallelTests::RSpec::RuntimeLogger < ParallelTests::RSpec::LoggerBase
     super if defined?(super)
   end
 
+  def seed(*); end
+
   def dump_summary(*); end
 
   def dump_failures(*); end

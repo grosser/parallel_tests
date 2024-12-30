@@ -109,11 +109,7 @@ module ParallelTests
     end
 
     def run_tests(group, process_number, num_processes, options)
-      if group.empty?
-        { stdout: '', exit_status: 0, command: nil, seed: nil }
-      else
-        @runner.run_tests(group, process_number, num_processes, options)
-      end
+      @runner.run_tests(group, process_number, num_processes, options)
     end
 
     def reprint_output(result, lockfile)
@@ -194,11 +190,11 @@ module ParallelTests
 
           Options are:
         BANNER
-        opts.on("-n [PROCESSES]", Integer, "How many processes to use, default: available CPUs") { |n| options[:count] = n }
-        opts.on("-p", "--pattern [PATTERN]", "run tests matching this regex pattern") { |pattern| options[:pattern] = /#{pattern}/ }
-        opts.on("--exclude-pattern", "--exclude-pattern [PATTERN]", "exclude tests matching this regex pattern") { |pattern| options[:exclude_pattern] = /#{pattern}/ }
+        opts.on("-n PROCESSES", Integer, "How many processes to use, default: available CPUs") { |n| options[:count] = n }
+        opts.on("-p", "--pattern PATTERN", "run tests matching this regex pattern") { |pattern| options[:pattern] = /#{pattern}/ }
+        opts.on("--exclude-pattern", "--exclude-pattern PATTERN", "exclude tests matching this regex pattern") { |pattern| options[:exclude_pattern] = /#{pattern}/ }
         opts.on(
-          "--group-by [TYPE]",
+          "--group-by TYPE",
           <<~TEXT.rstrip.split("\n").join("\n#{newline_padding}")
             group tests by:
             found - order of finding files
@@ -209,11 +205,11 @@ module ParallelTests
             default - runtime when runtime log is filled otherwise filesize
           TEXT
         ) { |type| options[:group_by] = type.to_sym }
-        opts.on("-m [FLOAT]", "--multiply-processes [FLOAT]", Float, "use given number as a multiplier of processes to run") do |multiply|
+        opts.on("-m COUNT", "--multiply-processes COUNT", Float, "use given number as a multiplier of processes to run") do |multiply|
           options[:multiply] = multiply
         end
 
-        opts.on("-s [PATTERN]", "--single [PATTERN]", "Run all matching files in the same process") do |pattern|
+        opts.on("-s PATTERN", "--single PATTERN", "Run all matching files in the same process") do |pattern|
           (options[:single_process] ||= []) << /#{pattern}/
         end
 
@@ -222,7 +218,7 @@ module ParallelTests
         end
 
         opts.on(
-          "--isolate-n [PROCESSES]",
+          "--isolate-n PROCESSES",
           Integer,
           "Use 'isolate'  singles with number of processes, default: 1"
         ) { |n| options[:isolate_count] = n }
@@ -233,13 +229,13 @@ module ParallelTests
         ) { options[:highest_exit_status] = true }
 
         opts.on(
-          "--failure-exit-code [INT]",
+          "--failure-exit-code INT",
           Integer,
           "Specify the exit code to use when tests fail"
         ) { |code| options[:failure_exit_code] = code }
 
         opts.on(
-          "--specify-groups [SPECS]",
+          "--specify-groups SPECS",
           <<~TEXT.rstrip.split("\n").join("\n#{newline_padding}")
             Use 'specify-groups' if you want to specify multiple specs running in multiple
             processes in a specific formation. Commas indicate specs in the same process,
@@ -253,7 +249,7 @@ module ParallelTests
         ) { |groups| options[:specify_groups] = groups }
 
         opts.on(
-          "--only-group INT[,INT]",
+          "--only-group GROUP_INDEX[,GROUP_INDEX]",
           Array,
           <<~TEXT.rstrip.split("\n").join("\n#{newline_padding}")
             Only run the given group numbers.
@@ -261,16 +257,16 @@ module ParallelTests
           TEXT
         ) { |groups| options[:only_group] = groups.map(&:to_i) }
 
-        opts.on("-e", "--exec [COMMAND]", "execute this code parallel and with ENV['TEST_ENV_NUMBER']") { |arg| options[:execute] = Shellwords.shellsplit(arg) }
-        opts.on("-o", "--test-options '[OPTIONS]'", "execute test commands with those options") { |arg| options[:test_options] = Shellwords.shellsplit(arg) }
-        opts.on("-t", "--type [TYPE]", "test(default) / rspec / cucumber / spinach") do |type|
+        opts.on("-e", "--exec COMMAND", "execute this code parallel and with ENV['TEST_ENV_NUMBER']") { |arg| options[:execute] = Shellwords.shellsplit(arg) }
+        opts.on("-o", "--test-options 'OPTIONS'", "execute test commands with those options") { |arg| options[:test_options] = Shellwords.shellsplit(arg) }
+        opts.on("-t", "--type TYPE", "test(default) / rspec / cucumber / spinach") do |type|
           @runner = load_runner(type)
         rescue NameError, LoadError => e
           puts "Runner for `#{type}` type has not been found! (#{e})"
           abort
         end
         opts.on(
-          "--suffix [PATTERN]",
+          "--suffix PATTERN",
           <<~TEXT.rstrip.split("\n").join("\n#{newline_padding}")
             override built in test file pattern (should match suffix):
             '_spec.rb$' - matches rspec files
@@ -282,12 +278,12 @@ module ParallelTests
         opts.on("--combine-stderr", "Combine stderr into stdout, useful in conjunction with --serialize-stdout") { options[:combine_stderr] = true }
         opts.on("--non-parallel", "execute same commands but do not in parallel, needs --exec") { options[:non_parallel] = true }
         opts.on("--no-symlinks", "Do not traverse symbolic links to find test files") { options[:symlinks] = false }
-        opts.on('--ignore-tags [PATTERN]', 'When counting steps ignore scenarios with tags that match this pattern') { |arg| options[:ignore_tag_pattern] = arg }
+        opts.on('--ignore-tags PATTERN', 'When counting steps ignore scenarios with tags that match this pattern') { |arg| options[:ignore_tag_pattern] = arg }
         opts.on("--nice", "execute test commands with low priority.") { options[:nice] = true }
-        opts.on("--runtime-log [PATH]", "Location of previously recorded test runtimes") { |path| options[:runtime_log] = path }
-        opts.on("--allowed-missing [INT]", Integer, "Allowed percentage of missing runtimes (default = 50)") { |percent| options[:allowed_missing_percent] = percent }
+        opts.on("--runtime-log PATH", "Location of previously recorded test runtimes") { |path| options[:runtime_log] = path }
+        opts.on("--allowed-missing COUNT", Integer, "Allowed percentage of missing runtimes (default = 50)") { |percent| options[:allowed_missing_percent] = percent }
         opts.on('--allow-duplicates', 'When detecting files to run, allow duplicates') { options[:allow_duplicates] = true }
-        opts.on("--unknown-runtime [FLOAT]", Float, "Use given number as unknown runtime (otherwise use average time)") { |time| options[:unknown_runtime] = time }
+        opts.on("--unknown-runtime SECONDS", Float, "Use given number as unknown runtime (otherwise use average time)") { |time| options[:unknown_runtime] = time }
         opts.on("--first-is-1", "Use \"1\" as TEST_ENV_NUMBER to not reuse the default test environment") { options[:first_is_1] = true }
         opts.on("--fail-fast", "Stop all groups when one group fails (best used with --test-options '--fail-fast' if supported") { options[:fail_fast] = true }
         opts.on("--verbose", "Print debug output") { options[:verbose] = true }
