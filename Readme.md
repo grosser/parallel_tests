@@ -238,23 +238,23 @@ Setup for non-rails
 
 Options are:
 <!-- copy output from bundle exec ./bin/parallel_test -h -->
-    -n [PROCESSES]                   How many processes to use, default: available CPUs
-    -p, --pattern [PATTERN]          run tests matching this regex pattern
-        --exclude-pattern [PATTERN]  exclude tests matching this regex pattern
-        --group-by [TYPE]            group tests by:
+    -n PROCESSES                     How many processes to use, default: available CPUs
+    -p, --pattern PATTERN            run tests matching this regex pattern
+        --exclude-pattern PATTERN    exclude tests matching this regex pattern
+        --group-by TYPE              group tests by:
                                      found - order of finding files
                                      steps - number of cucumber/spinach steps
                                      scenarios - individual cucumber scenarios
                                      filesize - by size of the file
                                      runtime - info from runtime log
                                      default - runtime when runtime log is filled otherwise filesize
-    -m, --multiply-processes [FLOAT] use given number as a multiplier of processes to run
-    -s, --single [PATTERN]           Run all matching files in the same process
+    -m, --multiply-processes COUNT   use given number as a multiplier of processes to run
+    -s, --single PATTERN             Run all matching files in the same process
     -i, --isolate                    Do not run any other tests in the group used by --single(-s)
-        --isolate-n [PROCESSES]      Use 'isolate'  singles with number of processes, default: 1
+        --isolate-n PROCESSES        Use 'isolate'  singles with number of processes, default: 1
         --highest-exit-status        Exit with the highest exit status provided by test run(s)
-        --failure-exit-code [INT]    Specify the exit code to use when tests fail
-        --specify-groups [SPECS]     Use 'specify-groups' if you want to specify multiple specs running in multiple
+        --failure-exit-code INT      Specify the exit code to use when tests fail
+        --specify-groups SPECS       Use 'specify-groups' if you want to specify multiple specs running in multiple
                                      processes in a specific formation. Commas indicate specs in the same process,
                                      pipes indicate specs in a new process. Cannot use with --single, --isolate, or
                                      --isolate-n.  Ex.
@@ -262,12 +262,13 @@ Options are:
                                        Process 1 will contain 1_spec.rb and 2_spec.rb
                                        Process 2 will contain 3_spec.rb
                                        Process 3 will contain all other specs
-        --only-group INT[,INT]       Only run the given group numbers.
+        --only-group GROUP_INDEX[,GROUP_INDEX]
+                                     Only run the given group numbers.
                                      Changes `--group-by` default to 'filesize'.
-    -e, --exec [COMMAND]             execute this code parallel and with ENV['TEST_ENV_NUMBER']
-    -o, --test-options '[OPTIONS]'   execute test commands with those options
-    -t, --type [TYPE]                test(default) / rspec / cucumber / spinach
-        --suffix [PATTERN]           override built in test file pattern (should match suffix):
+    -e, --exec COMMAND               execute this code parallel and with ENV['TEST_ENV_NUMBER']
+    -o, --test-options 'OPTIONS'     execute test commands with those options
+    -t, --type TYPE                  test(default) / rspec / cucumber / spinach
+        --suffix PATTERN             override built in test file pattern (should match suffix):
                                      '_spec.rb$' - matches rspec files
                                      '_(test|spec).rb$' - matches test or spec files
         --serialize-stdout           Serialize stdout output, nothing will be written until everything is done
@@ -276,14 +277,15 @@ Options are:
         --combine-stderr             Combine stderr into stdout, useful in conjunction with --serialize-stdout
         --non-parallel               execute same commands but do not in parallel, needs --exec
         --no-symlinks                Do not traverse symbolic links to find test files
-        --ignore-tags [PATTERN]      When counting steps ignore scenarios with tags that match this pattern
+        --ignore-tags PATTERN        When counting steps ignore scenarios with tags that match this pattern
         --nice                       execute test commands with low priority.
-        --runtime-log [PATH]         Location of previously recorded test runtimes
-        --allowed-missing [INT]      Allowed percentage of missing runtimes (default = 50)
+        --runtime-log PATH           Location of previously recorded test runtimes
+        --allowed-missing COUNT      Allowed percentage of missing runtimes (default = 50)
         --allow-duplicates           When detecting files to run, allow duplicates
-        --unknown-runtime [FLOAT]    Use given number as unknown runtime (otherwise use average time)
+        --unknown-runtime SECONDS    Use given number as unknown runtime (otherwise use average time)
         --first-is-1                 Use "1" as TEST_ENV_NUMBER to not reuse the default test environment
         --fail-fast                  Stop all groups when one group fails (best used with --test-options '--fail-fast' if supported
+        --test-file-limit LIMIT      Limit to this number of files per test run by batching (for windows set to ~100 to stay below 8192 max command limit, might have bugs from reusing test-env-number and summarizing partial results)
         --verbose                    Print debug output
         --verbose-command            Combines options --verbose-process-command and --verbose-rerun-command
         --verbose-process-command    Print the command that will be executed by each process before it begins
