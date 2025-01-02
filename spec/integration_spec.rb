@@ -716,21 +716,21 @@ describe 'CLI' do
     let(:test_count) { 3 }
     before do
       test_count.times do |i|
-        write "spec/x#{i}_spec.rb", "puts %(TEST#{i}-\#{ENV['TEST_ENV_NUMBER']}-\#{Process.pid})"
+        write "spec/x#{i}_spec.rb", "puts %(TEST-\#{ENV['TEST_ENV_NUMBER']}-\#{Process.pid})"
       end
     end
 
     it "runs in batches" do
       result = run_tests ["spec"], type: 'rspec', add: ['--test-file-limit', '1', '--first-is-1', '-n', '2']
-      expect(result.scan(/TEST\d-\d/).sort).to eq(["TEST0-1", "TEST1-2", "TEST2-1"])
-      pids = result.scan(/TEST\d-\d-(\d+)/).flatten.uniq
+      expect(result.scan(/TEST-\d/).sort).to eq(["TEST-1", "TEST-1", "TEST-2"])
+      pids = result.scan(/TEST-\d-(\d+)/).flatten.uniq
       expect(pids.size).to eq test_count # did not run 2 tests in the same process
     end
 
     it "does not run in batches when above limit" do
       result = run_tests ["spec"], type: 'rspec', add: ['--test-file-limit', '2', '--first-is-1', '-n', '2']
-      expect(result.scan(/TEST\d-\d/).sort).to eq(["TEST0-1", "TEST1-2", "TEST2-1"])
-      pids = result.scan(/TEST\d-\d-(\d+)/).flatten.uniq
+      expect(result.scan(/TEST-\d/).sort).to eq(["TEST-1", "TEST-1", "TEST-2"])
+      pids = result.scan(/TEST-\d-(\d+)/).flatten.uniq
       expect(pids.size).to eq 2
     end
   end
