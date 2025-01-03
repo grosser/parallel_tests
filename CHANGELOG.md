@@ -8,6 +8,12 @@
 
 ### Fixed
 
+## 4.8.0 - 2025-01-03
+
+### Added
+
+- add --test-file-limit option for huge windows setups that breaks command length limit
+
 ## 4.7.2 - 2024-09-09
 
 ### Fixed
