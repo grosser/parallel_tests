@@ -7,7 +7,9 @@ describe 'rails' do
 
   def run(command, options = {})
     result = IO.popen(options.fetch(:environment, {}), command, err: [:child, :out], &:read)
-    raise "FAILED #{command}\n#{result}" if $?.success? == !!options[:fail]
+    if $?.success? == !!options[:fail]
+      raise "FAILED #{command}\n#{result}"
+    end
     result
   end
 
