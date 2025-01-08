@@ -15,7 +15,7 @@ module ParallelTests
       end
 
       def purge_before_load
-        if Gem::Version.new(Rails.version) > Gem::Version.new('4.2.0')
+        if ActiveRecord.version > Gem::Version.new('4.2.0')
           Rake::Task.task_defined?('db:purge') ? 'db:purge' : 'app:db:purge'
         end
       end
@@ -90,7 +90,7 @@ module ParallelTests
       end
 
       def schema_format_based_on_rails_version
-        if rails_7_or_greater?
+        if active_record_7_or_greater?
           ActiveRecord.schema_format
         else
           ActiveRecord::Base.schema_format
@@ -98,7 +98,7 @@ module ParallelTests
       end
 
       def schema_type_based_on_rails_version
-        if rails_61_or_greater? || schema_format_based_on_rails_version == :ruby
+        if active_record_61_or_greater? || schema_format_based_on_rails_version == :ruby
           "schema"
         else
           "structure"
@@ -129,7 +129,7 @@ module ParallelTests
       end
 
       def configured_databases
-        return [] unless defined?(ActiveRecord) && rails_61_or_greater?
+        return [] unless defined?(ActiveRecord) && active_record_61_or_greater?
 
         @@configured_databases ||= ActiveRecord::Tasks::DatabaseTasks.setup_initial_database_yaml
       end
@@ -148,12 +148,12 @@ module ParallelTests
 
       private
 
-      def rails_7_or_greater?
-        Gem::Version.new(Rails.version) >= Gem::Version.new('7.0')
+      def active_record_7_or_greater?
+        ActiveRecord.version >= Gem::Version.new('7.0')
       end
 
-      def rails_61_or_greater?
-        Gem::Version.new(Rails.version) >= Gem::Version.new('6.1.0')
+      def active_record_61_or_greater?
+        ActiveRecord.version >= Gem::Version.new('6.1.0')
       end
     end
   end
