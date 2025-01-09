@@ -202,19 +202,19 @@ describe ParallelTests::Tasks do
   end
 
   describe ".purge_before_load" do
-    context 'Rails < 4.2.0' do
+    context 'ActiveRecord < 4.2.0' do
       before do
-        stub_const('Rails', double(version: '3.2.1'))
+        stub_const('ActiveRecord', double(version: Gem::Version.new('3.2.1')))
       end
 
-      it "should return nil for Rails < 4.2.0" do
+      it "should return nil for ActiveRecord < 4.2.0" do
         expect(ParallelTests::Tasks.purge_before_load).to eq nil
       end
     end
 
-    context 'Rails > 4.2.0' do
+    context 'ActiveRecord > 4.2.0' do
       before do
-        stub_const('Rails', double(version: '4.2.8'))
+        stub_const('ActiveRecord', double(version: Gem::Version.new('4.2.8')))
       end
 
       it "should return db:purge when defined" do
