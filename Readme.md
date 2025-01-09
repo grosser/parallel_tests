@@ -345,6 +345,7 @@ TIPS
  - [Capybara setup](https://github.com/grosser/parallel_tests/wiki)
  - [Sphinx setup](https://github.com/grosser/parallel_tests/wiki)
  - [Capistrano setup](https://github.com/grosser/parallel_tests/wiki/Remotely-with-capistrano) let your tests run on a big box instead of your laptop
+ - Rails vs `ArgumentError: secret_key_base`: use `config.secret_key_base = Random.hex(64)`, see [rails issue](https://github.com/rails/rails/issues/53661)
 
 Contribute your own gotchas to the [Wiki](https://github.com/grosser/parallel_tests/wiki) or even better open a PR :)
 
