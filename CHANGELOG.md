@@ -8,6 +8,12 @@
 
 ### Fixed
 
+## 4.9.0 - 2025-01-09
+
+### Fixed
+
+- check ActiveRecord version instead of Rails
+
 ## 4.8.0 - 2025-01-03
 
 ### Added
