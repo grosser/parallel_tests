@@ -8,6 +8,10 @@
 
 ### Fixed
 
+## 4.9.1 - 2025-02-19
+
+### Fixed
+
 - Fix output of Cucumber failures logger. Previously, an event handler inherited from `Cucumber::Formatter::Rerun` would improperly join failures (e.g. `feature/one.feature:1feature/two.feature:1`). Now failures are separated with a single space.
 
 ## 4.9.0 - 2025-01-09
