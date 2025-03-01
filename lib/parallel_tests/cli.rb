@@ -349,7 +349,7 @@ module ParallelTests
         raise "--group-by #{allowed.join(" or ")} is required for --only-group"
       end
 
-      if options[:specify_groups] && (options.keys & [:single_process, :isolate, :isolate_count]).any?
+      if options[:specify_groups] && options.keys.intersect?([:single_process, :isolate, :isolate_count])
         raise "Can't pass --specify-groups with any of these keys: --single, --isolate, or --isolate-n"
       end
 

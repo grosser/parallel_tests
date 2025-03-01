@@ -12,11 +12,11 @@ jobs:
     strategy:
       fail-fast: false # run all tests so we see which gem/ruby combinations break
       matrix:
-        ruby: ['3.0', '3.1', '3.2', '3.3', '3.4', head, jruby-head]
+        ruby: ['3.1', '3.2', '3.3', '3.4', head, jruby-head]
         os: [ubuntu-latest, windows-latest]
         task: [spec]
         include:
-          - ruby: '3.0' # lowest supported version, same as gemspec and .rubocop.yml
+          - ruby: '3.1' # lowest supported version, same as gemspec and .rubocop.yml
             os: ubuntu-latest
             task: rubocop
     steps:
