@@ -14,8 +14,8 @@ module ParallelTests
 
       ENV['DISABLE_SPRING'] ||= '1'
 
-      num_processes = ParallelTests.determine_number_of_processes(options[:count])
-      num_processes *= ParallelTests.determine_multiple(options[:multiply])
+      num_processes = ParallelTests.determine_processor_count(options[:count])
+      num_processes = (num_processes * ParallelTests.determine_multiple(options[:multiply])).round
 
       options[:first_is_1] ||= first_is_1?
 
@@ -220,8 +220,8 @@ module ParallelTests
             default - runtime when runtime log is filled otherwise filesize
           TEXT
         ) { |type| options[:group_by] = type.to_sym }
-        opts.on("-m COUNT", "--multiply-processes COUNT", Float, "use given number as a multiplier of processes to run") do |multiply|
-          options[:multiply] = multiply
+        opts.on("-m COUNT", "--multiply-processes COUNT", Float, "use given number as a multiplier of processes to run") do |m|
+          options[:multiply_processes] = m
         end
 
         opts.on("-s PATTERN", "--single PATTERN", "Run all matching files in the same process") do |pattern|

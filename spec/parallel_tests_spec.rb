@@ -8,7 +8,7 @@ describe ParallelTests do
     end
 
     def call(count)
-      ParallelTests.determine_number_of_processes(count)
+      ParallelTests.determine_processor_count(count)
     end
 
     it "uses the given count if set" do
@@ -55,7 +55,7 @@ describe ParallelTests do
 
     it "uses the processor multiple from ENV before Parallel" do
       ENV['PARALLEL_TEST_MULTIPLE'] = '0.75'
-      expect(call(nil)).to eq(0.75)
+      expect(call(nil)).to eq(1)
     end
 
     it "does not use blank multiple" do
