@@ -1,6 +1,6 @@
 AllCops:
   NewCops: enable
-  TargetRubyVersion: 3.0
+  TargetRubyVersion: 3.2
   SuggestExtensions: false
   Exclude:
   - '**/vendor/bundle/**/*'
@@ -134,4 +134,12 @@ Lint/EmptyClass:
 
 # ENV.fetch('FOO', nil) is the same as ENV['FOO']
 Style/FetchEnvVar:
+  Enabled: false
+
+# &block is pretty readable
+Naming/BlockForwarding:
+  Enabled: false
+
+# &block is pretty readable
+Style/ArgumentsForwarding:
   Enabled: false

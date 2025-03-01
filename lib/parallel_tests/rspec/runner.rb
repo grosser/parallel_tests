@@ -4,7 +4,6 @@ require "parallel_tests/test/runner"
 module ParallelTests
   module RSpec
     class Runner < ParallelTests::Test::Runner
-      DEV_NULL = (WINDOWS ? "NUL" : "/dev/null")
       class << self
         def run_tests(test_files, process_number, num_processes, options)
           cmd = [*executable, *options[:test_options], *color, *spec_opts, *test_files]
