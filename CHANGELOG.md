@@ -6,7 +6,7 @@
 
 ### Added
 
-- Allow processor multiplier (flag: `-m` or `--multiply-processes`) to be set via the environment variable `PARALLEL_TEST_MULTIPLE`
+- Allow processor multiplier (flag: `-m` or `--multiply-processes`) to be set via the environment variable `PARALLEL_TEST_MULTIPLY_PROCESSES`
 
 ### Fixed
 
