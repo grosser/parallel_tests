@@ -8,13 +8,18 @@
 
 ### Fixed
 
-## 4.20.1 - 2025-02-29
+## 5.0.0 - 2025-03-01
+
+### Breaking Changes
+- dropped ruby 3.0 and 3.1, added ruby 3.4
+
+## 4.10.1 - 2025-03-01
 
 ### Fixed
 
 - reverted determine_number_of_processes rename since that broke dependencies
 
-## 4.20.0 - 2025-02-28
+## 4.10.0 - 2025-02-28
 
 ### Added
 
