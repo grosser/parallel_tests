@@ -14,7 +14,8 @@ module ParallelTests
   autoload :Pids, "parallel_tests/pids"
 
   class << self
-    def determine_processor_count(count)
+    # used by external libraries, do not rename or change api
+    def determine_number_of_processes(count)
       Integer(
         [
           count,

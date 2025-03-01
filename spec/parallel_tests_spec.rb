@@ -8,7 +8,7 @@ describe ParallelTests do
     end
 
     def call(count)
-      ParallelTests.determine_processor_count(count)
+      ParallelTests.determine_number_of_processes(count)
     end
 
     it "uses the given count if set" do

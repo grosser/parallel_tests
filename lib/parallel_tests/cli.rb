@@ -14,7 +14,7 @@ module ParallelTests
 
       ENV['DISABLE_SPRING'] ||= '1'
 
-      num_processes = ParallelTests.determine_processor_count(options[:count])
+      num_processes = ParallelTests.determine_number_of_processes(options[:count])
       num_processes = (num_processes * ParallelTests.determine_multiple(options[:multiply])).round
 
       options[:first_is_1] ||= first_is_1?
