@@ -34,6 +34,40 @@ describe ParallelTests do
     end
   end
 
+  describe ".determine_multiple" do
+    let(:default_multiple) { 1.0 }
+
+    before do
+      allow(Parallel).to receive(:multiple).and_return(default_multiple)
+    end
+
+    def call(multiple)
+      ParallelTests.determine_multiple(multiple)
+    end
+
+    it "uses the given multiple if set" do
+      expect(call('.5')).to eq(0.5)
+    end
+
+    it "uses the processor multiple from Parallel" do
+      expect(call(nil)).to eq(default_multiple)
+    end
+
+    it "uses the processor multiple from ENV before Parallel" do
+      ENV['PARALLEL_TEST_MULTIPLE'] = '0.75'
+      expect(call(nil)).to eq(0.75)
+    end
+
+    it "does not use blank multiple" do
+      expect(call('   ')).to eq(default_multiple)
+    end
+
+    it "does not use blank env" do
+      ENV['PARALLEL_TEST_MULTIPLE'] = '   '
+      expect(call(nil)).to eq(default_multiple)
+    end
+  end
+
   describe ".bundler_enabled?" do
     before do
       allow(Object).to receive(:const_defined?).with(:Bundler).and_return false

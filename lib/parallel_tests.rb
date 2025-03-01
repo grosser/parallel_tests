@@ -6,6 +6,7 @@ require "rbconfig"
 module ParallelTests
   WINDOWS = (RbConfig::CONFIG['host_os'] =~ /cygwin|mswin|mingw|bccwin|wince|emx/)
   RUBY_BINARY = File.join(RbConfig::CONFIG['bindir'], RbConfig::CONFIG['ruby_install_name'])
+  DEFAULT_MULTIPLE = 1.0
 
   autoload :CLI, "parallel_tests/cli"
   autoload :VERSION, "parallel_tests/version"
@@ -19,6 +20,14 @@ module ParallelTests
         ENV["PARALLEL_TEST_PROCESSORS"],
         Parallel.processor_count
       ].detect { |c| !c.to_s.strip.empty? }.to_i
+    end
+
+    def determine_multiple(multiple)
+      [
+        multiple,
+        ENV["PARALLEL_TEST_MULTIPLE"],
+        DEFAULT_MULTIPLE,
+      ].detect { |c| !c.to_s.strip.empty? }.to_f
     end
 
     def with_pid_file

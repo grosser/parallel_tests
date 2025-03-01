@@ -335,6 +335,7 @@ TIPS
    e.g. `config.cache_store = ..., namespace: "test_#{ENV['TEST_ENV_NUMBER']}"`
  - Debug errors that only happen with multiple files using `--verbose` and [cleanser](https://github.com/grosser/cleanser)
  - `export PARALLEL_TEST_PROCESSORS=13` to override default processor count
+ - `export PARALLEL_TEST_MULTIPLE=.5` to override default processor multiplier
  - Shell alias: `alias prspec='parallel_rspec -m 2 --'`
  - [Spring] Add the [spring-commands-parallel-tests](https://github.com/DocSpring/spring-commands-parallel-tests) gem to your `Gemfile` to get `parallel_tests` working with Spring.
  - `--first-is-1` will make the first environment be `1`, so you can test while running your full suite.<br/>
