@@ -54,7 +54,12 @@ describe ParallelTests do
     end
 
     it "uses the processor multiple from ENV before Parallel" do
-      ENV['PARALLEL_TEST_MULTIPLE'] = '0.75'
+      ENV['## 4.20.0 - 2025-02-28
+
+### Added
+
+PARALLEL_TEST_MULTIPLY_PROCESSES
+'] = '0.75'
       expect(call(nil)).to eq(1)
     end
 
@@ -63,7 +68,12 @@ describe ParallelTests do
     end
 
     it "does not use blank env" do
-      ENV['PARALLEL_TEST_MULTIPLE'] = '   '
+      ENV['## 4.20.0 - 2025-02-28
+
+### Added
+
+PARALLEL_TEST_MULTIPLY_PROCESSES
+'] = '   '
       expect(call(nil)).to eq(default_multiple)
     end
   end
