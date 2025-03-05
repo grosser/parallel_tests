@@ -7,6 +7,10 @@
 ### Added
 
 ### Fixed
+
+## 5.0.1 - 2025-03-05
+
+### Fixed
 - Fix Cucumber failures logger when a runner doesn't have any failed examples
 
 ## 5.0.0 - 2025-03-01
