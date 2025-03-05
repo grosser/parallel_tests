@@ -41,6 +41,10 @@ describe ParallelTests do
       allow(Parallel).to receive(:multiple).and_return(default_multiple)
     end
 
+    after do
+      ENV.delete('PARALLEL_TEST_MULTIPLY_PROCESSES')
+    end
+
     def call(multiple)
       ParallelTests.determine_multiple(multiple)
     end
@@ -54,13 +58,8 @@ describe ParallelTests do
     end
 
     it "uses the processor multiple from ENV before Parallel" do
-      ENV['## 4.20.0 - 2025-02-28
-
-### Added
-
-PARALLEL_TEST_MULTIPLY_PROCESSES
-'] = '0.75'
-      expect(call(nil)).to eq(1)
+      ENV['PARALLEL_TEST_MULTIPLY_PROCESSES'] = '0.75'
+      expect(call(nil)).to eq(0.75)
     end
 
     it "does not use blank multiple" do
@@ -68,12 +67,7 @@ PARALLEL_TEST_MULTIPLY_PROCESSES
     end
 
     it "does not use blank env" do
-      ENV['## 4.20.0 - 2025-02-28
-
-### Added
-
-PARALLEL_TEST_MULTIPLY_PROCESSES
-'] = '   '
+      ENV['PARALLEL_TEST_MULTIPLY_PROCESSES'] = '   '
       expect(call(nil)).to eq(default_multiple)
     end
   end
