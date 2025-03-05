@@ -10,6 +10,7 @@ describe ParallelTests::Cucumber::FailuresLogger do
 
   let(:logger1) { ParallelTests::Cucumber::FailuresLogger.new(config) }
   let(:logger2) { ParallelTests::Cucumber::FailuresLogger.new(config) }
+  let(:logger3) { ParallelTests::Cucumber::FailuresLogger.new(config) }
 
   it "should produce a list of failing scenarios" do
     feature1 = double('feature', file: "feature/one.feature")
@@ -17,6 +18,7 @@ describe ParallelTests::Cucumber::FailuresLogger do
 
     logger1.instance_variable_set("@failures", { feature1.file => [1, 3] })
     logger2.instance_variable_set("@failures", { feature2.file => [2, 4] })
+    logger3.instance_variable_set("@failures", {})
 
     config.event_bus.broadcast(Cucumber::Events::TestRunFinished.new)
     parallel_cucumber_failures.rewind

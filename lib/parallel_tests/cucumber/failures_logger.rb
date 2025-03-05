@@ -20,7 +20,7 @@ module ParallelTests
 
         # Add our own handler
         config.on_event :test_run_finished do
-          return if @failures.empty?
+          next if @failures.empty?
 
           lock_output do
             @failures.each do |file, lines|
