@@ -8,6 +8,11 @@
 
 ### Fixed
 
+## 5.1.0 - 2025-03-09
+
+### Fixed
+- Restored jruby support by restoring ruby 3.1 support
+
 ## 5.0.1 - 2025-03-05
 
 ### Fixed
