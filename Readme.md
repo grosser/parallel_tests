@@ -129,7 +129,7 @@ Test groups will often run for different times, making the full test run as slow
 
 ### RSpec
 
-Rspec: Add to your `.rspec_parallel` (or `.rspec`) :
+Rspec: Add to your `.rspec_parallel` (or `.rspec`), but can also be used via `--test-options='--format x'`:
 
     --format progress
     --format ParallelTests::RSpec::RuntimeLogger --out tmp/parallel_runtime_rspec.log
@@ -154,7 +154,7 @@ RSpec: SummaryLogger
 
 Log the test output without the different processes overwriting each other.
 
-Add the following to your `.rspec_parallel` (or `.rspec`) :
+Add the following to your `.rspec_parallel` (or `.rspec`), but can also be used via `--test-options='--format x'`:
 
     --format progress
     --format ParallelTests::RSpec::SummaryLogger --out tmp/spec_summary.log
@@ -168,7 +168,7 @@ Produce pasteable command-line snippets for each failed example. For example:
 rspec /path/to/my_spec.rb:123 # should do something
 ```
 
-Add to `.rspec_parallel` or use as CLI flag:
+Add the following to your `.rspec_parallel` (or `.rspec`), but can also be used via `--test-options='--format x'`:
 
     --format progress
     --format ParallelTests::RSpec::FailuresLogger --out tmp/failing_specs.log
@@ -188,7 +188,7 @@ Prints a single line for starting and finishing each example, to see what is cur
 [14402] [1] [PASSED] Bar bar
 ```
 
-Add to `.rspec_parallel` or use as CLI flag:
+Add the following to your `.rspec_parallel` (or `.rspec`), but can also be used via `--test-options='--format x'`:
 
       --format ParallelTests::RSpec::VerboseLogger
 
@@ -205,6 +205,8 @@ Usage:
 Or add the formatter to the `parallel:` profile of your `cucumber.yml`:
 
     parallel: --format progress --format ParallelTests::Cucumber::FailuresLogger --out tmp/cucumber_failures.log
+
+but can also be used via `--test-options='--format x'`:
 
 Note if your `cucumber.yml` default profile uses `<%= std_opts %>` you may need to insert this as follows `parallel: <%= std_opts %> --format progress...`
 
