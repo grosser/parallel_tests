@@ -52,7 +52,7 @@ module ParallelTests
         groups = options[:specify_groups]
         return groups if groups != '-'
 
-        $stdin.gets
+        $stdin.read.chomp
       end
 
       def specify_groups(items, num_groups, options, groups)

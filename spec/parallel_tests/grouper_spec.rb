@@ -126,25 +126,25 @@ describe ParallelTests::Grouper do
 
     context 'with specific groups provided through STDIN' do
       it "groups specify_groups as specified when specify_groups is just one spec" do
-        allow($stdin).to receive(:gets).and_return('1')
+        allow($stdin).to receive(:read).and_return("1\n")
 
         expect(call(3, specify_groups: '-')).to eq([["1"], ["2", "5"], ["3", "4"]])
       end
 
       it "groups specify_groups as specified when specify_groups is just multiple specs in one process" do
-        allow($stdin).to receive(:gets).and_return('3,1')
+        allow($stdin).to receive(:read).and_return("3,1\n")
 
         expect(call(3, specify_groups: '-')).to eq([["3", "1"], ["5"], ["2", "4"]])
       end
 
       it "groups specify_groups as specified when specify_groups is multiple specs" do
-        allow($stdin).to receive(:gets).and_return('1,2|4')
+        allow($stdin).to receive(:read).and_return("1,2|4\n")
 
         expect(call(3, specify_groups: '-')).to eq([["1", "2"], ["4"], ["3", "5"]])
       end
 
       it "specify_groups aborts when number of specs separated by pipe is out of bounds" do
-        allow($stdin).to receive(:gets).and_return('1|2|3|4')
+        allow($stdin).to receive(:read).and_return("1|2|3|4\n")
 
         expect do
           call(3, specify_groups: '-')
@@ -154,7 +154,7 @@ describe ParallelTests::Grouper do
       end
 
       it "specify_groups aborts when spec passed in doesn't match existing specs" do
-        allow($stdin).to receive(:gets).and_return('1|2|6')
+        allow($stdin).to receive(:read).and_return("1|2|6\n")
 
         expect do
           call(3, specify_groups: '-')
@@ -164,7 +164,7 @@ describe ParallelTests::Grouper do
       end
 
       it "specify_groups aborts when spec passed in doesn't match existing specs again" do
-        allow($stdin).to receive(:gets).and_return('1,6|2')
+        allow($stdin).to receive(:read).and_return("1,6|2\n")
 
         expect do
           call(3, specify_groups: '-')
@@ -174,7 +174,7 @@ describe ParallelTests::Grouper do
       end
 
       it "specify_groups aborts when number of specs is equal to number passed in" do
-        allow($stdin).to receive(:gets).and_return('1|2|3')
+        allow($stdin).to receive(:read).and_return("1|2|3\n")
 
         expect do
           call(3, specify_groups: '-')
@@ -182,7 +182,7 @@ describe ParallelTests::Grouper do
       end
 
       it "specify_groups does not abort when the every single spec is specified in it" do
-        allow($stdin).to receive(:gets).and_return('1,2|3,4|5')
+        allow($stdin).to receive(:read).and_return("1,2|3,4|5\n")
 
         expect(call(3, specify_groups: '-')).to eq([["1", "2"], ["3", "4"], ["5"]])
       end
