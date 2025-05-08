@@ -2,7 +2,7 @@
 
 ## Unreleased
 
-- The `specify-groups` option supports to read from STDIN when set to `-`
+- The `specify-groups` option supports reading from STDIN when set to `-`
 
 ### Breaking Changes
 

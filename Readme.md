@@ -258,7 +258,7 @@ Options are:
         --failure-exit-code INT      Specify the exit code to use when tests fail
         --specify-groups SPECS       Use 'specify-groups' if you want to specify multiple specs running in multiple
                                      processes in a specific formation. Commas indicate specs in the same process,
-                                     pipes indicate specs in a new process. If SPECS is a `-` the actual value for this
+                                     pipes indicate specs in a new process. If SPECS is a `-` the value for this
                                      option is read from STDIN instead. Cannot use with --single, --isolate, or
                                      --isolate-n.  Ex.
                                      $ parallel_tests -n 3 . --specify-groups '1_spec.rb,2_spec.rb|3_spec.rb'
