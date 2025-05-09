@@ -2,13 +2,15 @@
 
 ## Unreleased
 
-- The `specify-groups` option supports reading from STDIN when set to `-`
-
 ### Breaking Changes
 
 ### Added
 
 ### Fixed
+
+## 5.2.0 - 2025-05-08
+
+- The `specify-groups` option supports reading from STDIN when set to `-`
 
 ## 5.1.0 - 2025-03-09
 

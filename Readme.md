@@ -452,6 +452,7 @@ inspired by [pivotal labs](https://blog.pivotal.io/labs/labs/parallelize-your-rs
  - [Jay Dorsey](https://github.com/jaydorsey)
  - [hatsu](https://github.com/hatsu38)
  - [Mark Huk](https://github.com/vimutter)
+ - [Johannes Vetter](https://github.com/johvet)
 
 [Michael Grosser](http://grosser.it)<br/>
 michael@grosser.it<br/>
