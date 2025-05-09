@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- The `specify-groups` option supports reading from STDIN when set to `-`
+
 ### Breaking Changes
 
 ### Added

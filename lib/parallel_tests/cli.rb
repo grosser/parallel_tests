@@ -254,7 +254,8 @@ module ParallelTests
           <<~TEXT.rstrip.split("\n").join("\n#{newline_padding}")
             Use 'specify-groups' if you want to specify multiple specs running in multiple
             processes in a specific formation. Commas indicate specs in the same process,
-            pipes indicate specs in a new process. Cannot use with --single, --isolate, or
+            pipes indicate specs in a new process. If SPECS is a '-' the value for this
+            option is read from STDIN instead. Cannot use with --single, --isolate, or
             --isolate-n.  Ex.
             $ parallel_tests -n 3 . --specify-groups '1_spec.rb,2_spec.rb|3_spec.rb'
               Process 1 will contain 1_spec.rb and 2_spec.rb
