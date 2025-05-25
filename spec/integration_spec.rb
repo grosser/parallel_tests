@@ -335,6 +335,27 @@ describe 'CLI' do
       expect(result).not_to match(/2.*0.*2/m)
     end
 
+    it "runs command in parallel with files as arguments" do
+      write 'spec/xxx_spec.rb', 'describe("it"){it("should"){puts "TEST1"}}'
+      write 'spec/xxx2_spec.rb', 'describe("it"){it("should"){puts "TEST2"}}'
+
+      result = run_tests "spec", type: 'rspec', add: ["--exec-args", "echo"]
+
+      expect(result).to include_exactly_times('spec/xxx_spec.rb', 1)
+      expect(result).to include_exactly_times('spec/xxx2_spec.rb', 1)
+    end
+
+    it "runs two commands in parallel with files as arguments" do
+      write 'spec/xxx_spec.rb', 'describe("it"){it("should"){puts "TEST1"}}'
+      write 'spec/xxx2_spec.rb', 'describe("it"){it("should"){puts "TEST2"}}'
+
+      result = run_tests "spec", type: 'rspec', add: ["--exec-args", "echo 'hello world' && rspec"]
+
+      expect(result).to include_exactly_times('hello world', 2)
+      expect(result).to include_exactly_times('TEST1', 1)
+      expect(result).to include_exactly_times('TEST2', 1)
+    end
+
     it "exists with success if all sub-processes returned success" do
       expect(system(*executable, '-e', 'cat /dev/null', '-n', '4')).to eq(true)
     end

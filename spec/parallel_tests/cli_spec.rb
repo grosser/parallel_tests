@@ -26,6 +26,10 @@ describe ParallelTests::CLI do
       expect(call(["--exec", "echo"])).to eq(execute: ["echo"])
     end
 
+    it "parses execute arguments" do
+      expect(call(["test", "--exec-args", "echo"])).to eq(defaults.merge(execute_args: ["echo"]))
+    end
+
     it "parses excludes pattern" do
       expect(call(["test", "--exclude-pattern", "spec/"])).to eq(defaults.merge(exclude_pattern: /spec\//))
     end

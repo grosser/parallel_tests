@@ -8,6 +8,12 @@
 
 ### Fixed
 
+## 5.3.0 - 2025-05-24
+
+### Added
+
+- The `--exec-args` option, which allows users to run shell commands in parallel with test files as arguments
+
 ## 5.2.0 - 2025-05-08
 
 - The `specify-groups` option supports reading from STDIN when set to `-`

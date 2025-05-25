@@ -269,6 +269,9 @@ Options are:
                                      Only run the given group numbers.
                                      Changes `--group-by` default to 'filesize'.
     -e, --exec COMMAND               execute this code parallel and with ENV['TEST_ENV_NUMBER']
+        --exec-args COMMAND          execute this code parallel with test files as arguments, Ex.
+                                     $ parallel_tests --exec-args echo
+                                        echo spec/a_spec.rb spec/b_spec.rb
     -o, --test-options 'OPTIONS'     execute test commands with those options
     -t, --type TYPE                  test(default) / rspec / cucumber / spinach
         --suffix PATTERN             override built in test file pattern (should match suffix):

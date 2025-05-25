@@ -6,8 +6,7 @@ module ParallelTests
     class Runner < ParallelTests::Test::Runner
       class << self
         def run_tests(test_files, process_number, num_processes, options)
-          cmd = [*executable, *options[:test_options], *color, *spec_opts, *test_files]
-          execute_command(cmd, process_number, num_processes, options)
+          execute_command(get_cmd(test_files, options), process_number, num_processes, options)
         end
 
         def determine_executable
@@ -40,6 +39,10 @@ module ParallelTests
 
         def line_is_result?(line)
           line =~ /\d+ examples?, \d+ failures?/
+        end
+
+        def build_cmd(file_list, options)
+          [*executable, *options[:test_options], *color, *spec_opts, *file_list]
         end
 
         # remove old seed and add new seed
