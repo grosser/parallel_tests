@@ -239,7 +239,7 @@ Setup for non-rails
     `parallel_cucumber -n 2 -o '-p foo_profile --tags @only_this_tag or @only_that_tag --format summary'`
 
 Options are:
-<!-- copy output from bundle exec ./bin/parallel_test -h -->
+<!-- rake readme -->
     -n PROCESSES                     How many processes to use, default: available CPUs
     -p, --pattern PATTERN            run tests matching this regex pattern
         --exclude-pattern PATTERN    exclude tests matching this regex pattern
@@ -258,7 +258,7 @@ Options are:
         --failure-exit-code INT      Specify the exit code to use when tests fail
         --specify-groups SPECS       Use 'specify-groups' if you want to specify multiple specs running in multiple
                                      processes in a specific formation. Commas indicate specs in the same process,
-                                     pipes indicate specs in a new process. If SPECS is a `-` the value for this
+                                     pipes indicate specs in a new process. If SPECS is a '-' the value for this
                                      option is read from STDIN instead. Cannot use with --single, --isolate, or
                                      --isolate-n.  Ex.
                                      $ parallel_tests -n 3 . --specify-groups '1_spec.rb,2_spec.rb|3_spec.rb'
@@ -268,10 +268,10 @@ Options are:
         --only-group GROUP_INDEX[,GROUP_INDEX]
                                      Only run the given group numbers.
                                      Changes `--group-by` default to 'filesize'.
-    -e, --exec COMMAND               execute this code parallel and with ENV['TEST_ENV_NUMBER']
-        --exec-args COMMAND          execute this code parallel with test files as arguments, Ex.
+    -e, --exec COMMAND               execute COMMAND in parallel and with ENV['TEST_ENV_NUMBER']
+        --exec-args COMMAND          execute COMMAND in parallel with test files as arguments, for example:
                                      $ parallel_tests --exec-args echo
-                                        echo spec/a_spec.rb spec/b_spec.rb
+                                     > echo spec/a_spec.rb spec/b_spec.rb
     -o, --test-options 'OPTIONS'     execute test commands with those options
     -t, --type TYPE                  test(default) / rspec / cucumber / spinach
         --suffix PATTERN             override built in test file pattern (should match suffix):
@@ -291,7 +291,9 @@ Options are:
         --unknown-runtime SECONDS    Use given number as unknown runtime (otherwise use average time)
         --first-is-1                 Use "1" as TEST_ENV_NUMBER to not reuse the default test environment
         --fail-fast                  Stop all groups when one group fails (best used with --test-options '--fail-fast' if supported
-        --test-file-limit LIMIT      Limit to this number of files per test run by batching (for windows set to ~100 to stay below 8192 max command limit, might have bugs from reusing test-env-number and summarizing partial results)
+        --test-file-limit LIMIT      Limit to this number of files per test run by batching
+                                     (for windows set to ~100 to stay below 8192 max command limit, might have bugs from reusing test-env-number
+                                     and summarizing partial results)
         --verbose                    Print debug output
         --verbose-command            Combines options --verbose-process-command and --verbose-rerun-command
         --verbose-process-command    Print the command that will be executed by each process before it begins
@@ -299,6 +301,7 @@ Options are:
         --quiet                      Print only tests output
     -v, --version                    Show Version
     -h, --help                       Show this.
+<!-- rake readme -->
 
 You can run any kind of code in parallel with -e / --exec
 

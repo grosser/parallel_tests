@@ -30,3 +30,15 @@ task :bundle_all do
     end
   end
 end
+
+desc "render the README option section"
+task :readme do
+  output = `bundle exec ./bin/parallel_test -h`
+  abort "Command failed: #{output}" unless $?.success?
+  output.sub!(/.*Options are:/m, "") || raise
+  file = "README.md"
+  separator = "<!-- rake readme -->"
+  parts = File.read(file).split(separator)
+  parts[1] = output
+  File.write file, parts.join(separator)
+end
