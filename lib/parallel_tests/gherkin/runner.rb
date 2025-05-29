@@ -18,11 +18,7 @@ module ParallelTests
           options[:env] ||= {}
           options[:env] = options[:env].merge({ 'AUTOTEST' => '1' }) if $stdout.tty?
 
-          cmd = executable
-          cmd += runtime_logging if File.directory?(File.dirname(runtime_log))
-          cmd += combined_scenarios
-          cmd += cucumber_opts(options[:test_options])
-          execute_command(cmd, process_number, num_processes, options)
+          execute_command(get_cmd(combined_scenarios, options), process_number, num_processes, options)
         end
 
         def test_file_name
@@ -39,6 +35,15 @@ module ParallelTests
 
         def line_is_result?(line)
           line =~ /^\d+ (steps?|scenarios?)/
+        end
+
+        def build_cmd(file_list, options)
+          cmd = [
+            *executable,
+            *(runtime_logging if File.directory?(File.dirname(runtime_log))),
+            *file_list,
+            *cucumber_opts(options[:test_options])
+          ]
         end
 
         # cucumber has 2 result lines per test run, that cannot be added

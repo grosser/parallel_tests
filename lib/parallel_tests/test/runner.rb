@@ -28,15 +28,7 @@ module ParallelTests
 
         def run_tests(test_files, process_number, num_processes, options)
           require_list = test_files.map { |file| file.gsub(" ", "\\ ") }.join(" ")
-          cmd = [
-            *executable,
-            '-Itest',
-            '-e',
-            "%w[#{require_list}].each { |f| require %{./\#{f}} }",
-            '--',
-            *options[:test_options]
-          ]
-          execute_command(cmd, process_number, num_processes, options)
+          execute_command(get_cmd(require_list, options), process_number, num_processes, options)
         end
 
         # ignores other commands runner noise
@@ -166,6 +158,25 @@ module ParallelTests
 
         def determine_executable
           ["ruby"]
+        end
+
+        def get_cmd(file_list, options = {})
+          if options[:execute_args]
+            [*options[:execute_args], *file_list]
+          else
+            build_cmd(file_list, options)
+          end
+        end
+
+        def build_cmd(file_list, options = {})
+          [
+            *executable,
+            '-Itest',
+            '-e',
+            "%w[#{file_list}].each { |f| require %{./\#{f}} }",
+            '--',
+            *options[:test_options]
+          ]
         end
 
         def sum_up_results(results)
