@@ -6,7 +6,7 @@ module ParallelTests
     class Runner < ParallelTests::Test::Runner
       class << self
         def run_tests(test_files, process_number, num_processes, options)
-          execute_command(get_cmd(test_files, options), process_number, num_processes, options)
+          execute_command(build_command(test_files, options), process_number, num_processes, options)
         end
 
         def determine_executable
@@ -41,7 +41,7 @@ module ParallelTests
           line =~ /\d+ examples?, \d+ failures?/
         end
 
-        def build_cmd(file_list, options)
+        def build_test_command(file_list, options)
           [*executable, *options[:test_options], *color, *spec_opts, *file_list]
         end
 

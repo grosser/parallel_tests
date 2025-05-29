@@ -346,10 +346,11 @@ describe 'CLI' do
     end
 
     it "runs two commands in parallel with files as arguments" do
-      write 'spec/xxx_spec.rb', 'describe("it"){it("should"){puts "TEST1"}}'
+      write 'spec/xxx_spec.rb', 'p ARGV; describe("it"){it("should"){puts "TEST1"}}'
       write 'spec/xxx2_spec.rb', 'describe("it"){it("should"){puts "TEST2"}}'
 
-      result = run_tests "spec", type: 'rspec', add: ["--exec-args", "echo 'hello world' && rspec"]
+      # need to `--` so sh uses them as arguments that then go into $@
+      result = run_tests "spec", type: 'rspec', add: ["--exec-args", "sh -c \"echo 'hello world' && rspec $@\" --"]
 
       expect(result).to include_exactly_times('hello world', 2)
       expect(result).to include_exactly_times('TEST1', 1)

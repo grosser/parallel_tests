@@ -18,7 +18,7 @@ module ParallelTests
           options[:env] ||= {}
           options[:env] = options[:env].merge({ 'AUTOTEST' => '1' }) if $stdout.tty?
 
-          execute_command(get_cmd(combined_scenarios, options), process_number, num_processes, options)
+          execute_command(build_command(combined_scenarios, options), process_number, num_processes, options)
         end
 
         def test_file_name
@@ -37,8 +37,8 @@ module ParallelTests
           line =~ /^\d+ (steps?|scenarios?)/
         end
 
-        def build_cmd(file_list, options)
-          cmd = [
+        def build_test_command(file_list, options)
+          [
             *executable,
             *(runtime_logging if File.directory?(File.dirname(runtime_log))),
             *file_list,

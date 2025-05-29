@@ -191,8 +191,9 @@ module ParallelTests
     end
 
     def parse_options!(argv)
-      newline_padding = " " * 37
+      newline_padding = 37 # poor man's way of getting a decent table like layout for -h output on 120 char width terminal
       options = {}
+
       OptionParser.new do |opts|
         opts.banner = <<~BANNER
           Run all tests in parallel, giving each process ENV['TEST_ENV_NUMBER'] ('', '2', '3', ...)
@@ -205,12 +206,14 @@ module ParallelTests
 
           Options are:
         BANNER
+
         opts.on("-n PROCESSES", Integer, "How many processes to use, default: available CPUs") { |n| options[:count] = n }
         opts.on("-p", "--pattern PATTERN", "run tests matching this regex pattern") { |pattern| options[:pattern] = /#{pattern}/ }
         opts.on("--exclude-pattern", "--exclude-pattern PATTERN", "exclude tests matching this regex pattern") { |pattern| options[:exclude_pattern] = /#{pattern}/ }
+
         opts.on(
           "--group-by TYPE",
-          <<~TEXT.rstrip.split("\n").join("\n#{newline_padding}")
+          heredoc(<<~TEXT, newline_padding)
             group tests by:
             found - order of finding files
             steps - number of cucumber/spinach steps
@@ -220,6 +223,7 @@ module ParallelTests
             default - runtime when runtime log is filled otherwise filesize
           TEXT
         ) { |type| options[:group_by] = type.to_sym }
+
         opts.on("-m COUNT", "--multiply-processes COUNT", Float, "use given number as a multiplier of processes to run") do |m|
           options[:multiply_processes] = m
         end
@@ -251,7 +255,7 @@ module ParallelTests
 
         opts.on(
           "--specify-groups SPECS",
-          <<~TEXT.rstrip.split("\n").join("\n#{newline_padding}")
+          heredoc(<<~TEXT, newline_padding)
             Use 'specify-groups' if you want to specify multiple specs running in multiple
             processes in a specific formation. Commas indicate specs in the same process,
             pipes indicate specs in a new process. If SPECS is a '-' the value for this
@@ -267,34 +271,40 @@ module ParallelTests
         opts.on(
           "--only-group GROUP_INDEX[,GROUP_INDEX]",
           Array,
-          <<~TEXT.rstrip.split("\n").join("\n#{newline_padding}")
+          heredoc(<<~TEXT, newline_padding)
             Only run the given group numbers.
             Changes `--group-by` default to 'filesize'.
           TEXT
         ) { |groups| options[:only_group] = groups.map(&:to_i) }
 
-        opts.on("-e", "--exec COMMAND", "execute this code parallel and with ENV['TEST_ENV_NUMBER']") { |arg| options[:execute] = Shellwords.shellsplit(arg) }
-        opts.on("--exec-args COMMAND",           <<~TEXT.rstrip.split("\n").join("\n#{newline_padding}")
-          execute this code parallel with test files as arguments, Ex.
-          $ parallel_tests --exec-args echo
-            echo spec/a_spec.rb spec/b_spec.rb#{' '}
-        TEXT
+        opts.on("-e", "--exec COMMAND", "execute COMMAND in parallel and with ENV['TEST_ENV_NUMBER']") { |arg| options[:execute] = Shellwords.shellsplit(arg) }
+        opts.on(
+          "--exec-args COMMAND",
+          heredoc(<<~TEXT, newline_padding)
+            execute COMMAND in parallel with test files as arguments, for example:
+            $ parallel_tests --exec-args echo
+            > echo spec/a_spec.rb spec/b_spec.rb
+          TEXT
         ) { |arg| options[:execute_args] = Shellwords.shellsplit(arg) }
+
         opts.on("-o", "--test-options 'OPTIONS'", "execute test commands with those options") { |arg| options[:test_options] = Shellwords.shellsplit(arg) }
+
         opts.on("-t", "--type TYPE", "test(default) / rspec / cucumber / spinach") do |type|
           @runner = load_runner(type)
         rescue NameError, LoadError => e
           puts "Runner for `#{type}` type has not been found! (#{e})"
           abort
         end
+
         opts.on(
           "--suffix PATTERN",
-          <<~TEXT.rstrip.split("\n").join("\n#{newline_padding}")
+          heredoc(<<~TEXT, newline_padding)
             override built in test file pattern (should match suffix):
             '_spec.rb$' - matches rspec files
             '_(test|spec).rb$' - matches test or spec files
           TEXT
         ) { |pattern| options[:suffix] = /#{pattern}/ }
+
         opts.on("--serialize-stdout", "Serialize stdout output, nothing will be written until everything is done") { options[:serialize_stdout] = true }
         opts.on("--prefix-output-with-test-env-number", "Prefixes test env number to the output when not using --serialize-stdout") { options[:prefix_output_with_test_env_number] = true }
         opts.on("--combine-stderr", "Combine stderr into stdout, useful in conjunction with --serialize-stdout") { options[:combine_stderr] = true }
@@ -308,7 +318,17 @@ module ParallelTests
         opts.on("--unknown-runtime SECONDS", Float, "Use given number as unknown runtime (otherwise use average time)") { |time| options[:unknown_runtime] = time }
         opts.on("--first-is-1", "Use \"1\" as TEST_ENV_NUMBER to not reuse the default test environment") { options[:first_is_1] = true }
         opts.on("--fail-fast", "Stop all groups when one group fails (best used with --test-options '--fail-fast' if supported") { options[:fail_fast] = true }
-        opts.on("--test-file-limit LIMIT", Integer, "Limit to this number of files per test run by batching (for windows set to ~100 to stay below 8192 max command limit, might have bugs from reusing test-env-number and summarizing partial results)") { |limit| options[:test_file_limit] = limit }
+
+        opts.on(
+          "--test-file-limit LIMIT",
+          Integer,
+          heredoc(<<~TEXT, newline_padding)
+            Limit to this number of files per test run by batching
+            (for windows set to ~100 to stay below 8192 max command limit, might have bugs from reusing test-env-number
+            and summarizing partial results)
+          TEXT
+        ) { |limit| options[:test_file_limit] = limit }
+
         opts.on("--verbose", "Print debug output") { options[:verbose] = true }
         opts.on("--verbose-command", "Combines options --verbose-process-command and --verbose-rerun-command") { options.merge! verbose_process_command: true, verbose_rerun_command: true }
         opts.on("--verbose-process-command", "Print the command that will be executed by each process before it begins") { options[:verbose_process_command] = true }
@@ -457,6 +477,10 @@ module ParallelTests
       else
         yield
       end
+    end
+
+    def heredoc(text, newline_padding)
+      text.rstrip.gsub("\n", "\n#{' ' * newline_padding}")
     end
   end
 end

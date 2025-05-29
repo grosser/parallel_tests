@@ -28,7 +28,7 @@ module ParallelTests
 
         def run_tests(test_files, process_number, num_processes, options)
           require_list = test_files.map { |file| file.gsub(" ", "\\ ") }.join(" ")
-          execute_command(get_cmd(require_list, options), process_number, num_processes, options)
+          execute_command(build_command(require_list, options), process_number, num_processes, options)
         end
 
         # ignores other commands runner noise
@@ -160,20 +160,21 @@ module ParallelTests
           ["ruby"]
         end
 
-        def get_cmd(file_list, options = {})
+        def build_command(file_list, options)
           if options[:execute_args]
-            [*options[:execute_args], *file_list]
+            options[:execute_args] + file_list
           else
-            build_cmd(file_list, options)
+            build_test_command(file_list, options)
           end
         end
 
-        def build_cmd(file_list, options = {})
+        # load all test files, to be overwritten by other runners
+        def build_test_command(file_list, options)
           [
             *executable,
-            '-Itest',
+            '-Itest', # adding ./test directory to the load path for compatibility to common setups
             '-e',
-            "%w[#{file_list}].each { |f| require %{./\#{f}} }",
+            "%w[#{file_list}].each { |f| require %{./\#{f}} }", # using %w to keep things readable
             '--',
             *options[:test_options]
           ]
