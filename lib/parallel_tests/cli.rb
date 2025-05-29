@@ -277,7 +277,7 @@ module ParallelTests
         opts.on("--exec-args COMMAND",           <<~TEXT.rstrip.split("\n").join("\n#{newline_padding}")
           execute COMMAND in parallel with test files as arguments, for example:
           $ parallel_tests --exec-args echo
-            echo spec/a_spec.rb spec/b_spec.rb
+          > echo spec/a_spec.rb spec/b_spec.rb
         TEXT
         ) { |arg| options[:execute_args] = Shellwords.shellsplit(arg) }
         opts.on("-o", "--test-options 'OPTIONS'", "execute test commands with those options") { |arg| options[:test_options] = Shellwords.shellsplit(arg) }
