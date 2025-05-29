@@ -2,17 +2,15 @@
 
 ## Unreleased
 
+only add here if you are working on a PR
+
 ### Breaking Changes
 
 ### Added
 
-### Fixed
-
-## 5.3.0 - 2025-05-24
-
-### Added
-
 - The `--exec-args` option, which allows users to run shell commands in parallel with test files as arguments
+
+### Fixed
 
 ## 5.2.0 - 2025-05-08
 

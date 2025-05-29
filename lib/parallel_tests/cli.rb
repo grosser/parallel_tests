@@ -273,11 +273,11 @@ module ParallelTests
           TEXT
         ) { |groups| options[:only_group] = groups.map(&:to_i) }
 
-        opts.on("-e", "--exec COMMAND", "execute this code parallel and with ENV['TEST_ENV_NUMBER']") { |arg| options[:execute] = Shellwords.shellsplit(arg) }
+        opts.on("-e", "--exec COMMAND", "execute COMMAND in parallel and with ENV['TEST_ENV_NUMBER']") { |arg| options[:execute] = Shellwords.shellsplit(arg) }
         opts.on("--exec-args COMMAND",           <<~TEXT.rstrip.split("\n").join("\n#{newline_padding}")
-          execute this code parallel with test files as arguments, Ex.
+          execute COMMAND in parallel with test files as arguments, for example:
           $ parallel_tests --exec-args echo
-            echo spec/a_spec.rb spec/b_spec.rb#{' '}
+            echo spec/a_spec.rb spec/b_spec.rb
         TEXT
         ) { |arg| options[:execute_args] = Shellwords.shellsplit(arg) }
         opts.on("-o", "--test-options 'OPTIONS'", "execute test commands with those options") { |arg| options[:test_options] = Shellwords.shellsplit(arg) }
