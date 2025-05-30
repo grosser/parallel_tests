@@ -8,12 +8,16 @@ only add here if you are working on a PR
 
 ### Added
 
-- The `--exec-args` option, which allows users to run shell commands in parallel with test files as arguments
-
 ### Fixed
+
+## 5.3.0 - 2025-05-30
+
+### Added
+- The `--exec-args` option, which allows users to run shell commands in parallel with test files as arguments
 
 ## 5.2.0 - 2025-05-08
 
+### Added
 - The `specify-groups` option supports reading from STDIN when set to `-`
 
 ## 5.1.0 - 2025-03-09

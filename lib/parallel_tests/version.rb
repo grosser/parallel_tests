@@ -1,4 +1,4 @@
 # frozen_string_literal: true
 module ParallelTests
-  VERSION = '5.2.0'
+  VERSION = '5.3.0'
 end
