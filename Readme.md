@@ -303,20 +303,29 @@ Options are:
     -h, --help                       Show this.
 <!-- rake readme -->
 
-You can run any kind of code in parallel with -e / --exec
+You can run any command in parallel with `-e` / `--exec`
 
-    parallel_test -n 5 -e 'ruby -e "puts %[hello from process #{ENV[:TEST_ENV_NUMBER.to_s].inspect}]"'
-    hello from process "2"
-    hello from process ""
-    hello from process "3"
-    hello from process "5"
-    hello from process "4"
+```bash
+parallel_test -n 3 -e 'ruby -e "puts %[hello from process #{ENV[:TEST_ENV_NUMBER.to_s].inspect}]"'
+hello from process "2"
+hello from process ""
+hello from process "3"
+```
 
-<table>
-<tr><td></td><td>1 Process</td><td>2 Processes</td><td>4 Processes</td></tr>
-<tr><td>RSpec spec-suite</td><td>18s</td><td>14s</td><td>10s</td></tr>
-<tr><td>Rails-ActionPack</td><td>88s</td><td>53s</td><td>44s</td></tr>
-</table>
+and pass arguments to a command with `--exec-args`
+
+```bash
+parallel_test -n 3 --exec-args echo
+spec/a_spec.rb spec/b_spec.rb 
+spec/c_spec.rb spec/d_spec.rb
+spec/e_spec.rb
+```
+
+and run multiple commands by using `sh` and `--exec-args`
+
+```bash
+parallel_test -n 3 --exec-args "sh -c \"echo 'hello world' && rspec \$@\" --"
+```
 
 TIPS
 ====
