@@ -101,17 +101,23 @@ require "parallel_tests"
 
 # preparation:
 # affected by race-condition: first process may boot slower than the second
-# either sleep a bit or use a lock for example File.lock
-ParallelTests.first_process? ? do_something : sleep(1)
+# the Process.ppid will be the pod of the process that started the parallel tests
+# when not using TEST_ENV_NUMBER we use a unique file per process because ppid would be the users shell
+done = "/tmp/parallel-setup-done-#{ENV['TEST_ENV_NUMBER'] ? Process.ppid : Process.pid}"
+if ParallelTests.first_process?
+  do_something
+  File.write done, "true"
+else
+  sleep 0.1 until File.exist?(done)
+end
 
 # cleanup:
-# last_process? does NOT mean last finished process, just last started
-ParallelTests.last_process? ? do_something : sleep(1)
-
+# could also use last_process? but that is just the last process to start, not the last to finish
 at_exit do
   if ParallelTests.first_process?
-    ParallelTests.wait_for_other_processes_to_finish
-    undo_something
+     File.unlink done
+     ParallelTests.wait_for_other_processes_to_finish
+     undo_something
   end
 end
 ```
