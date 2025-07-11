@@ -47,6 +47,7 @@ GEM
     json (2.10.1-java)
     language_server-protocol (3.17.0.4)
     lint_roller (1.1.0)
+    logger (1.7.0)
     mini_mime (1.1.5)
     minitest (5.25.4)
     multi_test (1.1.0)
@@ -108,6 +109,7 @@ DEPENDENCIES
   bump
   cucumber
   cuke_modeler
+  logger
   minitest
   parallel_tests!
   racc
