@@ -12,3 +12,4 @@ gem 'spinach'
 gem 'racc' # need for spinach on 3.3+ https://github.com/codegram/spinach/issues/256
 gem 'rake'
 gem 'rubocop', '~> 1.73.1' # lock minor so we do not get accidental violations
+gem 'logger' # to silence warnings in tests, not a real dependency
