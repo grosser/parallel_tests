@@ -55,11 +55,13 @@ module ParallelTests
             *test_options,
             *tests.map { |t| File.directory?(t) ? t : t.gsub(/:\d+$/, "") },
           ]
-          execute_command_and_capture_output(
-            (options[:env] || {}),
-            command,
-            options.merge(combine_stderr: false) # combine stderr breaks output parsing
-          )
+          ParallelTests.with_pid_file do
+            execute_command_and_capture_output(
+              (options[:env] || {}),
+              command,
+              options.merge(combine_stderr: false) # combine stderr breaks output parsing
+            )
+          end
 
           require "parallel_tests/rspec/runtime_json_formatter"
           RuntimeJsonFormatter.new(File.read(tmpfile.path)).example_files
