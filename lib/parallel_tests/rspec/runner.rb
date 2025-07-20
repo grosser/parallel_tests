@@ -39,7 +39,7 @@ module ParallelTests
 
         def find_tests(tests, options = {})
           test_options = options[:test_options] || []
-          return super if test_options.empty?
+          return super if test_options.include?('--tag')
 
           require "tempfile"
           tmpfile = Tempfile.new("parallel_tests-rspec-files")
@@ -53,7 +53,7 @@ module ParallelTests
             "--out",
             tmpfile.path,
             *test_options,
-            *tests.map { |t| File.directory?(t) ? t : t.gsub(/:\d+$/, "") },
+            *tests.map { |t| File.directory?(t) ? t : t.gsub(/:\d+$/, "") }
           ]
           ParallelTests.with_pid_file do
             execute_command_and_capture_output(
