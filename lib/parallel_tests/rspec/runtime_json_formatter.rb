@@ -12,7 +12,7 @@ module ParallelTests
       end
 
       def example_files
-        @data["examples"].map { |e| e["file_path"] }.uniq
+        @data["examples"].map { |e| e["file_path"] }.compact.uniq
       end
     end
   end
