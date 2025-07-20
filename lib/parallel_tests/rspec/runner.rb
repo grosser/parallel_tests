@@ -39,7 +39,7 @@ module ParallelTests
 
         def find_tests(tests, options = {})
           test_options = options[:test_options] || []
-          return super if test_options.include?('--tag')
+          return super unless test_options.include?('--tag')
 
           require "tempfile"
           tmpfile = Tempfile.new("parallel_tests-rspec-files")
