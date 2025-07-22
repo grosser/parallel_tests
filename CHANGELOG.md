@@ -10,6 +10,8 @@ only add here if you are working on a PR
 
 ### Fixed
 
+- The `--multiply-processes` option was being parsed into `options[:multiply-processes]` but was being referenced as `options[:multiply]` in the code 
+
 ## 5.3.0 - 2025-05-30
 
 ### Added
