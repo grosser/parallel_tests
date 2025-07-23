@@ -37,6 +37,38 @@ module ParallelTests
           /(_spec\.rb|\.feature)$/
         end
 
+        def find_tests(tests, options = {})
+          test_options = options[:test_options] || []
+          return super unless test_options.include?('--tag')
+
+          require "tempfile"
+          tmpfile = Tempfile.new("parallel_tests-rspec-files")
+          tmpfile.close
+
+          command = [
+            *executable,
+            "--dry-run",
+            "-f",
+            "json",
+            "--out",
+            tmpfile.path,
+            *test_options,
+            *tests.map { |t| File.directory?(t) ? t : t.gsub(/:\d+$/, "") }
+          ]
+          ParallelTests.with_pid_file do
+            execute_command_and_capture_output(
+              (options[:env] || {}),
+              command,
+              options.merge(combine_stderr: false) # combine stderr breaks output parsing
+            )
+          end
+
+          require "parallel_tests/rspec/runtime_json_formatter"
+          RuntimeJsonFormatter.new(File.read(tmpfile.path)).example_files
+        ensure
+          tmpfile.unlink if tmpfile
+        end
+
         def line_is_result?(line)
           line =~ /\d+ examples?, \d+ failures?/
         end
