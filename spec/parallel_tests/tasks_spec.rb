@@ -42,13 +42,19 @@ describe ParallelTests::Tasks do
   end
 
   describe ".rails_env" do
-    it "should be test" do
+    it "should be test when nothing was set" do
       expect(ParallelTests::Tasks.rails_env).to eq("test")
     end
 
-    it "should disregard whatever was set" do
+    it "should be whatever was set" do
       ENV["RAILS_ENV"] = "foo"
-      expect(ParallelTests::Tasks.rails_env).to eq("test")
+      expect(ParallelTests::Tasks.rails_env).to eq("foo")
+    end
+
+    it "should prioritize the PARALLEL_RAILS_ENV value over the standard" do
+      ENV["RAILS_ENV"] = "foo"
+      ENV["PARALLEL_RAILS_ENV"] = "bar"
+      expect(ParallelTests::Tasks.rails_env).to eq("bar")
     end
   end
 
