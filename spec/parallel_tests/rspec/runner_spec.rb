@@ -119,15 +119,40 @@ describe ParallelTests::RSpec::Runner do
       ParallelTests::RSpec::Runner.send(:find_tests, *args)
     end
 
-    it "finds turnip feature files" do
-      with_files(['a/test.feature']) do |root|
-        expect(call(["#{root}/"])).to eq(["#{root}/a/test.feature"])
+    context 'without --tag' do
+      it "calls super when test_options is empty" do
+        expect(ParallelTests::Test::Runner).to receive(:find_tests).with(["spec"], { test_options: [] })
+        call(["spec"], { test_options: [] })
+      end
+
+      it "calls super when test_options doesn't include --tag" do
+        expect(ParallelTests::Test::Runner).to receive(:find_tests).with(["spec"], { test_options: ["--format", "progress"] })
+        call(["spec"], { test_options: ["--format", "progress"] })
+      end
+
+      it "calls super when no test_options provided" do
+        expect(ParallelTests::Test::Runner).to receive(:find_tests).with(["spec"], {})
+        call(["spec"], {})
       end
     end
 
-    it "doesn't find backup files with the same name as test files" do
-      with_files(['a/x_spec.rb', 'a/x_spec.rb.bak']) do |root|
-        expect(call(["#{root}/"])).to eq(["#{root}/a/x_spec.rb"])
+    context "with --tag" do
+      it "does not call super when test_options includes --tag" do
+        expect(ParallelTests::Test::Runner).not_to receive(:find_tests)
+
+        # Mock the JSON dry-run path
+        tmpfile = instance_double(Tempfile, path: "/tmp/test", close: nil, unlink: nil)
+        allow(Tempfile).to receive(:new).and_return(tmpfile)
+        allow(File).to receive(:read).with("/tmp/test").and_return('{"examples": [{"file_path": "spec/models/user_spec.rb"}]}')
+        allow_any_instance_of(ParallelTests::RSpec::Runner).to receive(:execute_command_and_capture_output)
+
+        result = call(["spec"], { test_options: ["--tag", "slow"] })
+        expect(result).to eq(["spec/models/user_spec.rb"])
+      end
+
+      it "calls super when test_options includes --tag with value (not exact match)" do
+        expect(ParallelTests::Test::Runner).to receive(:find_tests).with(["spec"], { test_options: ["--tag=slow"] })
+        call(["spec"], { test_options: ["--tag=slow"] })
       end
     end
   end
