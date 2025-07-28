@@ -6,7 +6,7 @@ module ParallelTests
   module Tasks
     class << self
       def rails_env
-        'test'
+        ENV['PARALLEL_RAILS_ENV'] || ENV['RAILS_ENV'] || 'test'
       end
 
       def load_lib
