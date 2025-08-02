@@ -6,11 +6,9 @@ only add here if you are working on a PR
 
 ### Breaking Changes
 
-- `test` is not a hardcoded environment for rake tasks
-
 ### Added
 
-- Rake tasks will prioritize the `PARALLEL_RAILS_ENV` value over the standard `RAILS_ENV`, so setups where `RAILS_ENV` changes during the process will keep the `PARALLEL_RAILS_ENV` value (see https://github.com/grosser/parallel_tests/pull/776)
+- Rake tasks will prioritize the `PARALLEL_RAILS_ENV` value over the default `test` environment
 
 ### Fixed
 
