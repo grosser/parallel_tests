@@ -8,6 +8,8 @@ only add here if you are working on a PR
 
 ### Added
 
+- Rake tasks will prioritize the `PARALLEL_RAILS_ENV` value over the default `test` environment
+
 ### Fixed
 
 ## 5.3.1 - 2025-07-23
