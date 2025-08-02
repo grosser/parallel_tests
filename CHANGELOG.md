@@ -8,9 +8,12 @@ only add here if you are working on a PR
 
 ### Added
 
-- Rake tasks will prioritize the `PARALLEL_RAILS_ENV` value over the default `test` environment
-
 ### Fixed
+
+## 5.4.0 - 2025-08-01
+
+### Added
+- Rake tasks will prioritize the `PARALLEL_RAILS_ENV` value over the default `test` environment
 
 ## 5.3.1 - 2025-07-23
 
