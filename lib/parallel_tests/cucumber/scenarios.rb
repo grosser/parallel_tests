@@ -48,6 +48,12 @@ module ParallelTests
             document = ::CukeModeler::FeatureFile.new(path)
             feature = document.feature
 
+            # Check if feature is not nil before proceeding
+            if feature.nil?
+              warn "No feature found in #{path}. Skipping file."
+              next
+            end
+            
             # We make an attempt to parse the gherkin document, this could be failed if the document is not well formatted
             feature_tags = feature.tags.map(&:name)
 
