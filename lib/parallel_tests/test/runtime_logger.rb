@@ -8,6 +8,8 @@ module ParallelTests
       @@prepared = false
 
       class << self
+        attr_writer :logfile
+
         def log_test_run(test)
           prepare
 
@@ -66,7 +68,7 @@ module ParallelTests
         end
 
         def logfile
-          ParallelTests::Test::Runner.runtime_log
+          @logfile || ParallelTests::Test::Runner.runtime_log
         end
       end
     end
