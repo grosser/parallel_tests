@@ -51,4 +51,28 @@ describe ParallelTests::Test::RuntimeLogger do
       )
     end
   end
+
+  it "can write to a custom location" do
+    skip if RUBY_PLATFORM == "java" # just too slow ...
+    repo_root = Dir.pwd
+
+    use_temporary_directory do
+      FileUtils.mkdir "test"
+      File.write("test/a_test.rb", <<-RUBY)
+        require 'minitest/autorun'
+        require 'parallel_tests/test/runtime_logger'
+        ParallelTests::Test::RuntimeLogger.logfile = "foo.log"
+
+        class Bar < Minitest::Test
+          def test_foo
+            assert true
+          end
+        end
+      RUBY
+
+      run_tests(repo_root)
+
+      expect(File.exist?("foo.log")).to eq(true)
+    end
+  end
 end
