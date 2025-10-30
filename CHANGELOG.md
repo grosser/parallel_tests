@@ -10,6 +10,11 @@ only add here if you are working on a PR
 
 ### Fixed
 
+## 5.5.0 - 2025-10-30
+
+## Added
+- allow writing to a different runtime log for minitest
+
 ## 5.4.0 - 2025-08-01
 
 ### Added
