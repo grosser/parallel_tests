@@ -436,7 +436,7 @@ module ParallelTests
 
     def report_time_taken(&block)
       seconds = ParallelTests.delta(&block).to_i
-      puts "\nTook #{seconds} seconds#{detailed_duration(seconds)}"
+      puts "\nTook #{pluralize(seconds, 'second')}#{detailed_duration(seconds)}"
     end
 
     def detailed_duration(seconds)
