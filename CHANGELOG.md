@@ -9,6 +9,7 @@ only add here if you are working on a PR
 ### Added
 
 ### Fixed
+- Fixed grammar in duration message to use singular "second" when appropriate (e.g., "Took 1 second" instead of "Took 1 seconds")
 
 ## 5.5.0 - 2025-10-30
 
