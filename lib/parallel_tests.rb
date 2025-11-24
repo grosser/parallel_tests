@@ -70,7 +70,7 @@ module ParallelTests
       current = File.expand_path(Dir.pwd)
 
       until !File.directory?(current) || current == previous
-        filename = File.join(current, "Gemfile")
+        filename = File.join(current, "Gemfile.lock")
         return true if File.exist?(filename)
         previous = current
         current = File.expand_path("..", current)
