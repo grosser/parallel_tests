@@ -110,7 +110,16 @@ module ParallelTests
             capture_output(io, env, options)
           end
           ParallelTests.pids.delete(pid) if pid
-          exitstatus = $?.exitstatus
+
+          status = $?
+          exitstatus = if status.exitstatus
+            status.exitstatus
+          elsif status.termsig
+            status.termsig + 128
+          else
+            1
+          end
+
           seed = output[/seed (\d+)/, 1]
 
           output = "#{Shellwords.shelljoin(cmd)}\n#{output}" if report_process_command?(options) && options[:serialize_stdout]
