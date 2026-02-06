@@ -166,23 +166,29 @@ namespace :parallel do
     ParallelTests::Tasks.run_in_parallel(ParallelTests::Tasks.suppress_schema_load_output(command), args)
   end
 
+  # define parallel:create and parallel:create:slave etc variants
   ParallelTests::Tasks.for_each_database do |name|
     task_name = 'create'
     task_name += ":#{name}" if name
     desc "Create test#{" #{name}" if name} database via db:#{task_name} --> parallel:#{task_name}[num_cpus]"
-    task task_name.to_sym, :count do |_, args|
+    task task_name, :count do |_, args|
       ParallelTests::Tasks.run_in_parallel(
-        [$0, "db:#{task_name}", "RAILS_ENV=#{ParallelTests::Tasks.rails_env}"],
+        [
+          $0,
+          "db:#{task_name}",
+          "RAILS_ENV=#{ParallelTests::Tasks.rails_env}"
+        ],
         args
       )
     end
   end
 
+  # define parallel:drop and parallel:drop:slave etc variants
   ParallelTests::Tasks.for_each_database do |name|
     task_name = 'drop'
     task_name += ":#{name}" if name
     desc "Drop test#{" #{name}" if name} database via db:#{task_name} --> parallel:#{task_name}[num_cpus]"
-    task task_name.to_sym, :count do |_, args|
+    task task_name, :count do |_, args|
       ParallelTests::Tasks.run_in_parallel(
         [
           $0,
@@ -218,12 +224,12 @@ namespace :parallel do
     end
   end
 
-  # when dumping/resetting takes too long
   ParallelTests::Tasks.for_each_database do |name|
     task_name = 'migrate'
     task_name += ":#{name}" if name
+    # update test database via migrate for when dumping/resetting takes too long
     desc "Update test#{" #{name}" if name} database via db:#{task_name} --> parallel:#{task_name}[num_cpus]"
-    task task_name.to_sym, :count do |_, args|
+    task task_name, :count do |_, args|
       ParallelTests::Tasks.run_in_parallel(
         [$0, "db:#{task_name}", "RAILS_ENV=#{ParallelTests::Tasks.rails_env}"],
         args
@@ -241,14 +247,14 @@ namespace :parallel do
 
   # just load the schema (good for integration server <-> no development db)
   ParallelTests::Tasks.for_each_database do |name|
-    rails_task = 'db:schema:load'
-    rails_task += ":#{name}" if name
-
     task_name = 'load_schema'
     task_name += ":#{name}" if name
 
+    rails_task = 'db:schema:load'
+    rails_task += ":#{name}" if name
+
     desc "Load dumped schema for test#{" #{name}" if name} database via #{rails_task} --> parallel:#{task_name}[num_cpus]"
-    task task_name.to_sym, :count do |_, args|
+    task task_name, :count do |_, args|
       command = [
         $0,
         ParallelTests::Tasks.purge_before_load,
@@ -288,10 +294,10 @@ namespace :parallel do
     )
   end
 
-  desc "Launch given rake command in parallel"
+  desc "Launch given rake commands in parallel"
   task :rake, :command, :count do |_, args|
     ParallelTests::Tasks.run_in_parallel(
-      [$0, args.command, "RAILS_ENV=#{ParallelTests::Tasks.rails_env}"],
+      [$0, *args.command.shellsplit, "RAILS_ENV=#{ParallelTests::Tasks.rails_env}"],
       args
     )
   end
