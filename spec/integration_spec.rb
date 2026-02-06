@@ -722,6 +722,21 @@ describe 'CLI' do
       expect(result).to_not include("Should not get here either")
     end
 
+    it "passes on term signal to child processes", unless: Gem.win_platform? do
+      timeout = 2
+      write(
+        "spec/test_spec.rb",
+        "sleep #{timeout}; describe { specify { p 'Should not get here' }; specify { p 'Should not get here either'} }"
+      )
+      pid = nil
+      Thread.new { sleep timeout - 1.0; Process.kill("TERM", pid) }
+      result = run_tests(["spec"], processes: 2, type: 'rspec', fail: true) { |io| pid = io.pid }
+
+      expect(result).to include("RSpec is shutting down")
+      expect(result).to_not include("Should not get here")
+      expect(result).to_not include("Should not get here either")
+    end
+
     # Process.kill on Windows doesn't work as expected. It kills all process group instead of just one process.
     it "exits immediately if another int signal is received", unless: Gem.win_platform? do
       timeout = 2
