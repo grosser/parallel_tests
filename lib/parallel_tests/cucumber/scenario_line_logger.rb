@@ -21,7 +21,7 @@ module ParallelTests
             # or if it is not at the correct location
             return if line_numbers.any? && !line_numbers.include?(test_line)
 
-            @scenarios << [uri, feature_element.source_line].join(":")
+            @scenarios << [[uri, feature_element.source_line].join(":"), scenario_tags]
           else # :ScenarioOutline
             feature_element.examples.each do |example|
               example_tags = example.tags.map(&:name)
@@ -31,7 +31,7 @@ module ParallelTests
                 test_line = row.source_line
                 next if line_numbers.any? && !line_numbers.include?(test_line)
 
-                @scenarios << [uri, test_line].join(':')
+                @scenarios << [[uri, test_line].join(':'), scenario_tags]
               end
             end
           end
