@@ -18,7 +18,7 @@ module ParallelTests
       ENV['DISABLE_SPRING'] ||= '1'
 
       num_processes = ParallelTests.determine_number_of_processes(options[:count])
-      num_processes = (num_processes * ParallelTests.determine_multiple(options[:multiply])).round
+      num_processes = (num_processes * ParallelTests.determine_multiple(options[:multiply_processes])).round
 
       options[:first_is_1] ||= first_is_1?
 
@@ -439,7 +439,7 @@ module ParallelTests
 
     def report_time_taken(&block)
       seconds = ParallelTests.delta(&block).to_i
-      puts "\nTook #{seconds} seconds#{detailed_duration(seconds)}"
+      puts "\nTook #{pluralize(seconds, 'second')}#{detailed_duration(seconds)}"
     end
 
     def detailed_duration(seconds)

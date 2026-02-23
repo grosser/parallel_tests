@@ -129,7 +129,7 @@ Test groups will often run for different times, making the full test run as slow
 
 **Step 1**: Use these loggers (see below) to record test runtime
 
-**Step 2**: The next test run will use the recorded test runtimes (use `--runtime-log <file>` if you picked a location different from below)
+**Step 2**: The next test run will use the recorded test runtimes (use `--runtime-log <file>` if you wrote to a location different from default)
 
 **Step 3**: Automate upload/download of test runtime from your CI system [example](https://github.com/grosser/parallel_rails_example/blob/master/.github/workflows/test.yml) (chunks need to be combined, an alternative is [amend](https://github.com/grosser/amend))
 
@@ -140,17 +140,17 @@ Rspec: Add to your `.rspec_parallel` (or `.rspec`), but can also be used via `--
     --format progress
     --format ParallelTests::RSpec::RuntimeLogger --out tmp/parallel_runtime_rspec.log
 
-To use a custom logfile location (default: `tmp/parallel_runtime_rspec.log`), use the CLI: `parallel_test spec -t rspec --runtime-log my.log`
-
 ### Minitest
 
 Add to your `test_helper.rb`:
 ```ruby
-require 'parallel_tests/test/runtime_logger' if ENV['RECORD_RUNTIME']
+if ENV['RECORD_RUNTIME']
+   require 'parallel_tests/test/runtime_logger'
+   # ParallelTests::Test::RuntimeLogger.logfile = "tmp/parallel_runtime_test.log" # where to write it
+end
 ```
 
-results will be logged to `tmp/parallel_runtime_test.log` when `RECORD_RUNTIME` is set,
-so it is not always required or overwritten.
+results will be logged when `RECORD_RUNTIME` is set, so it is not always required or overwritten.
 
 Loggers
 =======
@@ -360,6 +360,7 @@ TIPS
  - Debug errors that only happen with multiple files using `--verbose` and [cleanser](https://github.com/grosser/cleanser)
  - `export PARALLEL_TEST_PROCESSORS=13` to override default processor count
  - `export PARALLEL_TEST_MULTIPLY_PROCESSES=.5` to override default processor multiplier
+ - `export PARALLEL_RAILS_ENV=environment_name` to override the default `test` environment
  - Shell alias: `alias prspec='parallel_rspec -m 2 --'`
  - [Spring] Add the [spring-commands-parallel-tests](https://github.com/DocSpring/spring-commands-parallel-tests) gem to your `Gemfile` to get `parallel_tests` working with Spring.
  - `--first-is-1` will make the first environment be `1`, so you can test while running your full suite.<br/>
@@ -474,6 +475,7 @@ inspired by [pivotal labs](https://blog.pivotal.io/labs/labs/parallelize-your-rs
  - [hatsu](https://github.com/hatsu38)
  - [Mark Huk](https://github.com/vimutter)
  - [Johannes Vetter](https://github.com/johvet)
+ - [Michel Filipe](https://github.com/mfilipe)
 
 [Michael Grosser](http://grosser.it)<br/>
 michael@grosser.it<br/>

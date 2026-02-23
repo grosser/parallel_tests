@@ -10,6 +10,27 @@ only add here if you are working on a PR
 
 ### Fixed
 
+## 5.6.0 - 2026-02-05
+
+### Fixed
+- Fixed grammar in duration message to use singular "second" when appropriate (e.g., "Took 1 second" instead of "Took 1 seconds")
+- Return correct exit status when process was terminated
+
+## 5.5.0 - 2025-10-30
+
+## Added
+- allow writing to a different runtime log for minitest
+
+## 5.4.0 - 2025-08-01
+
+### Added
+- Rake tasks will prioritize the `PARALLEL_RAILS_ENV` value over the default `test` environment
+
+## 5.3.1 - 2025-07-23
+
+### Fixed
+- The `--multiply-processes` option was being parsed into `options[:multiply-processes]` but was being referenced as `options[:multiply]` in the code
+
 ## 5.3.0 - 2025-05-30
 
 ### Added

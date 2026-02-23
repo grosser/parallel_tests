@@ -564,6 +564,13 @@ describe ParallelTests::Test::Runner do
       end
     end
 
+    it "returns exit status 128 + signal number when terminated by signal", unless: Gem.win_platform? do
+      run_with_file("Process.kill('KILL', Process.pid)") do |path|
+        result = call(["ruby", path], 1, 4, {})
+        expect(result[:exit_status]).to eq 128 + 9 # SIGKILL = 9
+      end
+    end
+
     it "prints each stream to the correct stream" do
       skip "open3"
       _out, err = run_with_file("puts 123 ; $stderr.puts 345 ; exit 5") do |path|
