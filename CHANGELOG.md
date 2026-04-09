@@ -10,6 +10,11 @@ only add here if you are working on a PR
 
 ### Fixed
 
+## 5.7.0 - 2026-04-09
+
+### Changed
+- no longer dump schema during parallel:prepare to mirror what rails does
+
 ## 5.6.0 - 2026-02-05
 
 ### Fixed
