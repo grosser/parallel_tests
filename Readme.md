@@ -30,40 +30,22 @@ test:
   database: yourproject_test<%= ENV['TEST_ENV_NUMBER'] %>
 ```
 
-### Create additional database(s)
+### Create additional test database(s)
     rake parallel:create
+    rake parallel:create:<database> # if using multi-db setup, <database> would be `secondary` for example
 
-### (Multi-DB) Create individual database
-    rake parallel:create:<database>
-    rake parallel:create:secondary
-
-### Copy development schema (repeat after migrations)
+### Copy development schema into all test databases (repeat after migrations)
     rake parallel:prepare
 
-### Run migrations in additional database(s) (repeat after migrations)
-    rake parallel:migrate
-
-### (Multi-DB) Run migrations in individual database
-    rake parallel:migrate:<database>
-
-### Setup environment from scratch (create db and loads schema, useful for CI)
-    rake parallel:setup
-
-### Drop all test databases
-    rake parallel:drop
-
-### (Multi-DB) Drop individual test database
-    rake parallel:drop:<database>
-
 ### Run!
-    rake parallel:test          # Minitest
-    rake parallel:spec          # RSpec
-    rake parallel:features      # Cucumber
-    rake parallel:features-spinach       # Spinach
+    rake parallel:test              # Minitest
+    rake parallel:spec              # RSpec
+    rake parallel:features          # Cucumber
+    rake parallel:features-spinach  # Spinach
 
     rake "parallel:test[1]" --> force 1 CPU --> 86 seconds
-    rake parallel:test    --> got 2 CPUs? --> 47 seconds
-    rake parallel:test    --> got 4 CPUs? --> 26 seconds
+    rake parallel:test      --> got 2 CPUs? --> 47 seconds
+    rake parallel:test      --> got 4 CPUs? --> 26 seconds
     ...
 
 Test by pattern with Regex (e.g. use one integration server per subfolder / see if you broke any 'user'-related tests)
@@ -91,6 +73,17 @@ rake "parallel:rake[my:custom:task]"
 # limited parallelism
 rake "parallel:rake[my:custom:task,2]"
 ```
+
+### Run migrations in all test databases (repeat after migrations)
+    rake parallel:migrate
+    rake parallel:migrate:<database> # for multi-db setup
+
+### Setup environment from scratch (create db and loads schema, useful for CI)
+    rake parallel:setup
+
+### Drop all test databases
+    rake parallel:drop
+    rake parallel:drop:<database> # for multi-db setup
 
 
 Running setup or teardown once
@@ -144,7 +137,9 @@ Rspec: Add to your `.rspec_parallel` (or `.rspec`), but can also be used via `--
 
 Add to your `test_helper.rb`:
 ```ruby
+
 if ENV['RECORD_RUNTIME']
+   require 'minitest'
    require 'parallel_tests/test/runtime_logger'
    # ParallelTests::Test::RuntimeLogger.logfile = "tmp/parallel_runtime_test.log" # where to write it
 end
