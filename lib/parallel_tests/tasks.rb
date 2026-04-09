@@ -203,8 +203,6 @@ namespace :parallel do
       # fast: dump once, load in parallel
       type = ParallelTests::Tasks.schema_type_based_on_rails_version
 
-      Rake::Task["db:#{type}:dump"].invoke
-
       # remove database connection to prevent "database is being accessed by other users"
       ActiveRecord::Base.remove_connection if ActiveRecord::Base.configurations.any?
 
