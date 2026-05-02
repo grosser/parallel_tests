@@ -9,6 +9,7 @@ only add here if you are working on a PR
 ### Added
 
 ### Fixed
+- silence filter messages from rspec in base logger
 
 ## 5.7.0 - 2026-04-09
 
