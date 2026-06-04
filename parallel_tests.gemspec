@@ -16,7 +16,7 @@ Gem::Specification.new name, ParallelTests::VERSION do |s|
     "rubygems_mfa_required" => "true"
   }
 
-  s.files = Dir["{lib,bin}/**/*"] + ["Readme.md"]
+  s.files = Dir["{lib,bin}/**/*"] + ["Readme.md", "LICENSE"]
   s.license = "MIT"
   s.executables = ["parallel_spinach", "parallel_cucumber", "parallel_rspec", "parallel_test"]
   s.add_dependency "parallel"
