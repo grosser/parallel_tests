@@ -56,8 +56,8 @@ module ParallelTests
       ENV.fetch('PARALLEL_PID_FILE')
     end
 
-    def stop_all_processes
-      pids.all.each { |pid| Process.kill(:INT, pid) }
+    def stop_all_processes(signal)
+      pids.all.each { |pid| Process.kill(signal, pid) }
     rescue Errno::ESRCH, Errno::EPERM
       # Process already terminated, do nothing
     end
