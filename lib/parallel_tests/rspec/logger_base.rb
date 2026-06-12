@@ -9,6 +9,7 @@ require 'rspec/core/formatters/base_text_formatter'
 class ParallelTests::RSpec::LoggerBase < RSpec::Core::Formatters::BaseTextFormatter
   def initialize(*args)
     super
+    silence_filter_messages
 
     @output ||= args[0]
 
@@ -26,6 +27,12 @@ class ParallelTests::RSpec::LoggerBase < RSpec::Core::Formatters::BaseTextFormat
   # stolen from Rspec
   def close(*)
     @output.close if (IO === @output) & (@output != $stdout)
+  end
+
+  def silence_filter_messages
+    RSpec.configure do |config|
+      config.silence_filter_announcements = true
+    end
   end
 
   protected

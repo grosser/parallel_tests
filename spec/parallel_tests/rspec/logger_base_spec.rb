@@ -32,5 +32,9 @@ describe ParallelTests::RSpec::LoggerBase do
       @logger = ParallelTests::RSpec::LoggerBase.new(io)
       @logger.close
     end
+
+    it 'filter messages should be silenced' do
+      expect(RSpec.configuration.silence_filter_announcements).to be true
+    end
   end
 end
