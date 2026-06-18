@@ -64,6 +64,9 @@ module ParallelTests
         def message(test, delta)
           return unless method = test.public_instance_methods(true).detect { |m| m =~ /^test_/ }
           filename = test.instance_method(method).source_location.first.sub("#{Dir.pwd}/", "")
+          unless filename.include?('_test.rb')
+            filename = Module.const_source_location(test.to_s).first.sub("#{Dir.pwd}/", "")
+          end
           "#{filename}:#{delta}"
         end
 
