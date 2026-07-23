@@ -308,6 +308,7 @@ module ParallelTests
         opts.on("--serialize-stdout", "Serialize stdout output, nothing will be written until everything is done") { options[:serialize_stdout] = true }
         opts.on("--prefix-output-with-test-env-number", "Prefixes test env number to the output when not using --serialize-stdout") { options[:prefix_output_with_test_env_number] = true }
         opts.on("--combine-stderr", "Combine stderr into stdout, useful in conjunction with --serialize-stdout") { options[:combine_stderr] = true }
+        opts.on("--progress-bar-compatible", "Serialize stdout output, but write immediately and rewrite on the fly") { options[:progress_bar_compatible] = true; options[:combine_stderr] = false }
         opts.on("--non-parallel", "execute same commands but do not in parallel, needs --exec") { options[:non_parallel] = true }
         opts.on("--no-symlinks", "Do not traverse symbolic links to find test files") { options[:symlinks] = false }
         opts.on('--ignore-tags PATTERN', 'When counting steps ignore scenarios with tags that match this pattern') { |arg| options[:ignore_tag_pattern] = arg }
