@@ -392,6 +392,15 @@ describe ParallelTests::CLI do
         expect(subject).to receive(:run_tests).once.with(['eee', 'fff'], 1, 1, options).and_return(results)
         subject.run(['test', '-n', '3', '--only-group', '2,3', '-t', 'my_test_runner'])
       end
+
+      context 'with --sync-test-env-with-group flag' do
+        it 'runs twice with matching group index' do
+          options = common_options.merge(count: 3, only_group: [1, 3], sync_test_env_with_group: true)
+          expect(subject).to receive(:run_tests).once.with(['aaa', 'bbb'], 0, 1, options).and_return(results)
+          expect(subject).to receive(:run_tests).once.with(['eee', 'fff'], 2, 1, options).and_return(results)
+          subject.run(['test', '-n', '3', '--only-group', '1,3', '-t', 'my_test_runner', '--sync-test-env-with-group'])
+        end
+      end
     end
 
     context 'when --allow-duplicates' do

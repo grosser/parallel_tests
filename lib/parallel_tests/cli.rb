@@ -82,6 +82,11 @@ module ParallelTests
 
         report_number_of_tests(groups) unless options[:quiet]
         test_results = execute_in_parallel(groups, groups.size, options) do |group, index|
+          if options[:only_group] && options[:sync_test_env_with_group]
+            # Here's where we "sync" the index. Since only_group is numerical, we need `- 1` to make it an index
+            # e.g. --only-group=1,4 should yield index 0 & 3 instead of 0 & 1
+            index = options[:only_group][index] - 1
+          end
           run_tests(group, index, num_processes, options)
         end
         report_results(test_results, options) unless options[:quiet]
