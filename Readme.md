@@ -269,6 +269,8 @@ Options are:
         --only-group GROUP_INDEX[,GROUP_INDEX]
                                      Only run the given group numbers.
                                      Changes `--group-by` default to 'filesize'.
+        --sync-test-env-with-group   Syncs ENV['TEST_ENV_NUMBER'] with the current `GROUP_INDEX`.
+                                     It only works when `--only-group` is specified.
     -e, --exec COMMAND               execute COMMAND in parallel and with ENV['TEST_ENV_NUMBER']
         --exec-args COMMAND          execute COMMAND in parallel with test files as arguments, for example:
                                      $ parallel_tests --exec-args echo

@@ -126,6 +126,18 @@ describe ParallelTests::CLI do
       end
     end
 
+    context "parsing --sync-test-env-with-group" do
+      it "adds the flag when --only-group is present" do
+        expect(call(["test", "--sync-test-env-with-group", "--only-group", '4'])).to eq(defaults.merge(only_group: [4], group_by: :filesize, sync_test_env_with_group: true))
+      end
+
+      context "without --only-group" do
+        it "doesn't add the flag" do
+          expect(call(["test", "--sync-test-env-with-group"])).to eq(defaults)
+        end
+      end
+    end
+
     context "single and isolate" do
       it "single_process should be an array of patterns" do
         expect(call(["test", "--single", '1'])).to eq(defaults.merge(single_process: [/1/]))

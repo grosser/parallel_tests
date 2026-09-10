@@ -277,6 +277,14 @@ module ParallelTests
           TEXT
         ) { |groups| options[:only_group] = groups.map(&:to_i) }
 
+        opts.on(
+          "--sync-test-env-with-group",
+          heredoc(<<~TEXT, newline_padding)
+            Syncs ENV['TEST_ENV_NUMBER'] with the current `GROUP_INDEX`.
+            It only works when `--only-group` is specified.
+          TEXT
+        ) { options[:sync_test_env_with_group] = true }
+
         opts.on("-e", "--exec COMMAND", "execute COMMAND in parallel and with ENV['TEST_ENV_NUMBER']") { |arg| options[:execute] = Shellwords.shellsplit(arg) }
         opts.on(
           "--exec-args COMMAND",
@@ -343,6 +351,8 @@ module ParallelTests
           exit 0
         end
       end.parse!(argv)
+
+      options.delete(:sync_test_env_with_group) unless options[:only_group]
 
       raise "Both options are mutually exclusive: verbose & quiet" if options[:verbose] && options[:quiet]
 
