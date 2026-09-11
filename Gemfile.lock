@@ -42,6 +42,7 @@ GEM
     cuke_modeler (3.31.0)
       cucumber-gherkin (< 43.0)
     diff-lcs (1.6.2)
+    drb (2.2.3)
     ffi (1.17.2)
     ffi (1.17.2-java)
     gherkin-ruby (0.3.2)
@@ -51,13 +52,16 @@ GEM
     lint_roller (1.1.0)
     logger (1.7.0)
     mini_mime (1.1.5)
-    minitest (5.25.4)
+    minitest (6.0.6)
+      drb (~> 2.0)
+      prism (~> 1.5)
     multi_test (1.1.0)
     parallel (1.26.3)
     parser (3.3.7.1)
       ast (~> 2.4.1)
       racc
     power_assert (2.0.5)
+    prism (1.9.0)
     racc (1.8.1)
     racc (1.8.1-java)
     rainbow (3.1.1)
@@ -99,7 +103,7 @@ GEM
       power_assert
     unicode-display_width (3.1.4)
       unicode-emoji (~> 4.0, >= 4.0.4)
-    unicode-emoji (4.0.4)
+    unicode-emoji (4.2.0)
 
 PLATFORMS
   java
