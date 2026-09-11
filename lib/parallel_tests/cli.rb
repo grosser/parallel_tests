@@ -390,6 +390,9 @@ module ParallelTests
       if !allowed.include?(options[:group_by]) && options[:only_group]
         raise "--group-by #{allowed.join(" or ")} is required for --only-group"
       end
+      if options[:only_group] && options[:only_group].any? { |g| g <= 0 }
+        raise '--only-group should not start at 0 or below'
+      end
 
       if options[:specify_groups] && options.keys.intersect?([:single_process, :isolate, :isolate_count])
         raise "Can't pass --specify-groups with any of these keys: --single, --isolate, or --isolate-n"

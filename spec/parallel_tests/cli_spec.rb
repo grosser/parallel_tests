@@ -124,6 +124,18 @@ describe ParallelTests::CLI do
       it "with a single group" do
         expect(call(["test", "--only-group", '4'])).to eq(defaults.merge(only_group: [4], group_by: :filesize))
       end
+
+      it 'raises error when group value is 0' do
+        expect do
+          call(["test", "--only-group", '0'])
+        end.to raise_error(RuntimeError)
+      end
+
+      it 'raises error when group value is negative' do
+        expect do
+          call(["test", "--only-group", '-1'])
+        end.to raise_error(RuntimeError)
+      end
     end
 
     context "parsing --sync-test-env-with-group" do
