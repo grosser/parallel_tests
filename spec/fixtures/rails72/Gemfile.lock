@@ -104,6 +104,8 @@ GEM
       racc (~> 1.4)
     nokogiri (1.18.3-arm64-darwin)
       racc (~> 1.4)
+    nokogiri (1.18.3-x64-mingw-ucrt)
+      racc (~> 1.4)
     parallel (1.26.3)
     pp (0.6.2)
       prettyprint
@@ -143,6 +145,7 @@ GEM
     securerandom (0.4.1)
     sqlite3 (1.7.3)
       mini_portile2 (~> 2.8.0)
+    sqlite3 (1.7.3-x64-mingw-ucrt)
     stringio (3.1.5)
     thor (1.3.2)
     timeout (0.4.3)
@@ -160,6 +163,7 @@ GEM
 PLATFORMS
   arm64-darwin-23
   ruby
+  x64-mingw-ucrt
 
 DEPENDENCIES
   actioncable (~> 7.2.0)
@@ -176,4 +180,4 @@ DEPENDENCIES
   tzinfo-data
 
 BUNDLED WITH
-   2.6.2
+  4.0.20
