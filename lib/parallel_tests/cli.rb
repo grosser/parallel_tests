@@ -286,7 +286,7 @@ module ParallelTests
           "--sync-test-env-with-group",
           heredoc(<<~TEXT, newline_padding)
             Syncs ENV['TEST_ENV_NUMBER'] with the current `GROUP_INDEX`.
-            It only works when `--only-group` is specified.
+            Requires `--only-group`.
           TEXT
         ) { options[:sync_test_env_with_group] = true }
 
@@ -391,7 +391,7 @@ module ParallelTests
         raise "--group-by #{allowed.join(" or ")} is required for --only-group"
       end
       if options[:only_group] && options[:only_group].any? { |g| g <= 0 }
-        raise '--only-group should not start at 0 or below'
+        raise '--only-group should be >= 0'
       end
 
       if options[:specify_groups] && options.keys.intersect?([:single_process, :isolate, :isolate_count])
