@@ -45,6 +45,7 @@ GEM
     drb (2.2.3)
     ffi (1.17.2)
     ffi (1.17.2-java)
+    ffi (1.17.2-x64-mingw-ucrt)
     gherkin-ruby (0.3.2)
     json (2.10.1)
     json (2.10.1-java)
@@ -108,7 +109,7 @@ GEM
 PLATFORMS
   java
   ruby
-  x64-mingw32
+  x64-mingw-ucrt
   x86_64-linux
 
 DEPENDENCIES
@@ -126,4 +127,4 @@ DEPENDENCIES
   test-unit
 
 BUNDLED WITH
-   4.0.20
+  4.0.20
