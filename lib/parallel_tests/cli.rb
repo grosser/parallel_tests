@@ -82,7 +82,7 @@ module ParallelTests
 
         report_number_of_tests(groups) unless options[:quiet]
         test_results = execute_in_parallel(groups, groups.size, options) do |group, index|
-          if options[:only_group] && options[:sync_test_env_with_group]
+          if options[:only_group] && options[:only_group_continuous_test_env]
             # Here's where we "sync" the index. Since only_group is numerical, we need `- 1` to make it an index
             # e.g. --only-group=1,4 should yield index 0 & 3 instead of 0 & 1
             index = options[:only_group][index] - 1
@@ -283,12 +283,14 @@ module ParallelTests
         ) { |groups| options[:only_group] = groups.map(&:to_i) }
 
         opts.on(
-          "--sync-test-env-with-group",
+          "--only-group-continuous-test-env",
           heredoc(<<~TEXT, newline_padding)
-            Syncs ENV['TEST_ENV_NUMBER'] with the current `GROUP_INDEX`.
+            Instead of always resetting the `ENV['TEST_ENV_NUMBER']` when running
+            `--only-group`, it stays continuous with the `GROUP_INDEX`. Great when
+            running in parallel with shared resources.
             Requires `--only-group`.
           TEXT
-        ) { options[:sync_test_env_with_group] = true }
+        ) { options[:only_group_continuous_test_env] = true }
 
         opts.on("-e", "--exec COMMAND", "execute COMMAND in parallel and with ENV['TEST_ENV_NUMBER']") { |arg| options[:execute] = Shellwords.shellsplit(arg) }
         opts.on(
@@ -357,7 +359,7 @@ module ParallelTests
         end
       end.parse!(argv)
 
-      options.delete(:sync_test_env_with_group) unless options[:only_group]
+      raise "--only-group is required for --only-group-continuous-test-env" if options[:only_group_continuous_test_env] && !options[:only_group]
 
       raise "Both options are mutually exclusive: verbose & quiet" if options[:verbose] && options[:quiet]
 

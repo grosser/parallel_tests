@@ -138,14 +138,14 @@ describe ParallelTests::CLI do
       end
     end
 
-    context "parsing --sync-test-env-with-group" do
+    context "parsing --only-group-continuous-test-env" do
       it "adds the flag when --only-group is present" do
-        expect(call(["test", "--sync-test-env-with-group", "--only-group", '4'])).to eq(defaults.merge(only_group: [4], group_by: :filesize, sync_test_env_with_group: true))
+        expect(call(["test", "--only-group-continuous-test-env", "--only-group", '4'])).to eq(defaults.merge(only_group: [4], group_by: :filesize, only_group_continuous_test_env: true))
       end
 
       context "without --only-group" do
-        it "doesn't add the flag" do
-          expect(call(["test", "--sync-test-env-with-group"])).to eq(defaults)
+        it "raises error" do
+          expect { call(["test", "--only-group-continuous-test-env"]) }.to raise_error(RuntimeError)
         end
       end
     end
@@ -405,12 +405,12 @@ describe ParallelTests::CLI do
         subject.run(['test', '-n', '3', '--only-group', '2,3', '-t', 'my_test_runner'])
       end
 
-      context 'with --sync-test-env-with-group flag' do
+      context 'with --only-group-continuous-test-env flag' do
         it 'runs twice with matching group index' do
-          options = common_options.merge(count: 3, only_group: [1, 3], sync_test_env_with_group: true)
+          options = common_options.merge(count: 3, only_group: [1, 3], only_group_continuous_test_env: true)
           expect(subject).to receive(:run_tests).once.with(['aaa', 'bbb'], 0, 1, options).and_return(results)
           expect(subject).to receive(:run_tests).once.with(['eee', 'fff'], 2, 1, options).and_return(results)
-          subject.run(['test', '-n', '3', '--only-group', '1,3', '-t', 'my_test_runner', '--sync-test-env-with-group'])
+          subject.run(['test', '-n', '3', '--only-group', '1,3', '-t', 'my_test_runner', '--only-group-continuous-test-env'])
         end
       end
     end
