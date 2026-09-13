@@ -582,10 +582,12 @@ describe 'CLI' do
       2.times do |i|
         write "features/good#{i}.feature", "Feature: xxx\n  Scenario: xxx\n    Given I print TEST_ENV_NUMBER"
       end
-      # marker file because captured stdout can duplicate lines on windows
-      write "features/steps/a.rb", "Given('I print TEST_ENV_NUMBER'){ File.open('env.log', 'a') { |f| f.puts \"ENV_IS_\#{ENV['TEST_ENV_NUMBER']}\" } }"
+      # per-process marker files because captured stdout can duplicate lines
+      # and concurrent appends to a shared file lose writes on windows
+      write "features/steps/a.rb", "Given('I print TEST_ENV_NUMBER'){ File.open('env' + ENV['TEST_ENV_NUMBER'].to_s + '.log', 'a') { |f| f.puts 'ran' } }"
       run_tests ["features"], type: "cucumber", add: ['-n', '3']
-      expect(read("env.log").split("\n").sort).to eq(["ENV_IS_", "ENV_IS_2"])
+      expect(read("env.log")).to eq("ran\n")
+      expect(read("env2.log")).to eq("ran\n")
     end
 
     it_runs_the_default_folder_if_it_exists "cucumber", "features"
@@ -701,10 +703,12 @@ describe 'CLI' do
       2.times do |i|
         write "features/good#{i}.feature", "Feature: A\n  Scenario: xxx\n    Given I print TEST_ENV_NUMBER\n"
       end
-      # marker file because captured stdout can duplicate lines on windows
-      write "features/steps/a.rb", "class A < Spinach::FeatureSteps\nGiven('I print TEST_ENV_NUMBER'){ File.open('env.log', 'a') { |f| f.puts \"ENV_IS_\#{ENV['TEST_ENV_NUMBER']}\" } }\nend"
+      # per-process marker files because captured stdout can duplicate lines
+      # and concurrent appends to a shared file lose writes on windows
+      write "features/steps/a.rb", "class A < Spinach::FeatureSteps\nGiven('I print TEST_ENV_NUMBER'){ File.open('env' + ENV['TEST_ENV_NUMBER'].to_s + '.log', 'a') { |f| f.puts 'ran' } }\nend"
       run_tests ["features"], type: "spinach", add: ['-n', '3']
-      expect(read("env.log").split("\n").sort).to eq(["ENV_IS_", "ENV_IS_2"])
+      expect(read("env.log")).to eq("ran\n")
+      expect(read("env2.log")).to eq("ran\n")
     end
 
     it_runs_the_default_folder_if_it_exists "spinach", "features"
