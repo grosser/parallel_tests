@@ -346,15 +346,16 @@ describe 'CLI' do
     end
 
     it "runs two commands in parallel with files as arguments" do
-      write 'spec/xxx_spec.rb', 'p ARGV; describe("it"){it("should"){puts "TEST1"}}'
-      write 'spec/xxx2_spec.rb', 'describe("it"){it("should"){puts "TEST2"}}'
+      # marker files because captured stdout can duplicate lines on windows
+      write 'spec/xxx_spec.rb', 'p ARGV; describe("it"){it("should"){ File.open("ran1.log", "a") { |f| f.puts "TEST1" } }}'
+      write 'spec/xxx2_spec.rb', 'describe("it"){it("should"){ File.open("ran2.log", "a") { |f| f.puts "TEST2" } }}'
 
       # need to `--` so sh uses them as arguments that then go into $@
       result = run_tests "spec", type: 'rspec', add: ["--exec-args", "sh -c \"echo 'hello world' && rspec $@\" --"]
 
       expect(result).to include_exactly_times('hello world', 2)
-      expect(result).to include_exactly_times('TEST1', 1)
-      expect(result).to include_exactly_times('TEST2', 1)
+      expect(read("ran1.log")).to eq("TEST1\n")
+      expect(read("ran2.log")).to eq("TEST2\n")
     end
 
     it "exists with success if all sub-processes returned success" do
@@ -581,8 +582,12 @@ describe 'CLI' do
       2.times do |i|
         write "features/good#{i}.feature", "Feature: xxx\n  Scenario: xxx\n    Given I print TEST_ENV_NUMBER"
       end
-      result = run_tests ["features"], type: "cucumber", add: ['-n', '3']
-      expect(result.scan(/YOUR TEST ENV IS \d?!/).sort).to eq(["YOUR TEST ENV IS !", "YOUR TEST ENV IS 2!"])
+      # per-process marker files because captured stdout can duplicate lines
+      # and concurrent appends to a shared file lose writes on windows
+      write "features/steps/a.rb", "Given('I print TEST_ENV_NUMBER'){ File.open('env' + ENV['TEST_ENV_NUMBER'].to_s + '.log', 'a') { |f| f.puts 'ran' } }"
+      run_tests ["features"], type: "cucumber", add: ['-n', '3']
+      expect(read("env.log")).to eq("ran\n")
+      expect(read("env2.log")).to eq("ran\n")
     end
 
     it_runs_the_default_folder_if_it_exists "cucumber", "features"
@@ -698,8 +703,12 @@ describe 'CLI' do
       2.times do |i|
         write "features/good#{i}.feature", "Feature: A\n  Scenario: xxx\n    Given I print TEST_ENV_NUMBER\n"
       end
-      result = run_tests ["features"], type: "spinach", add: ['-n', '3']
-      expect(result.scan(/YOUR TEST ENV IS \d?!/).sort).to eq(["YOUR TEST ENV IS !", "YOUR TEST ENV IS 2!"])
+      # per-process marker files because captured stdout can duplicate lines
+      # and concurrent appends to a shared file lose writes on windows
+      write "features/steps/a.rb", "class A < Spinach::FeatureSteps\nGiven('I print TEST_ENV_NUMBER'){ File.open('env' + ENV['TEST_ENV_NUMBER'].to_s + '.log', 'a') { |f| f.puts 'ran' } }\nend"
+      run_tests ["features"], type: "spinach", add: ['-n', '3']
+      expect(read("env.log")).to eq("ran\n")
+      expect(read("env2.log")).to eq("ran\n")
     end
 
     it_runs_the_default_folder_if_it_exists "spinach", "features"

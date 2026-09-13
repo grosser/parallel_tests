@@ -38,6 +38,7 @@ describe ParallelTests::RSpec::VerboseLogger do
         "ruby",
         "#{repo_root}/bin/parallel_rspec",
         "-n", "2",
+        "--serialize-stdout", # concurrent writes to the captured pipe get spliced/lost on windows
         "--",
         "--format", "ParallelTests::RSpec::VerboseLogger",
         "--"

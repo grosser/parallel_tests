@@ -24,7 +24,11 @@ jobs:
     - uses: ruby/setup-ruby@v1
       with:
         ruby-version: ${{ matrix.ruby }}
-        bundler-cache: true # runs 'bundle install' and caches installed gems automatically
+        # runs 'bundle install' and caches installed gems automatically
+        # disabled on jruby-head windows where frozen install fails with "lockfile needs to be updated"
+        bundler-cache: ${{ !(matrix.ruby == 'jruby-head' && matrix.os == 'windows-latest') }}
+    - if: matrix.ruby == 'jruby-head' && matrix.os == 'windows-latest'
+      run: bundle install
     - name: rake ${{ matrix.task }}
       # allow ruby/jruby-head to fail since they are moving targets
       # TODO: this will always show green, fix once https://github.com/actions/toolkit/issues/399 is resolved
