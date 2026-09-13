@@ -19,19 +19,15 @@ jobs:
           - ruby: '3.2' # lowest supported version, same as gemspec and .rubocop.yml
             os: ubuntu-latest
             task: rubocop
-          # frozen bundler-cache install fails on jruby-head windows with "lockfile needs to be updated"
-          # even though a non-frozen install changes nothing, so install without caching instead
-          - ruby: jruby-head
-            os: windows-latest
-            task: spec
-            no_cache: true
     steps:
     - uses: actions/checkout@master
     - uses: ruby/setup-ruby@v1
       with:
         ruby-version: ${{ matrix.ruby }}
-        bundler-cache: ${{ !matrix.no_cache }} # runs 'bundle install' and caches installed gems automatically
-    - if: matrix.no_cache
+        # runs 'bundle install' and caches installed gems automatically
+        # disabled on jruby-head windows where frozen install fails with "lockfile needs to be updated"
+        bundler-cache: ${{ !(matrix.ruby == 'jruby-head' && matrix.os == 'windows-latest') }}
+    - if: matrix.ruby == 'jruby-head' && matrix.os == 'windows-latest'
       run: bundle install
     - name: rake ${{ matrix.task }}
       # allow ruby/jruby-head to fail since they are moving targets
