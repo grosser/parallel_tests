@@ -82,6 +82,11 @@ module ParallelTests
 
         report_number_of_tests(groups) unless options[:quiet]
         test_results = execute_in_parallel(groups, groups.size, options) do |group, index|
+          if options[:only_group] && options[:only_group_continuous_test_env]
+            # Here's where we "sync" the index. Since only_group is numerical, we need `- 1` to make it an index
+            # e.g. --only-group=1,4 should yield index 0 & 3 instead of 0 & 1
+            index = options[:only_group][index] - 1
+          end
           run_tests(group, index, num_processes, options)
         end
         report_results(test_results, options) unless options[:quiet]
@@ -277,6 +282,16 @@ module ParallelTests
           TEXT
         ) { |groups| options[:only_group] = groups.map(&:to_i) }
 
+        opts.on(
+          "--only-group-continuous-test-env",
+          heredoc(<<~TEXT, newline_padding)
+            Instead of always resetting the `ENV['TEST_ENV_NUMBER']` when running
+            `--only-group`, it stays continuous with the `GROUP_INDEX`. Great when
+            running in parallel with shared resources.
+            Requires `--only-group`.
+          TEXT
+        ) { options[:only_group_continuous_test_env] = true }
+
         opts.on("-e", "--exec COMMAND", "execute COMMAND in parallel and with ENV['TEST_ENV_NUMBER']") { |arg| options[:execute] = Shellwords.shellsplit(arg) }
         opts.on(
           "--exec-args COMMAND",
@@ -344,6 +359,8 @@ module ParallelTests
         end
       end.parse!(argv)
 
+      raise "--only-group is required for --only-group-continuous-test-env" if options[:only_group_continuous_test_env] && !options[:only_group]
+
       raise "Both options are mutually exclusive: verbose & quiet" if options[:verbose] && options[:quiet]
 
       if options[:count] == 0
@@ -374,6 +391,9 @@ module ParallelTests
       allowed = [:filesize, :runtime, :found]
       if !allowed.include?(options[:group_by]) && options[:only_group]
         raise "--group-by #{allowed.join(" or ")} is required for --only-group"
+      end
+      if options[:only_group] && options[:only_group].any? { |g| g <= 0 }
+        raise '--only-group should be >= 0'
       end
 
       if options[:specify_groups] && options.keys.intersect?([:single_process, :isolate, :isolate_count])

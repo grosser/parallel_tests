@@ -124,6 +124,30 @@ describe ParallelTests::CLI do
       it "with a single group" do
         expect(call(["test", "--only-group", '4'])).to eq(defaults.merge(only_group: [4], group_by: :filesize))
       end
+
+      it 'raises error when group value is 0' do
+        expect do
+          call(["test", "--only-group", '0'])
+        end.to raise_error(RuntimeError)
+      end
+
+      it 'raises error when group value is negative' do
+        expect do
+          call(["test", "--only-group", '-1'])
+        end.to raise_error(RuntimeError)
+      end
+    end
+
+    context "parsing --only-group-continuous-test-env" do
+      it "adds the flag when --only-group is present" do
+        expect(call(["test", "--only-group-continuous-test-env", "--only-group", '4'])).to eq(defaults.merge(only_group: [4], group_by: :filesize, only_group_continuous_test_env: true))
+      end
+
+      context "without --only-group" do
+        it "raises error" do
+          expect { call(["test", "--only-group-continuous-test-env"]) }.to raise_error(RuntimeError)
+        end
+      end
     end
 
     context "single and isolate" do
@@ -379,6 +403,15 @@ describe ParallelTests::CLI do
         expect(subject).to receive(:run_tests).once.with(['ccc', 'ddd'], 0, 1, options).and_return(results)
         expect(subject).to receive(:run_tests).once.with(['eee', 'fff'], 1, 1, options).and_return(results)
         subject.run(['test', '-n', '3', '--only-group', '2,3', '-t', 'my_test_runner'])
+      end
+
+      context 'with --only-group-continuous-test-env flag' do
+        it 'runs twice with matching group index' do
+          options = common_options.merge(count: 3, only_group: [1, 3], only_group_continuous_test_env: true)
+          expect(subject).to receive(:run_tests).once.with(['aaa', 'bbb'], 0, 1, options).and_return(results)
+          expect(subject).to receive(:run_tests).once.with(['eee', 'fff'], 2, 1, options).and_return(results)
+          subject.run(['test', '-n', '3', '--only-group', '1,3', '-t', 'my_test_runner', '--only-group-continuous-test-env'])
+        end
       end
     end
 

@@ -269,6 +269,11 @@ Options are:
         --only-group GROUP_INDEX[,GROUP_INDEX]
                                      Only run the given group numbers.
                                      Changes `--group-by` default to 'filesize'.
+        --only-group-continuous-test-env
+                                     Instead of always resetting the `ENV['TEST_ENV_NUMBER']` when running
+                                     `--only-group`, it stays continuous with the `GROUP_INDEX`. Great when
+                                     running in parallel with shared resources.
+                                     Requires `--only-group`.
     -e, --exec COMMAND               execute COMMAND in parallel and with ENV['TEST_ENV_NUMBER']
         --exec-args COMMAND          execute COMMAND in parallel with test files as arguments, for example:
                                      $ parallel_tests --exec-args echo
