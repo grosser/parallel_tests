@@ -261,38 +261,33 @@ module ParallelTests
         opts.on(
           "--specify-groups SPECS",
           heredoc(<<~TEXT, newline_padding)
-            Use 'specify-groups' if you want to specify multiple specs running in multiple
-            processes in a specific formation. Commas indicate specs in the same process,
-            pipes indicate specs in a new process. If SPECS is a '-' the value for this
-            option is read from STDIN instead. Cannot use with --single, --isolate, or
-            --isolate-n.  Ex.
-            $ parallel_tests -n 3 . --specify-groups '1_spec.rb,2_spec.rb|3_spec.rb'
-              Process 1 will contain 1_spec.rb and 2_spec.rb
-              Process 2 will contain 3_spec.rb
-              Process 3 will contain all other specs
+            Specify multiple specs running in multiple processes in a given formation.
+            Commas separates specs in the same process, pipes separate processes.
+            Spec not mentioned are run in a separate process.
+            With '-' the value is read from STDIN.
+            Cannot use with --single, --isolate, or --isolate-n.
+            parallel_tests -n 3 . --specify-groups '1_spec.rb,2_spec.rb|3_spec.rb'
+            Process 1 = 1_spec.rb + 2_spec.rb, Process 2 = 3_spec.rb, Process 3 = remainder
           TEXT
         ) { |groups| options[:specify_groups] = groups }
 
         opts.on(
           "--only-group GROUP_INDEX[,GROUP_INDEX]",
           Array,
-          heredoc(<<~TEXT, newline_padding)
-            Only run the given group numbers.
-            Changes `--group-by` default to 'filesize'.
-          TEXT
+          "Only run the given group numbers. Changes `--group-by` default to 'filesize'."
         ) { |groups| options[:only_group] = groups.map(&:to_i) }
 
         opts.on(
           "--only-group-continuous-test-env",
           heredoc(<<~TEXT, newline_padding)
-            Instead of always resetting the `ENV['TEST_ENV_NUMBER']` when running
-            `--only-group`, it stays continuous with the `GROUP_INDEX`. Great when
-            running in parallel with shared resources.
+            Instead of resetting `ENV['TEST_ENV_NUMBER']` when using `--only-group`, the env matches the group index`.
+            Use when running in parallel with shared resources.
             Requires `--only-group`.
           TEXT
         ) { options[:only_group_continuous_test_env] = true }
 
         opts.on("-e", "--exec COMMAND", "execute COMMAND in parallel and with ENV['TEST_ENV_NUMBER']") { |arg| options[:execute] = Shellwords.shellsplit(arg) }
+
         opts.on(
           "--exec-args COMMAND",
           heredoc(<<~TEXT, newline_padding)
@@ -349,10 +344,12 @@ module ParallelTests
         opts.on("--verbose-process-command", "Print the command that will be executed by each process before it begins") { options[:verbose_process_command] = true }
         opts.on("--verbose-rerun-command", "After a process fails, print the command executed by that process") { options[:verbose_rerun_command] = true }
         opts.on("--quiet", "Print only tests output") { options[:quiet] = true }
+
         opts.on("-v", "--version", "Show Version") do
           puts ParallelTests::VERSION
           exit 0
         end
+
         opts.on("-h", "--help", "Show this.") do
           puts opts
           exit 0
@@ -392,7 +389,7 @@ module ParallelTests
       if !allowed.include?(options[:group_by]) && options[:only_group]
         raise "--group-by #{allowed.join(" or ")} is required for --only-group"
       end
-      if options[:only_group] && options[:only_group].any? { |g| g <= 0 }
+      if options[:only_group]&.any? { |g| g <= 0 }
         raise '--only-group should be >= 0'
       end
 

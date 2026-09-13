@@ -257,22 +257,18 @@ Options are:
         --isolate-n PROCESSES        Use 'isolate'  singles with number of processes, default: 1
         --highest-exit-status        Exit with the highest exit status provided by test run(s)
         --failure-exit-code INT      Specify the exit code to use when tests fail
-        --specify-groups SPECS       Use 'specify-groups' if you want to specify multiple specs running in multiple
-                                     processes in a specific formation. Commas indicate specs in the same process,
-                                     pipes indicate specs in a new process. If SPECS is a '-' the value for this
-                                     option is read from STDIN instead. Cannot use with --single, --isolate, or
-                                     --isolate-n.  Ex.
-                                     $ parallel_tests -n 3 . --specify-groups '1_spec.rb,2_spec.rb|3_spec.rb'
-                                       Process 1 will contain 1_spec.rb and 2_spec.rb
-                                       Process 2 will contain 3_spec.rb
-                                       Process 3 will contain all other specs
+        --specify-groups SPECS       Specify multiple specs running in multiple processes in a given formation.
+                                     Commas separates specs in the same process, pipes separate processes.
+                                     Spec not mentioned are run in a separate process. 
+                                     With '-' the value is read from STDIN. 
+                                     Cannot use with --single, --isolate, or --isolate-n.
+                                     parallel_tests -n 3 . --specify-groups '1_spec.rb,2_spec.rb|3_spec.rb'
+                                     Process 1 = 1_spec.rb + 2_spec.rb, Process 2 = 3_spec.rb, Process 3 = remainder
         --only-group GROUP_INDEX[,GROUP_INDEX]
-                                     Only run the given group numbers.
-                                     Changes `--group-by` default to 'filesize'.
+                                     Only run the given group numbers. Changes `--group-by` default to 'filesize'.
         --only-group-continuous-test-env
-                                     Instead of always resetting the `ENV['TEST_ENV_NUMBER']` when running
-                                     `--only-group`, it stays continuous with the `GROUP_INDEX`. Great when
-                                     running in parallel with shared resources.
+                                     Instead of resetting `ENV['TEST_ENV_NUMBER']` when using `--only-group`, the env matches the group index`.
+                                     Use when running in parallel with shared resources.
                                      Requires `--only-group`.
     -e, --exec COMMAND               execute COMMAND in parallel and with ENV['TEST_ENV_NUMBER']
         --exec-args COMMAND          execute COMMAND in parallel with test files as arguments, for example:
