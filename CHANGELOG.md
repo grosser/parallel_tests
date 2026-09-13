@@ -7,9 +7,13 @@ only add here if you are working on a PR
 ### Breaking Changes
 
 ### Added
-- Adds flag `--only-group-continuous-test-env` that sets `ENV['TEST_ENV_NUMBER']` to match the current `--only-group` GROUP_INDEX
 
 ### Fixed
+
+## 5.8.0 - 2026-09-13
+
+### Added
+- Adds flag `--only-group-continuous-test-env` that sets `ENV['TEST_ENV_NUMBER']` to match the current `--only-group` GROUP_INDEX
 
 ## 5.7.0 - 2026-04-09
 
