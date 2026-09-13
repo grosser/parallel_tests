@@ -19,12 +19,20 @@ jobs:
           - ruby: '3.2' # lowest supported version, same as gemspec and .rubocop.yml
             os: ubuntu-latest
             task: rubocop
+          - ruby: jruby-head # TODO debug: install without frozen mode to see what bundler wants to change
+            os: windows-latest
+            task: spec
+            debug: true
     steps:
     - uses: actions/checkout@master
     - uses: ruby/setup-ruby@v1
       with:
         ruby-version: ${{ matrix.ruby }}
-        bundler-cache: true # runs 'bundle install' and caches installed gems automatically
+        bundler-cache: ${{ !matrix.debug }} # runs 'bundle install' and caches installed gems automatically
+    - if: matrix.debug
+      run: |
+        bundle install
+        git --no-pager diff Gemfile.lock
     - name: rake ${{ matrix.task }}
       # allow ruby/jruby-head to fail since they are moving targets
       # TODO: this will always show green, fix once https://github.com/actions/toolkit/issues/399 is resolved
