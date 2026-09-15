@@ -1,7 +1,8 @@
 # frozen_string_literal: true
 require 'spec_helper'
 
-describe 'CLI' do
+# subprocess output randomly gets lost or duplicated on windows CI, so retry
+describe 'CLI', retry: (Gem.win_platform? ? 3 : 1) do
   before do
     FileUtils.remove_dir(folder, true)
   end

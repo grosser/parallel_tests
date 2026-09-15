@@ -5,6 +5,7 @@ require 'tmpdir'
 require 'timeout'
 
 require 'parallel_tests'
+require 'rspec/retry'
 require 'parallel_tests/test/runtime_logger'
 require 'parallel_tests/rspec/runtime_logger'
 require 'parallel_tests/rspec/summary_logger'
@@ -200,6 +201,10 @@ RSpec.configure do |config|
   config.extend SharedExamples
 
   config.raise_errors_for_deprecations!
+
+  # show what was retried so flakes stay visible
+  config.verbose_retry = true
+  config.display_try_failure_messages = true
 
   # sometimes stuff hangs -> do not hang everything
   # NOTE: the timeout error can sometimes swallow errors, comment it out if you run into trouble
