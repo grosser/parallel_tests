@@ -7,8 +7,11 @@ require 'pathname'
 
 module ParallelTests
   class CLI
+    SIGNALS = %w[INT TERM]
     def run(argv)
-      Signal.trap("INT") { handle_interrupt }
+      SIGNALS.each do |signal|
+        Signal.trap(signal) { handle_interrupt(signal) }
+      end
 
       options = parse_options!(argv)
 
@@ -28,7 +31,7 @@ module ParallelTests
 
     private
 
-    def handle_interrupt
+    def handle_interrupt(signal)
       @graceful_shutdown_attempted ||= false
       Kernel.exit if @graceful_shutdown_attempted
 
@@ -46,7 +49,7 @@ module ParallelTests
       # using Thread workaround https://github.com/ddollar/foreman/issues/332
       Thread.new do
         if Gem.win_platform? || ((child_pid = ParallelTests.pids.all.first) && Process.getpgid(child_pid) != Process.pid)
-          ParallelTests.stop_all_processes
+          ParallelTests.stop_all_processes(signal)
         end
       end
 
