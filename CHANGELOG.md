@@ -9,6 +9,7 @@ only add here if you are working on a PR
 ### Added
 
 ### Fixed
+- `ParallelTests::RSpec::RuntimeLogger` no longer writes RSpec messages like "Run options: ..." into the runtime log
 
 ## 5.8.0 - 2026-09-13
 

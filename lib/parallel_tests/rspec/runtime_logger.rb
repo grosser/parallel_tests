@@ -27,6 +27,8 @@ class ParallelTests::RSpec::RuntimeLogger < ParallelTests::RSpec::LoggerBase
 
   def seed(*); end
 
+  def message(*); end
+
   def dump_summary(*); end
 
   def dump_failures(*); end

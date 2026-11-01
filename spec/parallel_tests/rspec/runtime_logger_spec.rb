@@ -137,5 +137,23 @@ describe ParallelTests::RSpec::RuntimeLogger do
       expect(result).to start_with("spec/slower_spec.rb:3.0")
       expect(result).to include "spec/a_spec.rb:1.5"
     end
+
+    it "does not log messages like the run options" do
+      write "spec/a_spec.rb", <<-RUBY
+        describe "xxx" do
+          it "is tagged", :slow do
+          end
+        end
+      RUBY
+
+      system(
+        { 'TEST_ENV_NUMBER' => '1' },
+        "rspec", "spec", "-I", Bundler.root.join("lib").to_s, "--tag", "slow",
+        "--format", "ParallelTests::RSpec::RuntimeLogger", "--out", "runtime.log"
+      ) || raise("nope")
+
+      result = File.read("runtime.log")
+      expect(result).to match(%r{\Aspec/a_spec.rb:[-.e\d]+\n\z})
+    end
   end
 end
