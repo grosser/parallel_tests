@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 module ParallelTests
   class Grouper
+    BY_SCENARIOS_SUPPORTED_OPTIONS = [:single_process_tag].freeze
+
     class << self
       def by_steps(tests, num_groups, options)
         features_with_steps = group_by_features_with_steps(tests, options)
@@ -9,7 +11,7 @@ module ParallelTests
 
       def by_scenarios(tests, num_groups, options = {})
         scenarios = group_by_scenarios(tests, options)
-        in_even_groups_by_size(scenarios, num_groups)
+        in_even_groups_by_size(scenarios, num_groups, options.slice(*BY_SCENARIOS_SUPPORTED_OPTIONS))
       end
 
       def in_even_groups_by_size(items, num_groups, options = {})
@@ -17,12 +19,8 @@ module ParallelTests
 
         return specify_groups(items, num_groups, options, groups) if options[:specify_groups]
 
-        # add all files that should run in a single process to one group
-        single_process_patterns = options[:single_process] || []
-
-        single_items, items = items.partition do |item, _size|
-          single_process_patterns.any? { |pattern| item =~ pattern }
-        end
+        # add all files/scenarios that should run in a single process to one group
+        single_items, items = separate_single_items(items, options)
 
         isolate_count = isolate_count(options)
 
@@ -37,7 +35,7 @@ module ParallelTests
           group_features_by_size(items_to_group(items), groups[isolate_count..])
         else
           # add all files that should run in a single non-isolated process to first group
-          single_items.each { |item, size| add_to_group(groups.first, item, size) }
+          group_features_by_size(items_to_group(single_items), [groups.first])
 
           # group all by size
           group_features_by_size(items_to_group(items), groups)
@@ -132,6 +130,23 @@ module ParallelTests
         ParallelTests::Cucumber::Scenarios.all(tests, options)
       end
 
+      def separate_single_items(items, options)
+        items.partition { |item| to_single_items?(item, options) }
+      end
+
+      def to_single_items?(item, options)
+        if options[:single_process]
+          item = item_with_tags?(item) || item_with_size?(item) ? item[0] : item
+          options[:single_process].any? { |pattern| item =~ pattern }
+        elsif options[:single_process_tag]
+          raise "--single-tag option can only be used with '--group-by scenarios'" unless item_with_tags?(item)
+          item_tags = item[1]
+          item_tags.any? { |tag| tag.match?(options[:single_process_tag]) }
+        else
+          false
+        end
+      end
+
       def group_features_by_size(items, groups_to_fill)
         items.each do |item, size|
           size ||= 1
@@ -141,7 +156,30 @@ module ParallelTests
       end
 
       def items_to_group(items)
-        items.first && items.first.size == 2 ? largest_first(items) : items
+        return items_without_tags(items) if items_with_tags?(items)
+        return largest_first(items) if items_with_size?(items)
+
+        items
+      end
+
+      def items_with_tags?(items)
+        items.first.is_a?(Array) && item_with_tags?(items.first)
+      end
+
+      def items_with_size?(items)
+        items.first.is_a?(Array) && item_with_size?(items.first)
+      end
+
+      def item_with_tags?(item)
+        item[1].is_a?(Array)
+      end
+
+      def item_with_size?(item)
+        item[1].is_a?(Numeric)
+      end
+
+      def items_without_tags(items)
+        items.map(&:first)
       end
     end
   end
