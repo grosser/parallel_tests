@@ -126,6 +126,8 @@ Test groups will often run for different times, making the full test run as slow
 
 **Step 3**: Automate upload/download of test runtime from your CI system [example](https://github.com/grosser/parallel_rails_example/blob/master/.github/workflows/test.yml) (chunks need to be combined, an alternative is [amend](https://github.com/grosser/amend))
 
+For RSpec on GitHub Actions, [parallel_tests-ci](https://github.com/dblock/parallel_tests-ci) provides a reusable workflow that collects per-file timings, saves them as artifacts, and uses them to rebalance shards on later runs.
+
 ### RSpec
 
 Rspec: Add to your `.rspec_parallel` (or `.rspec`), but can also be used via `--test-options='--format x'`:
